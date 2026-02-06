@@ -1,0 +1,87 @@
+export const typography = {
+  fontFamily: [
+    'var(--font-roboto, Roboto)',
+    'var(--font-noto-sans-tc, "Noto Sans TC")',
+    'sans-serif',
+  ].join(','),
+  h1: {
+    fontWeight: 500,
+    fontSize: 40,
+    lineHeight: '48px',
+    letterSpacing: '0.02em',
+  },
+  h2: {
+    fontWeight: 400,
+    fontSize: 34,
+    lineHeight: '40px',
+    letterSpacing: '0.01em',
+  },
+  h3: {
+    fontWeight: 500,
+    fontSize: 32,
+    lineHeight: '36px',
+    letterSpacing: '0em',
+  },
+  h4: {
+    fontWeight: 500,
+    fontSize: 24,
+    lineHeight: '32px',
+    letterSpacing: '0em',
+  },
+  h5: {
+    fontWeight: 500,
+    fontSize: 20,
+    lineHeight: '26px',
+    letterSpacing: '0em',
+  },
+  h6: {
+    fontWeight: 500,
+    fontSize: 18,
+    lineHeight: '26px',
+    letterSpacing: '0em',
+  },
+  subtitle1: {
+    fontWeight: 400,
+    fontSize: 16,
+    lineHeight: '24px',
+    letterSpacing: '0em',
+  },
+  subtitle2: {
+    fontWeight: 500,
+    fontSize: 16,
+    lineHeight: '24px',
+    letterSpacing: '0em',
+  },
+  body1: {
+    fontWeight: 400,
+    fontSize: 14,
+    lineHeight: '22px',
+    letterSpacing: '0em',
+  },
+  body2: {
+    fontWeight: 500,
+    fontSize: 14,
+    lineHeight: '22px',
+    letterSpacing: '0em',
+  },
+  caption: {
+    fontWeight: 400,
+    fontSize: 12,
+    lineHeight: '22px',
+    letterSpacing: '0em',
+  },
+  button: {
+    fontWeight: 500,
+    fontSize: 14,
+    lineHeight: '22px',
+    letterSpacing: '0em',
+    textTransform: 'uppercase',
+  },
+  overline: {
+    fontWeight: 400,
+    fontSize: 12,
+    lineHeight: '22px',
+    letterSpacing: '0em',
+    textTransform: 'uppercase',
+  },
+} as const;

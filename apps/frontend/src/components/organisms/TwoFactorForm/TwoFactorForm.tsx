@@ -7,7 +7,6 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import { useTranslations } from 'next-intl';
-import { CodeInput } from '@/components/atoms';
 import { Button } from '@/components/atoms';
 import { AlertMessage } from '@/components/molecules';
 
@@ -29,12 +28,6 @@ export function TwoFactorForm({
   const [code, setCode] = useState('');
   const [isBackupCode, setIsBackupCode] = useState(false);
   const t = useTranslations('auth.twoFactor');
-
-  const handleComplete = (completeCode: string) => {
-    if (!loading) {
-      onSubmit(completeCode, isBackupCode);
-    }
-  };
 
   const handleManualSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,14 +60,14 @@ export function TwoFactorForm({
       )}
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <CodeInput
+        {/* <CodeInput
           length={codeLength}
           value={code}
           onChange={setCode}
           onComplete={handleComplete}
           error={Boolean(error)}
           disabled={loading}
-        />
+        /> */}
       </Box>
 
       <FormControlLabel
