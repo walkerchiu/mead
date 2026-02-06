@@ -1,0 +1,115 @@
+// User - 使用者基本資料
+model User {
+  /// 使用者唯一識別碼（UUID v7）
+  id           String        @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 使用者電子郵件地址（唯一，用於登入）
+  email        String        @unique
+  
+  /// 使用者顯示名稱（選填）
+  name         String?
+  
+  /// 密碼雜湊值（bcrypt，不會暴露到 API）
+  password     String
+  
+  /// 使用者可訪問的範圍陣列（PUBLIC_SCOPE, CUSTOMER_SCOPE, ADMIN_SCOPE）
+  accessScopes AccessScope[]
+  
+  /// JWT Refresh Token（用於刷新 Access Token）
+  refreshToken String?       @map("refresh_token") @db.Text
+  
+  /// 最後登入時間戳記
+  lastLoginAt  DateTime?     @map("last_login_at")
+  
+  // === 帳號鎖定欄位 ===
+  /// 連續登入失敗次數
+  failedLoginAttempts Int      @default(0) @map("failed_login_attempts")
+  
+  /// 最後一次登入失敗時間
+  lastFailedLoginAt   DateTime? @map("last_failed_login_at")
+  
+  /// 帳號鎖定至此時間（null 表示未鎖定）
+  lockedUntil         DateTime? @map("locked_until")
+  
+  /// 記錄建立時間
+  createdAt    DateTime      @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  
+  /// 軟刪除時間戳記（null 表示未刪除）
+  deletedAt    DateTime?     @map("deleted_at")
+
+  // === 關聯 ===
+  /// 使用者詳細資料（一對一）
+  profile   Profile?
+  
+  /// 使用者角色關聯（多對多）
+  userRoles UserRole[]
+  
+  /// 密碼重設記錄（一對多）
+  passwordResets PasswordReset[]
+  
+  /// 雙因素認證設定（一對一）
+  twoFactorAuth TwoFactorAuth?
+  
+  /// 雙因素認證驗證記錄（一對多）
+  twoFactorVerifications TwoFactorVerification[]
+  
+  /// 活躍 sessions（一對多）
+  sessions Session[] @relation("UserSessions")
+  
+  /// 撤銷的 sessions（作為撤銷者）
+  revokedSessions Session[] @relation("SessionRevoker")
+
+  // === 索引 ===
+  @@index([email])
+  @@index([deletedAt])
+  @@index([lockedUntil])
+  @@map("users")
+}
+
+// Profile - 使用者詳細資料
+model Profile {
+  /// Profile 唯一識別碼（UUID v7）
+  id        String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID（外鍵，唯一）
+  userId    String    @unique @map("user_id") @db.Uuid
+  
+  /// 個人簡介（文字區塊）
+  bio       String?   @db.Text
+  
+  /// 頭像圖片 URL
+  avatar    String?
+  
+  /// 聯絡電話（敏感資料）
+  phone     String?
+  
+  /// 聯絡地址（敏感資料）
+  address   String?
+  
+  /// 個人網站 URL
+  website   String?
+  
+  /// 偏好語言（ISO 639-1 語言代碼，預設 'en'）
+  language  String    @default("en") @db.VarChar(10)
+  
+  /// 記錄建立時間
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  /// 軟刪除時間戳記
+  deletedAt DateTime? @map("deleted_at")
+
+  // === 關聯 ===
+  /// 關聯的使用者（Cascade 刪除：刪除使用者時自動刪除 Profile）
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引 ===
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("profiles")
+}

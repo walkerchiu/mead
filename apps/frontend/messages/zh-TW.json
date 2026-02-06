@@ -1,0 +1,441 @@
+{
+  "common": {
+    "loading": "載入中...",
+    "submit": "提交",
+    "cancel": "取消",
+    "back": "返回",
+    "logout": "登出",
+    "save": "儲存",
+    "confirm": "確認",
+    "done": "完成",
+    "download": "下載",
+    "unknown": "未知",
+    "all": "全部",
+    "locale": "zh-TW",
+    "refresh": "刷新",
+    "clear": "清除",
+    "close": "關閉",
+    "settings": "設定",
+    "processing": "處理中...",
+    "previous": "上一頁",
+    "next": "下一頁",
+    "error": {
+      "loadFailed": "載入失敗",
+      "permissionDenied": "權限不足",
+      "permissionDeniedMessage": "抱歉，您沒有權限訪問此頁面。",
+      "permissionDeniedDescription": "此頁面僅限管理員訪問。如需協助，請聯繫系統管理員。",
+      "backToHome": "返回首頁"
+    }
+  },
+  "nav": {
+    "home": "首頁",
+    "dashboard": "儀表板",
+    "settings": "設定",
+    "securitySettings": "安全設定"
+  },
+  "auth": {
+    "login": {
+      "title": "登入",
+      "subtitle": "輸入您的帳號資訊以登入系統",
+      "emailLabel": "電子郵件",
+      "passwordLabel": "密碼",
+      "forgotPassword": "忘記密碼？",
+      "submit": "登入",
+      "success": "登入成功",
+      "error": "登入失敗，請檢查您的電子郵件和密碼",
+      "failed": "登入失敗",
+      "retry": "重試"
+    },
+    "forgotPassword": {
+      "title": "忘記密碼",
+      "subtitle": "輸入您的電子郵件地址，我們將發送密碼重設連結給您",
+      "submit": "發送重設連結",
+      "success": "重設密碼郵件已發送，請檢查您的信箱",
+      "successTitle": "檢查您的郵箱",
+      "successMessage": "我們已將密碼重設連結發送到您的電子郵件地址。請檢查您的郵箱並點擊連結以重設密碼。",
+      "successHint": "如果您沒有收到郵件，請檢查垃圾郵件資料夾。",
+      "backToLogin": "返回登入",
+      "error": "請求失敗，請稍後再試"
+    },
+    "resetPassword": {
+      "title": "重設密碼",
+      "subtitle": "請輸入您的新密碼",
+      "newPassword": "新密碼",
+      "confirmPassword": "確認密碼",
+      "submit": "重設密碼",
+      "success": "密碼重設成功！即將跳轉到登入頁...",
+      "successTitle": "密碼已重設",
+      "successMessage": "您的密碼已成功重設。現在您可以使用新密碼登入。",
+      "invalidToken": "重設連結無效或已過期。請重新請求密碼重設。",
+      "invalidTokenTitle": "連結已失效",
+      "backToForgotPassword": "返回忘記密碼頁面",
+      "missingToken": "缺少重設 Token",
+      "error": "密碼重設失敗，請稍後再試",
+      "passwordRequirements": "密碼必須符合以下條件：",
+      "minLength": "至少 8 個字元",
+      "uppercase": "至少一個大寫英文字母",
+      "lowercase": "至少一個小寫英文字母",
+      "number": "至少一個數字",
+      "helperText": "至少 8 個字元",
+      "confirmHelperText": "再次輸入新密碼"
+    },
+    "twoFactor": {
+      "title": "雙因素認證",
+      "subtitle": "驗證碼已發送到您的電子郵件",
+      "codeLabel": "驗證碼",
+      "backupCodeLabel": "備用驗證碼",
+      "submit": "驗證",
+      "useBackupCode": "使用備用驗證碼",
+      "backToLogin": "返回登入",
+      "codeInfo": "請輸入您在電子郵件中收到的 6 位數驗證碼。驗證碼將在 10 分鐘後過期。",
+      "codeRequired": "請輸入 6 位數驗證碼",
+      "codeTooLong": "驗證碼過長",
+      "verificationFailed": "驗證失敗",
+      "codeInvalid": "驗證碼錯誤或已過期",
+      "subtitleBackup": "請輸入備用碼",
+      "retry": "重試"
+    },
+    "twoFactorSettings": {
+      "title": "雙因素認證 (2FA)",
+      "enabled": "已啟用",
+      "disabled": "未啟用",
+      "description": "雙因素認證為您的帳號增加額外的安全層。啟用後，登入時除了密碼外，還需要輸入發送到您電子郵件的驗證碼。",
+      "enable": "啟用 2FA",
+      "disable": "停用 2FA",
+      "type": "類型",
+      "lastVerified": "最後驗證時間",
+      "confirmEnableTitle": "確認啟用雙因素認證",
+      "confirmEnableMessage": "驗證碼已發送到您的電子郵件，請在 10 分鐘內輸入。",
+      "confirmDisableTitle": "確認停用雙因素認證",
+      "confirmDisableWarning": "停用雙因素認證會降低您帳號的安全性。驗證碼已發送到您的電子郵件。",
+      "confirmDisable": "確認停用",
+      "verificationCodeSent": "驗證碼已發送到您的電子郵件",
+      "enableSuccess": "雙因素認證已啟用",
+      "disableSuccess": "雙因素認證已停用",
+      "enterCode": "請輸入驗證碼",
+      "backupCodesTitle": "備用驗證碼",
+      "backupCodesWarning": "請妥善保存這些備用驗證碼！每個驗證碼只能使用一次，當您無法收到電子郵件時可以使用。",
+      "requestFailed": "請求失敗",
+      "verificationFailed": "驗證失敗",
+      "email": "電子郵件",
+      "never": "從未"
+    }
+  },
+  "validation": {
+    "email": {
+      "required": "請輸入電子郵件",
+      "invalid": "請輸入有效的電子郵件地址",
+      "alreadyUsed": "此電子郵件已被使用"
+    },
+    "password": {
+      "required": "請輸入密碼",
+      "minLength": "密碼至少需要 8 個字元",
+      "uppercase": "密碼必須包含至少一個大寫字母",
+      "lowercase": "密碼必須包含至少一個小寫字母",
+      "number": "密碼必須包含至少一個數字",
+      "specialChar": "密碼必須包含至少一個特殊字元",
+      "mismatch": "密碼不一致",
+      "currentIncorrect": "當前密碼不正確",
+      "mustBeDifferent": "新密碼必須與當前密碼不同"
+    },
+    "name": {
+      "maxLength": "名稱不可超過 {max} 個字元"
+    },
+    "bio": {
+      "maxLength": "個人簡介不可超過 500 字元"
+    },
+    "website": {
+      "invalid": "請輸入有效的網址"
+    },
+    "language": {
+      "invalid": "請選擇有效的語言"
+    },
+    "twoFactorCode": {
+      "required": "請輸入驗證碼",
+      "length": "請輸入 6 位數驗證碼"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "歡迎使用 Starter",
+      "subtitle": "Next.js 16 + NestJS 11 + GraphQL + MUI 7",
+      "description": "完整的認證系統：登入、密碼重設、雙因素認證",
+      "login": "登入",
+      "dashboard": "Dashboard"
+    },
+    "dashboard": {
+      "title": "Starter Dashboard",
+      "welcome": "歡迎回來！",
+      "description": "您已成功登入系統。",
+      "securitySettings": "安全設定",
+      "backToHome": "返回首頁",
+      "loggedOut": "已登出",
+      "cards": {
+        "auditLogs": {
+          "title": "審計日誌",
+          "description": "查看系統操作記錄、使用者活動和安全事件（需要管理員權限）",
+          "action": "查看日誌"
+        },
+        "sessions": {
+          "title": "會話管理",
+          "description": "管理使用者登入狀態、撤銷會話和監控裝置活動（需要管理員權限）",
+          "action": "管理會話"
+        }
+      }
+    },
+    "settings": {
+      "navigation": {
+        "profile": "個人資料",
+        "security": "安全設定"
+      },
+      "security": {
+        "title": "安全設定",
+        "description": "管理您的帳號安全設定"
+      },
+      "profile": {
+        "title": "個人資料設定",
+        "description": "管理您的個人資訊和偏好設定",
+        "basicInfo": "基本資訊",
+        "profileDetails": "詳細資料",
+        "changePassword": "修改密碼",
+        "email": "電子郵件地址",
+        "emailHelper": "用於登入和通知",
+        "name": "顯示名稱",
+        "nameHelper": "您的名稱將顯示在系統中",
+        "bio": "個人簡介",
+        "bioHelper": "向其他人介紹您自己（最多 500 字元）",
+        "phone": "聯絡電話",
+        "phoneHelper": "您的聯絡電話號碼",
+        "address": "聯絡地址",
+        "addressHelper": "您的聯絡地址",
+        "website": "個人網站",
+        "websiteHelper": "您的個人網站或部落格網址",
+        "language": "偏好語言",
+        "languageHelper": "電子郵件和介面的顯示語言",
+        "currentPassword": "當前密碼",
+        "currentPasswordHelper": "輸入您的當前密碼以驗證身份",
+        "newPassword": "新密碼",
+        "newPasswordHelper": "至少 8 個字元，包含大小寫字母、數字和特殊字元",
+        "confirmPassword": "確認新密碼",
+        "confirmPasswordHelper": "再次輸入您的新密碼",
+        "revokeOtherDevices": "登出其他設備",
+        "revokeOtherDevicesHelper": "修改密碼後將其他所有設備登出",
+        "updateSuccess": "個人資料更新成功",
+        "updateProfileSuccess": "基本資訊更新成功",
+        "updateDetailsSuccess": "詳細資料更新成功",
+        "passwordChanged": "密碼修改成功",
+        "updateError": "更新個人資料失敗"
+      }
+    },
+    "admin": {
+      "auditLogs": {
+        "title": "審計日誌",
+        "description": "查看系統操作記錄、使用者活動和安全事件",
+        "refresh": "重新整理",
+        "newLogs": "有 {count} 筆新日誌，點擊重新整理",
+        "newLogsOnOtherPage": "第 1 頁有 {count} 筆新日誌，點擊查看",
+        "viewNew": "查看新日誌",
+        "loadError": "載入失敗",
+        "noData": "暫無稽核日誌",
+        "loading": "載入中...",
+        "filters": {
+          "title": "篩選條件",
+          "userId": "使用者 ID",
+          "userIdPlaceholder": "輸入使用者 ID",
+          "action": "操作",
+          "actionPlaceholder": "輸入操作名稱（如：QUERY_SESSIONSTATISTICS）",
+          "actionHelper": "支援模糊搜尋，輸入關鍵字即可",
+          "entity": "實體",
+          "entityPlaceholder": "輸入實體名稱（如：SESSION）",
+          "entityHelper": "支援模糊搜尋，輸入關鍵字即可",
+          "status": "狀態",
+          "success": "成功",
+          "failure": "失敗",
+          "apply": "套用篩選",
+          "clear": "清除篩選"
+        },
+        "stats": {
+          "totalCount": "總日誌數",
+          "successRate": "成功率",
+          "failureCount": "失敗數",
+          "topAction": "熱門操作",
+          "actionCount": "{count} 次",
+          "times": "次",
+          "noData": "無資料"
+        },
+        "table": {
+          "title": "稽核日誌列表",
+          "timestamp": "時間",
+          "user": "使用者",
+          "action": "操作",
+          "entity": "實體",
+          "status": "狀態",
+          "method": "方法",
+          "path": "路徑",
+          "ip": "IP",
+          "duration": "執行時間",
+          "success": "成功",
+          "failure": "失敗",
+          "unknown": "未知",
+          "noData": "暫無稽核日誌",
+          "page": "第 {current} 頁，共 {total} 頁",
+          "firstPage": "第一頁",
+          "lastPage": "最後一頁",
+          "totalRecords": "共 {count} 筆"
+        }
+      },
+      "sessions": {
+        "title": "會話管理",
+        "description": "管理使用者登入狀態、撤銷會話和監控裝置活動",
+        "sessionList": "會話列表",
+        "batchRevoke": "批量撤銷會話",
+        "stats": {
+          "activeCount": "活躍會話",
+          "revokedCount": "已撤銷會話",
+          "expiredCount": "過期會話",
+          "topDevice": "最常用設備",
+          "sessions": "個會話",
+          "noData": "無數據"
+        },
+        "filters": {
+          "title": "篩選條件",
+          "userId": "用戶 ID",
+          "userIdPlaceholder": "輸入用戶 ID",
+          "status": "狀態",
+          "ipAddress": "IP 地址",
+          "ipAddressPlaceholder": "例如：192.168.1.1",
+          "deviceInfo": "設備資訊",
+          "deviceInfoPlaceholder": "例如：Chrome、iPhone",
+          "location": "地理位置",
+          "locationPlaceholder": "例如：台灣",
+          "statuses": {
+            "active": "活躍",
+            "expired": "過期",
+            "revoked": "已撤銷"
+          }
+        },
+        "table": {
+          "user": "用戶",
+          "status": "狀態",
+          "device": "設備",
+          "ipAddress": "IP 地址",
+          "location": "位置",
+          "createdAt": "創建時間",
+          "lastUsedAt": "最後使用",
+          "actions": "操作",
+          "viewDetails": "查看詳情",
+          "revokeSession": "撤銷會話",
+          "totalCount": "共 {count} 個會話",
+          "noSessions": "未找到會話",
+          "noSessionsDescription": "沒有符合篩選條件的會話。",
+          "revokeSuccess": "會話已成功撤銷",
+          "statuses": {
+            "active": "活躍",
+            "expired": "過期",
+            "revoked": "已撤銷"
+          }
+        },
+        "details": {
+          "title": "會話詳情",
+          "userInfo": "用戶資訊",
+          "userName": "姓名",
+          "userEmail": "電子郵件",
+          "userId": "用戶 ID",
+          "deviceInfo": "設備資訊",
+          "browser": "瀏覽器",
+          "os": "操作系統",
+          "deviceDetails": "設備詳情",
+          "locationInfo": "位置資訊",
+          "ipAddress": "IP 地址",
+          "location": "位置",
+          "timeInfo": "時間資訊",
+          "createdAt": "創建時間",
+          "lastUsedAt": "最後使用時間",
+          "expiresAt": "過期時間",
+          "revocationInfo": "撤銷資訊",
+          "revokedAt": "撤銷時間",
+          "revokedBy": "撤銷者",
+          "revokerEmail": "撤銷者郵箱",
+          "revokedReason": "撤銷原因",
+          "revokedMethod": "撤銷方式",
+          "sessionId": "會話 ID",
+          "revokeSession": "撤銷此會話",
+          "statuses": {
+            "active": "活躍",
+            "expired": "過期",
+            "revoked": "已撤銷"
+          }
+        },
+        "revokeModal": {
+          "title": "撤銷會話",
+          "warning": "此操作將立即終止用戶的會話，用戶需要重新登錄。",
+          "targetUser": "目標用戶",
+          "reason": "原因",
+          "reasonPlaceholder": "例如：安全疑慮、可疑活動",
+          "sendNotification": "向用戶發送電子郵件通知",
+          "customMessage": "自訂訊息（選填）",
+          "customMessagePlaceholder": "給用戶的額外訊息",
+          "customMessageHelp": "此訊息將包含在通知郵件中",
+          "confirm": "撤銷會話",
+          "defaultReason": "管理員撤銷會話",
+          "error": "撤銷會話失敗",
+          "errorMessage": "撤銷會話失敗，請稍後再試或聯繫系統管理員。",
+          "errors": {
+            "sessionNotFound": "找不到該會話，可能已被刪除",
+            "sessionAlreadyRevoked": "該會話已被撤銷",
+            "cannotRevokeAdmin": "無法撤銷其他管理員的會話",
+            "cannotRevokeCurrent": "無法撤銷當前會話，請使用登出功能",
+            "notAuthenticated": "用戶未登入",
+            "ownSessionsOnly": "您只能操作自己的會話",
+            "userNotFound": "找不到目標用戶"
+          }
+        },
+        "batchRevokeModal": {
+          "title": "批量撤銷會話",
+          "warning": "⚠️ 危險：此操作將撤銷所有符合條件的會話，用戶將立即被登出。",
+          "tabs": {
+            "criteria": "篩選條件",
+            "options": "選項與通知"
+          },
+          "criteriaDescription": "至少選擇一個條件。多個條件將使用 AND 邏輯組合。",
+          "userIds": "用戶 ID",
+          "userIdsPlaceholder": "UUID1, UUID2, UUID3...",
+          "userIdsHelp": "用逗號分隔的用戶 ID",
+          "ipAddress": "IP 地址模式",
+          "ipAddressPlaceholder": "例如：192.168",
+          "ipAddressHelp": "支援部分匹配",
+          "deviceInfo": "設備資訊模式",
+          "deviceInfoPlaceholder": "例如：Chrome、iPhone",
+          "deviceInfoHelp": "支援部分匹配",
+          "inactiveDays": "閒置天數",
+          "inactiveDaysHelp": "最近 N 天未使用的會話",
+          "createdBeforeDays": "創建超過天數",
+          "createdBeforeDaysHelp": "創建超過 N 天的會話",
+          "reason": "原因",
+          "reasonPlaceholder": "例如：安全審計、清理閒置會話",
+          "sendNotification": "發送電子郵件通知",
+          "notificationInfo": "對於批量操作，預設不發送通知以避免垃圾郵件。僅在必要時啟用。",
+          "customMessage": "自訂訊息（選填）",
+          "customMessagePlaceholder": "給受影響用戶的訊息",
+          "customMessageHelp": "此訊息將包含在通知郵件中",
+          "confirm": "撤銷會話",
+          "defaultReason": "管理員批量清理會話",
+          "error": "批量撤銷會話失敗"
+        },
+        "revokeOtherDevicesModal": {
+          "title": "撤銷其他設備",
+          "info": "此操作將登出所有其他設備，但保留您當前的會話。",
+          "description": "當您懷疑有未授權訪問或想確保只有您一個人登錄時，此功能很有用。",
+          "currentDevice": "✓ 當前設備",
+          "currentDeviceDescription": "您的當前會話將保持活躍",
+          "reason": "原因（選填）",
+          "reasonPlaceholder": "例如：安全檢查",
+          "reasonHelp": "這將被記錄在審計日誌中",
+          "confirm": "撤銷其他設備",
+          "defaultReason": "用戶撤銷其他設備",
+          "error": "撤銷其他設備失敗"
+        }
+      }
+    }
+  }
+}

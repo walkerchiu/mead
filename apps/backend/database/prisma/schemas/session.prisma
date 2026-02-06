@@ -1,0 +1,63 @@
+// Session - 使用者登入 Session 管理
+// 用於追蹤活躍裝置和實施「登出所有裝置」功能
+model Session {
+  /// Session 唯一識別碼（UUID v7）
+  id String @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID
+  userId String @map("user_id") @db.Uuid
+  
+  /// Refresh Token 雜湊值（用於識別特定 session）
+  refreshTokenHash String @map("refresh_token_hash") @db.Text
+  
+  /// 裝置資訊（User-Agent）
+  deviceInfo String? @map("device_info") @db.Text
+  
+  /// 裝置類型（desktop, mobile, tablet）
+  deviceType String? @map("device_type")
+  
+  /// 瀏覽器資訊
+  browser String?
+  
+  /// 作業系統資訊
+  os String?
+  
+  /// 登入 IP 位址
+  ipAddress String? @map("ip_address")
+  
+  /// 地理位置資訊（城市/國家）
+  location String?
+  
+  /// 最後一次使用時間（每次 refresh token 時更新）
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+  
+  /// Session 建立時間
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  /// Session 過期時間
+  expiresAt DateTime @map("expires_at")
+  
+  /// Session 撤銷時間（手動登出）
+  revokedAt DateTime? @map("revoked_at")
+  
+  /// 撤銷者 ID（Admin 強制登出時記錄）
+  revokedBy String? @map("revoked_by") @db.Uuid
+  
+  /// 撤銷原因
+  revokedReason String? @map("revoked_reason") @db.Text
+  
+  /// 撤銷方式（user_logout/admin_force/batch_revoke/security_measure）
+  revokedMethod String? @map("revoked_method")
+
+  // === 關聯 ===
+  user User @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  revoker User? @relation("SessionRevoker", fields: [revokedBy], references: [id], onDelete: SetNull)
+
+  // === 索引 ===
+  @@index([userId, revokedAt])
+  @@index([refreshTokenHash])
+  @@index([expiresAt])
+  @@index([revokedBy])
+  @@index([lastUsedAt])
+  @@map("sessions")
+}

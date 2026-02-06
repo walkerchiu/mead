@@ -1,0 +1,32 @@
+{
+  "password": {
+    "strengthFailed": "Password does not meet strength requirements",
+    "minLength": "Password must be at least 8 characters long",
+    "uppercase": "Password must contain at least one uppercase letter",
+    "lowercase": "Password must contain at least one lowercase letter",
+    "number": "Password must contain at least one number",
+    "specialChar": "Password must contain at least one special character (!@#$%^&* etc.)",
+    "tooCommon": "Password is too common, please choose a more unique password",
+    "similarToEmail": "Password should not contain your email address",
+    "similarToName": "Password should not contain your name",
+    "similarToUsername": "Password should not contain your username",
+    "currentIncorrect": "Current password is incorrect",
+    "mustBeDifferent": "New password must be different from current password"
+  },
+  "email": {
+    "invalid": "Invalid email format",
+    "alreadyUsed": "This email address is already in use"
+  },
+  "name": {
+    "maxLength": "Name must not exceed {max} characters"
+  },
+  "website": {
+    "invalid": "Invalid website URL format"
+  },
+  "language": {
+    "invalid": "Invalid language selection"
+  },
+  "user": {
+    "notFound": "User not found"
+  }
+}

@@ -1,0 +1,41 @@
+// Role - 角色
+// 在每個 AccessScope 內的角色定義，用於群組權限管理
+model Role {
+  /// 角色唯一識別碼（UUID v7）
+  id          String      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 角色名稱（例如：SUPER_ADMIN, OWNER, MEMBER, GUEST）
+  name        String
+  
+  /// 角色顯示名稱（用於 UI，例如：「超級管理員」「專案擁有者」）
+  displayName String      @map("display_name")
+  
+  /// 此角色所屬的訪問範圍（ADMIN_SCOPE, CUSTOMER_SCOPE, PUBLIC_SCOPE）
+  scope       AccessScope
+  
+  /// 角色說明描述
+  description String?     @db.Text
+  
+  /// 是否為系統預設角色（系統角色不可刪除或修改）
+  isSystem    Boolean     @default(false) @map("is_system")
+  
+  /// 記錄建立時間
+  createdAt   DateTime    @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // === 關聯 ===
+  /// 使用者角色關聯（多對多）
+  userRoles       UserRole[]
+  
+  /// 角色權限關聯（多對多）
+  rolePermissions RolePermission[]
+
+  // === 索引與約束 ===
+  /// 同一 scope 內角色名稱唯一（例如：ADMIN_SCOPE 可以有 VIEWER，CUSTOMER_SCOPE 也可以有 VIEWER）
+  @@unique([name, scope])
+  @@index([scope])
+  @@index([isSystem])
+  @@map("roles")
+}

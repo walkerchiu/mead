@@ -1,0 +1,553 @@
+// This file is auto-generated. DO NOT EDIT manually.
+// Edit files in prisma/schemas/ instead and run: pnpm db:merge-schemas
+// Generated at: 2026-02-06T04:42:42.353Z
+
+// ============================================
+// Source: base.prisma
+// ============================================
+
+// Prisma 設定
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Source: access-scope.prisma
+// ============================================
+
+// AccessScope - 訪問範圍枚舉
+// 決定使用者可以訪問哪個介面
+enum AccessScope {
+  PUBLIC_SCOPE    // 公開頁面訪問
+  CUSTOMER_SCOPE  // 客戶儀表板訪問  
+  ADMIN_SCOPE     // 管理後台訪問
+}
+
+// ============================================
+// Source: audit-log.prisma
+// ============================================
+
+// AuditLog - 稽核日誌
+// 記錄所有系統操作（成功或失敗）用於安全審計和問題追蹤
+model AuditLog {
+  /// 稽核日誌唯一識別碼（UUID v7）
+  id          String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 請求追蹤 ID（用於關聯同一請求的多筆日誌）
+  requestId   String   @map("request_id") @db.Uuid
+  
+  /// 執行操作的使用者 ID（null 表示未登入使用者）
+  userId      String?  @map("user_id") @db.Uuid
+  
+  /// 操作類型（例如：CREATE_USER, UPDATE_POST, DELETE_COMMENT, LOGIN, LOGOUT）
+  action      String
+  
+  /// 實體類型（例如：User, Post, Comment, Role, Permission）
+  entity      String
+  
+  /// 被操作的實體 ID（null 表示操作不針對特定實體，如列表查詢）
+  entityId    String?  @map("entity_id") @db.Uuid
+  
+  /// 操作狀態（SUCCESS: 成功, FAILURE: 失敗）
+  status      String
+  
+  /// HTTP 方法或 GraphQL 操作類型（例如：GET, POST, query, mutation）
+  method      String?
+  
+  /// 請求路徑或 GraphQL operation 名稱
+  path        String?
+  
+  /// 請求來源 IP 位址
+  ipAddress   String?  @map("ip_address")
+  
+  /// 使用者代理字串（瀏覽器/客戶端資訊）
+  userAgent   String?  @map("user_agent") @db.Text
+  
+  /// 額外詳細資訊（JSON 格式）
+  /// 包含：操作前後的資料差異、錯誤訊息、驗證失敗原因等
+  details     Json?
+  
+  /// 操作執行時間（毫秒）
+  duration    Int?
+  
+  /// 日誌記錄時間戳記
+  timestamp   DateTime @default(now())
+
+  // === 索引（優化查詢效能）===
+  @@index([requestId])
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+  @@index([entity, entityId, timestamp(sort: Desc)])
+  @@index([status, timestamp(sort: Desc)])
+  @@index([timestamp(sort: Desc)])
+  @@map("audit_logs")
+}
+
+// ============================================
+// Source: metric.prisma
+// ============================================
+
+// Metric - TimescaleDB 時間序列資料
+model Metric {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  name      String
+  value     Float
+  tags      Json?
+  timestamp DateTime @default(now())
+
+  // 索引（時間序列優化）
+  @@index([timestamp(sort: Desc)])
+  @@index([name, timestamp(sort: Desc)])
+  @@map("metrics")
+}
+
+// ============================================
+// Source: password-reset.prisma
+// ============================================
+
+// PasswordReset - 密碼重置請求
+// 用於安全的密碼重置流程，採用一次性 token 機制
+model PasswordReset {
+  /// 密碼重置記錄唯一識別碼（UUID v7）
+  id        String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 請求重置密碼的使用者 ID
+  userId    String    @map("user_id") @db.Uuid
+  
+  /// 重置 Token 的雜湊值（bcrypt hash，原始 token 僅在 email 中發送）
+  token     String    @unique
+  
+  /// Token 過期時間（預設 30 分鐘）
+  expiresAt DateTime  @map("expires_at")
+  
+  /// Token 使用時間戳記（null 表示未使用，非 null 表示已使用且不可重複使用）
+  usedAt    DateTime? @map("used_at")
+  
+  /// 請求來源 IP 位址（用於安全審計）
+  ipAddress String?   @map("ip_address")
+  
+  /// 記錄建立時間
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // === 關聯 ===
+  /// 關聯的使用者（Cascade 刪除：刪除使用者時自動刪除所有重置記錄）
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引（優化查詢效能）===
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@index([createdAt(sort: Desc)])
+  @@map("password_resets")
+}
+
+// ============================================
+// Source: permission.prisma
+// ============================================
+
+// Permission - 權限
+// 系統中所有細粒度權限的定義，採用 resource:action 命名方式
+model Permission {
+  /// 權限唯一識別碼（UUID v7）
+  id          String      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 權限名稱（格式：resource:action，例如：users:create, projects:edit）
+  name        String
+  
+  /// 資源名稱（例如：users, projects, billing, audit-logs）
+  resource    String
+  
+  /// 動作名稱（例如：create, read, update, delete, list, manage, export）
+  action      String
+  
+  /// 此權限所屬的訪問範圍（ADMIN_SCOPE, CUSTOMER_SCOPE, PUBLIC_SCOPE）
+  scope       AccessScope
+  
+  /// 權限說明描述
+  description String?     @db.Text
+  
+  /// 記錄建立時間
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  // === 關聯 ===
+  /// 角色權限關聯（多對多）
+  rolePermissions RolePermission[]
+
+  // === 索引和約束 ===
+  /// 同一個權限名稱可在不同 scope 存在（例如：ADMIN_SCOPE 的 users:read 和 CUSTOMER_SCOPE 的 users:read）
+  @@unique([name, scope], name: "name_scope")
+  @@index([resource, action])
+  @@index([scope])
+  @@index([resource])
+  @@map("permissions")
+}
+
+// ============================================
+// Source: role-permission.prisma
+// ============================================
+
+// RolePermission - 角色權限關聯表（多對多）
+model RolePermission {
+  id           String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  roleId       String   @map("role_id") @db.Uuid
+  permissionId String   @map("permission_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // 關聯
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  // 索引與約束
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
+// ============================================
+// Source: role.prisma
+// ============================================
+
+// Role - 角色
+// 在每個 AccessScope 內的角色定義，用於群組權限管理
+model Role {
+  /// 角色唯一識別碼（UUID v7）
+  id          String      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 角色名稱（例如：SUPER_ADMIN, OWNER, MEMBER, GUEST）
+  name        String
+  
+  /// 角色顯示名稱（用於 UI，例如：「超級管理員」「專案擁有者」）
+  displayName String      @map("display_name")
+  
+  /// 此角色所屬的訪問範圍（ADMIN_SCOPE, CUSTOMER_SCOPE, PUBLIC_SCOPE）
+  scope       AccessScope
+  
+  /// 角色說明描述
+  description String?     @db.Text
+  
+  /// 是否為系統預設角色（系統角色不可刪除或修改）
+  isSystem    Boolean     @default(false) @map("is_system")
+  
+  /// 記錄建立時間
+  createdAt   DateTime    @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // === 關聯 ===
+  /// 使用者角色關聯（多對多）
+  userRoles       UserRole[]
+  
+  /// 角色權限關聯（多對多）
+  rolePermissions RolePermission[]
+
+  // === 索引與約束 ===
+  /// 同一 scope 內角色名稱唯一（例如：ADMIN_SCOPE 可以有 VIEWER，CUSTOMER_SCOPE 也可以有 VIEWER）
+  @@unique([name, scope])
+  @@index([scope])
+  @@index([isSystem])
+  @@map("roles")
+}
+
+// ============================================
+// Source: session.prisma
+// ============================================
+
+// Session - 使用者登入 Session 管理
+// 用於追蹤活躍裝置和實施「登出所有裝置」功能
+model Session {
+  /// Session 唯一識別碼（UUID v7）
+  id String @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID
+  userId String @map("user_id") @db.Uuid
+  
+  /// Refresh Token 雜湊值（用於識別特定 session）
+  refreshTokenHash String @map("refresh_token_hash") @db.Text
+  
+  /// 裝置資訊（User-Agent）
+  deviceInfo String? @map("device_info") @db.Text
+  
+  /// 裝置類型（desktop, mobile, tablet）
+  deviceType String? @map("device_type")
+  
+  /// 瀏覽器資訊
+  browser String?
+  
+  /// 作業系統資訊
+  os String?
+  
+  /// 登入 IP 位址
+  ipAddress String? @map("ip_address")
+  
+  /// 地理位置資訊（城市/國家）
+  location String?
+  
+  /// 最後一次使用時間（每次 refresh token 時更新）
+  lastUsedAt DateTime @default(now()) @map("last_used_at")
+  
+  /// Session 建立時間
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  /// Session 過期時間
+  expiresAt DateTime @map("expires_at")
+  
+  /// Session 撤銷時間（手動登出）
+  revokedAt DateTime? @map("revoked_at")
+  
+  /// 撤銷者 ID（Admin 強制登出時記錄）
+  revokedBy String? @map("revoked_by") @db.Uuid
+  
+  /// 撤銷原因
+  revokedReason String? @map("revoked_reason") @db.Text
+  
+  /// 撤銷方式（user_logout/admin_force/batch_revoke/security_measure）
+  revokedMethod String? @map("revoked_method")
+
+  // === 關聯 ===
+  user User @relation("UserSessions", fields: [userId], references: [id], onDelete: Cascade)
+  revoker User? @relation("SessionRevoker", fields: [revokedBy], references: [id], onDelete: SetNull)
+
+  // === 索引 ===
+  @@index([userId, revokedAt])
+  @@index([refreshTokenHash])
+  @@index([expiresAt])
+  @@index([revokedBy])
+  @@index([lastUsedAt])
+  @@map("sessions")
+}
+
+// ============================================
+// Source: two-factor-auth.prisma
+// ============================================
+
+// TwoFactorAuth - 雙因素認證
+// 支援多種 2FA 類型：EMAIL, TOTP, SMS（未來可擴展）
+model TwoFactorAuth {
+  /// 2FA 記錄唯一識別碼（UUID v7）
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID
+  userId    String   @unique @map("user_id") @db.Uuid
+  
+  /// 2FA 類型（EMAIL: 郵件驗證碼, TOTP: 時間型一次性密碼, SMS: 簡訊驗證碼）
+  type      String   @default("EMAIL") // EMAIL, TOTP, SMS
+  
+  /// 是否已啟用 2FA
+  enabled   Boolean  @default(false)
+  
+  /// TOTP 密鑰（僅用於 TOTP 類型，加密儲存）
+  secret    String?  @db.Text
+  
+  /// 備用驗證碼（JSON 陣列，已使用的會被標記）
+  /// 格式：[{"code": "ABC123", "used": false, "usedAt": null}, ...]
+  backupCodes Json?
+  
+  /// 最後驗證成功時間
+  lastVerifiedAt DateTime? @map("last_verified_at")
+  
+  /// 記錄建立時間
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  // === 關聯 ===
+  /// 關聯的使用者（Cascade 刪除：刪除使用者時自動刪除 2FA 設定）
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引 ===
+  @@index([userId])
+  @@index([enabled])
+  @@map("two_factor_auth")
+}
+
+// TwoFactorVerification - 2FA 驗證記錄（用於 Email/SMS 驗證碼）
+model TwoFactorVerification {
+  /// 驗證記錄唯一識別碼（UUID v7）
+  id        String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID
+  userId    String    @map("user_id") @db.Uuid
+  
+  /// 驗證類型（LOGIN: 登入驗證, ENABLE: 啟用 2FA, DISABLE: 停用 2FA）
+  purpose   String    // LOGIN, ENABLE, DISABLE
+  
+  /// 驗證碼（已加密）
+  code      String
+  
+  /// 過期時間（預設 10 分鐘）
+  expiresAt DateTime  @map("expires_at")
+  
+  /// 驗證成功時間（null 表示未驗證）
+  verifiedAt DateTime? @map("verified_at")
+  
+  /// 嘗試次數（防止暴力破解）
+  attempts  Int       @default(0)
+  
+  /// 請求來源 IP 位址
+  ipAddress String?   @map("ip_address")
+  
+  /// 記錄建立時間
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  // === 關聯 ===
+  /// 關聯的使用者（Cascade 刪除）
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引 ===
+  @@index([userId, purpose])
+  @@index([expiresAt])
+  @@index([createdAt(sort: Desc)])
+  @@map("two_factor_verifications")
+}
+
+// ============================================
+// Source: user-role.prisma
+// ============================================
+
+// UserRole - 使用者角色關聯表（多對多）
+model UserRole {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  grantedAt DateTime @default(now()) @map("granted_at")
+  grantedBy String?  @map("granted_by") @db.Uuid // 誰授予的
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  // 索引與約束
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// ============================================
+// Source: user.prisma
+// ============================================
+
+// User - 使用者基本資料
+model User {
+  /// 使用者唯一識別碼（UUID v7）
+  id           String        @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 使用者電子郵件地址（唯一，用於登入）
+  email        String        @unique
+  
+  /// 使用者顯示名稱（選填）
+  name         String?
+  
+  /// 密碼雜湊值（bcrypt，不會暴露到 API）
+  password     String
+  
+  /// 使用者可訪問的範圍陣列（PUBLIC_SCOPE, CUSTOMER_SCOPE, ADMIN_SCOPE）
+  accessScopes AccessScope[]
+  
+  /// JWT Refresh Token（用於刷新 Access Token）
+  refreshToken String?       @map("refresh_token") @db.Text
+  
+  /// 最後登入時間戳記
+  lastLoginAt  DateTime?     @map("last_login_at")
+  
+  // === 帳號鎖定欄位 ===
+  /// 連續登入失敗次數
+  failedLoginAttempts Int      @default(0) @map("failed_login_attempts")
+  
+  /// 最後一次登入失敗時間
+  lastFailedLoginAt   DateTime? @map("last_failed_login_at")
+  
+  /// 帳號鎖定至此時間（null 表示未鎖定）
+  lockedUntil         DateTime? @map("locked_until")
+  
+  /// 記錄建立時間
+  createdAt    DateTime      @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  
+  /// 軟刪除時間戳記（null 表示未刪除）
+  deletedAt    DateTime?     @map("deleted_at")
+
+  // === 關聯 ===
+  /// 使用者詳細資料（一對一）
+  profile   Profile?
+  
+  /// 使用者角色關聯（多對多）
+  userRoles UserRole[]
+  
+  /// 密碼重設記錄（一對多）
+  passwordResets PasswordReset[]
+  
+  /// 雙因素認證設定（一對一）
+  twoFactorAuth TwoFactorAuth?
+  
+  /// 雙因素認證驗證記錄（一對多）
+  twoFactorVerifications TwoFactorVerification[]
+  
+  /// 活躍 sessions（一對多）
+  sessions Session[] @relation("UserSessions")
+  
+  /// 撤銷的 sessions（作為撤銷者）
+  revokedSessions Session[] @relation("SessionRevoker")
+
+  // === 索引 ===
+  @@index([email])
+  @@index([deletedAt])
+  @@index([lockedUntil])
+  @@map("users")
+}
+
+// Profile - 使用者詳細資料
+model Profile {
+  /// Profile 唯一識別碼（UUID v7）
+  id        String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 關聯的使用者 ID（外鍵，唯一）
+  userId    String    @unique @map("user_id") @db.Uuid
+  
+  /// 個人簡介（文字區塊）
+  bio       String?   @db.Text
+  
+  /// 頭像圖片 URL
+  avatar    String?
+  
+  /// 聯絡電話（敏感資料）
+  phone     String?
+  
+  /// 聯絡地址（敏感資料）
+  address   String?
+  
+  /// 個人網站 URL
+  website   String?
+  
+  /// 偏好語言（ISO 639-1 語言代碼，預設 'en'）
+  language  String    @default("en") @db.VarChar(10)
+  
+  /// 記錄建立時間
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  /// 記錄最後更新時間
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  /// 軟刪除時間戳記
+  deletedAt DateTime? @map("deleted_at")
+
+  // === 關聯 ===
+  /// 關聯的使用者（Cascade 刪除：刪除使用者時自動刪除 Profile）
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引 ===
+  @@index([userId])
+  @@index([deletedAt])
+  @@map("profiles")
+}
+

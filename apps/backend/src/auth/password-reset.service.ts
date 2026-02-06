@@ -1,0 +1,244 @@
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { MailService } from '../mail/mail.service';
+import { ConfigService } from '@nestjs/config';
+import { I18nService } from 'nestjs-i18n';
+import * as crypto from 'crypto';
+import * as bcrypt from 'bcrypt';
+import { assertPasswordStrength } from '../common/utils/password-validator';
+import { logger } from '../common/services/logger.service';
+
+@Injectable()
+export class PasswordResetService {
+  private readonly SALT_ROUNDS = 10;
+  private readonly TOKEN_BYTES = 32;
+  private readonly EXPIRE_MINUTES: number;
+  private readonly RESET_URL: string;
+
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+    private config: ConfigService,
+    private i18n: I18nService,
+  ) {
+    // 縮短過期時間至 15 分鐘（安全性增強）
+    this.EXPIRE_MINUTES = parseInt(
+      this.config.get('PASSWORD_RESET_EXPIRE_MINUTES', '15'),
+    );
+    this.RESET_URL = this.config.get(
+      'PASSWORD_RESET_URL',
+      'http://localhost:3000/reset-password',
+    );
+  }
+
+  /**
+   * 請求密碼重置
+   * 即使 email 不存在也返回成功（防止列舉攻擊）
+   */
+  async requestPasswordReset(
+    email: string,
+    ipAddress?: string,
+    lang?: string,
+  ): Promise<boolean> {
+    // 查找用戶
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    // 即使用戶不存在也等待相同時間（防止時序攻擊）
+    if (!user || user.deletedAt) {
+      // 模擬處理時間
+      await this.simulateProcessing();
+      return true; // 不透露用戶是否存在
+    }
+
+    // 生成隨機 token
+    const rawToken = crypto.randomBytes(this.TOKEN_BYTES).toString('hex');
+    const hashedToken = await bcrypt.hash(rawToken, this.SALT_ROUNDS);
+
+    // 計算過期時間
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + this.EXPIRE_MINUTES);
+
+    // 刪除該用戶之前的未使用重置請求
+    await this.prisma.passwordReset.deleteMany({
+      where: {
+        userId: user.id,
+        usedAt: null,
+      },
+    });
+
+    // 創建新的重置請求
+    await this.prisma.passwordReset.create({
+      data: {
+        userId: user.id,
+        token: hashedToken,
+        expiresAt,
+        ipAddress,
+      },
+    });
+
+    // 發送重置 email
+    try {
+      await this.mailService.sendPasswordResetEmail(
+        user.email,
+        user.name,
+        rawToken,
+        this.RESET_URL,
+        ipAddress,
+        lang,
+      );
+    } catch (error) {
+      // Email 發送失敗也不拋出錯誤，避免洩漏信息
+      logger.error('[PasswordReset] Failed to send email:', error);
+    }
+
+    return true;
+  }
+
+  /**
+   * 驗證重置 token 是否有效
+   */
+  async verifyResetToken(token: string): Promise<boolean> {
+    try {
+      const resetRequest = await this.findValidResetRequest(token);
+      return !!resetRequest;
+    } catch {
+      return false;
+    } finally {
+      // 防止時序攻擊：無論結果如何，確保回應時間一致
+      await this.simulateProcessing();
+    }
+  }
+
+  /**
+   * 重置密碼
+   */
+  async resetPassword(
+    token: string,
+    newPassword: string,
+    ipAddress?: string,
+    lang?: string,
+  ): Promise<boolean> {
+    // 查找有效的重置請求（先取得用戶資訊以進行相似度檢查）
+    const resetRequest = await this.findValidResetRequest(token);
+    if (!resetRequest) {
+      throw new UnauthorizedException(
+        this.i18n.translate('auth.invalidResetToken', { lang }),
+      );
+    }
+
+    // 獲取用戶
+    const user = await this.prisma.user.findUnique({
+      where: { id: resetRequest.userId },
+    });
+
+    if (!user || user.deletedAt) {
+      throw new UnauthorizedException(
+        this.i18n.translate('auth.userNotFound', { lang }),
+      );
+    }
+
+    // 驗證新密碼強度（包含相似度檢查）
+    assertPasswordStrength(newPassword, lang, this.i18n, {
+      email: user.email,
+      name: user.name || undefined,
+    });
+
+    // 檢查新密碼是否與舊密碼相同
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      throw new BadRequestException(
+        this.i18n.translate('auth.passwordSameAsOld', { lang }),
+      );
+    }
+
+    // Hash 新密碼
+    const hashedPassword = await bcrypt.hash(newPassword, this.SALT_ROUNDS);
+
+    // 開始事務
+    await this.prisma.$transaction(async (tx) => {
+      // 更新密碼
+      await tx.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          refreshToken: null, // 清除 refresh token，強制重新登入
+          updatedAt: new Date(),
+        },
+      });
+
+      // 標記 token 為已使用
+      await tx.passwordReset.update({
+        where: { id: resetRequest.id },
+        data: { usedAt: new Date() },
+      });
+    });
+
+    // 發送密碼變更通知
+    try {
+      await this.mailService.sendPasswordChangedEmail(
+        user.email,
+        user.name,
+        ipAddress,
+        lang,
+      );
+    } catch (error) {
+      logger.error('[PasswordReset] Failed to send notification:', error);
+    }
+
+    return true;
+  }
+
+  /**
+   * 查找有效的重置請求
+   */
+  private async findValidResetRequest(token: string) {
+    // 獲取所有未使用且未過期的重置請求
+    const resetRequests = await this.prisma.passwordReset.findMany({
+      where: {
+        usedAt: null,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    // 逐一比對 token（因為 token 是 hashed）
+    for (const request of resetRequests) {
+      const isValid = await bcrypt.compare(token, request.token);
+      if (isValid) {
+        return request;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * 模擬處理時間（防止時序攻擊）
+   */
+  private async simulateProcessing(): Promise<void> {
+    const delay = 100 + Math.random() * 200; // 100-300ms
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+
+  /**
+   * 清除過期的重置請求（cron job 使用）
+   */
+  async cleanupExpiredTokens(): Promise<number> {
+    const result = await this.prisma.passwordReset.deleteMany({
+      where: {
+        expiresAt: {
+          lt: new Date(),
+        },
+      },
+    });
+
+    return result.count;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "alreadyEnabled": "Two-factor authentication is already enabled",
+  "notEnabled": "Two-factor authentication is not enabled",
+  "codeSent": "A verification code has been sent to your email",
+  "enableSuccess": "Two-factor authentication has been successfully enabled",
+  "disableSuccess": "Two-factor authentication has been disabled",
+  "codeNotFoundOrExpired": "Verification code does not exist or has expired",
+  "tooManyAttempts": "Too many attempts. Please request a new verification code.",
+  "codeInvalid": "Invalid verification code"
+}

@@ -1,0 +1,16 @@
+# Our security address
+Contact: mailto:security@example.com
+
+# Our security policy
+Preferred-Languages: en, zh-TW
+
+# Our OpenPGP key (optional - replace with your actual key URL)
+# Encryption: https://example.com/pgp-key.txt
+
+# Acknowledgments page (optional)
+# Acknowledgments: https://example.com/security/hall-of-fame
+
+Expires: 2027-12-31T23:59:59.000Z
+
+# Policy
+Policy: https://example.com/security-policy

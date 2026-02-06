@@ -1,0 +1,55 @@
+// AuditLog - 稽核日誌
+// 記錄所有系統操作（成功或失敗）用於安全審計和問題追蹤
+model AuditLog {
+  /// 稽核日誌唯一識別碼（UUID v7）
+  id          String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  
+  /// 請求追蹤 ID（用於關聯同一請求的多筆日誌）
+  requestId   String   @map("request_id") @db.Uuid
+  
+  /// 執行操作的使用者 ID（null 表示未登入使用者）
+  userId      String?  @map("user_id") @db.Uuid
+  
+  /// 操作類型（例如：CREATE_USER, UPDATE_POST, DELETE_COMMENT, LOGIN, LOGOUT）
+  action      String
+  
+  /// 實體類型（例如：User, Post, Comment, Role, Permission）
+  entity      String
+  
+  /// 被操作的實體 ID（null 表示操作不針對特定實體，如列表查詢）
+  entityId    String?  @map("entity_id") @db.Uuid
+  
+  /// 操作狀態（SUCCESS: 成功, FAILURE: 失敗）
+  status      String
+  
+  /// HTTP 方法或 GraphQL 操作類型（例如：GET, POST, query, mutation）
+  method      String?
+  
+  /// 請求路徑或 GraphQL operation 名稱
+  path        String?
+  
+  /// 請求來源 IP 位址
+  ipAddress   String?  @map("ip_address")
+  
+  /// 使用者代理字串（瀏覽器/客戶端資訊）
+  userAgent   String?  @map("user_agent") @db.Text
+  
+  /// 額外詳細資訊（JSON 格式）
+  /// 包含：操作前後的資料差異、錯誤訊息、驗證失敗原因等
+  details     Json?
+  
+  /// 操作執行時間（毫秒）
+  duration    Int?
+  
+  /// 日誌記錄時間戳記
+  timestamp   DateTime @default(now())
+
+  // === 索引（優化查詢效能）===
+  @@index([requestId])
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([action, timestamp(sort: Desc)])
+  @@index([entity, entityId, timestamp(sort: Desc)])
+  @@index([status, timestamp(sort: Desc)])
+  @@index([timestamp(sort: Desc)])
+  @@map("audit_logs")
+}

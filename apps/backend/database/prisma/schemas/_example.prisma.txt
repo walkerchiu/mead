@@ -1,0 +1,16 @@
+// 這是一個範例檔案，展示如何建立新的 schema
+// 實際使用時可以刪除此檔案
+
+// AuditLog - 稽核日誌（範例）
+// model AuditLog {
+//   id          String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+//   action      String
+//   entityId    String   @db.Uuid
+//   performedBy String   @db.Uuid
+//   timestamp   DateTime @default(now())
+//   details     Json?
+// 
+//   @@index([entityId])
+//   @@index([timestamp(sort: Desc)])
+//   @@map("audit_logs")
+// }

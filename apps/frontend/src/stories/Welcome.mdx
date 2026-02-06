@@ -1,0 +1,228 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Welcome" />
+
+# 歡迎使用 Starter Storybook
+
+這是 Starter 專案的 Storybook 組件庫，基於 **Atomic Design** 原則構建。
+
+## 🎯 什麼是 Atomic Design？
+
+Atomic Design 是一種設計系統方法論，將 UI 組件分為五個層級：
+
+```
+Atoms（原子）→ Molecules（分子）→ Organisms（有機體）→ Templates（模板）→ Pages（頁面）
+```
+
+### 📦 組件層級
+
+#### 1. **Atoms** (原子)
+
+最基礎的 UI 元素，不可再分割。
+
+範例：
+
+- `Button` - 按鈕組件
+- `TextField` - 輸入框
+- `CodeInput` - 驗證碼輸入
+
+**何時使用**：當你需要最基本的 UI 元素時。
+
+#### 2. **Molecules** (分子)
+
+由多個 Atoms 組合而成，具有特定功能。
+
+範例：
+
+- `FormField` - 表單欄位（TextField + Label + Error）
+- `PasswordField` - 密碼輸入框（TextField + 顯示/隱藏按鈕 + 強度指示器）
+- `AlertMessage` - 提示訊息
+
+**何時使用**：當你需要組合多個基礎元素完成特定功能時。
+
+#### 3. **Organisms** (有機體)
+
+由 Molecules 和 Atoms 組成的完整功能模組。
+
+範例：
+
+- `LoginForm` - 登入表單
+- `TwoFactorForm` - 雙因素認證表單
+- `ForgotPasswordForm` - 忘記密碼表單
+
+**何時使用**：當你需要完整的功能模組（如表單、卡片）時。
+
+#### 4. **Templates** (模板)
+
+定義頁面結構和佈局。
+
+範例：
+
+- `AuthLayout` - 認證頁面佈局
+
+**何時使用**：當你需要統一的頁面佈局時。
+
+#### 5. **Pages** (頁面)
+
+完整的頁面展示（僅用於 Storybook）。
+
+範例：
+
+- `LoginPage` - 完整登入頁面流程
+- `ForgotPasswordPage` - 忘記密碼頁面
+
+**何時使用**：用於展示完整的用戶流程和互動。
+
+---
+
+## 🚀 快速開始
+
+### 瀏覽組件
+
+在左側導航欄中：
+
+1. **Atoms** - 查看基礎組件
+2. **Molecules** - 查看組合組件
+3. **Organisms** - 查看功能模組
+4. **Templates** - 查看頁面模板
+5. **Pages** - 查看完整頁面流程
+
+### 測試組件
+
+每個組件都有多個 **Stories**（情境展示）：
+
+- **Default** - 預設狀態
+- **Loading** - 載入狀態
+- **Error** - 錯誤狀態
+- **Interactive** - 互動式範例
+
+### 使用 Controls
+
+點擊 **Controls** 標籤，可以即時調整組件 props：
+
+- 修改文字內容
+- 切換狀態（disabled, loading）
+- 調整樣式（variant, color, size）
+
+---
+
+## �� 開發指南
+
+### Story-First 開發流程
+
+1. **在 Storybook 中開發 UI**
+
+   ```bash
+   pnpm storybook
+   ```
+
+2. **創建組件和 Stories**
+
+   ```tsx
+   // Button.tsx
+   export function Button({ children, loading }) {
+     return <MuiButton disabled={loading}>{children}</MuiButton>;
+   }
+
+   // Button.stories.tsx
+   export const Default: Story = {
+     args: { children: '點擊我' },
+   };
+
+   export const Loading: Story = {
+     args: { children: '載入中', loading: true },
+   };
+   ```
+
+3. **測試所有狀態**
+   - 在 Storybook 中預覽
+   - 使用 Controls 測試不同 props
+   - 檢查響應式設計
+
+4. **整合到 Next.js 頁面**
+
+   ```tsx
+   // app/login/page.tsx
+   import { LoginForm } from '@/components/organisms';
+
+   export default function LoginPage() {
+     return <LoginForm onSubmit={handleLogin} />;
+   }
+   ```
+
+### 命名規範
+
+- **組件**：PascalCase（例如：`LoginForm`）
+- **檔案**：與組件同名（例如：`LoginForm.tsx`）
+- **Stories**：組件名.stories.tsx（例如：`LoginForm.stories.tsx`）
+
+### 目錄結構
+
+```text
+src/components/
+├── atoms/
+│   ├── Button/
+│   │   ├── Button.tsx
+│   │   └── Button.stories.tsx
+│   └── index.ts
+├── molecules/
+│   ├── FormField/
+│   │   ├── FormField.tsx
+│   │   └── FormField.stories.tsx
+│   └── index.ts
+└── organisms/
+    ├── LoginForm/
+    │   ├── LoginForm.tsx
+    │   └── LoginForm.stories.tsx
+    └── index.ts
+```
+
+---
+
+## 🎨 設計原則
+
+### 1. 單一職責
+
+每個組件只做一件事，並把它做好。
+
+### 2. 組合優於繼承
+
+使用組合（Composition）而非繼承構建複雜組件。
+
+### 3. Props 驅動
+
+組件應該是無狀態的，通過 props 控制行為。
+
+### 4. 一致性
+
+保持命名、樣式、行為的一致性。
+
+---
+
+## 🔧 技術棧
+
+- **Storybook 10.2.1** - 組件展示和文檔
+- **Next.js 16** - 應用框架
+- **React 19** - UI 函式庫
+- **MUI 6** - Material-UI 組件庫
+- **TypeScript** - 類型安全
+- **MSW** - API Mock
+- **React Hook Form** - 表單處理
+- **Zod** - Schema 驗證
+
+---
+
+## 📖 更多資源
+
+- [Storybook 文檔](https://storybook.js.org/docs)
+- [Atomic Design 原則](https://bradfrost.com/blog/post/atomic-web-design/)
+- [MUI 文檔](https://mui.com/)
+- [Next.js 文檔](https://nextjs.org/docs)
+
+---
+
+## 🎉 開始探索
+
+選擇左側導航欄中的任何組件開始探索！
+
+建議從 **Atoms/Button** 開始，逐步了解整個設計系統。

@@ -1,0 +1,441 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "back": "Back",
+    "logout": "Logout",
+    "save": "Save",
+    "confirm": "Confirm",
+    "done": "Done",
+    "download": "Download",
+    "unknown": "Unknown",
+    "all": "All",
+    "locale": "en",
+    "refresh": "Refresh",
+    "clear": "Clear",
+    "close": "Close",
+    "settings": "Settings",
+    "processing": "Processing...",
+    "previous": "Previous",
+    "next": "Next",
+    "error": {
+      "loadFailed": "Load failed",
+      "permissionDenied": "Permission Denied",
+      "permissionDeniedMessage": "Sorry, you don't have permission to access this page.",
+      "permissionDeniedDescription": "This page is restricted to administrators only. Please contact your system administrator if you need assistance.",
+      "backToHome": "Back to Home"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Settings",
+    "securitySettings": "Security Settings"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Enter your credentials to sign in",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "forgotPassword": "Forgot password?",
+      "submit": "Login",
+      "success": "Login successful",
+      "error": "Login failed, please check your email and password",
+      "failed": "Login failed",
+      "retry": "Try Again"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we'll send you a reset link",
+      "submit": "Send Reset Link",
+      "success": "Password reset email sent, please check your inbox",
+      "successTitle": "Check Your Inbox",
+      "successMessage": "We've sent a password reset link to your email address. Please check your inbox and click the link to reset your password.",
+      "successHint": "If you haven't received the email, check your spam folder.",
+      "backToLogin": "Back to Login",
+      "error": "Request failed, please try again later"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Reset Password",
+      "success": "Password reset successful! Redirecting to login...",
+      "successTitle": "Password Reset",
+      "successMessage": "Your password has been reset successfully. You can now sign in with your new password.",
+      "invalidToken": "This reset link is invalid or expired. Please request a new password reset.",
+      "invalidTokenTitle": "Link Expired",
+      "backToForgotPassword": "Back to Forgot Password",
+      "missingToken": "Missing reset token",
+      "error": "Password reset failed, please try again later",
+      "passwordRequirements": "Password must meet the following requirements:",
+      "minLength": "At least 8 characters",
+      "uppercase": "At least one uppercase letter",
+      "lowercase": "At least one lowercase letter",
+      "number": "At least one number",
+      "helperText": "At least 8 characters",
+      "confirmHelperText": "Re-enter your new password"
+    },
+    "twoFactor": {
+      "title": "Two-Factor Authentication",
+      "subtitle": "A verification code has been sent to your email",
+      "codeLabel": "Verification Code",
+      "backupCodeLabel": "Backup Code",
+      "submit": "Verify",
+      "useBackupCode": "Use backup code",
+      "backToLogin": "Back to Login",
+      "codeInfo": "Please enter the 6-digit verification code you received in your email. The code will expire in 10 minutes.",
+      "codeRequired": "Please enter a 6-digit verification code",
+      "codeTooLong": "Verification code is too long",
+      "verificationFailed": "Verification failed",
+      "codeInvalid": "Verification code is incorrect or expired",
+      "subtitleBackup": "Enter the backup code from your verification app",
+      "retry": "Try Again"
+    },
+    "twoFactorSettings": {
+      "title": "Two-Factor Authentication (2FA)",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "description": "Two-factor authentication adds an extra layer of security to your account. Once enabled, you'll need to enter a verification code sent to your email in addition to your password.",
+      "enable": "Enable 2FA",
+      "disable": "Disable 2FA",
+      "type": "Type",
+      "lastVerified": "Last verified",
+      "confirmEnableTitle": "Confirm Enable Two-Factor Authentication",
+      "confirmEnableMessage": "A verification code has been sent to your email. Please enter it within 10 minutes.",
+      "confirmDisableTitle": "Confirm Disable Two-Factor Authentication",
+      "confirmDisableWarning": "Disabling two-factor authentication will reduce the security of your account. A verification code has been sent to your email.",
+      "confirmDisable": "Confirm Disable",
+      "verificationCodeSent": "Verification code sent to your email",
+      "enableSuccess": "Two-factor authentication enabled",
+      "disableSuccess": "Two-factor authentication disabled",
+      "enterCode": "Please enter the verification code",
+      "backupCodesTitle": "Backup Codes",
+      "backupCodesWarning": "Please save these backup codes securely! Each code can only be used once. Use them when you cannot receive the email.",
+      "requestFailed": "Request failed",
+      "verificationFailed": "Verification failed",
+      "email": "Email",
+      "never": "Never"
+    }
+  },
+  "validation": {
+    "email": {
+      "required": "Email is required",
+      "invalid": "Please enter a valid email address",
+      "alreadyUsed": "This email address is already in use"
+    },
+    "password": {
+      "required": "Please enter your password",
+      "minLength": "Password must be at least 8 characters",
+      "uppercase": "Password must contain at least one uppercase letter",
+      "lowercase": "Password must contain at least one lowercase letter",
+      "number": "Password must contain at least one number",
+      "specialChar": "Password must contain at least one special character",
+      "mismatch": "Passwords do not match",
+      "currentIncorrect": "Current password is incorrect",
+      "mustBeDifferent": "New password must be different from current password"
+    },
+    "name": {
+      "maxLength": "Name cannot exceed {max} characters"
+    },
+    "bio": {
+      "maxLength": "Bio cannot exceed 500 characters"
+    },
+    "website": {
+      "invalid": "Please enter a valid URL"
+    },
+    "language": {
+      "invalid": "Please select a valid language"
+    },
+    "twoFactorCode": {
+      "required": "Please enter the verification code",
+      "length": "Please enter a 6-digit verification code"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "Welcome to Starter",
+      "subtitle": "Next.js 16 + NestJS 11 + GraphQL + MUI 7",
+      "description": "Complete authentication system: Login, Password Reset, Two-Factor Authentication",
+      "login": "Login",
+      "dashboard": "Dashboard"
+    },
+    "dashboard": {
+      "title": "Starter Dashboard",
+      "welcome": "Welcome Back!",
+      "description": "You have successfully signed in.",
+      "securitySettings": "Security Settings",
+      "backToHome": "Back to Home",
+      "loggedOut": "Logged out",
+      "cards": {
+        "auditLogs": {
+          "title": "Audit Logs",
+          "description": "View system operation records, user activities, and security events (requires admin permissions)",
+          "action": "View Logs"
+        },
+        "sessions": {
+          "title": "Session Management",
+          "description": "Manage user login sessions, revoke sessions, and monitor device activity (requires admin permissions)",
+          "action": "Manage Sessions"
+        }
+      }
+    },
+    "settings": {
+      "navigation": {
+        "profile": "Profile",
+        "security": "Security"
+      },
+      "security": {
+        "title": "Security Settings",
+        "description": "Manage your account security settings"
+      },
+      "profile": {
+        "title": "Profile Settings",
+        "description": "Manage your personal information and preferences",
+        "basicInfo": "Basic Information",
+        "profileDetails": "Profile Details",
+        "changePassword": "Change Password",
+        "email": "Email Address",
+        "emailHelper": "Used for login and notifications",
+        "name": "Display Name",
+        "nameHelper": "Your name will be displayed throughout the system",
+        "bio": "Bio",
+        "bioHelper": "Tell others about yourself (max 500 characters)",
+        "phone": "Phone Number",
+        "phoneHelper": "Your contact phone number",
+        "address": "Address",
+        "addressHelper": "Your contact address",
+        "website": "Website",
+        "websiteHelper": "Your personal website or blog URL",
+        "language": "Preferred Language",
+        "languageHelper": "Language for emails and interface",
+        "currentPassword": "Current Password",
+        "currentPasswordHelper": "Enter your current password for verification",
+        "newPassword": "New Password",
+        "newPasswordHelper": "At least 8 characters with uppercase, lowercase, number, and special character",
+        "confirmPassword": "Confirm New Password",
+        "confirmPasswordHelper": "Re-enter your new password",
+        "revokeOtherDevices": "Sign out other devices",
+        "revokeOtherDevicesHelper": "Log out from all other devices after changing password",
+        "updateSuccess": "Profile updated successfully",
+        "updateProfileSuccess": "Basic information updated successfully",
+        "updateDetailsSuccess": "Profile details updated successfully",
+        "passwordChanged": "Password changed successfully",
+        "updateError": "Failed to update profile"
+      }
+    },
+    "admin": {
+      "auditLogs": {
+        "title": "Audit Logs",
+        "description": "View system operation records, user activities, and security events",
+        "refresh": "Refresh",
+        "newLogs": "{count} new logs available, click to refresh",
+        "newLogsOnOtherPage": "{count} new logs available on page 1, click to view",
+        "viewNew": "View New",
+        "loadError": "Load failed",
+        "noData": "No audit logs available",
+        "loading": "Loading...",
+        "filters": {
+          "title": "Filters",
+          "userId": "User ID",
+          "userIdPlaceholder": "Enter User ID",
+          "action": "Action",
+          "actionPlaceholder": "Enter action name (e.g., QUERY_SESSIONSTATISTICS)",
+          "actionHelper": "Supports fuzzy search, enter keywords",
+          "entity": "Entity",
+          "entityPlaceholder": "Enter entity name (e.g., SESSION)",
+          "entityHelper": "Supports fuzzy search, enter keywords",
+          "status": "Status",
+          "success": "Success",
+          "failure": "Failed",
+          "apply": "Apply Filters",
+          "clear": "Clear Filters"
+        },
+        "stats": {
+          "totalCount": "Total Logs",
+          "successRate": "Success Rate",
+          "failureCount": "Failed",
+          "topAction": "Top Action",
+          "actionCount": "{count} times",
+          "times": "times",
+          "noData": "No data"
+        },
+        "table": {
+          "title": "Audit Log List",
+          "timestamp": "Time",
+          "user": "User",
+          "action": "Action",
+          "entity": "Entity",
+          "status": "Status",
+          "method": "Method",
+          "path": "Path",
+          "ip": "IP",
+          "duration": "Duration",
+          "success": "Success",
+          "failure": "Failed",
+          "unknown": "Unknown",
+          "noData": "No audit logs available",
+          "page": "Page {current} of {total}",
+          "firstPage": "First Page",
+          "lastPage": "Last Page",
+          "totalRecords": "{count} total"
+        }
+      },
+      "sessions": {
+        "title": "Session Management",
+        "description": "Manage user login states, revoke sessions, and monitor device activities",
+        "sessionList": "Session List",
+        "batchRevoke": "Batch Revoke Sessions",
+        "stats": {
+          "activeCount": "Active Sessions",
+          "revokedCount": "Revoked Sessions",
+          "expiredCount": "Expired Sessions",
+          "topDevice": "Top Device",
+          "sessions": "sessions",
+          "noData": "No data"
+        },
+        "filters": {
+          "title": "Filters",
+          "userId": "User ID",
+          "userIdPlaceholder": "Enter User ID",
+          "status": "Status",
+          "ipAddress": "IP Address",
+          "ipAddressPlaceholder": "e.g., 192.168.1.1",
+          "deviceInfo": "Device Info",
+          "deviceInfoPlaceholder": "e.g., Chrome, iPhone",
+          "location": "Location",
+          "locationPlaceholder": "e.g., Taiwan",
+          "statuses": {
+            "active": "Active",
+            "expired": "Expired",
+            "revoked": "Revoked"
+          }
+        },
+        "table": {
+          "user": "User",
+          "status": "Status",
+          "device": "Device",
+          "ipAddress": "IP Address",
+          "location": "Location",
+          "createdAt": "Created",
+          "lastUsedAt": "Last Used",
+          "actions": "Actions",
+          "viewDetails": "View Details",
+          "revokeSession": "Revoke Session",
+          "totalCount": "Total: {count} sessions",
+          "noSessions": "No Sessions Found",
+          "noSessionsDescription": "There are no sessions matching your filters.",
+          "revokeSuccess": "Session revoked successfully",
+          "statuses": {
+            "active": "Active",
+            "expired": "Expired",
+            "revoked": "Revoked"
+          }
+        },
+        "details": {
+          "title": "Session Details",
+          "userInfo": "User Information",
+          "userName": "Name",
+          "userEmail": "Email",
+          "userId": "User ID",
+          "deviceInfo": "Device Information",
+          "browser": "Browser",
+          "os": "Operating System",
+          "deviceDetails": "Device Details",
+          "locationInfo": "Location Information",
+          "ipAddress": "IP Address",
+          "location": "Location",
+          "timeInfo": "Time Information",
+          "createdAt": "Created At",
+          "lastUsedAt": "Last Used At",
+          "expiresAt": "Expires At",
+          "revocationInfo": "Revocation Information",
+          "revokedAt": "Revoked At",
+          "revokedBy": "Revoked By",
+          "revokerEmail": "Revoker Email",
+          "revokedReason": "Reason",
+          "revokedMethod": "Method",
+          "sessionId": "Session ID",
+          "revokeSession": "Revoke This Session",
+          "statuses": {
+            "active": "Active",
+            "expired": "Expired",
+            "revoked": "Revoked"
+          }
+        },
+        "revokeModal": {
+          "title": "Revoke Session",
+          "warning": "This action will immediately terminate the user's session. They will need to log in again.",
+          "targetUser": "Target User",
+          "reason": "Reason",
+          "reasonPlaceholder": "e.g., Security concern, suspicious activity",
+          "sendNotification": "Send email notification to user",
+          "customMessage": "Custom Message (Optional)",
+          "customMessagePlaceholder": "Additional message for the user",
+          "customMessageHelp": "This message will be included in the notification email",
+          "confirm": "Revoke Session",
+          "defaultReason": "Session revoked by administrator",
+          "error": "Failed to revoke session",
+          "errorMessage": "Failed to revoke the session. Please try again later or contact the system administrator.",
+          "errors": {
+            "sessionNotFound": "Session not found. It may have been deleted.",
+            "sessionAlreadyRevoked": "This session has already been revoked",
+            "cannotRevokeAdmin": "Cannot revoke other administrator sessions",
+            "cannotRevokeCurrent": "Cannot revoke your current session. Please use logout instead.",
+            "notAuthenticated": "User not authenticated",
+            "ownSessionsOnly": "You can only manage your own sessions",
+            "userNotFound": "Target user not found"
+          }
+        },
+        "batchRevokeModal": {
+          "title": "Batch Revoke Sessions",
+          "warning": "⚠️ DANGER: This will revoke ALL sessions matching the criteria. Users will be logged out immediately.",
+          "tabs": {
+            "criteria": "Criteria",
+            "options": "Options & Notification"
+          },
+          "criteriaDescription": "Select at least one criterion. Multiple criteria will be combined with AND logic.",
+          "userIds": "User IDs",
+          "userIdsPlaceholder": "UUID1, UUID2, UUID3...",
+          "userIdsHelp": "Comma-separated user IDs",
+          "ipAddress": "IP Address Pattern",
+          "ipAddressPlaceholder": "e.g., 192.168",
+          "ipAddressHelp": "Partial match supported",
+          "deviceInfo": "Device Info Pattern",
+          "deviceInfoPlaceholder": "e.g., Chrome, iPhone",
+          "deviceInfoHelp": "Partial match supported",
+          "inactiveDays": "Inactive for Days",
+          "inactiveDaysHelp": "Sessions not used in the last N days",
+          "createdBeforeDays": "Created Before Days",
+          "createdBeforeDaysHelp": "Sessions created more than N days ago",
+          "reason": "Reason",
+          "reasonPlaceholder": "e.g., Security audit, cleanup inactive sessions",
+          "sendNotification": "Send email notifications",
+          "notificationInfo": "For batch operations, notifications are disabled by default to avoid spam. Enable only if necessary.",
+          "customMessage": "Custom Message (Optional)",
+          "customMessagePlaceholder": "Message for affected users",
+          "customMessageHelp": "This message will be included in notification emails",
+          "confirm": "Revoke Sessions",
+          "defaultReason": "Batch session cleanup by administrator",
+          "error": "Failed to revoke sessions"
+        },
+        "revokeOtherDevicesModal": {
+          "title": "Revoke Other Devices",
+          "info": "This will log out all other devices while keeping your current session active.",
+          "description": "This is useful when you suspect unauthorized access or want to ensure you're the only one logged in.",
+          "currentDevice": "✓ Current Device",
+          "currentDeviceDescription": "Your current session will remain active",
+          "reason": "Reason (Optional)",
+          "reasonPlaceholder": "e.g., Security check",
+          "reasonHelp": "This will be recorded in the audit log",
+          "confirm": "Revoke Other Devices",
+          "defaultReason": "User revoked other devices",
+          "error": "Failed to revoke other devices"
+        }
+      }
+    }
+  }
+}

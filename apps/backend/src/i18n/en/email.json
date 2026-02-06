@@ -1,0 +1,17 @@
+{
+  "passwordReset": {
+    "subject": "Reset your password"
+  },
+  "passwordChanged": {
+    "subject": "Your password has been changed"
+  },
+  "profileUpdated": {
+    "subject": "Your profile has been updated"
+  },
+  "twoFactorCode": {
+    "login": "Login verification code",
+    "enable": "Enable two-factor authentication verification code",
+    "disable": "Disable two-factor authentication verification code",
+    "default": "Verification code"
+  }
+}

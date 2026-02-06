@@ -1,0 +1,148 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <style>
+      body {
+        font-family:
+          'Microsoft JhengHei', 'PingFang TC', 'Heiti TC', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #f44336;
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px 20px;
+      }
+      .info-box {
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #2196f3;
+        border-radius: 4px;
+      }
+      .info-box h3 {
+        margin-top: 0;
+        color: #2196f3;
+        font-size: 18px;
+      }
+      .session-item {
+        padding: 15px;
+        margin: 10px 0;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 4px;
+      }
+      .session-item p {
+        margin: 5px 0;
+        font-size: 14px;
+      }
+      .custom-message {
+        background-color: #fff3cd;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+      }
+      .custom-message h3 {
+        margin-top: 0;
+        color: #856404;
+        font-size: 18px;
+      }
+      .footer {
+        background-color: #f9f9f9;
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        border-top: 1px solid #e0e0e0;
+      }
+      strong {
+        color: #333;
+      }
+      .highlight {
+        color: #f44336;
+        font-size: 20px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h2>🔒 您的
+          <span class='highlight'>{{sessionCount}}</span>
+          個會話已被終止</h2>
+      </div>
+
+      <div class='content'>
+        <p>親愛的 {{userName}}，</p>
+
+        <p>您的 <strong>{{sessionCount}}</strong> 個登入會話已被管理員終止。</p>
+
+        <div class='info-box'>
+          <h3>受影響的會話</h3>
+          {{#each sessions}}
+            <div class='session-item'>
+              <p><strong>設備：</strong>{{this.deviceInfo}}</p>
+              {{#if this.browser}}
+                <p><strong>瀏覽器：</strong>{{this.browser}}</p>
+              {{/if}}
+              {{#if this.ipAddress}}
+                <p><strong>IP 位址：</strong>{{this.ipAddress}}</p>
+              {{/if}}
+              <p><strong>最後活動：</strong>{{this.lastUsedAt}}</p>
+            </div>
+          {{/each}}
+        </div>
+
+        <div class='info-box'>
+          <h3>撤銷資訊</h3>
+          <p><strong>撤銷者：</strong>{{revokedByName}} ({{revokedBy}})</p>
+          <p><strong>原因：</strong>{{reason}}</p>
+          <p><strong>時間：</strong>{{timestamp}}</p>
+        </div>
+
+        {{#if customMessage}}
+          <div class='custom-message'>
+            <h3>📝 管理員訊息</h3>
+            <p>{{customMessage}}</p>
+          </div>
+        {{/if}}
+
+        <p>如需重新登入，請訪問我們的網站。</p>
+
+        <p>如果您有任何疑問，請聯繫支援團隊。</p>
+
+        <p>
+          <strong>支援郵箱：</strong>
+          <a href='mailto:{{supportEmail}}'>{{supportEmail}}</a>
+        </p>
+      </div>
+
+      <div class='footer'>
+        <p>此為系統自動發送的郵件，請勿直接回覆。</p>
+        <p>© 2026 Starter Platform. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

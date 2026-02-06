@@ -1,0 +1,466 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Best Practices" />
+
+# 組件開發最佳實踐
+
+本指南提供開發 Starter 組件的最佳實踐和規範。
+
+---
+
+## 📋 開發流程
+
+### 1. Story-First 開發
+
+**先寫 Story，再寫組件**
+
+```tsx
+// ✅ 好的做法
+// 1. 先在 Storybook 中定義你想要的 UI
+export const LoginButton: Story = {
+  args: {
+    children: '登入',
+    variant: 'contained',
+    loading: false,
+  },
+};
+
+// 2. 然後實作組件
+export function Button({ children, loading, ...props }) {
+  return <MuiButton {...props}>{loading ? '...' : children}</MuiButton>;
+}
+```
+
+**為什麼？**
+
+- ✅ 即時視覺回饋
+- ✅ 更容易發現設計問題
+- ✅ 自動生成文檔
+- ✅ 方便協作和溝通
+
+---
+
+## 🎯 組件設計原則
+
+### 1. 保持組件純淨（Pure Components）
+
+```tsx
+// ❌ 不好：組件內部有副作用
+function LoginForm() {
+  const [login] = useMutation(LOGIN_MUTATION); // API 調用
+  const router = useRouter(); // 路由邏輯
+
+  return <form>...</form>;
+}
+
+// ✅ 好：組件只負責 UI
+function LoginForm({ onSubmit, loading, error }) {
+  const { handleSubmit } = useForm();
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {error && <ErrorMessage />}
+      <Button loading={loading}>登入</Button>
+    </form>
+  );
+}
+
+// 在頁面層處理邏輯
+function LoginPage() {
+  const [login, { loading }] = useMutation(LOGIN_MUTATION);
+  const handleSubmit = async (data) => {
+    await login({ variables: data });
+  };
+  return <LoginForm onSubmit={handleSubmit} loading={loading} />;
+}
+```
+
+### 2. Props 設計原則
+
+#### 保持簡單
+
+```tsx
+// ❌ 不好：太多 props
+<Button
+  showIcon
+  iconPosition="left"
+  iconSize="small"
+  iconColor="primary"
+/>
+
+// ✅ 好：使用組合
+<Button startIcon={<IconCheck />}>
+  確認
+</Button>
+```
+
+#### 使用有意義的命名
+
+```tsx
+// ❌ 不好
+<FormField err={true} txt="輸入內容" />
+
+// ✅ 好
+<FormField error="欄位必填" helperText="請輸入您的電子郵件" />
+```
+
+#### 提供預設值
+
+```tsx
+export interface ButtonProps {
+  variant?: 'contained' | 'outlined' | 'text'; // ✅ 明確的類型
+  size?: 'small' | 'medium' | 'large';
+  loading?: boolean;
+}
+
+export function Button({
+  variant = 'contained', // ✅ 合理的預設值
+  size = 'medium',
+  loading = false,
+  ...props
+}) {
+  // ...
+}
+```
+
+### 3. TypeScript 使用
+
+#### 明確的類型定義
+
+```tsx
+// ✅ 好：明確的類型
+export interface LoginFormProps {
+  onSubmit: (data: LoginFormData) => void | Promise<void>;
+  loading?: boolean;
+  error?: string;
+  defaultEmail?: string;
+}
+
+export type LoginFormData = {
+  email: string;
+  password: string;
+};
+```
+
+#### 避免 any
+
+```tsx
+// ❌ 不好
+function handleSubmit(data: any) {}
+
+// ✅ 好
+function handleSubmit(data: LoginFormData) {}
+```
+
+---
+
+## 📝 Stories 撰寫規範
+
+### 1. 為每個狀態創建 Story
+
+```tsx
+// ✅ 完整的 Stories 範例
+export const Default: Story = {
+  args: { children: '按鈕' },
+};
+
+export const Loading: Story = {
+  args: { children: '載入中...', loading: true },
+};
+
+export const Disabled: Story = {
+  args: { children: '停用', disabled: true },
+};
+
+export const WithIcon: Story = {
+  args: { children: '新增', startIcon: <IconAdd /> },
+};
+
+export const Error: Story = {
+  args: { children: '錯誤', color: 'error' },
+};
+```
+
+### 2. 提供互動式範例
+
+```tsx
+export const Interactive: Story = {
+  render: function InteractiveExample() {
+    const [count, setCount] = useState(0);
+
+    return (
+      <Button onClick={() => setCount(count + 1)}>點擊次數: {count}</Button>
+    );
+  },
+};
+```
+
+### 3. 添加說明文檔
+
+````tsx
+/**
+ * 主要按鈕
+ *
+ * 用於最重要的操作，如提交表單、確認動作等。
+ *
+ * @example
+ * ```tsx
+ * <Button variant="contained" color="primary">
+ *   提交
+ * </Button>
+ * ```
+ */
+export const Primary: Story = {
+  args: {
+    children: '主要按鈕',
+    variant: 'contained',
+  },
+};
+````
+
+---
+
+## 🎨 樣式規範
+
+### 1. 使用 MUI sx prop
+
+```tsx
+// ✅ 好：使用 sx
+<Box sx={{
+  p: 2,
+  mb: 3,
+  borderRadius: 1,
+  bgcolor: 'background.paper',
+}}>
+  內容
+</Box>
+
+// ❌ 避免：inline styles
+<Box style={{
+  padding: '16px',
+  marginBottom: '24px',
+}}>
+  內容
+</Box>
+```
+
+### 2. 響應式設計
+
+```tsx
+<Box
+  sx={{
+    p: { xs: 2, sm: 3, md: 4 }, // 不同斷點不同 padding
+    width: { xs: '100%', sm: '80%', md: '60%' },
+  }}
+>
+  內容
+</Box>
+```
+
+### 3. 使用 theme 變數
+
+```tsx
+// ✅ 好：使用 theme
+<Box sx={{ color: 'primary.main', bgcolor: 'background.paper' }} />
+
+// ❌ 避免：硬編碼顏色
+<Box sx={{ color: '#1976d2', bgcolor: '#fff' }} />
+```
+
+---
+
+## 🧪 測試規範
+
+### 1. 在 Storybook 中測試
+
+每個組件應該有：
+
+- ✅ Default story（預設狀態）
+- ✅ Loading story（載入狀態）
+- ✅ Error story（錯誤狀態）
+- ✅ Disabled story（停用狀態）
+- ✅ Interactive story（互動範例）
+
+### 2. 使用 MSW 模擬 API
+
+```tsx
+export const WithAPICall: Story = {
+  parameters: {
+    msw: {
+      handlers: [
+        graphql.mutation('Login', () => {
+          return HttpResponse.json({
+            data: { login: { accessToken: 'token' } },
+          });
+        }),
+      ],
+    },
+  },
+};
+```
+
+---
+
+## 📦 組件組織
+
+### 1. 檔案結構
+
+```text
+ComponentName/
+├── ComponentName.tsx       # 組件主檔
+├── ComponentName.stories.tsx  # Stories
+├── ComponentName.test.tsx  # 單元測試（可選）
+└── index.ts                # 導出
+```
+
+### 2. 導出規範
+
+```tsx
+// ComponentName/index.ts
+export { ComponentName } from './ComponentName';
+export type { ComponentNameProps } from './ComponentName';
+
+// atoms/index.ts
+export * from './Button';
+export * from './TextField';
+```
+
+---
+
+## ⚡ 性能優化
+
+### 1. 使用 React.memo
+
+```tsx
+// 對於純展示組件
+export const Button = React.memo(function Button({ children, ...props }) {
+  return <MuiButton {...props}>{children}</MuiButton>;
+});
+```
+
+### 2. 避免不必要的重渲染
+
+```tsx
+// ❌ 不好：每次都創建新物件
+<Button onClick={() => handleClick(id)} />;
+
+// ✅ 好：使用 useCallback
+const handleClick = useCallback(() => {
+  doSomething(id);
+}, [id]);
+
+<Button onClick={handleClick} />;
+```
+
+---
+
+## 🔍 無障礙性（a11y）
+
+### 1. 語義化 HTML
+
+```tsx
+// ✅ 好
+<button type="submit">提交</button>
+
+// ❌ 不好
+<div onClick={handleSubmit}>提交</div>
+```
+
+### 2. ARIA 標籤
+
+```tsx
+<IconButton aria-label="關閉對話框" onClick={onClose}>
+  <CloseIcon />
+</IconButton>
+```
+
+### 3. 鍵盤導航
+
+確保所有互動元素都可以通過鍵盤操作。
+
+---
+
+## 📚 文檔規範
+
+### 1. JSDoc 註解
+
+````tsx
+/**
+ * Button 組件 - Atomic Design: Atom
+ *
+ * 基於 MUI Button 的封裝，提供統一的按鈕樣式和行為。
+ *
+ * @example
+ * ```tsx
+ * <Button variant="contained" loading>
+ *   載入中...
+ * </Button>
+ * ```
+ */
+export function Button({ children, loading, ...props }: ButtonProps) {
+  // ...
+}
+````
+
+### 2. Props 說明
+
+```tsx
+export interface ButtonProps {
+  /**
+   * 按鈕內容
+   */
+  children: React.ReactNode;
+
+  /**
+   * 是否顯示載入狀態
+   * @default false
+   */
+  loading?: boolean;
+
+  /**
+   * 按鈕變體
+   * @default 'contained'
+   */
+  variant?: 'contained' | 'outlined' | 'text';
+}
+```
+
+---
+
+## ✅ 檢查清單
+
+開發新組件時，確保：
+
+- [ ] 遵循 Atomic Design 原則，放在正確的層級
+- [ ] 組件是純淨的（無副作用）
+- [ ] 提供完整的 TypeScript 類型
+- [ ] 創建多個 Stories 展示不同狀態
+- [ ] 添加 JSDoc 註解
+- [ ] 支援響應式設計
+- [ ] 符合無障礙性標準
+- [ ] 使用 theme 變數（不硬編碼顏色）
+- [ ] 提供合理的預設值
+- [ ] 在 Storybook 中測試所有狀態
+
+---
+
+## 🎓 學習資源
+
+- [Storybook Best Practices](https://storybook.js.org/docs/react/writing-stories/introduction)
+- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
+- [MUI Customization Guide](https://mui.com/material-ui/customization/how-to-customize/)
+- [Atomic Design Methodology](https://bradfrost.com/blog/post/atomic-web-design/)
+
+---
+
+## 💡 提示
+
+**記住：好的組件應該是**
+
+- 📦 **可重用** - 可以在多個地方使用
+- 🧪 **可測試** - 容易編寫測試
+- 📖 **有文檔** - 清楚說明如何使用
+- 🎨 **一致** - 遵循設計系統
+- ⚡ **高效** - 性能良好
+
+開始構建你的組件吧！ 🚀

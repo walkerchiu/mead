@@ -1,0 +1,158 @@
+<html lang='en'>
+  <head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Two-Factor Authentication Code</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 40px 30px;
+      }
+      .verification-code {
+        background: #f8f9fa;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin: 30px 0;
+      }
+      .code {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        letter-spacing: 8px;
+        font-family: 'Courier New', monospace;
+      }
+      .info {
+        background: #f0f7ff;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🔐 Two-Factor Authentication</h1>
+      </div>
+
+      <div class='content'>
+        <p>Hello, {{name}}!</p>
+
+        {{#if (eq purpose 'LOGIN')}}
+          <p>You are attempting to log in to your account. Please use the
+            following code to complete login:</p>
+        {{else if (eq purpose 'ENABLE')}}
+          <p>You are enabling two-factor authentication. Please use the
+            following code to complete setup:</p>
+        {{else if (eq purpose 'DISABLE')}}
+          <p>You are disabling two-factor authentication. Please use the
+            following code to confirm:</p>
+        {{/if}}
+
+        <div class='verification-code'>
+          <div
+            style='font-size: 14px; color: #666; margin-bottom: 10px;'
+          >Verification Code</div>
+          <div class='code'>{{code}}</div>
+          <div style='font-size: 12px; color: #999; margin-top: 10px;'>This code
+            will expire in
+            {{expiryMinutes}}
+            minutes</div>
+        </div>
+
+        <div class='info'>
+          <strong>📋 Instructions:</strong>
+          <ul>
+            <li>Enter this code within
+              <strong>{{expiryMinutes}} minutes</strong></li>
+            <li>The code can only be used once</li>
+            <li>The code is case-sensitive</li>
+            <li>Maximum 5 attempts</li>
+          </ul>
+        </div>
+
+        <div class='warning'>
+          <strong>⚠️ Security Reminder:</strong>
+          <ul>
+            <li><strong>Do not</strong> share this code with anyone</li>
+            <li>If you did not initiate this action, please
+              <a href='mailto:support@yourapp.com'>contact us</a>
+              immediately</li>
+            <li>Please verify your account security</li>
+          </ul>
+        </div>
+
+        <p style='font-size: 12px; color: #999; margin-top: 30px;'>
+          <strong>Request Information:</strong><br />
+          Time:
+          {{timestamp}}<br />
+          {{#if ipAddress}}
+            IP Address:
+            {{ipAddress}}<br />
+          {{/if}}
+        </p>
+      </div>
+
+      <div class='footer'>
+        <p>This email was sent automatically. Please do not reply directly.</p>
+        <p>If you have any questions, please contact
+          <a href='mailto:support@yourapp.com'>Customer Support</a></p>
+        <p>&copy; 2026 Starter App. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

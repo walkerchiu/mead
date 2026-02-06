@@ -1,0 +1,147 @@
+<html>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background-color: #f44336;
+        color: white;
+        padding: 30px 20px;
+        text-align: center;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 30px 20px;
+      }
+      .info-box {
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #2196f3;
+        border-radius: 4px;
+      }
+      .info-box h3 {
+        margin-top: 0;
+        color: #2196f3;
+        font-size: 18px;
+      }
+      .info-box ul {
+        margin: 10px 0;
+        padding-left: 20px;
+      }
+      .info-box li {
+        margin: 8px 0;
+      }
+      .custom-message {
+        background-color: #fff3cd;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+      }
+      .custom-message h3 {
+        margin-top: 0;
+        color: #856404;
+        font-size: 18px;
+      }
+      .footer {
+        background-color: #f9f9f9;
+        padding: 20px;
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        border-top: 1px solid #e0e0e0;
+      }
+      .button {
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #2196f3;
+        color: white !important;
+        text-decoration: none;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      strong {
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h2>🔒 Your Session Has Been Terminated</h2>
+      </div>
+
+      <div class='content'>
+        <p>Dear {{userName}},</p>
+
+        <p>One of your login sessions has been terminated by an administrator.</p>
+
+        <div class='info-box'>
+          <h3>Session Information</h3>
+          <ul>
+            <li><strong>Device:</strong> {{deviceInfo}}</li>
+            {{#if browser}}
+              <li><strong>Browser:</strong> {{browser}}</li>
+            {{/if}}
+            {{#if os}}
+              <li><strong>Operating System:</strong> {{os}}</li>
+            {{/if}}
+            {{#if ipAddress}}
+              <li><strong>IP Address:</strong> {{ipAddress}}</li>
+            {{/if}}
+            {{#if location}}
+              <li><strong>Location:</strong> {{location}}</li>
+            {{/if}}
+            <li><strong>Revoked At:</strong> {{timestamp}}</li>
+          </ul>
+        </div>
+
+        <div class='info-box'>
+          <h3>Revocation Details</h3>
+          <p><strong>Revoked By:</strong> {{revokedByName}} ({{revokedBy}})</p>
+          <p><strong>Reason:</strong> {{reason}}</p>
+        </div>
+
+        {{#if customMessage}}
+          <div class='custom-message'>
+            <h3>📝 Administrator Message</h3>
+            <p>{{customMessage}}</p>
+          </div>
+        {{/if}}
+
+        <p>If this was not initiated by you, or if you have any questions,
+          please contact our support team immediately.</p>
+
+        <p>
+          <strong>Support Email:</strong>
+          <a href='mailto:{{supportEmail}}'>{{supportEmail}}</a>
+        </p>
+      </div>
+
+      <div class='footer'>
+        <p>This is an automated email. Please do not reply directly.</p>
+        <p>© 2026 Starter Platform. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

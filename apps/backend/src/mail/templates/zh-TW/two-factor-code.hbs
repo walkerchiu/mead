@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>雙因素認證驗證碼</title>
+    <style>
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC',
+          'Microsoft JhengHei', sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+      .content {
+        padding: 40px 30px;
+      }
+      .verification-code {
+        background: #f8f9fa;
+        border: 2px dashed #667eea;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        margin: 30px 0;
+      }
+      .code {
+        font-size: 36px;
+        font-weight: bold;
+        color: #667eea;
+        letter-spacing: 8px;
+        font-family: 'Courier New', monospace;
+      }
+      .info {
+        background: #f0f7ff;
+        border-left: 4px solid #667eea;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .warning {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .footer {
+        background: #f8f9fa;
+        padding: 20px 30px;
+        text-align: center;
+        font-size: 12px;
+        color: #666;
+      }
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+      }
+      ul {
+        padding-left: 20px;
+      }
+      li {
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class='container'>
+      <div class='header'>
+        <h1>🔐 雙因素認證</h1>
+      </div>
+
+      <div class='content'>
+        <p>您好，{{name}}！</p>
+
+        {{#if (eq purpose 'LOGIN')}}
+          <p>您正在嘗試登入帳號。請使用以下驗證碼完成登入：</p>
+        {{else if (eq purpose 'ENABLE')}}
+          <p>您正在啟用雙因素認證。請使用以下驗證碼完成設定：</p>
+        {{else if (eq purpose 'DISABLE')}}
+          <p>您正在停用雙因素認證。請使用以下驗證碼確認操作：</p>
+        {{/if}}
+
+        <div class='verification-code'>
+          <div
+            style='font-size: 14px; color: #666; margin-bottom: 10px;'
+          >驗證碼</div>
+          <div class='code'>{{code}}</div>
+          <div
+            style='font-size: 12px; color: #999; margin-top: 10px;'
+          >此驗證碼將在 {{expiryMinutes}} 分鐘後過期</div>
+        </div>
+
+        <div class='info'>
+          <strong>📋 使用說明：</strong>
+          <ul>
+            <li>請在 <strong>{{expiryMinutes}} 分鐘內</strong>輸入此驗證碼</li>
+            <li>驗證碼只能使用一次</li>
+            <li>驗證碼區分大小寫</li>
+            <li>最多嘗試 5 次</li>
+          </ul>
+        </div>
+
+        <div class='warning'>
+          <strong>⚠️ 安全提醒：</strong>
+          <ul>
+            <li><strong>請勿</strong>將此驗證碼分享給任何人</li>
+            <li>如果您沒有進行此操作，請立即<a
+                href='mailto:support@yourapp.com'
+              >聯繫我們</a></li>
+            <li>請確認您的帳號安全性</li>
+          </ul>
+        </div>
+
+        <p style='font-size: 12px; color: #999; margin-top: 30px;'>
+          <strong>操作資訊：</strong><br />
+          時間：{{timestamp}}<br />
+          {{#if ipAddress}}
+            IP 位址：{{ipAddress}}<br />
+          {{/if}}
+        </p>
+      </div>
+
+      <div class='footer'>
+        <p>本郵件由系統自動發送，請勿直接回覆。</p>
+        <p>如有任何問題，請聯繫
+          <a href='mailto:support@yourapp.com'>客戶支援</a></p>
+        <p>&copy; 2026 Starter App. All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>

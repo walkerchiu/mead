@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Coverage
+coverage/
+
+# Lock files
+pnpm-lock.yaml
+
+# Auto-generated files
+next-env.d.ts

@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+next-env.d.ts
+storybook-static/
+
+# Cache
+.cache/
+.turbo/
+*.tsbuildinfo
+.eslintcache
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+# Docker environment (contains sensitive data)
+.env.docker
+!.env.docker.example
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+.claude/
+.github/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+!**/admin/logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+
+# Environment state
+.current-env
+
+# Temporary
+tmp/
+temp/
+
+# Database backups
+backups/

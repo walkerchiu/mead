@@ -1,0 +1,18 @@
+// UserRole - 使用者角色關聯表（多對多）
+model UserRole {
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  grantedAt DateTime @default(now()) @map("granted_at")
+  grantedBy String?  @map("granted_by") @db.Uuid // 誰授予的
+
+  // 關聯
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  // 索引與約束
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
