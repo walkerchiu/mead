@@ -1221,6 +1221,8 @@ export type { AvatarProps } from './Avatar';
 
 ## 📚 Storybook 使用
 
+Storybook 是設計規範的展示來源，所有規範與組件都必須有對應的 Story，並與專案 Token / 字體 / 斷點保持一致。
+
 ### 啟動 Storybook
 
 ```bash

@@ -1,16 +1,16 @@
 'use client';
 
-import { useEffect, useState, createContext, useContext } from 'react';
-import {
-  isAuthenticated,
-  refreshAccessToken,
-  getAccessToken,
-  parseJwt,
-} from '@/lib/auth';
-import { useRouter } from '@/i18n/routing';
-import { useTranslations } from 'next-intl';
 import { DashboardSkeleton } from '@/components/atoms';
 import { ErrorDisplay } from '@/components/molecules';
+import { useRouter } from '@/i18n/routing';
+import {
+  getAccessToken,
+  isAuthenticated,
+  parseJwt,
+  refreshAccessToken,
+} from '@/lib/auth';
+import { useTranslations } from 'next-intl';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 // Context to notify children when auth is ready
 const AuthReadyContext = createContext<boolean>(false);
@@ -145,11 +145,7 @@ export default function ProtectedRoute({
     };
 
     check();
-    // ✅ 只在組件首次掛載時檢查認證，不依賴路由變化
-    // 路由變化時不需要重新檢查，因為 useAuthInit 已經處理了 token 管理
-    // eslint-disable-next-line
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [requiredPermission, router, t]);
 
   // 認證檢查中 - 顯示載入畫面
   if (checking) {

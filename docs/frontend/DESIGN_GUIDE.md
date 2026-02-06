@@ -18,15 +18,19 @@
     - [色彩系統](#色彩系統)
       - [Primary（主色）](#primary主色)
       - [Secondary（次要色）](#secondary次要色)
+      - [Accent（輔助強調）](#accent輔助強調)
       - [Semantic Colors（語意色）](#semantic-colors語意色)
       - [Neutral Colors（中性色）](#neutral-colors中性色)
     - [字體系統](#字體系統)
+    - [響應式斷點](#響應式斷點)
+    - [Guide（版型尺寸）](#guide版型尺寸)
     - [間距系統](#間距系統)
     - [圓角系統](#圓角系統)
     - [陰影系統](#陰影系統)
   - [📐 組件規範](#-組件規範)
     - [🔹 Atoms（原子組件）](#-atoms原子組件)
       - [Button（按鈕）](#button按鈕)
+      - [Switch（開關）](#switch開關)
       - [TextField（輸入框）](#textfield輸入框)
       - [CodeInput（驗證碼輸入）](#codeinput驗證碼輸入)
     - [🟢 Molecules（分子組件）](#-molecules分子組件)
@@ -135,88 +139,288 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 
 ```text
 用途：主要按鈕、連結、強調元素
-預設值：#1976d2（藍色）
-
-變體：
-├── Main: #1976d2
-├── Light: #42a5f5
-├── Dark: #1565c0
-└── Contrast Text: #ffffff
+色階：
+├── 0: #FFFFFF
+├── 50: #FFF4ED
+├── 100: #FFE6D5
+├── 200: #FECAAA
+├── 300: #FDA474
+├── 400: #FB743C
+├── 500: #F94F16
+├── 600: #E0320B
+├── 700: #C2240C
+├── 800: #9A1E12
+├── 900: #7C1C12
+└── 950: #430A07
 ```
 
 #### Secondary（次要色）
 
 ```text
 用途：次要操作、輔助元素
-預設值：Material UI 預設
+色階：
+├── 0: #FFFFFF
+├── 50: #FCF6F0
+├── 100: #F8EADC
+├── 200: #F2D7C1
+├── 300: #E6B28B
+├── 400: #DB8A5C
+├── 500: #D36D3C
+├── 600: #C55731
+├── 700: #A4432A
+├── 800: #833729
+├── 900: #6A3024
+└── 950: #391711
+```
 
-設計時考慮：
-- 與主色搭配協調
-- 對比度足夠
+#### Accent（輔助強調）
+
+```text
+用途：標記強調、輔助視覺焦點
+色階：
+├── 0: #FFFFFF
+├── 50: #FCF5FE
+├── 100: #F8EAFD
+├── 200: #F1D3FB
+├── 300: #E8B1F6
+├── 400: #DB82F0
+├── 500: #C547E1
+├── 600: #AE32C7
+├── 700: #9327A4
+├── 800: #7A2286
+├── 900: #66216E
+└── 950: #420949
 ```
 
 #### Semantic Colors（語意色）
 
+**Error（錯誤）**
+
 ```text
-✅ Success（成功）：#4caf50（綠色）
-   用途：成功訊息、完成狀態
+├── 0: #FFFFFF
+├── 50: #FFF1F2
+├── 100: #FFE0E3
+├── 200: #FFC7CC
+├── 300: #FF9FA7
+├── 400: #FF6874
+├── 500: #FA3949
+├── 600: #E61728
+├── 700: #C31221
+├── 800: #A1131F
+├── 900: #86161F
+└── 950: #49060C
+```
 
-❌ Error（錯誤）：#f44336（紅色）
-   用途：錯誤訊息、驗證失敗
+**Warning（警告）**
 
-⚠️ Warning（警告）：#ff9800（橙色）
-   用途：警告訊息
+```text
+├── 0: #FFFFFF
+├── 50: #FFF8ED
+├── 100: #FFEFD4
+├── 200: #FFDCA8
+├── 300: #FFC270
+├── 400: #FF9D37
+├── 500: #FF7B07
+├── 600: #F06406
+├── 700: #C74A07
+├── 800: #9E3A0E
+├── 900: #7F330F
+└── 950: #451705
+```
 
-ℹ️ Info（資訊）：#2196f3（藍色）
-   用途：提示訊息
+**Info（資訊）**
+
+```text
+├── 0: #FFFFFF
+├── 50: #ECFAFF
+├── 100: #D4F2FF
+├── 200: #B2E9FF
+├── 300: #7DDEFF
+├── 400: #40CBFF
+├── 500: #14A8FF
+├── 600: #0087FF
+├── 700: #006FFF
+├── 800: #005ED9
+├── 900: #084DA0
+└── 950: #0A2F61
+```
+
+**Success（成功）**
+
+```text
+├── 0: #FFFFFF
+├── 50: #E9FFE5
+├── 100: #CDFFC7
+├── 200: #9FFF96
+├── 300: #64FD59
+├── 400: #33F328
+├── 500: #10DA08
+├── 600: #05AE02
+├── 700: #078A07
+├── 800: #0C680C
+├── 900: #0F5812
+└── 950: #023105
 ```
 
 #### Neutral Colors（中性色）
 
 ```text
-Text Colors:
-├── Primary: rgba(0, 0, 0, 0.87) - 主要文字
-├── Secondary: rgba(0, 0, 0, 0.6) - 次要文字
-└── Disabled: rgba(0, 0, 0, 0.38) - 禁用文字
+Grey Scale:
+├── 0: #FFFFFF
+├── 50: #F6F7F9
+├── 100: #ECEFF2
+├── 200: #D4DAE3
+├── 300: #AFBACA
+├── 400: #8396AD
+├── 500: #637994
+├── 600: #4F617A
+├── 700: #414F63
+├── 800: #384354
+├── 900: #2A313C
+└── 950: #212630
 
-Background Colors:
-├── Default: #fafafa - 頁面背景
-├── Paper: #ffffff - 卡片背景
-└── Divider: rgba(0, 0, 0, 0.12) - 分隔線
+Text / Background 建議：
+├── Text Primary: Grey 900
+├── Text Secondary: Grey 600
+├── Text Disabled: Grey 400
+├── Background Default: Grey 50
+├── Background Paper: Grey 0
+└── Divider: Grey 200
+```
+
+#### Light Theme Guidance
+
+```text
+Primary: E0320B
+On Primary: FFFFFF
+Primary Container: FFE6D5
+On Primary Container: C2240C
+
+Secondary: C55731
+On Secondary: FFFFFF
+Secondary Container: F8EADC
+On Secondary Container: A4432A
+
+Accent: AE32C7
+On Accent: FFFFFF
+Accent Container: F8EAFD
+On Accent Container: 9327A4
+
+Semantic
+Error: E61728
+On Error: E61728
+Error Container: FFE0E3
+On Error Container: C31221
+
+Warning: F06406
+On Warning: F06406
+Warning Container: FFEFD4
+On Warning Container: C74A07
+
+Info: 0087FF
+On Info: 0087FF
+Info Container: D4F2FF
+On Info Container: 006FFF
+
+Success: 05AE02
+On Success: 05AE02
+Success Container: CDFFC7
+On Success Container: 078A07
+```
+
+#### Icon / Surface / Text / Outline
+
+```text
+Icon
+├── Default: N-950 (#212630)
+├── Secondary: N-900 (#2A313C)
+└── Invert: N-0 (#FFFFFF)
+
+Surface
+├── Default: P-50 (#FFF4ED)
+├── Dark: N-100 (#ECEFF2)
+└── White: N-0 (#FFFFFF)
+
+Surface Container
+├── P-50 (#FFF4ED)
+├── N-100 (#ECEFF2)
+└── N-0 (#FFFFFF)
+
+Text
+├── Primary: N-900 (#2A313C)
+├── Secondary: N-800 (#384354)
+└── Invert: N-0 (#FFFFFF)
+
+Outline
+├── Default: N-200 (#D4DAE3)
+└── Variant: #ECECEC
 ```
 
 ### 字體系統
 
-```text
 字體家族：
-├── 主要字體：Roboto, "Noto Sans TC", sans-serif
-└── 等寬字體：'Roboto Mono', monospace（用於代碼）
 
-字體大小（基準：16px = 1rem）：
-├── h1: 96px / 6rem
-├── h2: 60px / 3.75rem
-├── h3: 48px / 3rem
-├── h4: 34px / 2.125rem
-├── h5: 24px / 1.5rem
-├── h6: 20px / 1.25rem
-├── subtitle1: 16px / 1rem
-├── subtitle2: 14px / 0.875rem
-├── body1: 16px / 1rem（主要內文）
-├── body2: 14px / 0.875rem（次要內文）
-├── button: 14px / 0.875rem（全大寫）
-├── caption: 12px / 0.75rem
-└── overline: 12px / 0.75rem（全大寫）
+- 主要字體：Roboto, "Noto Sans TC", sans-serif（中文 fallback）
+- 等寬字體：`Roboto Mono`, monospace（用於代碼）
 
-字重：
-├── Light: 300
-├── Regular: 400
-├── Medium: 500
-└── Bold: 700
+**Typography 規格（English）**
 
-行高：
-├── Tight: 1.2（標題）
-├── Normal: 1.5（內文）
-└── Loose: 1.8（長文）
+| Style     | 用途     | Font Family | Weight        | Size (px) | Line-height (px) | Letter-spacing |
+| --------- | -------- | ----------- | ------------- | --------- | ---------------- | -------------- |
+| H1        | 展示標題 | Roboto      | Medium (500)  | 40        | 48               | 2%             |
+| H2        | 主標題   | Roboto      | Regular (400) | 34        | 40               | 1%             |
+| H3        | 副標題   | Roboto      | Medium (500)  | 32        | 36               | 0%             |
+| H4        | 副標題   | Roboto      | Medium (500)  | 24        | 32               | 0%             |
+| H5        | 副標題   | Roboto      | Medium (500)  | 20        | 26               | 0%             |
+| H6        | 副標題   | Roboto      | Medium (500)  | 18        | 26               | 0%             |
+| subtitle1 | 內文     | Roboto      | Regular (400) | 16        | 24               | 0%             |
+| subtitle2 | 內文粗體 | Roboto      | Medium (500)  | 16        | 24               | 0%             |
+| body1     | 內文     | Roboto      | Regular (400) | 14        | 22               | 0%             |
+| body2     | 內文粗體 | Roboto      | Medium (500)  | 14        | 22               | 0%             |
+| caption   | 標籤     | Roboto      | Regular (400) | 12        | 22               | 0%             |
+| button    | 按鈕     | Roboto      | Medium (500)  | 14        | 22               | 0%             |
+| overline  | Overline | Roboto      | Regular (400) | 12        | 22               | 0%             |
+
+> 備註：字距百分比可轉成 `em`（例如 2% → `0.02em`）。
+
+### 響應式斷點
+
+**裝置對應與區間**
+
+```text
+Large / TV：1920px+
+XL / Desktop：1440px–1919px
+L / Laptop：1024px–1439px
+M / Tablet：768px–1023px
+S / Mobile：360px–767px
+```
+
+**對應 MUI Breakpoints（min-width）**
+
+```text
+xs: 360
+sm: 768
+md: 1024
+lg: 1440
+xl: 1920
+```
+
+### Guide（版型尺寸）
+
+**設計 Frame 區間**
+
+```text
+XL / Desktop: 1920–1440
+L / Laptop: 1439–1024
+M / Tablet: 1023–768
+S / Mobile L: 767–480
+XS / Mobile S: 479–360
+```
+
+**建議 Frame 寬度（Figma）**
+
+```text
+1440 / 1024 / 768 / 480 / 360
 ```
 
 ### 間距系統
@@ -232,12 +436,37 @@ Background Colors:
 ├── 4: 32px  (2rem)
 ├── 5: 40px  (2.5rem)
 ├── 6: 48px  (3rem)
-└── ...以此類推
+├── 7: 56px  (3.5rem)
+└── 8: 64px  (4rem)
 
 使用場景：
 - 組件內邊距（Padding）
 - 組件外邊距（Margin）
 - 元素之間間距（Gap）
+```
+
+**Horizontal / Vertical**
+
+```text
+Spacing:1 = 8
+Spacing:2 = 16
+Spacing:3 = 24
+Spacing:4 = 32
+Spacing:5 = 40
+Spacing:6 = 48
+Spacing:7 = 56
+Spacing:8 = 64
+```
+
+**元件間距範例**
+
+```text
+Dropdown / Input spacing:
+ - 元件與元件之間：8px（Spacing:1）
+
+Chart label:
+ - 主/次標籤之間：8px（Spacing:1）
+ - 群組標籤之間：24px（Spacing:3）
 ```
 
 > 💡 **設計原則**：盡量使用 8 的倍數，保持視覺節奏一致
@@ -355,55 +584,109 @@ Loading 狀態特性：
 
 ---
 
-#### TextField（輸入框）
+#### Switch（開關）
 
-**設計規範**：
+**Design Tokens**：
 
 ```text
-結構：
-├── Label（標籤）
-│   ├── 字體：Body2 (14px)
-│   ├── 顏色：Text Secondary
-│   └── 必填標記：* (紅色)
-│
-├── Input Container（輸入容器）
-│   ├── 高度：56px
-│   ├── 內邊距：16px
-│   ├── 邊框：1px solid rgba(0,0,0,0.23)
-│   └── 圓角：4px
-│
-├── Helper Text（輔助文字）
-│   ├── 字體：Caption (12px)
-│   ├── 顏色：Text Secondary
-│   └── 位置：輸入框下方 4px
-│
-└── Error Message（錯誤訊息）
-    ├── 字體：Caption (12px)
-    ├── 顏色：Error
-    └── 圖示：⚠️（可選）
+Sizes
+- Medium: width 44, height 24, padding 2, thumb 20, track radius 12
+- Small: width 36, height 20, padding 2, thumb 16, track radius 10
 
-狀態：
-├── Default：邊框 #ccc
-├── Hover：邊框變深
-├── Focus：邊框 2px，主色
-├── Error：邊框紅色，顯示錯誤訊息
-├── Disabled：背景色 #f5f5f5，禁用
-└── Filled：標籤上移，縮小
+Colors
+- Track Off: #D4DAE3
+- Track On: #F94F16
+- Track Disabled: #ECEFF2
+- Thumb: #FFFFFF
+- Thumb Disabled: #D4DAE3
 ```
 
-**特殊類型**：
+**狀態**：
 
 ```text
-Email：
-- 前綴圖示：@ 或信封
-- 自動驗證格式
+- Default（未啟用）
+- Checked（啟用）
+- Disabled（禁用）
+```
 
-Password：
-- 後綴按鈕：眼睛圖示（顯示/隱藏）
-- 遮罩字元：●
+---
 
-Number：
-- 後綴按鈕：+ / - 按鈕（可選）
+#### Radio（單選）
+
+**Design Tokens**：
+
+```text
+Sizes
+- Large: size 24, dot 14, border 1
+- Medium: size 20, dot 12, border 1
+- Small: size 16, dot 10, border 1
+
+Colors (Unchecked)
+- Border: #D4DAE3
+- Background: #FFFFFF
+- Hover Border: #AFBACA
+- Hover Background: #F6F7F9
+- Pressed Border: #8396AD
+- Pressed Background: #ECEFF2
+- Disabled Border: #ECEFF2
+- Disabled Background: #FFFFFF
+
+Colors (Checked)
+- Border/Dot: #F94F16
+- Background: #FFF4ED
+- Hover Border/Dot: #E0320B
+- Hover Background: #FFE6D5
+- Pressed Border/Dot: #C2240C
+- Pressed Background: #FECAAA
+- Disabled Border: #D4DAE3
+- Disabled Background: #FFFFFF
+- Disabled Dot: #AFBACA
+```
+
+**狀態**：
+
+```text
+- Default（未選）
+- Checked（已選）
+- Disabled（禁用）
+```
+
+---
+
+#### TextField（輸入框）
+
+**Design Tokens**：
+
+```text
+Sizes
+- Large: height 48, paddingX 16, radius 20, font 14, label 12
+- Medium: height 40, paddingX 14, radius 20, font 14, label 12
+- Small: height 32, paddingX 12, radius 16, font 13, label 12
+
+Colors
+- Border: #D4DAE3
+- Hover Border: #4F617A
+- Focus Border: #F94F16
+- Disabled Border: #D4DAE3
+- Background: #FFFFFF
+- Disabled Background: #F6F7F9
+- Text: #2A313C
+- Placeholder: #AFBACA
+- Label: #4F617A
+- Focus Label: #F94F16
+- Error Border: #FA3949
+- Error Background: #FFF1F2
+- Error Text/Label: #E61728
+```
+
+**狀態**：
+
+```text
+- Enable
+- Hover
+- Focus
+- Disabled
+- Error
 ```
 
 **設計檢查清單**：
@@ -989,8 +1272,8 @@ Badge（徽章）顯示：
 └── Logo（可選，頂部）
 
 響應式斷點：
-├── Desktop (>= 900px)：卡片居中，固定寬度
-└── Mobile (< 900px)：卡片全寬，減少內邊距
+├── Tablet and up (>= 768px)：卡片居中，固定寬度
+└── Mobile (< 768px)：卡片全寬，減少內邊距
 ```
 
 ---
@@ -1043,6 +1326,10 @@ Badge（徽章）顯示：
 │   │   │   - 3 種變體 × 3 種尺寸 × 6 種狀態
 │   │   │   - 圖示按鈕（startIcon、endIcon、iconOnly）
 │   │   │   - Loading 狀態下的 Spinner 替換
+│   │   │
+│   │   ├── Switch（開關）
+│   │   │   說明：基本狀態切換元件，支援大小與狀態
+│   │   │   包含：Small/Medium、Default/Checked/Disabled
 │   │   │
 │   │   ├── TextField（輸入框）
 │   │   │   說明：基礎文字輸入組件，用於表單中收集使用者輸入
@@ -1578,6 +1865,7 @@ Button States Frame:
 - [ ] 加入使用說明
 - [ ] 記錄設計決策
 - [ ] 提供範例和反例
+- [ ] Storybook 有對應展示（字體/Token/斷點一致）
 
 ---
 
