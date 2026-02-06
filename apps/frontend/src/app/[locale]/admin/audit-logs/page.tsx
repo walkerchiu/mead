@@ -1,9 +1,17 @@
 'use client';
 
-import { useState } from 'react';
-import { Box, Container, Typography, Button, Alert } from '@mui/material';
-import { Refresh } from '@mui/icons-material';
+import { useState, useEffect } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Alert,
+  IconButton,
+} from '@mui/material';
+import { Refresh, ArrowBack } from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 import { MainAppBar } from '@/components/layout';
 import { useAuditLogs } from '@/hooks/useAuditLogs';
 import { useAuditLogSubscription } from '@/hooks/useAuditLogSubscription';
@@ -11,12 +19,44 @@ import { AuditLogStats } from '@/components/admin/AuditLogStats';
 import { AuditLogFilters } from '@/components/admin/AuditLogFilters';
 import { AuditLogTable } from '@/components/admin/AuditLogTable';
 import ProtectedRoute, { useAuthReady } from '@/components/auth/ProtectedRoute';
-import { logout } from '@/lib/auth';
+import { logout, getAccessToken, parseJwt } from '@/lib/auth';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 function AuditLogsContent() {
+  const router = useRouter();
   const t = useTranslations('pages.admin.auditLogs');
   const [filters, setFilters] = useState({});
   const authReady = useAuthReady();
+  const [userFromToken, setUserFromToken] = useState<{
+    name: string;
+    email: string;
+  } | null>(null);
+
+  // 取得當前使用者資訊
+  const { user: currentUser } = useCurrentUser({ skip: !authReady });
+
+  useEffect(() => {
+    if (!authReady) {
+      return;
+    }
+
+    const token = getAccessToken();
+    if (token) {
+      const payload = parseJwt(token);
+      // 從 token 取得基本使用者資訊作為 fallback
+      if (payload?.email) {
+        setUserFromToken({
+          name: (payload.email as string).split('@')[0],
+          email: payload.email as string,
+        });
+      }
+    } else {
+      setUserFromToken(null);
+    }
+  }, [authReady]);
+
+  // 使用 GraphQL 查詢結果，如果失敗則使用 token 中的資訊
+  const displayUser = currentUser || userFromToken;
 
   const { logs, loading, error, pageInfo, page, setPage, refetch } =
     useAuditLogs({ filters, authReady });
@@ -55,10 +95,67 @@ function AuditLogsContent() {
     await logout();
   };
 
+  const handleAccountClick = () => {
+    router.push('/settings/account');
+  };
+
+  const handleProfileClick = () => {
+    router.push('/settings/profile');
+  };
+
+  const handleSecurityClick = () => {
+    router.push('/settings/security');
+  };
+
+  const handleHelpClick = () => {
+    // TODO: Navigate to help page or open help dialog
+    console.log('Help clicked');
+  };
+
+  const handleAboutClick = () => {
+    // TODO: Navigate to about page or open about dialog
+    console.log('About clicked');
+  };
+
   return (
     <>
       {/* 頂部導航欄 */}
-      <MainAppBar title={t('title')} showBackButton onLogout={handleLogout} />
+      <MainAppBar
+        logo={
+          <Box
+            sx={{
+              fontSize: '1.75rem',
+              fontWeight: 'bold',
+              color: 'white',
+            }}
+          >
+            📊
+          </Box>
+        }
+        title={'Wind Dashboard'}
+        titleLink="/dashboard"
+        user={
+          displayUser
+            ? {
+                name: displayUser.name,
+                email: displayUser.email,
+                avatar: currentUser?.avatar,
+                role: 'Admin',
+                status: 'online',
+              }
+            : undefined
+        }
+        accountUrl="/settings/account"
+        profileUrl="/settings/profile"
+        securityUrl="/settings/security"
+        onAccountClick={handleAccountClick}
+        onProfileClick={handleProfileClick}
+        onSecurityClick={handleSecurityClick}
+        onLogout={handleLogout}
+        onHelpClick={handleHelpClick}
+        onAboutClick={handleAboutClick}
+        userIconMode={true}
+      />
 
       {/* 主要內容區 */}
       <Container maxWidth="xl" sx={{ mt: 4, mb: 4 }}>
@@ -71,13 +168,22 @@ function AuditLogsContent() {
             mb: 3,
           }}
         >
-          <Box>
-            <Typography variant="h4" gutterBottom>
-              {t('title')}
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              {t('description')}
-            </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <IconButton
+              onClick={() => router.push('/dashboard')}
+              sx={{ mr: 1 }}
+              aria-label="back to dashboard"
+            >
+              <ArrowBack />
+            </IconButton>
+            <Box>
+              <Typography variant="h4" gutterBottom>
+                {t('title')}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {t('description')}
+              </Typography>
+            </Box>
           </Box>
 
           <Button

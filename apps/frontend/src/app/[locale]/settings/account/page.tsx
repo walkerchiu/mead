@@ -15,22 +15,22 @@ import { useSnackbar } from 'notistack';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import ProtectedRoute, { useAuthReady } from '@/components/auth/ProtectedRoute';
 import { MainAppBar } from '@/components/layout';
 import { logout, getAccessToken, parseJwt } from '@/lib/auth';
-import { ME_QUERY, UPDATE_MY_PROFILE_DETAILS_MUTATION } from '@/lib/graphql';
+import { ME_QUERY, UPDATE_MY_PROFILE_MUTATION } from '@/lib/graphql';
 import { getErrorMessage } from '@/lib/error-utils';
-import { FormField, SelectField } from '@/components/molecules';
+import { FormField } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
-export default function ProfileSettingsPage() {
+export default function AccountSettingsPage() {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
-  const t = useTranslations('pages.settings.profile');
+  const t = useTranslations('pages.settings.account');
   const tc = useTranslations('common');
   const td = useTranslations('pages.dashboard');
   const tv = useTranslations('validation');
@@ -50,11 +50,6 @@ export default function ProfileSettingsPage() {
       name?: string;
       profile?: {
         avatar?: string;
-        bio?: string;
-        phone?: string;
-        address?: string;
-        website?: string;
-        language?: 'en' | 'zh-TW';
       };
     };
   };
@@ -64,24 +59,31 @@ export default function ProfileSettingsPage() {
     loading: queryLoading,
     refetch,
   } = useQuery<MeQueryData>(ME_QUERY);
-  const [updateProfileDetails, { loading: updateDetailsLoading }] = useMutation(
-    UPDATE_MY_PROFILE_DETAILS_MUTATION,
+  const [updateProfile, { loading: updateProfileLoading }] = useMutation(
+    UPDATE_MY_PROFILE_MUTATION,
   );
 
   const user = data?.me;
 
   useEffect(() => {
+    console.log('[AccountSettings] useEffect triggered, authReady:', authReady);
+
     const token = getAccessToken();
     if (token) {
       const payload = parseJwt(token);
       // 從 token 取得基本使用者資訊作為 fallback
       if (payload?.email) {
-        setUserFromToken({
+        const user = {
           name: (payload.email as string).split('@')[0],
           email: payload.email as string,
-        });
+        };
+        console.log('[AccountSettings] Setting userFromToken:', user);
+        setUserFromToken(user);
       }
     } else {
+      console.log(
+        '[AccountSettings] No token found, setting userFromToken to null',
+      );
       setUserFromToken(null);
     }
   }, [authReady]);
@@ -91,42 +93,32 @@ export default function ProfileSettingsPage() {
 
   // Debug logging
   useEffect(() => {
-    console.log('[ProfileSettings] authReady:', authReady);
-    console.log('[ProfileSettings] currentUser:', currentUser);
-    console.log('[ProfileSettings] userFromToken:', userFromToken);
-    console.log('[ProfileSettings] displayUser:', displayUser);
+    console.log('[AccountSettings] authReady:', authReady);
+    console.log('[AccountSettings] currentUser:', currentUser);
+    console.log('[AccountSettings] userFromToken:', userFromToken);
+    console.log('[AccountSettings] displayUser:', displayUser);
   }, [authReady, currentUser, userFromToken, displayUser]);
 
-  // Profile Details Form Schema
-  const profileDetailsSchema = z.object({
-    bio: z.string().max(500, tv('bio.maxLength')).optional(),
-    phone: z.string().optional(),
-    address: z.string().optional(),
-    website: z
+  // Account Info Form Schema
+  const accountSchema = z.object({
+    email: z.string().email(tv('email.invalid')),
+    name: z
       .string()
-      .refine(
-        (val) => !val || val === '' || /^https?:\/\/.+/.test(val),
-        tv('website.invalid'),
-      )
+      .max(100, tv('name.maxLength', { max: 100 }))
       .optional(),
-    language: z.enum(['en', 'zh-TW']).optional(),
   });
 
-  type ProfileDetailsFormData = z.infer<typeof profileDetailsSchema>;
+  type AccountFormData = z.infer<typeof accountSchema>;
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
-  } = useForm<ProfileDetailsFormData>({
-    resolver: zodResolver(profileDetailsSchema),
+  } = useForm<AccountFormData>({
+    resolver: zodResolver(accountSchema),
     values: {
-      bio: user?.profile?.bio || '',
-      phone: user?.profile?.phone || '',
-      address: user?.profile?.address || '',
-      website: user?.profile?.website || '',
-      language: (user?.profile?.language as 'en' | 'zh-TW' | undefined) || 'en',
+      email: user?.email || '',
+      name: user?.name || '',
     },
   });
 
@@ -157,16 +149,13 @@ export default function ProfileSettingsPage() {
     console.log('About clicked');
   };
 
-  const onSubmit = async (data: ProfileDetailsFormData) => {
+  const onSubmit = async (data: AccountFormData) => {
     try {
-      await updateProfileDetails({
+      await updateProfile({
         variables: {
           input: {
-            bio: data.bio || null,
-            phone: data.phone || null,
-            address: data.address || null,
-            website: data.website || null,
-            language: data.language || null,
+            email: data.email,
+            name: data.name || null,
           },
         },
       });
@@ -251,80 +240,38 @@ export default function ProfileSettingsPage() {
           {t('description')}
         </Typography>
 
-        {/* Profile Details Card */}
+        {/* Account Information Card */}
         <Card>
           <CardContent>
             <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
               <FormField
-                {...register('bio')}
+                {...register('email')}
                 margin="normal"
+                required
                 fullWidth
-                label={t('bio')}
-                multiline
-                rows={4}
-                error={errors.bio}
-                helperText={errors.bio?.message || t('bioHelper')}
-                disabled={updateDetailsLoading}
+                label={t('email')}
+                type="email"
+                autoComplete="email"
+                error={errors.email}
+                helperText={errors.email?.message || t('emailHelper')}
+                disabled={updateProfileLoading}
               />
 
               <FormField
-                {...register('phone')}
+                {...register('name')}
                 margin="normal"
                 fullWidth
-                label={t('phone')}
-                autoComplete="tel"
-                error={errors.phone}
-                helperText={errors.phone?.message || t('phoneHelper')}
-                disabled={updateDetailsLoading}
-              />
-
-              <FormField
-                {...register('address')}
-                margin="normal"
-                fullWidth
-                label={t('address')}
-                autoComplete="street-address"
-                error={errors.address}
-                helperText={errors.address?.message || t('addressHelper')}
-                disabled={updateDetailsLoading}
-              />
-
-              <FormField
-                {...register('website')}
-                margin="normal"
-                fullWidth
-                label={t('website')}
-                type="url"
-                autoComplete="url"
-                error={errors.website}
-                helperText={errors.website?.message || t('websiteHelper')}
-                disabled={updateDetailsLoading}
-              />
-
-              <Controller
-                name="language"
-                control={control}
-                render={({ field }) => (
-                  <SelectField
-                    {...field}
-                    margin="normal"
-                    fullWidth
-                    label={t('language')}
-                    options={[
-                      { value: 'en', label: 'English' },
-                      { value: 'zh-TW', label: '繁體中文' },
-                    ]}
-                    error={errors.language}
-                    helperText={errors.language?.message || t('languageHelper')}
-                    disabled={updateDetailsLoading}
-                  />
-                )}
+                label={t('name')}
+                autoComplete="name"
+                error={errors.name}
+                helperText={errors.name?.message || t('nameHelper')}
+                disabled={updateProfileLoading}
               />
 
               <Button
                 type="submit"
                 variant="contained"
-                loading={updateDetailsLoading}
+                loading={updateProfileLoading}
                 sx={{ mt: 2 }}
               >
                 {tc('save')}
