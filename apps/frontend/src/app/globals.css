@@ -12,8 +12,7 @@ body {
 
 body {
   font-family:
-    var(--font-roboto, Roboto),
-    var(--font-noto-sans-tc, "Noto Sans TC"),
+    var(--font-roboto, Roboto), var(--font-noto-sans-tc, 'Noto Sans TC'),
     sans-serif;
 }
 
@@ -22,13 +21,6 @@ pre,
 kbd,
 samp {
   font-family:
-    var(--font-roboto-mono, "Roboto Mono"),
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Monaco,
-    Consolas,
-    "Liberation Mono",
-    "Courier New",
-    monospace;
+    var(--font-roboto-mono, 'Roboto Mono'), ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }

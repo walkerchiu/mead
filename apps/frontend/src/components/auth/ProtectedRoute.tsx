@@ -78,10 +78,19 @@ export default function ProtectedRoute({
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
+    console.log(
+      '[ProtectedRoute] Running auth check, isAuthenticated:',
+      isAuthenticated(),
+    );
+
     const check = async () => {
       try {
         // ✅ 優先檢查是否已認證（避免重複調用 refreshAccessToken）
         if (isAuthenticated()) {
+          console.log(
+            '[ProtectedRoute] Already authenticated, setting authReady to true',
+          );
+
           // 檢查權限
           if (requiredPermission && !hasPermission(requiredPermission)) {
             setError(t('permissionDeniedMessage'));

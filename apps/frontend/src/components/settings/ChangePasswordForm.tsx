@@ -21,7 +21,7 @@ export default function ChangePasswordForm({
   onSuccess,
 }: ChangePasswordFormProps) {
   const { enqueueSnackbar } = useSnackbar();
-  const t = useTranslations('pages.settings.profile');
+  const t = useTranslations('pages.settings.security');
   const tv = useTranslations('validation');
 
   const [changePassword, { loading }] = useMutation(CHANGE_PASSWORD_MUTATION);
