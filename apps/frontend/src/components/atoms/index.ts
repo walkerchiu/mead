@@ -41,8 +41,24 @@ export {
   LanguageSwitcher,
   type LanguageSwitcherProps,
 } from './LanguageSwitcher';
+export {
+  NotificationMenu,
+  type NotificationMenuProps,
+  type Notification,
+} from './NotificationMenu';
 export { Progress, type ProgressProps } from './Progress';
-export { SettingsMenu, type SettingsMenuProps } from './SettingsMenu';
+export {
+  SettingsMenu,
+  createSettingsMenuItems,
+  type SettingsMenuProps,
+  type SettingsMenuItem,
+} from './SettingsMenu';
+export {
+  UserMenu,
+  createUserMenuItems,
+  type UserMenuProps,
+  type UserMenuItem,
+} from './UserMenu';
 export { DashboardSkeleton } from './Skeleton';
 export { Slider, type SliderMark, type SliderProps } from './Slider';
 export { SnackbarWithProgress } from './SnackbarWithProgress';

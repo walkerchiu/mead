@@ -1,28 +1,38 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { SettingsMenu } from './SettingsMenu';
-import { AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { SettingsMenu, createSettingsMenuItems } from './SettingsMenu';
+import { AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
 import Link from 'next/link';
-import { MainAppBar } from '@/components/layout';
+import React from 'react';
+
+// 默認的 menu items（使用 i18n 中的標籤）
+const defaultMenuItems = createSettingsMenuItems({
+  onHelpClick: () => console.log('Help clicked'),
+  onAboutClick: () => console.log('About clicked'),
+  helpUrl: '/help',
+  aboutUrl: '/about',
+  helpLabel: '說明文件', // 對應 i18n: components.settingsMenu.help
+  aboutLabel: '關於', // 對應 i18n: components.settingsMenu.about
+});
 
 /**
- * SettingsMenu provides quick access to profile, security settings, and logout.
+ * SettingsMenu provides quick access to theme settings, help, and about.
  *
- * Features:
- * - Dropdown menu with profile and security options
- * - Logout option with divider
+ * **Features**:
+ * - Inline theme toggle (Light/Dark/System)
+ * - Help documentation link
+ * - About information link
  * - Icon-only or with label display modes
- * - Follows Material-UI Menu pattern
  * - Accessible with ARIA labels
  */
 const meta = {
-  title: 'Molecules/SettingsMenu',
+  title: 'Atoms/SettingsMenu',
   component: SettingsMenu,
   parameters: {
     layout: 'centered',
     docs: {
       description: {
         component:
-          'A settings menu component that provides quick navigation to profile settings, security settings, and logout functionality.',
+          'A settings menu component that provides quick access to theme settings, help documentation, and about information.',
       },
     },
   },
@@ -59,9 +69,22 @@ const meta = {
         defaultValue: { summary: 'inherit' },
       },
     },
-    onLogout: {
-      action: 'logout',
-      description: 'Custom logout handler (optional)',
+    currentTheme: {
+      control: 'select',
+      options: ['light', 'dark', 'system'],
+      description: 'Current theme setting',
+      table: {
+        defaultValue: { summary: 'system' },
+      },
+    },
+    onThemeChange: {
+      action: 'theme changed',
+    },
+    onHelpClick: {
+      action: 'help clicked',
+    },
+    onAboutClick: {
+      action: 'about clicked',
     },
   },
 } satisfies Meta<typeof SettingsMenu>;
@@ -70,27 +93,35 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default icon-only display
+ * Default icon-only display with system theme
  */
 export const Default: Story = {
-  args: {},
-};
-
-/**
- * Icon-only with primary color
- */
-export const Primary: Story = {
   args: {
-    color: 'primary',
+    showThemeToggle: true,
+    currentTheme: 'system',
+    menuItems: defaultMenuItems,
   },
 };
 
 /**
- * Icon-only with secondary color
+ * Light theme selected
  */
-export const Secondary: Story = {
+export const LightTheme: Story = {
   args: {
-    color: 'secondary',
+    showThemeToggle: true,
+    currentTheme: 'light',
+    menuItems: defaultMenuItems,
+  },
+};
+
+/**
+ * Dark theme selected
+ */
+export const DarkTheme: Story = {
+  args: {
+    showThemeToggle: true,
+    currentTheme: 'dark',
+    menuItems: defaultMenuItems,
   },
 };
 
@@ -100,7 +131,9 @@ export const Secondary: Story = {
 export const WithLabel: Story = {
   args: {
     showLabel: true,
-    color: 'primary',
+    showThemeToggle: true,
+    currentTheme: 'system',
+    menuItems: defaultMenuItems,
   },
 };
 
@@ -110,7 +143,9 @@ export const WithLabel: Story = {
 export const Small: Story = {
   args: {
     size: 'small',
-    color: 'primary',
+    showThemeToggle: true,
+    currentTheme: 'light',
+    menuItems: defaultMenuItems,
   },
 };
 
@@ -120,33 +155,56 @@ export const Small: Story = {
 export const Large: Story = {
   args: {
     size: 'large',
-    color: 'primary',
+    showThemeToggle: true,
+    currentTheme: 'dark',
+    menuItems: defaultMenuItems,
   },
 };
 
 /**
- * Size comparison
+ * Primary color
  */
-export const SizeComparison: Story = {
+export const Primary: Story = {
+  args: {
+    color: 'primary',
+    showThemeToggle: true,
+    currentTheme: 'system',
+    menuItems: defaultMenuItems,
+  },
+};
+
+/**
+ * Different theme states
+ */
+export const ThemeStates: Story = {
   render: () => (
-    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-          Small
-        </Typography>
-        <SettingsMenu size="small" color="primary" />
+    <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography sx={{ width: 100 }}>Light:</Typography>
+        <SettingsMenu
+          showThemeToggle
+          currentTheme="light"
+          color="primary"
+          menuItems={defaultMenuItems}
+        />
       </Box>
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-          Medium
-        </Typography>
-        <SettingsMenu size="medium" color="primary" />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography sx={{ width: 100 }}>Dark:</Typography>
+        <SettingsMenu
+          showThemeToggle
+          currentTheme="dark"
+          color="primary"
+          menuItems={defaultMenuItems}
+        />
       </Box>
-      <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
-          Large
-        </Typography>
-        <SettingsMenu size="large" color="primary" />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+        <Typography sx={{ width: 100 }}>System:</Typography>
+        <SettingsMenu
+          showThemeToggle
+          currentTheme="system"
+          color="primary"
+          menuItems={defaultMenuItems}
+        />
       </Box>
     </Box>
   ),
@@ -158,6 +216,9 @@ export const SizeComparison: Story = {
 export const InAppBar: Story = {
   args: {
     color: 'inherit',
+    showThemeToggle: true,
+    currentTheme: 'light',
+    menuItems: defaultMenuItems,
   },
   decorators: [
     (Story) => (
@@ -194,6 +255,9 @@ export const InAppBarWithLabel: Story = {
   args: {
     color: 'inherit',
     showLabel: true,
+    showThemeToggle: true,
+    currentTheme: 'dark',
+    menuItems: defaultMenuItems,
   },
   decorators: [
     (Story) => (
@@ -224,76 +288,187 @@ export const InAppBarWithLabel: Story = {
 };
 
 /**
- * Dashboard header with language switcher and settings menu
+ * In AppBar with other elements
  */
-export const DashboardHeader: Story = {
-  render: () => (
-    <Box sx={{ width: '100%', minWidth: 800 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography
-            variant="h6"
-            component={Link}
-            href="/dashboard"
-            sx={{
-              flexGrow: 1,
-              color: 'inherit',
-              textDecoration: 'none',
-              '&:hover': {
-                opacity: 0.8,
-              },
-            }}
-          >
-            My Dashboard
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Box
-              component="span"
-              sx={{
-                color: 'inherit',
-                px: 1,
-                py: 0.5,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              🌐
+export const InAppBarWithOthers: Story = {
+  args: {
+    color: 'inherit',
+    showThemeToggle: true,
+    currentTheme: 'system',
+    menuItems: defaultMenuItems,
+  },
+  decorators: [
+    (Story) => (
+      <Box sx={{ width: '100%', minWidth: 800 }}>
+        <AppBar position="static">
+          <Toolbar>
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+              My Application
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+              <Box
+                component="span"
+                sx={{
+                  color: 'inherit',
+                  px: 2,
+                  py: 1,
+                  cursor: 'pointer',
+                  borderRadius: 1,
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                🔔 3
+              </Box>
+              <Box
+                component="span"
+                sx={{
+                  color: 'inherit',
+                  px: 2,
+                  py: 1,
+                  cursor: 'pointer',
+                  borderRadius: 1,
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                🌐 EN
+              </Box>
+              <Box
+                component="span"
+                sx={{
+                  color: 'inherit',
+                  px: 2,
+                  py: 1,
+                  cursor: 'pointer',
+                  borderRadius: 1,
+                  '&:hover': {
+                    bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                👤 User
+              </Box>
+              <Story />
             </Box>
-            <SettingsMenu color="inherit" />
-          </Box>
-        </Toolbar>
-      </AppBar>
-    </Box>
-  ),
+          </Toolbar>
+        </AppBar>
+      </Box>
+    ),
+  ],
 };
 
 /**
- * Complete page header with MainAppBar component (with back button, title link, and settings menu)
- * This demonstrates the real-world usage scenario like the audit logs and session management pages
+ * In settings panel
  */
-export const WithMainAppBar: Story = {
-  render: () => (
-    <Box>
-      <MainAppBar
-        title="Audit Logs"
-        titleLink="/admin/audit-logs"
-        showBackButton
-        backPath="/dashboard"
-      />
-      <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
-        <Typography variant="h5" gutterBottom>
-          Page Content
+export const InSettingsPanel: Story = {
+  args: {
+    color: 'primary',
+    showLabel: true,
+    showThemeToggle: true,
+    currentTheme: 'light',
+    menuItems: defaultMenuItems,
+  },
+  decorators: [
+    (Story) => (
+      <Paper sx={{ p: 3, width: 400 }}>
+        <Typography variant="h6" gutterBottom>
+          Application Settings
         </Typography>
-        <Typography variant="body1" color="text.secondary">
-          This story demonstrates the complete navigation bar with:
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          Customize your preferences
         </Typography>
-        <Box component="ul" sx={{ mt: 2 }}>
-          <li>Back button (clicking will navigate to /dashboard)</li>
-          <li>Clickable title "Audit Logs" (links to /admin/audit-logs)</li>
-          <li>Language switcher</li>
-          <li>Settings menu with Profile, Security, and Logout options</li>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Typography variant="body1" sx={{ flexGrow: 1 }}>
+            Settings:
+          </Typography>
+          <Story />
         </Box>
+      </Paper>
+    ),
+  ],
+};
+
+/**
+ * Interactive example with theme switching
+ */
+export const Interactive: Story = {
+  render: () => {
+    const [theme, setTheme] = React.useState<'light' | 'dark' | 'system'>(
+      'system',
+    );
+
+    return (
+      <Box sx={{ textAlign: 'center' }}>
+        <Paper sx={{ p: 3, mb: 2 }}>
+          <Typography variant="h6" gutterBottom>
+            Try the Settings Menu
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            Current theme: <strong>{theme}</strong>
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Click the settings icon to change theme
+          </Typography>
+          <SettingsMenu
+            showThemeToggle
+            currentTheme={theme}
+            onThemeChange={setTheme}
+            color="primary"
+            menuItems={defaultMenuItems}
+          />
+        </Paper>
+        <Typography variant="caption" color="text.secondary">
+          Theme switching will be reflected in the menu
+        </Typography>
+      </Box>
+    );
+  },
+};
+
+/**
+ * All size comparison
+ */
+export const SizeComparison: Story = {
+  render: () => (
+    <Box sx={{ display: 'flex', gap: 3, alignItems: 'center' }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+          Small
+        </Typography>
+        <SettingsMenu
+          size="small"
+          color="primary"
+          showThemeToggle
+          currentTheme="light"
+          menuItems={defaultMenuItems}
+        />
+      </Box>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+          Medium
+        </Typography>
+        <SettingsMenu
+          size="medium"
+          color="primary"
+          showThemeToggle
+          currentTheme="dark"
+          menuItems={defaultMenuItems}
+        />
+      </Box>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+          Large
+        </Typography>
+        <SettingsMenu
+          size="large"
+          color="primary"
+          showThemeToggle
+          currentTheme="system"
+          menuItems={defaultMenuItems}
+        />
       </Box>
     </Box>
   ),
