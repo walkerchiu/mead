@@ -26,97 +26,119 @@ const preview: Preview = {
     options: {
       storySort: {
         order: [
-          // 1. 設計系統基礎(最優先)
+          // 1. 介紹與文檔
+          'Introduction',
+          ['Welcome', 'Best Practices', 'Getting Started'],
+
+          // 2. 設計系統基礎
           'Design System',
           [
             'Colors', // 顏色系統
             'Typography', // 字體排版
           ],
 
-          // 2. Atoms - 原子組件(最小單位)
+          // 3. Atoms - 原子組件(按功能分組)
           'Atoms',
           [
-            // 基礎輸入
-            'Buttons', // 按鈕相關
-            'Fields', // 欄位相關
-            'Chips', // 標籤
-            'TextField', // 文字輸入
-            'CodeInput', // 驗證碼輸入
-            'Switch', // 開關
-            'Slider', // 滑塊
+            // 按鈕類
+            'Button',
+            'ActionButton',
+            'IconButton',
 
-            // 視覺展示
-            'Avatar', // 頭像
-            'Badge', // 徽章
-            'Icon', // 圖示
-            'Progress', // 進度條
-            'Divider', // 分隔線
-            'Skeleton', // 骨架屏
+            // 表單欄位類
+            'TextField',
+            'Search',
+            'DatePicker',
+            'TimePicker',
+            'Radio',
+            'Switch',
+
+            // 輸入組件
+            'CodeInput',
+            'Slider',
+
+            // 標籤與標記
+            'Chip',
+            'Badge',
+
+            // 資料顯示
+            'Avatar',
+            'Icon',
+            'Progress',
+            'Skeleton',
+
+            // 佈局與分隔
+            'Divider',
+
+            // 選單類
+            'NotificationMenu',
+            'UserMenu',
+            'SettingsMenu',
           ],
 
-          // 3. Molecules - 分子組件(組合型)
+          // 4. Molecules - 分子組件(按功能分組)
           'Molecules',
           [
             // 表單組件
-            'FormField', // 表單欄位
-            'PasswordField', // 密碼欄位
-            'SelectField', // 選擇欄位
-            'CheckboxGroup', // 多選組
-            'RadioGroup', // 單選組
+            'FormField',
+            'PasswordField',
+            'SelectField',
+            'CheckboxGroup',
+            'RadioGroup',
 
             // 反饋組件
-            'ErrorDisplay', // 錯誤顯示
-            'AlertMessage', // 警告訊息
-            'SnackbarWithProgress', // 進度通知
+            'AlertMessage',
+            'ErrorDisplay',
+            'SnackbarWithProgress',
 
             // 導航組件
-            'Tabs', // 標籤頁
-            'Stepper', // 步驟條
-            'Pagination', // 分頁
-            'LanguageSwitcher', // 語言切換
-            'SettingsMenu', // 設定選單
+            'Tabs',
+            'Stepper',
+            'Pagination',
 
-            // 資料展示
-            'Card', // 卡片
-            'DataTable', // 資料表格
-            'DataList', // 資料列表
-            'Accordion', // 手風琴
+            // 語言與設定
+            'LanguageSwitcher',
+
+            // 資料展示組件
+            'Card',
+            'DataTable',
+            'DataList',
+            'Accordion',
           ],
 
-          // 4. Organisms - 有機組件(複雜組合)
+          // 5. Organisms - 有機組件
           'Organisms',
           [
-            // 導航結構
-            'MainAppBar', // 主導航列
-            'Sidebar', // 側邊欄
-            'Drawer', // 抽屜
+            // 佈局組件
+            'Drawer',
+            'Modal',
+            'Sidebar',
 
-            // 覆蓋層
-            'Modal', // 模態框
-
-            // 表單組合
-            'LoginForm', // 登入表單
-            'ForgotPasswordForm', // 忘記密碼表單
-            'ResetPasswordForm', // 重設密碼表單
-            'TwoFactorForm', // 雙因素認證表單
+            // 認證表單
+            'LoginForm',
+            'ForgotPasswordForm',
+            'ResetPasswordForm',
+            'TwoFactorForm',
           ],
 
-          // 5. Templates - 模板(頁面骨架)
+          // 6. Layout - 佈局組件
+          'Layout',
+          ['MainAppBar'],
+
+          // 7. Templates - 模板
           'Templates',
-          [
-            'AuthLayout', // 認證佈局
-          ],
+          ['AuthLayout'],
 
-          // 6. Pages - 完整頁面
+          // 8. Pages - 完整頁面
           'Pages',
           [
-            'LoginPage', // 登入頁
-            'ForgotPasswordPage', // 忘記密碼頁
-            'ResetPasswordPage', // 重設密碼頁
-            'LoginPageWithMSW', // 登入頁(帶模擬)
+            'LoginPage',
+            'LoginPage (MSW)',
+            'ForgotPasswordPage',
+            'ResetPasswordPage',
           ],
 
-          // 7. Examples - 範例與測試
+          // 9. Examples - 範例與測試
           'Example',
           ['Apollo + MSW Test'],
         ],

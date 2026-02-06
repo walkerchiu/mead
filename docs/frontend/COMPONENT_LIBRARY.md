@@ -38,20 +38,23 @@
       - [Stepper](#stepper)
       - [Pagination](#pagination)
       - [LanguageSwitcher](#languageswitcher)
+      - [NotificationMenu](#notificationmenu)
+      - [UserMenu](#usermenu)
       - [SettingsMenu](#settingsmenu)
       - [Card](#card)
       - [DataTable](#datatable)
       - [DataList](#datalist)
       - [Accordion](#accordion)
     - [🟠 Organisms（有機體組件）](#-organisms有機體組件)
-      - [MainAppBar](#mainappbar)
-      - [Sidebar](#sidebar)
       - [Drawer](#drawer)
       - [Modal](#modal)
+      - [Sidebar](#sidebar)
       - [LoginForm](#loginform)
       - [TwoFactorForm](#twofactorform)
       - [ForgotPasswordForm](#forgotpasswordform)
       - [ResetPasswordForm](#resetpasswordform)
+    - [🟣 Layout（佈局組件）](#-layout佈局組件)
+      - [MainAppBar](#mainappbar)
     - [🔵 Templates（模板）](#-templates模板)
       - [AuthLayout](#authlayout)
     - [📄 Pages（Storybook 頁面）](#-pagesstorybook-頁面)
@@ -132,10 +135,20 @@ Pages (頁面)
 ```text
 apps/frontend/src/components/
 ├── atoms/              # 基礎原子組件（不可再分割）
-│   ├── Button/
-│   ├── TextField/
+│   ├── Buttons/        # 按鈕類
+│   │   ├── Button/
+│   │   ├── ActionButton/
+│   │   └── IconButton/
+│   ├── Fields/         # 表單欄位類
+│   │   ├── TextField/
+│   │   ├── Search/
+│   │   ├── DatePicker/
+│   │   ├── TimePicker/
+│   │   ├── Radio/
+│   │   └── Switch/
+│   ├── Chips/          # 標籤類
+│   │   └── Chip/
 │   ├── CodeInput/
-│   ├── Switch/
 │   ├── Slider/
 │   ├── Avatar/
 │   ├── Badge/
@@ -144,6 +157,8 @@ apps/frontend/src/components/
 │   ├── Divider/
 │   ├── Skeleton/
 │   ├── LanguageSwitcher/
+│   ├── NotificationMenu/
+│   ├── UserMenu/
 │   ├── SettingsMenu/
 │   ├── SnackbarWithProgress/
 │   └── Drawer/
@@ -167,11 +182,13 @@ apps/frontend/src/components/
 │   └── Modal/
 │
 ├── organisms/          # 有機體組件（完整功能單元）
-│   ├── MainAppBar/
 │   ├── LoginForm/
 │   ├── TwoFactorForm/
 │   ├── ForgotPasswordForm/
 │   └── ResetPasswordForm/
+│
+├── layout/             # 佈局組件
+│   └── MainAppBar/
 │
 ├── templates/          # 頁面模板（佈局）
 │   └── AuthLayout/
@@ -701,7 +718,7 @@ interface AlertMessageProps {
 
 #### LanguageSwitcher
 
-**路徑**: `components/atoms/LanguageSwitcher/`
+**路徑**: `components/molecules/LanguageSwitcher/`
 
 **功能**:
 
@@ -712,14 +729,195 @@ interface AlertMessageProps {
 
 ---
 
+#### NotificationMenu
+
+**路徑**: `components/atoms/NotificationMenu/`
+
+**功能**:
+
+- 通知選單組件
+- 顯示通知列表
+- 未讀通知數量提示（Badge）
+
+**Props**:
+
+```typescript
+interface Notification {
+  id: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message: string;
+  timestamp: Date;
+  read: boolean;
+}
+
+interface NotificationMenuProps {
+  notifications?: Notification[];
+  unreadCount?: number;
+  onNotificationClick?: (notification: Notification) => void;
+  onMarkAllRead?: () => void;
+  onViewAll?: () => void;
+  onClearAll?: () => void;
+  color?: string;
+}
+```
+
+**Storybook**: ✅ `NotificationMenu.stories.tsx`
+
+---
+
+#### UserMenu
+
+**路徑**: `components/atoms/UserMenu/`
+
+**功能**:
+
+- 使用者選單組件
+- 支援動態選單項目（menuItems）
+- 支援圖示模式（iconMode）
+- 顯示使用者頭像、名稱、狀態
+
+**Props**:
+
+```typescript
+interface UserMenuItem {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+  href?: string;
+  disabled?: boolean;
+  dividerAfter?: boolean;
+  variant?: 'default' | 'danger';
+}
+
+interface UserMenuProps {
+  user: {
+    name: string;
+    email: string;
+    avatar?: string;
+    status?: 'online' | 'offline' | 'busy';
+  };
+  menuItems?: UserMenuItem[]; // 動態選單項目
+  iconMode?: boolean; // 圖示模式（統一圖示風格）
+  showName?: boolean; // 顯示使用者名稱
+  showStatus?: boolean; // 顯示線上狀態
+  size?: 'small' | 'medium' | 'large';
+}
+```
+
+**Helper 函數**:
+
+```typescript
+// 建立標準選單項目
+createUserMenuItems(options: {
+  onAccountClick?: () => void;
+  onProfileClick?: () => void;
+  onSecurityClick?: () => void;
+  onLogout?: () => void;
+  accountUrl?: string;
+  profileUrl?: string;
+  securityUrl?: string;
+  accountLabel?: string;
+  profileLabel?: string;
+  securityLabel?: string;
+  logoutLabel?: string;
+}): UserMenuItem[]
+```
+
+**使用範例**:
+
+```tsx
+import { createUserMenuItems } from '@/components/atoms/UserMenu';
+
+// 使用 helper 函數建立選單項目
+const menuItems = createUserMenuItems({
+  onAccountClick: () => router.push('/settings/account'),
+  onProfileClick: () => router.push('/settings/profile'),
+  onSecurityClick: () => router.push('/settings/security'),
+  onLogout: handleLogout,
+  accountLabel: '帳號設定',
+  profileLabel: '個人資料',
+  securityLabel: '安全設定',
+  logoutLabel: '登出',
+});
+
+<UserMenu
+  user={user}
+  menuItems={menuItems}
+  iconMode={true}
+  showName={true}
+  showStatus={true}
+/>;
+```
+
+**Storybook**: ✅ `UserMenu.stories.tsx`
+
+---
+
 #### SettingsMenu
 
 **路徑**: `components/atoms/SettingsMenu/`
 
 **功能**:
 
-- 設定選單
-- 使用者選項下拉選單
+- 設定選單組件
+- 支援動態選單項目（menuItems）
+- 主題切換、說明、關於
+
+**Props**:
+
+```typescript
+interface SettingsMenuItem {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  onClick?: () => void;
+  href?: string;
+  disabled?: boolean;
+  dividerAfter?: boolean;
+}
+
+interface SettingsMenuProps {
+  menuItems?: SettingsMenuItem[]; // 動態選單項目
+  currentTheme?: 'light' | 'dark';
+  onThemeChange?: (theme: 'light' | 'dark') => void;
+  color?: string;
+}
+```
+
+**Helper 函數**:
+
+```typescript
+// 建立標準選單項目
+createSettingsMenuItems(options: {
+  onHelpClick?: () => void;
+  onAboutClick?: () => void;
+  helpUrl?: string;
+  aboutUrl?: string;
+  helpLabel?: string;
+  aboutLabel?: string;
+}): SettingsMenuItem[]
+```
+
+**使用範例**:
+
+```tsx
+import { createSettingsMenuItems } from '@/components/atoms/SettingsMenu';
+
+const menuItems = createSettingsMenuItems({
+  onHelpClick: () => console.log('Help clicked'),
+  onAboutClick: () => console.log('About clicked'),
+  helpLabel: '說明',
+  aboutLabel: '關於',
+});
+
+<SettingsMenu
+  menuItems={menuItems}
+  currentTheme="light"
+  onThemeChange={(theme) => setTheme(theme)}
+/>;
+```
 
 **Storybook**: ✅ `SettingsMenu.stories.tsx`
 
@@ -954,33 +1152,6 @@ interface DataListProps {
 
 完整的功能單元，由多個 molecules 和 atoms 組合而成。
 
-#### MainAppBar
-
-**路徑**: `components/organisms/MainAppBar/`
-
-**功能**:
-
-- 主應用程式列
-- 導航、Logo、使用者選單
-- 響應式設計
-
-**Storybook**: ✅ `MainAppBar.stories.tsx`
-
----
-
-#### Sidebar
-
-**路徑**: `components/molecules/Sidebar/`
-
-**功能**:
-
-- 側邊欄導航
-- 選單項目管理
-
-**Storybook**: ✅ `Sidebar.stories.tsx`
-
----
-
 #### Drawer
 
 **路徑**: `components/atoms/Drawer/`
@@ -1004,6 +1175,19 @@ interface DataListProps {
 - 彈出式內容容器
 
 **Storybook**: ✅ `Modal.stories.tsx`
+
+---
+
+#### Sidebar
+
+**路徑**: `components/molecules/Sidebar/`
+
+**功能**:
+
+- 側邊欄導航
+- 選單項目管理
+
+**Storybook**: ✅ `Sidebar.stories.tsx`
 
 ---
 
@@ -1079,6 +1263,91 @@ interface DataListProps {
 - 密碼強度檢查
 
 **Storybook**: ✅ `ResetPasswordForm.stories.tsx`
+
+---
+
+### 🟣 Layout（佈局組件）
+
+全域佈局組件，用於整個應用程式的導航和結構。
+
+#### MainAppBar
+
+**路徑**: `components/layout/MainAppBar/`
+
+**功能**:
+
+- 主應用程式導航列
+- 全域導航元件（Logo、標題、通知、使用者選單、設定選單）
+- 響應式設計
+
+**設計原則**:
+
+- ✅ **全域導航**: AppBar 為全域導航，始終顯示網站標題/Logo
+- ✅ **一致性**: 所有頁面共用同一個 AppBar 配置
+- ❌ **不包含頁面層級操作**: 返回按鈕等頁面操作應放在頁面內容區域
+
+**Props**:
+
+```typescript
+interface MainAppBarProps {
+  logo?: React.ReactNode; // 自訂 Logo
+  title?: string; // 標題
+  titleLink?: string; // 標題連結
+  user?: UserInfo; // 使用者資訊
+  showUserName?: boolean; // 顯示使用者名稱
+  showUserStatus?: boolean; // 顯示使用者狀態
+  userIconMode?: boolean; // 使用圖示模式（統一圖示風格）
+  notifications?: Notification[]; // 通知列表
+  unreadNotificationCount?: number; // 未讀通知數
+  showNotifications?: boolean; // 顯示通知鈴鐺
+  showUserMenu?: boolean; // 顯示使用者選單
+  showSettings?: boolean; // 顯示設定選單
+  currentTheme?: 'light' | 'dark'; // 當前主題
+  onThemeChange?: (theme: 'light' | 'dark') => void;
+  onAccountClick?: () => void;
+  onProfileClick?: () => void;
+  onSecurityClick?: () => void;
+  onLogout?: () => void;
+  onHelpClick?: () => void;
+  onAboutClick?: () => void;
+}
+```
+
+**使用範例**:
+
+```tsx
+// Dashboard 範例（基於 Storybook 設計）
+<MainAppBar
+  logo={<Box sx={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'white' }}>📊</Box>}
+  title="Wind Dashboard"
+  titleLink="/dashboard"
+  user={user}
+  unreadNotificationCount={3}
+  notifications={notifications}
+  showUserName={true}
+  showUserStatus={true}
+  userIconMode={true}
+  onAccountClick={handleAccountClick}
+  onProfileClick={handleProfileClick}
+  onSecurityClick={handleSecurityClick}
+  onLogout={handleLogout}
+  onHelpClick={handleHelpClick}
+  onAboutClick={handleAboutClick}
+/>
+
+// 頁面內容區域的返回按鈕（正確模式）
+<Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+    <IconButton onClick={() => router.push('/dashboard')} sx={{ mr: 1 }}>
+      <ArrowBack />
+    </IconButton>
+    <Typography variant="h4">帳號設定</Typography>
+  </Box>
+  {/* 頁面內容 */}
+</Container>
+```
+
+**Storybook**: ✅ `MainAppBar.stories.tsx`
 
 ---
 
@@ -1237,66 +1506,92 @@ pnpm storybook
 根據 `.storybook/preview.tsx`，當前的分類結構為：
 
 ```text
-1. Introduction（介紹）
+1. Introduction（介紹與文檔）
    - Welcome
    - Best Practices
+   - Getting Started
 
-2. Design System（設計系統）
+2. Design System（設計系統基礎）
    - Colors
    - Typography
 
-3. Atoms（原子組件）
-   - Button（支援 startIcon, endIcon, iconOnly）
-   - TextField
-   - CodeInput
-   - Skeleton
-   - Switch
-   - Slider
-   - Avatar
-   - Badge
-   - Icon
-   - Divider
-   - Progress
+3. Atoms（原子組件 - 按功能分組）
+   - 按鈕類
+     - Button（支援 startIcon, endIcon, iconOnly, loading）
+     - ActionButton
+     - IconButton
+   - 表單欄位類
+     - TextField
+     - Search
+     - DatePicker
+     - TimePicker
+     - Radio
+     - Switch
+   - 輸入組件
+     - CodeInput
+     - Slider
+   - 標籤與標記
+     - Chip
+     - Badge
+   - 資料顯示
+     - Avatar
+     - Icon
+     - Progress
+     - Skeleton
+   - 佈局與分隔
+     - Divider
+   - 選單類
+     - NotificationMenu
+     - UserMenu（支援 dynamic menuItems, iconMode）
+     - SettingsMenu（支援 dynamic menuItems）
 
-4. Molecules（分子組件）
-   - FormField
-   - PasswordField
-   - SelectField（支援分組、圖示、篩選）
-   - RadioGroup
-   - CheckboxGroup
-   - Card
-   - Accordion
-   - Tabs
-   - Stepper
-   - Pagination
-   - LanguageSwitcher
-   - SettingsMenu
-   - SnackbarWithProgress
-   - AlertMessage
-   - ErrorDisplay
-   - DataTable（支援排序、篩選、高亮、展開、選擇）
-   - DataList（支援排序、篩選、高亮、展開、選擇）
+4. Molecules（分子組件 - 按功能分組）
+   - 表單組件
+     - FormField
+     - PasswordField
+     - SelectField（支援分組、圖示、篩選）
+     - CheckboxGroup
+     - RadioGroup
+   - 反饋組件
+     - AlertMessage
+     - ErrorDisplay
+     - SnackbarWithProgress
+   - 導航組件
+     - Tabs
+     - Stepper
+     - Pagination
+   - 語言與設定
+     - LanguageSwitcher
+   - 資料展示組件
+     - Card
+     - DataTable（支援排序、篩選、高亮、展開、選擇）
+     - DataList（支援排序、篩選、高亮、展開、選擇）
+     - Accordion
 
 5. Organisms（有機體組件）
-   - Drawer
-   - Modal
-   - Sidebar
-   - MainAppBar
-   - LoginForm
-   - ForgotPasswordForm
-   - ResetPasswordForm
-   - TwoFactorForm
+   - 佈局組件
+     - Drawer
+     - Modal
+     - Sidebar
+   - 認證表單
+     - LoginForm
+     - ForgotPasswordForm
+     - ResetPasswordForm
+     - TwoFactorForm
 
-6. Templates（模板）
+6. Layout（佈局組件）
+   - MainAppBar（全域導航，不包含頁面層級操作）
+
+7. Templates（模板）
    - AuthLayout
 
-7. Pages（頁面）
+8. Pages（完整頁面）
    - LoginPage
    - LoginPage (MSW)
    - ForgotPasswordPage
    - ResetPasswordPage
 
-8. Example（範例）
+9. Example（範例與測試）
    - Apollo + MSW Test
 ```
 

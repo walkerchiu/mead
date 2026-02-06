@@ -185,23 +185,23 @@
     },
     "settings": {
       "navigation": {
+        "account": "Account Settings",
         "profile": "Profile",
         "security": "Security"
       },
-      "security": {
-        "title": "Security Settings",
-        "description": "Manage your account security settings"
-      },
-      "profile": {
-        "title": "Profile Settings",
-        "description": "Manage your personal information and preferences",
-        "basicInfo": "Basic Information",
-        "profileDetails": "Profile Details",
-        "changePassword": "Change Password",
+      "account": {
+        "title": "Account Settings",
+        "description": "Manage your basic account information",
         "email": "Email Address",
         "emailHelper": "Used for login and notifications",
         "name": "Display Name",
         "nameHelper": "Your name will be displayed throughout the system",
+        "updateSuccess": "Account information updated successfully",
+        "updateError": "Failed to update account information"
+      },
+      "profile": {
+        "title": "Profile",
+        "description": "Manage your personal details and preferences",
         "bio": "Bio",
         "bioHelper": "Tell others about yourself (max 500 characters)",
         "phone": "Phone Number",
@@ -212,6 +212,13 @@
         "websiteHelper": "Your personal website or blog URL",
         "language": "Preferred Language",
         "languageHelper": "Language for emails and interface",
+        "updateSuccess": "Profile updated successfully",
+        "updateError": "Failed to update profile"
+      },
+      "security": {
+        "title": "Security Settings",
+        "description": "Manage your password and account security",
+        "changePassword": "Change Password",
         "currentPassword": "Current Password",
         "currentPasswordHelper": "Enter your current password for verification",
         "newPassword": "New Password",
@@ -220,11 +227,7 @@
         "confirmPasswordHelper": "Re-enter your new password",
         "revokeOtherDevices": "Sign out other devices",
         "revokeOtherDevicesHelper": "Log out from all other devices after changing password",
-        "updateSuccess": "Profile updated successfully",
-        "updateProfileSuccess": "Basic information updated successfully",
-        "updateDetailsSuccess": "Profile details updated successfully",
-        "passwordChanged": "Password changed successfully",
-        "updateError": "Failed to update profile"
+        "passwordChanged": "Password changed successfully"
       }
     },
     "admin": {
@@ -436,6 +439,32 @@
           "error": "Failed to revoke other devices"
         }
       }
+    }
+  },
+  "components": {
+    "notificationMenu": {
+      "title": "Notifications",
+      "markAllAsRead": "Mark all as read",
+      "viewAll": "View all notifications",
+      "clearAll": "Clear",
+      "noNotifications": "No notifications"
+    },
+    "userMenu": {
+      "account": "Account Settings",
+      "profile": "Profile",
+      "security": "Security",
+      "logout": "Logout"
+    },
+    "settingsMenu": {
+      "title": "Settings",
+      "appearance": "Appearance",
+      "theme": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "help": "Help & Documentation",
+      "about": "About"
     }
   }
 }

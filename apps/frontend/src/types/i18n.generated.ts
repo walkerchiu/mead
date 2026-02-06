@@ -188,23 +188,23 @@ export interface Messages {
     };
     settings: {
       navigation: {
+        account: string;
         profile: string;
         security: string;
       };
-      security: {
+      account: {
         title: string;
         description: string;
-      };
-      profile: {
-        title: string;
-        description: string;
-        basicInfo: string;
-        profileDetails: string;
-        changePassword: string;
         email: string;
         emailHelper: string;
         name: string;
         nameHelper: string;
+        updateSuccess: string;
+        updateError: string;
+      };
+      profile: {
+        title: string;
+        description: string;
         bio: string;
         bioHelper: string;
         phone: string;
@@ -215,6 +215,13 @@ export interface Messages {
         websiteHelper: string;
         language: string;
         languageHelper: string;
+        updateSuccess: string;
+        updateError: string;
+      };
+      security: {
+        title: string;
+        description: string;
+        changePassword: string;
         currentPassword: string;
         currentPasswordHelper: string;
         newPassword: string;
@@ -223,11 +230,7 @@ export interface Messages {
         confirmPasswordHelper: string;
         revokeOtherDevices: string;
         revokeOtherDevicesHelper: string;
-        updateSuccess: string;
-        updateProfileSuccess: string;
-        updateDetailsSuccess: string;
         passwordChanged: string;
-        updateError: string;
       };
     };
     admin: {
@@ -441,8 +444,35 @@ export interface Messages {
       };
     };
   };
+  components: {
+    notificationMenu: {
+      title: string;
+      markAllAsRead: string;
+      viewAll: string;
+      clearAll: string;
+      noNotifications: string;
+    };
+    userMenu: {
+      account: string;
+      profile: string;
+      security: string;
+      logout: string;
+    };
+    settingsMenu: {
+      title: string;
+      appearance: string;
+      theme: {
+        light: string;
+        dark: string;
+        system: string;
+      };
+      help: string;
+      about: string;
+    };
+  };
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface IntlMessages extends Messages {}
 }
