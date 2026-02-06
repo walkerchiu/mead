@@ -100,7 +100,7 @@ importers:
       '@prisma/client':
         specifier: 6.19.2
         version: 6.19.2(prisma@6.19.2(typescript@5.9.3))(typescript@5.9.3)
-      '@starter/typescript-config':
+      '@wind/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
       amqp-connection-manager:

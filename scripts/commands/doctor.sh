@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - doctor 命令
+# Wind CLI - doctor 命令
 # 環境診斷工具
 # ==========================================
 
@@ -68,7 +68,7 @@ done
 # 切換到專案根目錄
 cd "$PROJECT_ROOT"
 
-print_header "Starter 環境診斷"
+print_header "Wind 環境診斷"
 
 ISSUES_FOUND=0
 
@@ -168,17 +168,17 @@ fi
 log_step "3/7 Docker 服務"
 
 # 檢查容器是否運行
-if docker ps --format '{{.Names}}' | grep -q "starter-"; then
+if docker ps --format '{{.Names}}' | grep -q "wind-"; then
   log_success "Docker 容器正在運行"
 
   # 列出運行中的容器
   echo ""
   echo "  運行中的服務:"
-  docker ps --filter "name=starter-" --format "    - {{.Names}} ({{.Status}})"
+  docker ps --filter "name=wind-" --format "    - {{.Names}} ({{.Status}})"
   echo ""
 else
   ISSUES_FOUND=$((ISSUES_FOUND + 1))
-  log_error "沒有運行中的 Starter 容器"
+  log_error "沒有運行中的 Wind 容器"
   echo "      建議: docker-compose --env-file .env.docker up -d"
 
   if [ "$AUTO_FIX" = true ]; then

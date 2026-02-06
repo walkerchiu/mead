@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - status 命令
+# Wind CLI - status 命令
 # 查看所有服務狀態
 # ==========================================
 
@@ -70,7 +70,7 @@ check_service() {
     # 如果提供了 URL，測試連線
     if [[ -n "$url" ]] && [[ "$HEALTH_CHECK" == "true" ]]; then
       local is_healthy=false
-      
+
       # GraphQL 端點需要 POST 請求
       if [[ "$url" == *"/graphql"* ]]; then
         if curl -sf -X POST "$url" -H "Content-Type: application/json" -d '{"query":"{ __typename }"}' >/dev/null 2>&1; then
@@ -198,7 +198,7 @@ if [[ "$WATCH_MODE" == "true" ]]; then
 
   while true; do
     clear
-    echo -e "${GREEN}Starter 服務狀態監控${NC} - $(date '+%Y-%m-%d %H:%M:%S')"
+    echo -e "${GREEN}Wind 服務狀態監控${NC} - $(date '+%Y-%m-%d %H:%M:%S')"
     echo ""
 
     # 執行檢查（不使用 print_header 避免清屏）

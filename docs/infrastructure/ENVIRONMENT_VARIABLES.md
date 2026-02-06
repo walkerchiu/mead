@@ -1,6 +1,6 @@
 # 環境變數配置指南
 
-本指南說明如何正確配置 Starter 專案的環境變數。
+本指南說明如何正確配置 Wind 專案的環境變數。
 
 ---
 
@@ -54,7 +54,7 @@
 
 ## 📖 概述
 
-Starter 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
+Wind 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
 
 **核心概念**：
 
@@ -67,10 +67,10 @@ Starter 專案使用三層環境變數架構，分別管理 Docker 服務、Back
 
 ## 📋 專案結構
 
-Starter 專案有三個層級的環境變數：
+Wind 專案有三個層級的環境變數：
 
 ```text
-starter/
+wind/
 ├── .env.docker              # Docker 服務（PostgreSQL, RabbitMQ, Redis）
 ├── .env.docker.example      # Docker 範本 ✅
 ├── apps/
@@ -151,7 +151,7 @@ pnpm dev
 | `POSTGRES_PASSWORD`     | PostgreSQL 密碼   | `dev_postgres_2024` | ✅   |
 | `RABBITMQ_DEFAULT_PASS` | RabbitMQ 密碼     | `dev_rabbitmq_2024` | ✅   |
 | `POSTGRES_USER`         | PostgreSQL 使用者 | `postgres`          | ❌   |
-| `POSTGRES_DB`           | 資料庫名稱        | `starter_db`        | ❌   |
+| `POSTGRES_DB`           | 資料庫名稱        | `wind_db`           | ❌   |
 
 ### Backend (.env)
 
@@ -190,7 +190,7 @@ pnpm dev
 | `MAIL_USER`      | SMTP 使用者名稱 | `your-email@ethereal.email`    | ✅   |
 | `MAIL_PASSWORD`  | SMTP 密碼       | `your-password`                | ✅   |
 | `MAIL_FROM`      | 寄件者郵箱      | `noreply@localhost`            | ✅   |
-| `MAIL_FROM_NAME` | 寄件者名稱      | `Starter (Local)`              | ❌   |
+| `MAIL_FROM_NAME` | 寄件者名稱      | `Wind (Local)`                 | ❌   |
 | `MAIL_SECURE`    | 啟用 TLS/SSL    | `false` (開發) / `true` (生產) | ❌   |
 
 #### 其他配置
@@ -211,7 +211,7 @@ pnpm dev
 | 變數                           | 說明             | 範例                            | 必填 |
 | ------------------------------ | ---------------- | ------------------------------- | ---- |
 | `NEXT_PUBLIC_GRAPHQL_ENDPOINT` | GraphQL API 地址 | `http://localhost:4000/graphql` | ✅   |
-| `NEXT_PUBLIC_APP_NAME`         | 應用名稱         | `Starter`                       | ❌   |
+| `NEXT_PUBLIC_APP_NAME`         | 應用名稱         | `Wind`                          | ❌   |
 | `NEXT_PUBLIC_APP_URL`          | 應用 URL         | `http://localhost:3000`         | ❌   |
 
 ---
@@ -227,7 +227,7 @@ pnpm dev
 POSTGRES_PASSWORD=dev_postgres_2024
 
 # apps/backend/.env
-DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/starter_db"
+DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/wind_db"
                                     ^^^^^^^^^^^^^^^^^^
 ```
 

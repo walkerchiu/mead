@@ -147,7 +147,7 @@ export function AuthLayout({
                   mb: 1,
                 }}
               >
-                🌊 Starter
+                🌊 Wind
               </Typography>
               {title && (
                 <Typography
@@ -193,7 +193,7 @@ export function AuthLayout({
           }}
         >
           <Typography variant="body2">
-            © 2026 Starter. All rights reserved.
+            © 2026 Wind. All rights reserved.
           </Typography>
         </Box>
       )}

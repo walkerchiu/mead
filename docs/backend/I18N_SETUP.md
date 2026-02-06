@@ -153,7 +153,7 @@ cd apps/backend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @starter/backend generate-i18n-types
+pnpm --filter @wind/backend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -274,7 +274,7 @@ describe('I18n Translations Completeness', () => {
 pnpm test src/i18n/i18n-completeness.spec.ts
 
 # 或從根目錄
-pnpm --filter @starter/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
 ```
 
 ### 測試失敗範例
@@ -533,10 +533,10 @@ curl -X POST http://localhost:4000/graphql \
   -d '{"query":"{ __typename }"}'
 
 # 執行完整性測試
-pnpm --filter @starter/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
 
 # 重新生成類型
-pnpm --filter @starter/backend generate-i18n-types
+pnpm --filter @wind/backend generate-i18n-types
 ```
 
 ---
@@ -546,7 +546,7 @@ pnpm --filter @starter/backend generate-i18n-types
 ### 翻譯測試與類型生成
 
 ```bash
-# 啟動 Starter CLI
+# 啟動 Wind CLI
 ./scripts/cli.sh
 
 # 選擇 14（i18n 多語系管理）
@@ -560,13 +560,13 @@ pnpm --filter @starter/backend generate-i18n-types
 
 ```bash
 # 後端：生成類型
-pnpm --filter @starter/backend generate-i18n-types
+pnpm --filter @wind/backend generate-i18n-types
 
 # 後端：測試翻譯完整性
-pnpm --filter @starter/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
 
 # 前端：生成類型
-pnpm --filter @starter/frontend generate-i18n-types
+pnpm --filter @wind/frontend generate-i18n-types
 ```
 
 ---

@@ -1,6 +1,6 @@
-# Starter 專案文檔
+# Wind 專案文檔
 
-歡迎來到 Starter Monorepo 專案文檔！本文檔已依主題分類，方便快速查找。
+歡迎來到 Wind Monorepo 專案文檔！本文檔已依主題分類，方便快速查找。
 
 ---
 
@@ -9,7 +9,7 @@
 ### 我是新手，從哪裡開始？
 
 1. **專案概覽** → 返回 [根目錄 README](../README.md)
-2. **開發工具** → [Starter CLI 完整指南](getting-started/CLI_GUIDE.md)
+2. **開發工具** → [Wind CLI 完整指南](getting-started/CLI_GUIDE.md)
 3. **環境設置** → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
 4. **專案結構** → [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)
 
@@ -23,7 +23,7 @@
 
 | 文檔                                                         | 說明                                                   | 閱讀時間 |
 | ------------------------------------------------------------ | ------------------------------------------------------ | -------- |
-| [Starter CLI 完整指南](getting-started/CLI_GUIDE.md)         | 開發者 CLI 工具（快速上手+命令參考+架構）              | 15 分鐘  |
+| [Wind CLI 完整指南](getting-started/CLI_GUIDE.md)            | 開發者 CLI 工具（快速上手+命令參考+架構）              | 15 分鐘  |
 | [Docker 設置指南](getting-started/DOCKER_SETUP.md)           | Docker 服務設置與安全最佳實踐                          | 10 分鐘  |
 | [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)   | pnpm workspace + Turborepo 架構                        | 8 分鐘   |
 | [前後端 i18n 協調機制](getting-started/I18N_COORDINATION.md) | 前端（next-intl）與後端（nestjs-i18n）如何協調語言設定 | 8 分鐘   |
@@ -112,7 +112,7 @@ Docker、RabbitMQ、Dragonfly、Mailpit、GeoIP 等基礎設施配置。
 ```text
 1. 專案概覽 (../README.md)
    ↓
-2. Starter CLI 完整指南 (getting-started/CLI_GUIDE.md)
+2. Wind CLI 完整指南 (getting-started/CLI_GUIDE.md)
    ↓
 3. Docker 設置指南 (getting-started/DOCKER_SETUP.md)
    ↓
@@ -170,7 +170,7 @@ Docker、RabbitMQ、Dragonfly、Mailpit、GeoIP 等基礎設施配置。
    ↓
 3. RabbitMQ + Dragonfly (infrastructure/RABBITMQ_DRAGONFLY.md)
    ↓
-4. Starter CLI 完整指南 (getting-started/CLI_GUIDE.md)
+4. Wind CLI 完整指南 (getting-started/CLI_GUIDE.md)
    ↓
 5. 資料庫備份與還原 (database/BACKUP_RESTORE.md) ⭐ 重要
    ↓
@@ -225,7 +225,7 @@ Docker、RabbitMQ、Dragonfly、Mailpit、GeoIP 等基礎設施配置。
 
 ### 開發工具
 
-- CLI 工具 → [Starter CLI 完整指南](getting-started/CLI_GUIDE.md)
+- CLI 工具 → [Wind CLI 完整指南](getting-started/CLI_GUIDE.md)
 - Docker → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
 - 環境變數 → [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)
 - 備份還原 → [資料庫備份還原](database/BACKUP_RESTORE.md)

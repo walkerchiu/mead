@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - deps 命令
+# Wind CLI - deps 命令
 # 依賴管理工具
 # ==========================================
 
@@ -90,21 +90,21 @@ deps_outdated() {
   local workspace="${1:-all}"
   local filter
   local label
-  
+
   filter=$(get_filter "$workspace")
   label=$(get_ws_label "$workspace")
 
   print_header "檢查過時套件 ($label)"
-  
+
   echo -e "${DIM}正在執行: pnpm $filter outdated${NC}"
   echo -e "${DIM}────────────────────────────────────────${NC}\n"
   echo -e "${CYAN}⏳ 正在檢查套件版本...${NC}\n"
 
   cd "$PROJECT_ROOT"
-  
+
   # 顯示即時輸出 - 不重定向，讓用戶看到進度
   pnpm $filter outdated || true
-  
+
   echo ""
   log_success "檢查完成"
   echo ""
@@ -115,21 +115,21 @@ deps_audit() {
   local workspace="${1:-all}"
   local filter
   local label
-  
+
   filter=$(get_filter "$workspace")
   label=$(get_ws_label "$workspace")
 
   print_header "安全性審計 ($label)"
-  
+
   echo -e "${DIM}正在執行: pnpm $filter audit${NC}"
   echo -e "${DIM}────────────────────────────────────────${NC}\n"
   echo -e "${CYAN}🔍 正在掃描安全漏洞...${NC}\n"
 
   cd "$PROJECT_ROOT"
-  
+
   # 顯示即時輸出 - 不重定向，讓用戶看到進度
   pnpm $filter audit || true
-  
+
   echo ""
   log_success "審計完成"
   echo ""
@@ -140,12 +140,12 @@ deps_update() {
   local workspace="${1:-all}"
   local filter
   local label
-  
+
   filter=$(get_filter "$workspace")
   label=$(get_ws_label "$workspace")
 
   print_header "更新套件 ($label)"
-  
+
   echo -e "${YELLOW}⚠️  警告：${NC}這將更新套件到最新版本"
   echo -e "${DIM}正在執行: pnpm $filter update --latest${NC}"
   echo -e "${DIM}────────────────────────────────────────${NC}\n"
@@ -153,7 +153,7 @@ deps_update() {
   echo -e "${DIM}(可能需要數分鐘，請耐心等待)${NC}\n"
 
   cd "$PROJECT_ROOT"
-  
+
   # 顯示即時輸出
   pnpm $filter update --latest
 

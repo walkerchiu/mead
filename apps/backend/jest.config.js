@@ -16,7 +16,7 @@ module.exports = {
   coverageDirectory: './coverage',
   testEnvironment: 'node',
   moduleNameMapper: {
-    '^@starter/typescript-config/(.*)$':
+    '^@wind/typescript-config/(.*)$':
       '<rootDir>/../../packages/typescript-config/$1',
   },
 };

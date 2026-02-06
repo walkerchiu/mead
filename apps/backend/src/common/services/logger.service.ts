@@ -60,7 +60,7 @@ if (isProduction || process.env.ENABLE_FILE_LOGGING === 'true') {
 export const logger = createLogger({
   level: isProduction ? 'warn' : 'debug',
   format: logFormat,
-  defaultMeta: { service: 'starter-backend' },
+  defaultMeta: { service: 'wind-backend' },
   transports: logTransports,
   // 防止未處理的錯誤導致程序崩潰
   exitOnError: false,

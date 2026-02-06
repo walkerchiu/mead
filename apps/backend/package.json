@@ -1,5 +1,5 @@
 {
-  "name": "@starter/backend",
+  "name": "@wind/backend",
   "version": "0.1.0",
   "author": {
     "name": "Walker Chiu",
@@ -50,7 +50,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "6.19.2",
-    "@starter/typescript-config": "workspace:*",
+    "@wind/typescript-config": "workspace:*",
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9",
     "bcrypt": "^6.0.0",

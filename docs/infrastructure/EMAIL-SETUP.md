@@ -69,7 +69,7 @@ docker-compose up -d mailpit
 docker ps | grep mailpit
 
 # 應該看到類似輸出：
-# starter-mailpit   axllent/mailpit:latest   Up 2 minutes   0.0.0.0:1025->1025/tcp, 0.0.0.0:8025->8025/tcp
+# wind-mailpit   axllent/mailpit:latest   Up 2 minutes   0.0.0.0:1025->1025/tcp, 0.0.0.0:8025->8025/tcp
 ```
 
 ### 3️⃣ 訪問 Web UI
@@ -97,7 +97,7 @@ MAIL_PORT=1025          # SMTP 端口
 MAIL_USER=              # 留空（Mailpit 不需要認證）
 MAIL_PASSWORD=          # 留空
 MAIL_FROM=noreply@localhost
-MAIL_FROM_NAME="Starter Development"
+MAIL_FROM_NAME="Wind Development"
 MAIL_SECURE=false       # 不使用 TLS
 ```
 

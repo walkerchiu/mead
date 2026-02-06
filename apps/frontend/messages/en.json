@@ -157,14 +157,14 @@
   },
   "pages": {
     "home": {
-      "title": "Welcome to Starter",
+      "title": "Welcome to Wind",
       "subtitle": "Next.js 16 + NestJS 11 + GraphQL + MUI 7",
       "description": "Complete authentication system: Login, Password Reset, Two-Factor Authentication",
       "login": "Login",
       "dashboard": "Dashboard"
     },
     "dashboard": {
-      "title": "Starter Dashboard",
+      "title": "Wind Dashboard",
       "welcome": "Welcome Back!",
       "description": "You have successfully signed in.",
       "securitySettings": "Security Settings",

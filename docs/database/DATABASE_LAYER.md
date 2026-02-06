@@ -198,7 +198,7 @@ datasource db {
 
 ### 環境別載入
 
-Seed 系統根據 `STARTER_ENV` 環境變數載入對應資料：
+Seed 系統根據 `WIND_ENV` 環境變數載入對應資料：
 
 - **base**: 所有環境的基礎資料（roles, permissions）
 - **development**: 開發環境測試帳號
@@ -212,7 +212,7 @@ Seed 系統根據 `STARTER_ENV` 環境變數載入對應資料：
 pnpm db:seed
 
 # 指定環境
-STARTER_ENV=uat pnpm db:seed
+WIND_ENV=uat pnpm db:seed
 ```
 
 ---
@@ -373,7 +373,7 @@ generator client {
 
 ### 快速備份/還原
 
-使用 Starter CLI 進行資料庫備份與還原：
+使用 Wind CLI 進行資料庫備份與還原：
 
 ```bash
 # 備份資料庫
@@ -398,11 +398,11 @@ generator client {
 ```text
 backups/
 ├── development/
-│   └── starter_db_development_YYYYMMDD_HHMMSS.sql.gz
+│   └── wind_db_development_YYYYMMDD_HHMMSS.sql.gz
 ├── uat/
-│   └── starter_db_uat_YYYYMMDD_HHMMSS.sql.gz
+│   └── wind_db_uat_YYYYMMDD_HHMMSS.sql.gz
 └── production/
-    └── starter_db_production_YYYYMMDD_HHMMSS.sql.gz
+    └── wind_db_production_YYYYMMDD_HHMMSS.sql.gz
 ```
 
 ### 環境差異

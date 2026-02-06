@@ -50,7 +50,7 @@
 
 ## 📖 概述
 
-Starter 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
+Wind 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
 
 ### 技術棧
 
@@ -102,7 +102,7 @@ Starter 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代�
 services:
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.5
-    container_name: starter-dragonfly
+    container_name: wind-dragonfly
     ports:
       - '6379:6379'
     volumes:
@@ -116,14 +116,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - starter-network
+      - wind-network
 
 volumes:
   dragonfly-data:
     driver: local
 
 networks:
-  starter-network:
+  wind-network:
     driver: bridge
 ```
 

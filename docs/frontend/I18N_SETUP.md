@@ -299,7 +299,7 @@ cd apps/frontend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @starter/frontend generate-i18n-types
+pnpm --filter @wind/frontend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -539,7 +539,7 @@ cp messages/en.json messages/ja.json
 
 ```bash
 # 啟動開發伺服器
-pnpm --filter @starter/frontend dev
+pnpm --filter @wind/frontend dev
 
 # 訪問
 # http://localhost:3000/ja/login
@@ -550,7 +550,7 @@ pnpm --filter @starter/frontend dev
 
 ```bash
 # 重新生成類型以包含新語言
-pnpm --filter @starter/frontend generate-i18n-types
+pnpm --filter @wind/frontend generate-i18n-types
 ```
 
 ---
@@ -560,7 +560,7 @@ pnpm --filter @starter/frontend generate-i18n-types
 ### 翻譯測試與類型生成
 
 ```bash
-# 啟動 Starter CLI
+# 啟動 Wind CLI
 ./scripts/cli.sh
 
 # 選擇 14（i18n 多語系管理）
@@ -574,10 +574,10 @@ pnpm --filter @starter/frontend generate-i18n-types
 
 ```bash
 # 前端：生成類型
-pnpm --filter @starter/frontend generate-i18n-types
+pnpm --filter @wind/frontend generate-i18n-types
 
 # 後端：生成類型
-pnpm --filter @starter/backend generate-i18n-types
+pnpm --filter @wind/backend generate-i18n-types
 
 # 類型檢查
 pnpm type-check

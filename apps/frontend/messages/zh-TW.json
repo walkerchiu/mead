@@ -157,14 +157,14 @@
   },
   "pages": {
     "home": {
-      "title": "歡迎使用 Starter",
+      "title": "歡迎使用 Wind",
       "subtitle": "Next.js 16 + NestJS 11 + GraphQL + MUI 7",
       "description": "完整的認證系統：登入、密碼重設、雙因素認證",
       "login": "登入",
       "dashboard": "Dashboard"
     },
     "dashboard": {
-      "title": "Starter Dashboard",
+      "title": "Wind Dashboard",
       "welcome": "歡迎回來！",
       "description": "您已成功登入系統。",
       "securitySettings": "安全設定",

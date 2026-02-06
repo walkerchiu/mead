@@ -56,7 +56,7 @@
 
 ## 📖 概述
 
-Starter 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `BaseResponse<T>`，確保所有 API 回應結構一致。
+Wind 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `BaseResponse<T>`，確保所有 API 回應結構一致。
 
 ### 核心原則
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - db 命令
+# Wind CLI - db 命令
 # 資料庫管理工具（支援多環境）
 # ==========================================
 
@@ -14,7 +14,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$SCRIPT_DIR/../utils/common.sh"
 
 # 預設環境
-ENVIRONMENT="${STARTER_ENV:-development}"
+ENVIRONMENT="${WIND_ENV:-development}"
 
 # 顯示幫助
 show_command_help() {
@@ -40,7 +40,7 @@ show_command_help() {
   echo ""
   echo -e "${YELLOW}環境選項:${NC}"
   echo "  --env <env>    指定環境 (development, uat, production)"
-  echo "                 預設: development (或從 STARTER_ENV 環境變數讀取)"
+  echo "                 預設: development (或從 WIND_ENV 環境變數讀取)"
   echo ""
   echo -e "${YELLOW}範例:${NC}"
   echo "  # 開發環境（預設）"
@@ -331,8 +331,8 @@ db_reset() {
   fi
 
   log_step "3/3 載入種子資料"
-  export STARTER_ENV="$ENVIRONMENT"
-  log_info "Seed 環境: $STARTER_ENV"
+  export WIND_ENV="$ENVIRONMENT"
+  log_info "Seed 環境: $WIND_ENV"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else
@@ -370,8 +370,8 @@ db_seed() {
   # 設置資料庫 URL
   export DATABASE_URL=$(get_database_url)
 
-  export STARTER_ENV="$ENVIRONMENT"
-  log_info "載入種子資料...（環境: $STARTER_ENV）"
+  export WIND_ENV="$ENVIRONMENT"
+  log_info "載入種子資料...（環境: $WIND_ENV）"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else
@@ -394,7 +394,7 @@ db_backup() {
 
   # 產生備份檔案名稱
   TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-  BACKUP_FILE="$BACKUP_DIR/starter_db_${ENVIRONMENT}_$TIMESTAMP.sql"
+  BACKUP_FILE="$BACKUP_DIR/wind_db_${ENVIRONMENT}_$TIMESTAMP.sql"
   BACKUP_FILE_GZ="$BACKUP_FILE.gz"
 
   log_info "準備備份環境: $ENVIRONMENT"
@@ -408,7 +408,7 @@ db_backup() {
         PG_HOST="localhost"
         PG_PORT="5432"
         PG_USER="postgres"
-        PG_DB="starter_db"
+        PG_DB="wind_db"
       else
         log_error ".env.docker 不存在"
         exit 1
@@ -586,7 +586,7 @@ db_restore() {
         PG_HOST="localhost"
         PG_PORT="5432"
         PG_USER="postgres"
-        PG_DB="starter_db"
+        PG_DB="wind_db"
       else
         log_error ".env.docker 不存在"
         exit 1

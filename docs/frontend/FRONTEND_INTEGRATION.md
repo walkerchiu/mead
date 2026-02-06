@@ -154,11 +154,11 @@ NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
 
 ```bash
 # Terminal 1 - 後端 API
-cd /path/to/starter
+cd /path/to/wind
 pnpm --filter api dev
 
 # Terminal 2 - 前端 Web
-cd /path/to/starter
+cd /path/to/wind
 pnpm --filter web dev
 ```
 

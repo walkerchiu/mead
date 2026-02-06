@@ -1,4 +1,4 @@
-# Starter Web - Next.js 前端
+# Wind Web - Next.js 前端
 
 Next.js 16 應用程式，使用 MUI 7、Apollo Client 和 Atomic Design 架構。
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - 主入口（互動式）
+# Wind CLI - 主入口（互動式）
 # ==========================================
 
 set -euo pipefail
@@ -23,7 +23,7 @@ VERSION="1.0.0"
 
 # 顯示版本
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-  echo -e "Starter CLI v$VERSION"
+  echo -e "Wind CLI v$VERSION"
   exit 0
 fi
 
@@ -42,7 +42,7 @@ show_interactive_menu() {
     echo -e ""
     echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║                                                               ║${NC}"
-    echo -e "${GREEN}║                   🌪️  ${NC}${CYAN}Starter CLI${NC} ${GREEN}v$VERSION                       ║${NC}"
+    echo -e "${GREEN}║                   🌪️  ${NC}${CYAN}Wind CLI${NC} ${GREEN}v$VERSION                       ║${NC}"
     echo -e "${GREEN}║              開發工作流程管理工具 - 互動式選單                ║${NC}"
     echo -e "${GREEN}║                                                               ║${NC}"
     echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
@@ -262,7 +262,7 @@ show_interactive_menu() {
             ;;
           2)
             # 列出可用備份供選擇
-            BACKUP_DIR="$SCRIPT_DIR/../backups/${STARTER_ENV:-development}"
+            BACKUP_DIR="$SCRIPT_DIR/../backups/${WIND_ENV:-development}"
 
             # 檢查是否有任何備份檔案
             has_backups=false
@@ -475,7 +475,7 @@ show_interactive_menu() {
 # 顯示命令列表幫助
 show_command_help() {
   echo -e ""
-  echo -e "${GREEN}Starter CLI${NC} - 開發工作流程管理工具 v$VERSION"
+  echo -e "${GREEN}Wind CLI${NC} - 開發工作流程管理工具 v$VERSION"
   echo -e ""
   echo -e "${YELLOW}使用方式:${NC}"
   echo -e "  ./scripts/cli.sh            # 進入互動式選單（推薦）"

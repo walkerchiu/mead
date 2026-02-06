@@ -1,14 +1,14 @@
 services:
   timescaledb:
     image: timescale/timescaledb:latest-pg16
-    container_name: starter-timescaledb
+    container_name: wind-timescaledb
     restart: unless-stopped
     ports:
       - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env.docker}
-      POSTGRES_DB: ${POSTGRES_DB:-starter_db}
+      POSTGRES_DB: ${POSTGRES_DB:-wind_db}
     volumes:
       - timescaledb-data:/var/lib/postgresql/data
     healthcheck:
@@ -19,7 +19,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
-    container_name: starter-rabbitmq
+    container_name: wind-rabbitmq
     restart: unless-stopped
     ports:
       - '127.0.0.1:${RABBITMQ_PORT:-5672}:5672' # AMQP 協定（僅限本機存取）
@@ -40,7 +40,7 @@ services:
 
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.5
-    container_name: starter-dragonfly
+    container_name: wind-dragonfly
     restart: unless-stopped
     ports:
       - '127.0.0.1:${REDIS_PORT:-6379}:6379'
@@ -56,7 +56,7 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    container_name: starter-mailpit
+    container_name: wind-mailpit
     restart: unless-stopped
     ports:
       - '127.0.0.1:${MAIL_SMTP_PORT:-1025}:1025' # SMTP 端口

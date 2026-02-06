@@ -56,7 +56,7 @@
 
 ## 📖 概述
 
-Starter 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 協議和 Handlebars 模板引擎。
+Wind 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 協議和 Handlebars 模板引擎。
 
 ### 技術棧
 
@@ -108,7 +108,7 @@ cp apps/backend/.env.production.example apps/backend/.env.production
 ### 3. 啟動服務
 
 ```bash
-# 使用 Starter CLI
+# 使用 Wind CLI
 ./scripts/cli.sh dev
 
 # 或手動啟動
@@ -140,7 +140,7 @@ https://ethereal.email/login
 | `MAIL_USER`             | SMTP 帳號              | (Ethereal 帳號)                      | (真實帳號)                             |
 | `MAIL_PASS`             | SMTP 密碼              | (Ethereal 密碼)                      | (真實密碼)                             |
 | `MAIL_FROM`             | 寄件者 Email           | noreply@ethereal.email               | noreply@example.com                    |
-| `MAIL_FROM_NAME`        | 寄件者名稱             | Starter App                          | Your App Name                          |
+| `MAIL_FROM_NAME`        | 寄件者名稱             | Wind App                             | Your App Name                          |
 | `PASSWORD_RESET_EXPIRY` | 密碼重設有效期（分鐘） | 30                                   | 15                                     |
 | `PASSWORD_RESET_URL`    | 密碼重設頁面 URL       | http://localhost:3000/reset-password | https://app.example.com/reset-password |
 
@@ -470,7 +470,7 @@ MAIL_SECURE=false
 MAIL_USER=your-ethereal-username@ethereal.email
 MAIL_PASS=your-ethereal-password
 MAIL_FROM=noreply@ethereal.email
-MAIL_FROM_NAME=Starter App (Dev)
+MAIL_FROM_NAME=Wind App (Dev)
 ```
 
 #### 3. 查看發送的郵件

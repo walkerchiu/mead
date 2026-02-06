@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - init 命令
+# Wind CLI - init 命令
 # 新開發者專案初始化
 # ==========================================
 
@@ -15,7 +15,7 @@ source "$SCRIPT_DIR/../utils/common.sh"
 
 # 顯示幫助
 show_command_help() {
-  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 Starter 專案\n"
+  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 Wind 專案\n"
   echo -e "${YELLOW}描述:${NC}"
   echo "  為新開發者設置完整的開發環境，包括："
   echo "  - 檢查系統需求 (Node.js, pnpm, Docker)"
@@ -75,7 +75,7 @@ done
 # 切換到專案根目錄
 cd "$PROJECT_ROOT"
 
-print_header "Starter 專案初始化"
+print_header "Wind 專案初始化"
 
 # ==========================================
 # Step 1: 檢查系統需求
@@ -231,7 +231,7 @@ if [ "$SKIP_DB" = false ]; then
   ENABLE_UUID_SQL="apps/backend/database/prisma/migrations/enable_uuid_v7.sql"
   if [ -f "$ENABLE_UUID_SQL" ]; then
     PG_CONTAINER=$(get_container_name timescaledb)
-    docker exec -i "$PG_CONTAINER" psql -U postgres -d starter_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
+    docker exec -i "$PG_CONTAINER" psql -U postgres -d wind_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
     log_success "資料庫函式已初始化"
   else
     log_warning "找不到 enable_uuid_v7.sql，跳過"
@@ -246,21 +246,21 @@ if [ "$SKIP_DB" = false ]; then
     exit 1
   fi
 
-  # 讀取當前環境並設定 STARTER_ENV
+  # 讀取當前環境並設定 WIND_ENV
   CURRENT_ENV="local"
   if [[ -f "$PROJECT_ROOT/.current-env" ]]; then
     CURRENT_ENV=$(cat "$PROJECT_ROOT/.current-env")
   fi
 
   case "$CURRENT_ENV" in
-    local|dev) STARTER_ENV="development" ;;
-    uat)       STARTER_ENV="uat" ;;
-    prod)      STARTER_ENV="production" ;;
-    *)         STARTER_ENV="development" ;;
+    local|dev) WIND_ENV="development" ;;
+    uat)       WIND_ENV="uat" ;;
+    prod)      WIND_ENV="production" ;;
+    *)         WIND_ENV="development" ;;
   esac
 
-  export STARTER_ENV
-  log_info "Seed 環境: $STARTER_ENV"
+  export WIND_ENV
+  log_info "Seed 環境: $WIND_ENV"
 
   # 執行 seed
   log_info "載入初始資料..."
@@ -308,8 +308,8 @@ echo "  1. 啟動開發環境:"
 echo -e "     ${CYAN}./scripts/cli.sh dev${NC}"
 echo "     "
 echo "     或分別啟動:"
-echo -e "     ${CYAN}pnpm --filter @starter/frontend dev${NC}  # 終端 1"
-echo -e "     ${CYAN}pnpm --filter @starter/backend dev${NC}   # 終端 2"
+echo -e "     ${CYAN}pnpm --filter @wind/frontend dev${NC}  # 終端 1"
+echo -e "     ${CYAN}pnpm --filter @wind/backend dev${NC}   # 終端 2"
 echo ""
 echo "  2. 查看 Storybook:"
 echo -e "     ${CYAN}pnpm storybook${NC}"

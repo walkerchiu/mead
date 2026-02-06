@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - 共用工具函數庫
+# Wind CLI - 共用工具函數庫
 # ==========================================
 
 # 顏色定義
@@ -257,7 +257,7 @@ spinner() {
 show_help() {
   local command="${1:-}"
 
-  echo -e "\n${GREEN}Starter CLI${NC} - 專案管理工具\n"
+  echo -e "\n${GREEN}Wind CLI${NC} - 專案管理工具\n"
   echo -e "${YELLOW}使用方式:${NC}"
   echo "  ./scripts/cli.sh <command> [options]"
   echo ""
@@ -313,51 +313,51 @@ get_container_name() {
   local compose_service_name=""
   local default_name=""
   local project_root="${PROJECT_ROOT:-$(get_project_root)}"
-  
+
   # 根據服務類型設定對應變數
   case "$service_name" in
     timescaledb|postgres|postgresql)
       env_var_name="POSTGRES_CONTAINER_NAME"
       compose_service_name="timescaledb"
-      default_name="starter-timescaledb"
+      default_name="wind-timescaledb"
       ;;
     rabbitmq|rabbit)
       env_var_name="RABBITMQ_CONTAINER_NAME"
       compose_service_name="rabbitmq"
-      default_name="starter-rabbitmq"
+      default_name="wind-rabbitmq"
       ;;
     dragonfly|redis)
       env_var_name="DRAGONFLY_CONTAINER_NAME"
       compose_service_name="dragonfly"
-      default_name="starter-dragonfly"
+      default_name="wind-dragonfly"
       ;;
     mailpit|mail)
       env_var_name="MAILPIT_CONTAINER_NAME"
       compose_service_name="mailpit"
-      default_name="starter-mailpit"
+      default_name="wind-mailpit"
       ;;
     *)
       log_error "不支援的服務類型: $service_name"
       return 1
       ;;
   esac
-  
+
   local container_name=""
-  
+
   # 1. 優先從 .env.docker 讀取
   if [[ -f "$project_root/.env.docker" ]]; then
     container_name=$(grep -E "^${env_var_name}=" "$project_root/.env.docker" | cut -d'=' -f2 | tr -d '"' | tr -d "'")
   fi
-  
+
   # 2. 如果沒有設定，從 docker-compose.yml 讀取
   if [[ -z "$container_name" ]] && [[ -f "$project_root/docker-compose.yml" ]]; then
     container_name=$(awk "/^  ${compose_service_name}:/,/^  [a-z]/ {if (\$1 == \"container_name:\") print \$2}" "$project_root/docker-compose.yml")
   fi
-  
+
   # 3. 如果還是沒有，使用預設值
   if [[ -z "$container_name" ]]; then
     container_name="$default_name"
   fi
-  
+
   echo "$container_name"
 }

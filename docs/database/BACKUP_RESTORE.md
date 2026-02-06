@@ -68,7 +68,7 @@
 
 ## 📖 概述
 
-本文檔介紹如何使用 Starter CLI 進行資料庫備份與還原操作，包含開發、UAT、生產環境的最佳實踐。
+本文檔介紹如何使用 Wind CLI 進行資料庫備份與還原操作，包含開發、UAT、生產環境的最佳實踐。
 
 ---
 
@@ -86,8 +86,8 @@
 ```text
 ✓ 備份完成（已壓縮）
   環境: development
-  檔案: starter_db_development_20260201_233215.sql.gz
-  路徑: /path/to/backups/development/starter_db_development_20260201_233215.sql.gz
+  檔案: wind_db_development_20260201_233215.sql.gz
+  路徑: /path/to/backups/development/wind_db_development_20260201_233215.sql.gz
   大小: 8.0K
 ```
 
@@ -121,14 +121,14 @@
 ```text
 backups/                    # ⚠️ 不納入版控（已加入 .gitignore）
 ├── development/
-│   ├── starter_db_development_20260201_150530.sql.gz
-│   ├── starter_db_development_20260201_140215.sql.gz
+│   ├── wind_db_development_20260201_150530.sql.gz
+│   ├── wind_db_development_20260201_140215.sql.gz
 │   └── emergency_backup_development_20260201_120000.sql.gz
 ├── uat/
-│   ├── starter_db_uat_20260201_120000.sql.gz
-│   └── starter_db_uat_20260131_230000.sql.gz
+│   ├── wind_db_uat_20260201_120000.sql.gz
+│   └── wind_db_uat_20260131_230000.sql.gz
 └── production/
-    ├── starter_db_production_20260201_000000.sql.gz
+    ├── wind_db_production_20260201_000000.sql.gz
     └── emergency_backup_production_20260201_153000.sql.gz
 ```
 
@@ -143,7 +143,7 @@ backups/                    # ⚠️ 不納入版控（已加入 .gitignore）
 **一般備份**：
 
 ```text
-starter_db_{environment}_{timestamp}.sql.gz
+wind_db_{environment}_{timestamp}.sql.gz
 ```
 
 **緊急備份**：
@@ -164,7 +164,7 @@ emergency_backup_{environment}_{timestamp}.sql.gz
 
 ```bash
 # 簡單直接的備份
-docker exec starter-timescaledb pg_dump -U postgres -d starter_db > backup.sql
+docker exec wind-timescaledb pg_dump -U postgres -d wind_db > backup.sql
 gzip backup.sql
 ```
 
@@ -172,10 +172,10 @@ gzip backup.sql
 
 ```bash
 # 完全重建資料庫
-DROP DATABASE starter_db;
-CREATE DATABASE starter_db;
+DROP DATABASE wind_db;
+CREATE DATABASE wind_db;
 # 還原資料
-gunzip -c backup.sql.gz | psql -d starter_db -q
+gunzip -c backup.sql.gz | psql -d wind_db -q
 ```
 
 **特點**：
@@ -198,7 +198,7 @@ pg_dump \
   --if-exists \       # 使用 IF EXISTS
   --no-owner \        # 不還原擁有者
   --no-privileges \   # 不還原權限
-  -d starter_db \
+  -d wind_db \
   > backup.sql
 gzip backup.sql
 ```
@@ -237,7 +237,7 @@ gzip backup.sql
 
 ```text
 備份資訊：
-  檔案: starter_db_production_20260201_233215.sql.gz
+  檔案: wind_db_production_20260201_233215.sql.gz
   大小: 8.0K
   修改時間: 2026-02-01 23:32:15
 
@@ -281,10 +281,10 @@ gzip backup.sql
 
 ```bash
 # 原始備份
-starter_db_development_20260201.sql      # 40 MB
+wind_db_development_20260201.sql      # 40 MB
 
 # 壓縮後
-starter_db_development_20260201.sql.gz   # 8 MB (80% 減少)
+wind_db_development_20260201.sql.gz   # 8 MB (80% 減少)
 ```
 
 ### 保留策略
@@ -314,11 +314,11 @@ starter_db_development_20260201.sql.gz   # 8 MB (80% 減少)
 
 # 輸出
 環境 development: 發現 10 個備份
-  刪除: starter_db_development_20260125_120000.sql.gz
-  刪除: starter_db_development_20260126_120000.sql.gz
-  刪除: starter_db_development_20260127_120000.sql.gz
-  刪除: starter_db_development_20260128_120000.sql.gz
-  刪除: starter_db_development_20260129_120000.sql.gz
+  刪除: wind_db_development_20260125_120000.sql.gz
+  刪除: wind_db_development_20260126_120000.sql.gz
+  刪除: wind_db_development_20260127_120000.sql.gz
+  刪除: wind_db_development_20260128_120000.sql.gz
+  刪除: wind_db_development_20260129_120000.sql.gz
 ✓ 環境 development: 刪除了 5 個備份
 ✓ 清理完成：共刪除 5 個備份，釋放 40MB 空間
 ```
@@ -348,8 +348,8 @@ systemctl stop frontend-service
 
 ```bash
 # 檢查關鍵資料表
-psql -d starter_db -c "SELECT COUNT(*) FROM users;"
-psql -d starter_db -c "SELECT COUNT(*) FROM roles;"
+psql -d wind_db -c "SELECT COUNT(*) FROM users;"
+psql -d wind_db -c "SELECT COUNT(*) FROM roles;"
 ```
 
 #### 4. 測試應用
@@ -391,7 +391,7 @@ systemctl start frontend-service
 
 ```bash
 # 進入資料庫
-docker exec -it starter-timescaledb psql -U postgres -d starter_db
+docker exec -it wind-timescaledb psql -U postgres -d wind_db
 
 # 檢查資料表
 \dt
@@ -437,7 +437,7 @@ pg_dump \
   --jobs=4 \           # 使用 4 個並行工作
   --format=directory \ # 目錄格式
   --file=backup_dir \
-  -d starter_db
+  -d wind_db
 ```
 
 ### 還原效能
@@ -496,7 +496,7 @@ docker ps --format "{{.Names}}"
 
 # 設定正確名稱
 # 編輯 .env.docker
-POSTGRES_CONTAINER_NAME=starter-timescaledb
+POSTGRES_CONTAINER_NAME=wind-timescaledb
 ```
 
 **詳細說明**：參考 [Docker 容器命名指南](../DOCKER_CONTAINER_NAMING.md)
@@ -508,7 +508,7 @@ POSTGRES_CONTAINER_NAME=starter-timescaledb
 **症狀**：
 
 ```text
-ERROR: permission denied for database starter_db
+ERROR: permission denied for database wind_db
 ```
 
 **解決方案**：
@@ -518,7 +518,7 @@ ERROR: permission denied for database starter_db
 psql -d postgres -c "\du"
 
 # 授予權限
-psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE starter_db TO postgres;"
+psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE wind_db TO postgres;"
 ```
 
 ---
@@ -555,10 +555,10 @@ docker volume prune
 
 ```bash
 # 備份時加密
-pg_dump -d starter_db | gzip | gpg --encrypt > backup.sql.gz.gpg
+pg_dump -d wind_db | gzip | gpg --encrypt > backup.sql.gz.gpg
 
 # 還原時解密
-gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d starter_db
+gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d wind_db
 ```
 
 2. **安全儲存**：

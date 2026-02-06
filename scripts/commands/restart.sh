@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - restart 命令
+# Wind CLI - restart 命令
 # 快速重啟服務
 # ==========================================
 
@@ -124,7 +124,7 @@ restart_docker() {
 
     PG_CONTAINER=$(get_container_name timescaledb)
     REDIS_CONTAINER=$(get_container_name dragonfly)
-    
+
     wait_for_service "docker exec $PG_CONTAINER pg_isready -U postgres" "PostgreSQL" 30 2
     wait_for_service "docker exec $REDIS_CONTAINER redis-cli ping" "Dragonfly" 30 2
     wait_for_service "curl -s http://localhost:15672 > /dev/null" "RabbitMQ" 30 2
@@ -143,7 +143,7 @@ restart_frontend() {
 
   log_info "啟動前端..."
   echo ""
-  
+
   # 自動啟動前端
   exec "$SCRIPT_DIR/dev.sh" --frontend-only
 }
@@ -156,7 +156,7 @@ restart_backend() {
 
   log_info "啟動後端..."
   echo ""
-  
+
   # 自動啟動後端
   exec "$SCRIPT_DIR/dev.sh" --backend-only
 }

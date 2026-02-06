@@ -1,4 +1,4 @@
-# Starter Monorepo
+# Wind Monorepo
 
 現代化全端 monorepo，使用 Next.js 16、NestJS 11、GraphQL 和 TimescaleDB。
 
@@ -37,7 +37,7 @@
 ### 目錄結構
 
 ```text
-starter/
+wind/
 ├── apps/
 │   ├── frontend/              # Next.js 前端應用
 │   └── backend/               # NestJS GraphQL API
@@ -45,7 +45,7 @@ starter/
 ├── packages/
 │   ├── typescript-config/     # 共享 TypeScript 設定
 │   └── eslint-config/         # 共享 ESLint 設定
-├── scripts/                   # Starter CLI 工具腳本
+├── scripts/                   # Wind CLI 工具腳本
 │   ├── cli.sh                 # CLI 主程式
 │   ├── commands/              # CLI 命令實作
 │   └── utils/                 # CLI 工具函式
@@ -97,7 +97,7 @@ starter/
 
 ### 🚀 開發工具
 
-- Starter CLI 開發工具
+- Wind CLI 開發工具
 - Turborepo 任務編排
 - pnpm Workspace
 - Docker Compose
@@ -116,7 +116,7 @@ starter/
 
 ## 快速開始
 
-### 方式 1：使用 Starter CLI（推薦）⭐
+### 方式 1：使用 Wind CLI（推薦）⭐
 
 最簡單的方式，一鍵完成所有設置：
 
@@ -128,7 +128,7 @@ starter/
 ./scripts/cli.sh init
 ```
 
-Starter CLI 會自動完成：
+Wind CLI 會自動完成：
 
 - ✅ 系統需求檢查
 - ✅ 依賴安裝
@@ -136,7 +136,7 @@ Starter CLI 會自動完成：
 - ✅ 資料庫初始化
 - ✅ 服務驗證
 
-**完整說明**：[Starter CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
+**完整說明**：[Wind CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
 
 ---
 
@@ -196,8 +196,8 @@ pnpm db:seed
 pnpm dev
 
 # 或個別啟動
-pnpm --filter @starter/frontend dev
-pnpm --filter @starter/backend dev
+pnpm --filter @wind/frontend dev
+pnpm --filter @wind/backend dev
 ```
 
 </details>
@@ -208,7 +208,7 @@ pnpm --filter @starter/backend dev
 
 ### 啟動開發環境
 
-使用 Starter CLI（推薦）：
+使用 Wind CLI（推薦）：
 
 ```bash
 ./scripts/cli.sh dev
@@ -232,7 +232,7 @@ pnpm dev
 
 ### 常用命令
 
-#### Starter CLI（推薦）
+#### Wind CLI（推薦）
 
 ```bash
 ./scripts/cli.sh              # 互動式選單
@@ -247,7 +247,7 @@ pnpm dev
 ./scripts/cli.sh clean        # 清理快取
 ```
 
-完整說明: [Starter CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
+完整說明: [Wind CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
 
 #### pnpm 命令
 
@@ -307,7 +307,7 @@ docker-compose ps                              # 查看服務狀態
 
 ### 📖 新手推薦閱讀順序
 
-1. [Starter CLI 完整指南](docs/getting-started/CLI_GUIDE.md) - 開發者工具
+1. [Wind CLI 完整指南](docs/getting-started/CLI_GUIDE.md) - 開發者工具
 2. [Docker 設置指南](docs/getting-started/DOCKER_SETUP.md) - 環境設置
 3. [Monorepo 結構說明](docs/getting-started/MONOREPO_STRUCTURE.md) - 專案結構
 4. [前後端 i18n 協調機制](docs/getting-started/I18N_COORDINATION.md) - 多國語系

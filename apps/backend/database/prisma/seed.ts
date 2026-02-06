@@ -6,7 +6,7 @@ import { seedUat } from './seeds/uat';
 const prisma = new PrismaClient();
 
 async function main() {
-  const env = process.env.STARTER_ENV || process.env.NODE_ENV || 'development';
+  const env = process.env.WIND_ENV || process.env.NODE_ENV || 'development';
 
   console.log(`🌱 開始 Seed 資料...（環境: ${env}）`);
 

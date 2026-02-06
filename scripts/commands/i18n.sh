@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Starter CLI - i18n 命令
+# Wind CLI - i18n 命令
 # 多語系管理工具
 # ==========================================
 
@@ -40,18 +40,18 @@ show_command_help() {
 # 執行測試
 run_test() {
   print_header "執行 i18n 翻譯完整性測試"
-  
+
   log_info "▶ 1/2 後端翻譯測試"
   echo ""
   cd "$PROJECT_ROOT/apps/backend"
   pnpm test:i18n
-  
+
   echo ""
   log_info "▶ 2/2 前端翻譯測試"
   echo ""
   cd "$PROJECT_ROOT/apps/frontend"
   pnpm test:i18n
-  
+
   echo ""
   log_success "✅ 所有 i18n 測試通過"
 }
@@ -59,16 +59,16 @@ run_test() {
 # 生成類型
 generate_types() {
   print_header "生成 TypeScript 類型定義"
-  
+
   log_info "▶ 1/2 後端類型生成"
   cd "$PROJECT_ROOT/apps/backend"
   pnpm generate-i18n-types
-  
+
   echo ""
   log_info "▶ 2/2 前端類型生成"
   cd "$PROJECT_ROOT/apps/frontend"
   pnpm generate-i18n-types
-  
+
   echo ""
   log_success "✅ TypeScript 類型定義已生成"
   echo ""
@@ -955,10 +955,10 @@ CLEANUP_SCRIPT_CONTENT
 # 顯示統計
 show_stats() {
   print_header "i18n 翻譯統計"
-  
+
   echo -e "${CYAN}後端翻譯:${NC}"
   echo ""
-  
+
   for lang in en zh-TW; do
     echo -e "  ${YELLOW}$lang${NC}"
     cd "$PROJECT_ROOT/apps/backend/src/i18n/$lang"
@@ -971,10 +971,10 @@ show_stats() {
     done
     echo ""
   done
-  
+
   echo -e "${CYAN}前端翻譯:${NC}"
   echo ""
-  
+
   for lang in en zh-TW; do
     local file="$PROJECT_ROOT/apps/frontend/messages/$lang.json"
     if [ -f "$file" ]; then
@@ -985,7 +985,7 @@ show_stats() {
       echo ""
     fi
   done
-  
+
   echo -e "${CYAN}支援的語言:${NC}"
   echo "  • en (English)"
   echo "  • zh-TW (繁體中文)"
