@@ -1,3 +1,6 @@
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import InputAdornment from '@mui/material/InputAdornment';
+import { useTheme } from '@mui/material/styles';
 import { TextField, type TextFieldProps } from '../TextField/TextField';
 
 export type TimePickerState = 'default' | 'hover' | 'focus' | 'press';
@@ -29,6 +32,9 @@ export function TimePicker({
   sx,
   ...props
 }: TimePickerProps) {
+  const theme = useTheme();
+  const colors = theme.palette.textFieldTokens.colors;
+  const iconColor = disabled ? colors.disabledText : colors.placeholder;
   const mergedClassName = [className, stateClassMap[state]]
     .filter(Boolean)
     .join(' ');
@@ -38,9 +44,24 @@ export function TimePicker({
       shrink: true,
       ...slotProps?.inputLabel,
     },
-    input: {
-      ...slotProps?.input,
-    },
+    input: () => ({
+      sx: {
+        paddingRight: '16px !important',
+      },
+      endAdornment: (
+        <InputAdornment
+          position="end"
+          sx={{
+            marginLeft: '8px',
+            minWidth: '20px',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <AccessTimeIcon sx={{ color: iconColor }} />
+        </InputAdornment>
+      ),
+    }),
     htmlInput: {
       ...slotProps?.htmlInput,
       inputMode: 'numeric',

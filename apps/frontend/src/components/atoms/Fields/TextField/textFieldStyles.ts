@@ -20,25 +20,32 @@ export const getTextFieldStyles = ({
     '& .MuiFormLabel-root': {
       color: colors.label,
       fontSize: sizeToken.labelFontSize,
-      transform: 'none',
-      marginBottom: 0,
-      padding: '2px 3px',
+    },
+    '& .MuiInputLabel-shrink': {
+      position: 'absolute',
+      top: 0,
+      left: sizeToken.paddingX - 4,
+      transform: 'translate(0, -50%) !important',
+      padding: '0 4px',
       backgroundColor: colors.bg,
-      marginTop: 7,
-      top: -16,
-      marginLeft: 10,
-      lineHeight: 1.2,
+      lineHeight: 1,
+      zIndex: 1,
+      pointerEvents: 'none',
     },
     '& .MuiFormLabel-root.Mui-focused': {
       color: colors.focusLabel,
     },
     '& .MuiFormLabel-root.Mui-error': {
       color: colors.errorLabel,
-      backgroundColor: 'transparent',
+    },
+    '& .MuiInputLabel-shrink.Mui-error': {
+      backgroundColor: colors.bg,
     },
     '& .MuiFormLabel-root.Mui-disabled': {
       color: colors.disabledLabel,
-      backgroundColor: 'transparent',
+    },
+    '& .MuiInputLabel-shrink.Mui-disabled': {
+      backgroundColor: colors.bg,
     },
     '& .MuiFormHelperText-root': {
       marginLeft: 0,
@@ -95,6 +102,18 @@ export const getTextFieldStyles = ({
       minHeight: sizeToken.height,
       alignItems: 'flex-start',
       padding: 0,
+    },
+    '& .MuiInputAdornment-root': {
+      color: colors.text,
+      fontSize: sizeToken.fontSize,
+      marginLeft: 0,
+      marginRight: 0,
+    },
+    '& .MuiInputAdornment-positionStart': {
+      marginRight: '8px',
+    },
+    '& .MuiInputAdornment-positionEnd': {
+      marginLeft: '8px',
     },
     '& .MuiOutlinedInput-notchedOutline': {
       borderColor: colors.border,

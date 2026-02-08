@@ -43,14 +43,24 @@ export function DatePicker({
       shrink: true,
       ...slotProps?.inputLabel,
     },
-    input: {
-      ...slotProps?.input,
+    input: () => ({
+      sx: {
+        paddingRight: '16px !important',
+      },
       endAdornment: (
-        <InputAdornment position="end" sx={{ mr: 1 }}>
+        <InputAdornment
+          position="end"
+          sx={{
+            marginLeft: '8px',
+            minWidth: '20px',
+            display: 'flex',
+            justifyContent: 'flex-end',
+          }}
+        >
           <DateRangeIcon sx={{ color: iconColor }} />
         </InputAdornment>
       ),
-    },
+    }),
     htmlInput: {
       ...slotProps?.htmlInput,
       inputMode: 'numeric',
