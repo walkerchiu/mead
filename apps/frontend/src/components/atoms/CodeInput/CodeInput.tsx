@@ -10,13 +10,13 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 /**
- * CodeInput 組件 - Atomic Design: Atom
+ * CodeInput Component - Atomic Design: Atom
  *
- * 專為驗證碼輸入設計的組件，支援：
- * - 自動聚焦到下一個輸入框
- * - 貼上完整驗證碼（自動分配到各個框）
- * - 退格鍵回到上一個輸入框
- * - 只允許數字輸入
+ * Component specifically designed for verification code input, supports:
+ * - Auto-focus to next input box
+ * - Paste complete verification code（Automatically distribute to each field）
+ * - Backspace to previous input field
+ * - Only allow numeric input
  *
  * @example
  * ```tsx
@@ -24,47 +24,47 @@ import TextField from '@mui/material/TextField';
  *   length={6}
  *   value={code}
  *   onChange={setCode}
- *   onComplete={(code) => console.log('完成:', code)}
+ *   onComplete={(code) => console.log('complete:', code)}
  * />
  * ```
  */
 
 export interface CodeInputProps {
   /**
-   * 驗證碼長度
+   * verification code length
    * @default 6
    */
   length?: number;
 
   /**
-   * 當前驗證碼值
+   * current verification code value
    */
   value?: string;
 
   /**
-   * 驗證碼變更時的回調
+   * callback on verification code change
    */
   onChange?: (value: string) => void;
 
   /**
-   * 輸入完成時的回調
-   * 當所有位數都填滿時觸發
+   * Inputcomplete callback
+   * triggered when all positions are filled
    */
   onComplete?: (value: string) => void;
 
   /**
-   * 是否顯示錯誤狀態
+   * whether to show error state
    */
   error?: boolean;
 
   /**
-   * 是否停用輸入
+   * whether to disable input
    */
   disabled?: boolean;
 }
 
 /**
- * CodeInput 組件
+ * CodeInput component
  */
 export function CodeInput({
   length = 6,
@@ -77,20 +77,20 @@ export function CodeInput({
   const [digits, setDigits] = useState<string[]>(Array(length).fill(''));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // 同步外部 value 到內部 state
+  // sync external value to internal state
   useEffect(() => {
     const newDigits = value.padEnd(length, '').split('').slice(0, length);
     setDigits(newDigits);
   }, [value, length]);
 
-  // 處理單個輸入框的變更
+  // handle singleInputfieldchange
   const handleChange = (
     index: number,
     event: ChangeEvent<HTMLInputElement>,
   ) => {
     const newValue = event.target.value;
 
-    // 只允許數字
+    // only allowcountcharacters
     if (newValue && !/^\d$/.test(newValue)) {
       return;
     }
@@ -102,34 +102,34 @@ export function CodeInput({
     const code = newDigits.join('');
     onChange?.(code);
 
-    // 如果輸入了值，自動跳到下一個輸入框
+    // if value is entered, auto jump to next input field
     if (newValue && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
 
-    // 如果所有位數都填滿，觸發 onComplete
+    // if all positionscountare filled，trigger onComplete
     if (code.length === length && !code.includes('')) {
       onComplete?.(code);
     }
   };
 
-  // 處理按鍵事件
+  // handle keyboard events
   const handleKeyDown = (
     index: number,
     event: KeyboardEvent<HTMLInputElement>,
   ) => {
-    // 退格鍵：清除當前框並回到上一個框
+    // backspace: clear current field and return to previous field
     if (event.key === 'Backspace') {
       event.preventDefault();
       const newDigits = [...digits];
 
       if (digits[index]) {
-        // 如果當前框有值，清除它
+        // if current field has value, clear it
         newDigits[index] = '';
         setDigits(newDigits);
         onChange?.(newDigits.join(''));
       } else if (index > 0) {
-        // 如果當前框沒有值，回到上一個框並清除
+        // if current fieldnoValue，return to previousfieldandclear
         newDigits[index - 1] = '';
         setDigits(newDigits);
         onChange?.(newDigits.join(''));
@@ -137,23 +137,23 @@ export function CodeInput({
       }
     }
 
-    // 左箭頭：移到上一個框
+    // left arrow：Move to previous field
     if (event.key === 'ArrowLeft' && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
 
-    // 右箭頭：移到下一個框
+    // right arrow：move to next field
     if (event.key === 'ArrowRight' && index < length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
   };
 
-  // 處理貼上事件
+  // handlePaste event
   const handlePaste = (event: ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     const pastedData = event.clipboardData.getData('text/plain');
 
-    // 只保留數字
+    // only keepcountcharacters
     const numbers = pastedData.replace(/\D/g, '').slice(0, length);
 
     if (numbers) {
@@ -162,11 +162,11 @@ export function CodeInput({
       const code = newDigits.join('');
       onChange?.(code);
 
-      // 聚焦到最後一個填入的框
+      // focus to last filledfield
       const lastFilledIndex = Math.min(numbers.length, length) - 1;
       inputRefs.current[lastFilledIndex]?.focus();
 
-      // 如果貼上的是完整的驗證碼，觸發 onComplete
+      // if pastedYescomplete verification code，trigger onComplete
       if (numbers.length === length) {
         onComplete?.(code);
       }
@@ -214,7 +214,7 @@ export function CodeInput({
             maxLength: 1,
             inputMode: 'numeric',
             pattern: '[0-9]*',
-            'aria-label': `驗證碼第 ${index + 1} 位`,
+            'aria-label': `verification code position ${index + 1} position`,
           }}
         />
       ))}

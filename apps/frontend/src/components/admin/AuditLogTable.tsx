@@ -48,16 +48,16 @@ export function AuditLogTable({
   const t = useTranslations('pages.admin.auditLogs.table');
   const tc = useTranslations('common');
 
-  // 根據當前語言選擇 date-fns locale
+  // Select date-fns locale based on current language
   const locale = tc('locale') === 'zh-TW' ? zhTW : enUS;
 
-  // ✅ 追蹤新插入的日誌 ID（用於動畫效果）
+  // ✅ Track newly inserted log IDs (for animation effects)
   const [newLogIds, setNewLogIds] = React.useState<Set<string>>(new Set());
   const prevLogsRef = React.useRef<AuditLog[]>(logs);
 
   React.useEffect(() => {
     if (logs.length > 0 && prevLogsRef.current.length > 0) {
-      // 檢測新插入的日誌（出現在列表最上方但不在之前的列表中）
+      // Detect newly inserted logs (appear at top of list but not in previous list)
       const prevIds = new Set(prevLogsRef.current.map((log) => log.id));
       const newIds = logs
         .filter((log) => !prevIds.has(log.id))
@@ -70,7 +70,7 @@ export function AuditLogTable({
         );
         setNewLogIds(new Set(newIds));
 
-        // 3 秒後清除新日誌標記
+        // 3 seconds before clearing new log marker
         setTimeout(() => {
           setNewLogIds(new Set());
         }, 3000);
@@ -97,7 +97,7 @@ export function AuditLogTable({
     return status === 'SUCCESS' ? t('success') : t('failure');
   };
 
-  // 定義表格列
+  // Define table columns
   const columns: DataTableColumn<AuditLog>[] = [
     {
       id: 'timestamp',

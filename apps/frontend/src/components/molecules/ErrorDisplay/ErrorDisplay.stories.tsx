@@ -8,28 +8,28 @@ import LoginIcon from '@mui/icons-material/Login';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 /**
- * ErrorDisplay 是頁面級錯誤顯示組件。
+ * ErrorDisplay is a page-level error display component.
  *
- * **用途：頁面級錯誤顯示**
+ * **Purpose: Page-level error display**
  *
- * ## 使用時機
- * - **404 錯誤**: 頁面未找到
- * - **403 錯誤**: 權限不足
- * - **500 錯誤**: 伺服器錯誤
- * - **網路錯誤**: 無法連線
- * - **Session 過期**: 需要重新登入
- * - **資料載入失敗**: 整個頁面無法顯示
+ * ## When to Use
+ * - **404 Error**: Page not found
+ * - **403 Error**: Insufficient permissions
+ * - **500 Error**: Server error
+ * - **Network Error**: Unable to connect
+ * - **Session Expired**: Need to log in again
+ * - **Data Load Failed**: Entire page cannot be displayed
  *
- * ## 嚴重性等級
- * - **error**: 嚴重錯誤，需要用戶操作
- * - **warning**: 警告訊息，可能影響功能
- * - **info**: 資訊提示，不影響功能
+ * ## Severity Levels
+ * - **error**: Serious error, requires user action
+ * - **warning**: Warning message, may affect functionality
+ * - **info**: Information notice, does not affect functionality
  *
- * **注意**：表單內或頁面內的內嵌訊息請使用 AlertMessage 組件
+ * **Note**: For inline messages within forms or pages, use the AlertMessage component
  *
- * ## 與 AlertMessage 的區別
- * - **ErrorDisplay**: 頁面級，佔據大空間，大圖示 (80px)，中央顯示
- * - **AlertMessage**: 內嵌式，輕量級，小圖示，適合表單和頁面內提示
+ * ## Difference from AlertMessage
+ * - **ErrorDisplay**: Page-level, occupies large space, large icon (80px), centered display
+ * - **AlertMessage**: Inline, lightweight, small icon, suitable for forms and page notifications
  */
 const meta = {
   title: 'Molecules/ErrorDisplay',
@@ -39,7 +39,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '頁面級錯誤顯示組件，佔據大空間並在中央顯示大圖示和錯誤訊息。適合作為整個頁面或主要內容區域的錯誤提示。表單內的內嵌訊息請使用 AlertMessage 組件。',
+          'Page-level error display component that occupies large space and displays a large icon and error message in the center. Suitable for entire pages or main content area error notifications. For inline messages within forms, use the AlertMessage component.',
       },
     },
   },
@@ -48,22 +48,22 @@ const meta = {
     severity: {
       control: 'select',
       options: ['error', 'warning', 'info'],
-      description: '錯誤嚴重性',
+      description: 'Error severity',
     },
     showRetry: {
       control: 'boolean',
-      description: '是否顯示重試按鈕',
+      description: 'Whether to show retry button',
     },
     iconSize: {
       control: 'number',
-      description: '圖示大小 (px)',
+      description: 'Icon size (px)',
       table: {
         defaultValue: { summary: '80' },
       },
     },
     minHeight: {
       control: 'text',
-      description: '最小高度',
+      description: 'Minimum height',
       table: {
         defaultValue: { summary: '50vh' },
       },
@@ -75,7 +75,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 404 頁面未找到
+ * 404 Page Not Found
  */
 export const PageNotFound: Story = {
   args: {
@@ -84,12 +84,12 @@ export const PageNotFound: Story = {
     severity: 'error',
     showRetry: true,
     retryText: 'Go Home',
-    onRetry: () => alert('返回首頁...'),
+    onRetry: () => alert('Navigating to home...'),
   },
 };
 
 /**
- * 403 權限不足
+ * 403 Access Denied
  */
 export const AccessDenied: Story = {
   args: {
@@ -103,7 +103,7 @@ export const AccessDenied: Story = {
 };
 
 /**
- * 500 伺服器錯誤
+ * 500 Server Error
  */
 export const ServerError: Story = {
   args: {
@@ -117,7 +117,7 @@ export const ServerError: Story = {
 };
 
 /**
- * 網路連線失敗
+ * Network Connection Failed
  */
 export const NetworkError: Story = {
   args: {
@@ -127,12 +127,12 @@ export const NetworkError: Story = {
     severity: 'error',
     showRetry: true,
     retryText: 'Retry',
-    onRetry: () => alert('重試中...'),
+    onRetry: () => alert('Retrying...'),
   },
 };
 
 /**
- * Session 過期
+ * Session Expired
  */
 export const SessionExpired: Story = {
   args: {
@@ -150,7 +150,7 @@ export const SessionExpired: Story = {
 };
 
 /**
- * 資料載入失敗
+ * Data Load Failed
  */
 export const DataLoadFailed: Story = {
   args: {
@@ -164,7 +164,7 @@ export const DataLoadFailed: Story = {
 };
 
 /**
- * 維護通知
+ * Maintenance Notice
  */
 export const MaintenanceMode: Story = {
   args: {
@@ -178,7 +178,7 @@ export const MaintenanceMode: Story = {
 };
 
 /**
- * 帶多個操作按鈕
+ * With Multiple Action Buttons
  */
 export const WithMultipleActions: Story = {
   args: {
@@ -201,7 +201,7 @@ export const WithMultipleActions: Story = {
 };
 
 /**
- * 自訂圖示大小
+ * Custom Icon Size
  */
 export const CustomIconSize: Story = {
   args: {
@@ -215,7 +215,7 @@ export const CustomIconSize: Story = {
 };
 
 /**
- * 自訂高度
+ * Custom Height
  */
 export const CustomHeight: Story = {
   args: {
@@ -227,7 +227,7 @@ export const CustomHeight: Story = {
 };
 
 /**
- * 所有嚴重性等級
+ * All Severity Levels
  */
 export const AllSeverities: Story = {
   render: () => (
@@ -255,20 +255,23 @@ export const AllSeverities: Story = {
 };
 
 /**
- * 真實世界範例：404 頁面
+ * Real World Example: 404 Page
  */
 export const RealWorld404: Story = {
   render: () => (
     <ErrorDisplay
-      title="404 - 找不到頁面"
-      message="抱歉，您訪問的頁面不存在或已被移除。"
+      title="404 - Page Not Found"
+      message="Sorry, the page you are looking for does not exist or has been removed."
       severity="error"
       showRetry
-      retryText="返回首頁"
-      onRetry={() => alert('導航到首頁')}
+      retryText="Go to Home"
+      onRetry={() => alert('Navigate to home')}
       action={
-        <Button variant="outlined" onClick={() => alert('返回上一頁')}>
-          返回上一頁
+        <Button
+          variant="outlined"
+          onClick={() => alert('Go back to previous page')}
+        >
+          Go Back
         </Button>
       }
     />
@@ -276,29 +279,29 @@ export const RealWorld404: Story = {
 };
 
 /**
- * 真實世界範例：權限不足
+ * Real World Example: Access Denied
  */
 export const RealWorldAccessDenied: Story = {
   render: () => (
     <ErrorDisplay
-      title="權限不足"
-      message="您沒有權限訪問此頁面。如需訪問，請聯繫管理員申請權限。"
+      title="Access Denied"
+      message="You do not have permission to access this page. To request access, please contact your administrator."
       severity="warning"
       action={
         <Stack direction="row" spacing={2}>
           <Button
             variant="contained"
             startIcon={<LoginIcon />}
-            onClick={() => alert('切換帳號')}
+            onClick={() => alert('Switch account')}
           >
-            切換帳號
+            Switch Account
           </Button>
           <Button
             variant="outlined"
             startIcon={<HomeIcon />}
-            onClick={() => alert('返回首頁')}
+            onClick={() => alert('Go to home')}
           >
-            返回首頁
+            Go Home
           </Button>
         </Stack>
       }
@@ -307,7 +310,7 @@ export const RealWorldAccessDenied: Story = {
 };
 
 /**
- * 真實世界範例：網路錯誤
+ * Real World Example: Network Error
  */
 export const RealWorldNetworkError: Story = {
   render: function NetworkErrorExample() {
@@ -315,20 +318,20 @@ export const RealWorldNetworkError: Story = {
 
     const handleRetry = () => {
       setRetryCount(retryCount + 1);
-      alert(`重試次數: ${retryCount + 1}`);
+      alert(`Retry count: ${retryCount + 1}`);
     };
 
     return (
       <ErrorDisplay
-        title="無法連線到伺服器"
-        message="請檢查您的網路連線，或稍後再試。如果問題持續發生，請聯繫技術支援。"
+        title="Unable to Connect to Server"
+        message="Please check your network connection, or try again later. If the problem persists, please contact technical support."
         severity="error"
         showRetry
-        retryText={retryCount > 0 ? `重試 (${retryCount})` : '重試'}
+        retryText={retryCount > 0 ? `Retry (${retryCount})` : 'Retry'}
         onRetry={handleRetry}
         action={
-          <Button variant="outlined" onClick={() => alert('查看狀態頁面')}>
-            查看系統狀態
+          <Button variant="outlined" onClick={() => alert('View status page')}>
+            Check System Status
           </Button>
         }
       />

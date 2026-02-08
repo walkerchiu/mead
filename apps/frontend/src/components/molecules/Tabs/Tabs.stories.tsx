@@ -17,29 +17,29 @@ type Story = StoryObj<typeof meta>;
 
 const sampleTabs = [
   {
-    label: '標籤一',
+    label: 'Tab One',
     content: (
       <Box>
-        <Typography variant="h6">第一個標籤的內容</Typography>
-        <Typography>這是第一個標籤面板的內容。</Typography>
+        <Typography variant="h6">First Tab Content</Typography>
+        <Typography>This is the content of the first tab panel.</Typography>
       </Box>
     ),
   },
   {
-    label: '標籤二',
+    label: 'Tab Two',
     content: (
       <Box>
-        <Typography variant="h6">第二個標籤的內容</Typography>
-        <Typography>這是第二個標籤面板的內容。</Typography>
+        <Typography variant="h6">Second Tab Content</Typography>
+        <Typography>This is the content of the second tab panel.</Typography>
       </Box>
     ),
   },
   {
-    label: '標籤三',
+    label: 'Tab Three',
     content: (
       <Box>
-        <Typography variant="h6">第三個標籤的內容</Typography>
-        <Typography>這是第三個標籤面板的內容。</Typography>
+        <Typography variant="h6">Third Tab Content</Typography>
+        <Typography>This is the content of the third tab panel.</Typography>
       </Box>
     ),
   },
@@ -68,14 +68,14 @@ export const Centered: Story = {
 export const Scrollable: Story = {
   args: {
     tabs: [
-      { label: '標籤一', content: <Typography>內容一</Typography> },
-      { label: '標籤二', content: <Typography>內容二</Typography> },
-      { label: '標籤三', content: <Typography>內容三</Typography> },
-      { label: '標籤四', content: <Typography>內容四</Typography> },
-      { label: '標籤五', content: <Typography>內容五</Typography> },
-      { label: '標籤六', content: <Typography>內容六</Typography> },
-      { label: '標籤七', content: <Typography>內容七</Typography> },
-      { label: '標籤八', content: <Typography>內容八</Typography> },
+      { label: 'Tab One', content: <Typography>Content One</Typography> },
+      { label: 'Tab Two', content: <Typography>Content Two</Typography> },
+      { label: 'Tab Three', content: <Typography>Content Three</Typography> },
+      { label: 'Tab Four', content: <Typography>Content Four</Typography> },
+      { label: 'Tab Five', content: <Typography>Content Five</Typography> },
+      { label: 'Tab Six', content: <Typography>Content Six</Typography> },
+      { label: 'Tab Seven', content: <Typography>Content Seven</Typography> },
+      { label: 'Tab Eight', content: <Typography>Content Eight</Typography> },
     ],
     variant: 'scrollable',
   },
@@ -84,13 +84,19 @@ export const Scrollable: Story = {
 export const WithDisabled: Story = {
   args: {
     tabs: [
-      { label: '啟用', content: <Typography>這個標籤是啟用的</Typography> },
       {
-        label: '禁用',
-        content: <Typography>這個標籤是禁用的</Typography>,
+        label: 'Enabled',
+        content: <Typography>This tab is enabled</Typography>,
+      },
+      {
+        label: 'Disabled',
+        content: <Typography>This tab is disabled</Typography>,
         disabled: true,
       },
-      { label: '啟用', content: <Typography>這個標籤也是啟用的</Typography> },
+      {
+        label: 'Enabled',
+        content: <Typography>This tab is also enabled</Typography>,
+      },
     ],
   },
 };
@@ -109,7 +115,7 @@ export const Controlled: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          當前標籤索引: {value}
+          Current tab index: {value}
         </Typography>
         <Tabs tabs={sampleTabs} value={value} onChange={setValue} />
       </Box>
@@ -121,46 +127,52 @@ export const SettingsTabs: Story = {
   args: {
     tabs: [
       {
-        label: '個人資料',
+        label: 'Profile',
         content: (
           <Box>
             <Typography variant="h6" gutterBottom>
-              個人資料設定
+              Profile Settings
             </Typography>
-            <Typography>管理您的個人資訊和偏好設定</Typography>
+            <Typography>
+              Manage your personal information and preferences
+            </Typography>
           </Box>
         ),
       },
       {
-        label: '安全性',
+        label: 'Security',
         content: (
           <Box>
             <Typography variant="h6" gutterBottom>
-              安全性設定
+              Security Settings
             </Typography>
-            <Typography>管理您的密碼和雙因素驗證</Typography>
+            <Typography>
+              Manage your password and two-factor authentication
+            </Typography>
           </Box>
         ),
       },
       {
-        label: '通知',
+        label: 'Notifications',
         content: (
           <Box>
             <Typography variant="h6" gutterBottom>
-              通知設定
+              Notification Settings
             </Typography>
-            <Typography>自訂您的通知偏好</Typography>
+            <Typography>Customize your notification preferences</Typography>
           </Box>
         ),
       },
       {
-        label: '隱私',
+        label: 'Privacy',
         content: (
           <Box>
             <Typography variant="h6" gutterBottom>
-              隱私設定
+              Privacy Settings
             </Typography>
-            <Typography>控制您的隱私和資料共享設定</Typography>
+            <Typography>
+              Control your privacy and data sharing settings
+            </Typography>
           </Box>
         ),
       },
@@ -175,38 +187,38 @@ export const Vertical: Story = {
         orientation="vertical"
         tabs={[
           {
-            label: '概覽',
+            label: 'Overview',
             content: (
               <Box>
-                <Typography variant="h6">概覽</Typography>
-                <Typography>查看系統概況和統計資料</Typography>
+                <Typography variant="h6">Overview</Typography>
+                <Typography>View system overview and statistics</Typography>
               </Box>
             ),
           },
           {
-            label: '使用者管理',
+            label: 'User Management',
             content: (
               <Box>
-                <Typography variant="h6">使用者管理</Typography>
-                <Typography>管理系統使用者和權限</Typography>
+                <Typography variant="h6">User Management</Typography>
+                <Typography>Manage system users and permissions</Typography>
               </Box>
             ),
           },
           {
-            label: '系統設定',
+            label: 'System Settings',
             content: (
               <Box>
-                <Typography variant="h6">系統設定</Typography>
-                <Typography>配置系統參數和選項</Typography>
+                <Typography variant="h6">System Settings</Typography>
+                <Typography>Configure system parameters and options</Typography>
               </Box>
             ),
           },
           {
-            label: '日誌記錄',
+            label: 'Logs',
             content: (
               <Box>
-                <Typography variant="h6">日誌記錄</Typography>
-                <Typography>查看系統活動日誌</Typography>
+                <Typography variant="h6">Logs</Typography>
+                <Typography>View system activity logs</Typography>
               </Box>
             ),
           },

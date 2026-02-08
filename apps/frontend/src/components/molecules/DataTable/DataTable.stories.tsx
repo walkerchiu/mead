@@ -7,21 +7,21 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 
 /**
- * DataTable 是一個功能完整的數據表格組件。
+ * DataTable is a fully-featured data table component.
  *
- * ## 特色
- * - 支援排序（可自訂排序邏輯）
- * - 支援篩選（可自訂篩選邏輯）
- * - 支援行高亮
- * - 支援展開/收合
- * - 支援多選
- * - 支援分頁
- * - 完整的 TypeScript 類型支援
+ * ## Features
+ * - Supports sorting (customizable sorting logic)
+ * - Supports filtering (customizable filtering logic)
+ * - Supports row highlighting
+ * - Supports expand/collapse
+ * - Supports multi-select
+ * - Supports pagination
+ * - Full TypeScript type support
  *
- * ## 使用場景
- * - 數據列表展示
- * - 管理後台表格
- * - 複雜數據查詢介面
+ * ## Use Cases
+ * - Data list display
+ * - Admin backend tables
+ * - Complex data query interfaces
  */
 const meta = {
   title: 'Molecules/DataTable',
@@ -30,7 +30,8 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component: '功能完整的數據表格組件，支援排序、篩選、高亮、展開等功能。',
+        component:
+          'Fully-featured data table component with sorting, filtering, highlighting, expand, and other features.',
       },
     },
   },
@@ -40,7 +41,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// 範例數據
+// Example data
 interface User {
   id: string;
   name: string;
@@ -55,67 +56,67 @@ interface User {
 const sampleUsers: User[] = [
   {
     id: '1',
-    name: '王小明',
-    email: 'wang@example.com',
+    name: 'John Doe',
+    email: 'john@example.com',
     age: 28,
     role: 'Engineer',
     status: 'active',
-    department: '技術部',
+    department: 'Engineering',
     joinDate: '2023-01-15',
   },
   {
     id: '2',
-    name: '李小華',
-    email: 'lee@example.com',
+    name: 'Emily Chen',
+    email: 'emily@example.com',
     age: 32,
     role: 'Manager',
     status: 'active',
-    department: '管理部',
+    department: 'Management',
     joinDate: '2022-06-20',
   },
   {
     id: '3',
-    name: '張小美',
-    email: 'zhang@example.com',
+    name: 'Sarah Johnson',
+    email: 'sarah@example.com',
     age: 25,
     role: 'Designer',
     status: 'inactive',
-    department: '設計部',
+    department: 'Design',
     joinDate: '2023-03-10',
   },
   {
     id: '4',
-    name: '陳小強',
-    email: 'chen@example.com',
+    name: 'Michael Brown',
+    email: 'michael@example.com',
     age: 30,
     role: 'Engineer',
     status: 'active',
-    department: '技術部',
+    department: 'Engineering',
     joinDate: '2022-11-05',
   },
   {
     id: '5',
-    name: '林小芳',
-    email: 'lin@example.com',
+    name: 'Lisa Anderson',
+    email: 'lisa@example.com',
     age: 27,
     role: 'HR',
     status: 'pending',
-    department: '人資部',
+    department: 'Human Resources',
     joinDate: '2024-01-01',
   },
 ];
 
 const basicColumns: DataTableColumn<User>[] = [
-  { id: 'name', label: '姓名' },
-  { id: 'email', label: '電子郵件' },
-  { id: 'age', label: '年齡', align: 'center' },
-  { id: 'role', label: '職位' },
-  { id: 'department', label: '部門' },
+  { id: 'name', label: 'Name' },
+  { id: 'email', label: 'Email' },
+  { id: 'age', label: 'Age', align: 'center' },
+  { id: 'role', label: 'Position' },
+  { id: 'department', label: 'Department' },
 ];
 
 /**
- * 基本表格
- * 最簡單的數據表格展示
+ * Basic table
+ * Simplest data table display
  */
 export const Basic: Story = {
   args: {
@@ -125,59 +126,64 @@ export const Basic: Story = {
 };
 
 /**
- * 可排序表格
- * 點擊列標題即可排序
+ * Sortable table
+ * Click column header to sort
  */
 export const Sortable: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件', sortable: true },
-      { id: 'age', label: '年齡', align: 'center', sortable: true },
-      { id: 'role', label: '職位', sortable: true },
-      { id: 'department', label: '部門', sortable: true },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email', sortable: true },
+      { id: 'age', label: 'Age', align: 'center', sortable: true },
+      { id: 'role', label: 'Role', sortable: true },
+      { id: 'department', label: 'Department', sortable: true },
     ],
     data: sampleUsers,
   },
 };
 
 /**
- * 可篩選表格
- * 每列都有篩選輸入框
+ * Filterable table
+ * Each column has a filter input
  */
 export const Filterable: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true, filterable: true },
-      { id: 'email', label: '電子郵件', sortable: true, filterable: true },
-      { id: 'age', label: '年齡', align: 'center', sortable: true },
-      { id: 'role', label: '職位', sortable: true, filterable: true },
-      { id: 'department', label: '部門', sortable: true, filterable: true },
+      { id: 'name', label: 'Name', sortable: true, filterable: true },
+      { id: 'email', label: 'Email', sortable: true, filterable: true },
+      { id: 'age', label: 'Age', align: 'center', sortable: true },
+      { id: 'role', label: 'Role', sortable: true, filterable: true },
+      {
+        id: 'department',
+        label: 'Department',
+        sortable: true,
+        filterable: true,
+      },
     ],
     data: sampleUsers,
   },
 };
 
 /**
- * 自訂渲染
- * 使用 render 函數自訂列的顯示方式
+ * Custom rendering
+ * Use render function to customize column display
  */
 export const CustomRender: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件' },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
       {
         id: 'age',
-        label: '年齡',
+        label: 'Age',
         align: 'center',
         sortable: true,
-        render: (value) => <Chip label={`${value} 歲`} size="small" />,
+        render: (value) => <Chip label={`${value} years old`} size="small" />,
       },
-      { id: 'role', label: '職位' },
+      { id: 'role', label: 'Role' },
       {
         id: 'status',
-        label: '狀態',
+        label: 'Status',
         render: (value: 'active' | 'inactive' | 'pending') => {
           const colorMap = {
             active: 'success' as const,
@@ -185,9 +191,9 @@ export const CustomRender: Story = {
             pending: 'warning' as const,
           };
           const labelMap = {
-            active: '啟用',
-            inactive: '停用',
-            pending: '待審核',
+            active: 'Active',
+            inactive: 'Inactive',
+            pending: 'Pending',
           };
           return (
             <Badge color={colorMap[value]} size="small">
@@ -202,19 +208,19 @@ export const CustomRender: Story = {
 };
 
 /**
- * 高亮行
- * 根據條件高亮特定行
+ * Highlight rows
+ * Highlight specific rows based on conditions
  */
 export const HighlightRows: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件' },
-      { id: 'age', label: '年齡', align: 'center', sortable: true },
-      { id: 'role', label: '職位' },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
+      { id: 'age', label: 'Age', align: 'center', sortable: true },
+      { id: 'role', label: 'Role' },
       {
         id: 'status',
-        label: '狀態',
+        label: 'Status',
         render: (value: 'active' | 'inactive' | 'pending') => {
           const colorMap = {
             active: 'success' as const,
@@ -222,9 +228,9 @@ export const HighlightRows: Story = {
             pending: 'warning' as const,
           };
           const labelMap = {
-            active: '啟用',
-            inactive: '停用',
-            pending: '待審核',
+            active: 'Active',
+            inactive: 'Inactive',
+            pending: 'Pending',
           };
           return (
             <Badge color={colorMap[value]} size="small">
@@ -241,18 +247,18 @@ export const HighlightRows: Story = {
 };
 
 /**
- * 可展開表格
- * 點擊展開按鈕顯示詳細資訊
+ * Expandable table
+ * Click expand button to show details
  */
 export const Expandable: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件' },
-      { id: 'role', label: '職位' },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
+      { id: 'role', label: 'Role' },
       {
         id: 'status',
-        label: '狀態',
+        label: 'Status',
         render: (value: 'active' | 'inactive' | 'pending') => {
           const colorMap = {
             active: 'success' as const,
@@ -260,9 +266,9 @@ export const Expandable: Story = {
             pending: 'warning' as const,
           };
           const labelMap = {
-            active: '啟用',
-            inactive: '停用',
-            pending: '待審核',
+            active: 'Active',
+            inactive: 'Inactive',
+            pending: 'Pending',
           };
           return (
             <Badge color={colorMap[value]} size="small">
@@ -277,16 +283,16 @@ export const Expandable: Story = {
     renderExpandedRow: (row: User) => (
       <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
         <Typography variant="h6" gutterBottom>
-          詳細資訊
+          Details
         </Typography>
         <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 1 }}>
-          <Typography color="text.secondary">部門：</Typography>
+          <Typography color="text.secondary">Department：</Typography>
           <Typography>{row.department}</Typography>
-          <Typography color="text.secondary">入職日期：</Typography>
+          <Typography color="text.secondary">Hire Date：</Typography>
           <Typography>{row.joinDate}</Typography>
-          <Typography color="text.secondary">年齡：</Typography>
-          <Typography>{row.age} 歲</Typography>
-          <Typography color="text.secondary">電子郵件：</Typography>
+          <Typography color="text.secondary">Age：</Typography>
+          <Typography>{row.age} years old</Typography>
+          <Typography color="text.secondary">Email：</Typography>
           <Typography>{row.email}</Typography>
         </Box>
       </Box>
@@ -295,8 +301,8 @@ export const Expandable: Story = {
 };
 
 /**
- * 可選擇表格
- * 支援多選行
+ * Selectable table
+ * Supports multi-select rows
  */
 export const Selectable: Story = {
   render: function SelectableTable() {
@@ -305,15 +311,15 @@ export const Selectable: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          已選擇：{selected.length} 行
+          Selected: {selected.length} rows
         </Typography>
         <DataTable
           columns={[
-            { id: 'name', label: '姓名', sortable: true },
-            { id: 'email', label: '電子郵件' },
-            { id: 'age', label: '年齡', align: 'center', sortable: true },
-            { id: 'role', label: '職位' },
-            { id: 'department', label: '部門' },
+            { id: 'name', label: 'Name', sortable: true },
+            { id: 'email', label: 'Email' },
+            { id: 'age', label: 'Age', align: 'center', sortable: true },
+            { id: 'role', label: 'Role' },
+            { id: 'department', label: 'Department' },
           ]}
           data={sampleUsers}
           selectable
@@ -326,8 +332,8 @@ export const Selectable: Story = {
 };
 
 /**
- * 帶分頁表格
- * 顯示分頁控制
+ * Paginated table
+ * Display pagination controls
  */
 export const WithPagination: Story = {
   render: function PaginatedTable() {
@@ -336,10 +342,10 @@ export const WithPagination: Story = {
     return (
       <DataTable
         columns={[
-          { id: 'name', label: '姓名', sortable: true },
-          { id: 'email', label: '電子郵件' },
-          { id: 'role', label: '職位' },
-          { id: 'department', label: '部門' },
+          { id: 'name', label: 'Name', sortable: true },
+          { id: 'email', label: 'Email' },
+          { id: 'role', label: 'Role' },
+          { id: 'department', label: 'Department' },
         ]}
         data={sampleUsers}
         pagination
@@ -352,8 +358,8 @@ export const WithPagination: Story = {
 };
 
 /**
- * 載入中狀態
- * 顯示載入指示器
+ * loadingStatus
+ * Display loading indicator
  */
 export const Loading: Story = {
   args: {
@@ -364,29 +370,29 @@ export const Loading: Story = {
 };
 
 /**
- * 空數據狀態
- * 無數據時的顯示
+ * empty dataStatus
+ * Display when no data
  */
 export const Empty: Story = {
   args: {
     columns: basicColumns,
     data: [],
-    emptyText: '目前沒有使用者資料',
+    emptyText: 'No user data available',
   },
 };
 
 /**
- * 固定表頭
- * 滾動時表頭固定在頂部
+ * Fixed header
+ * Header fixed at top when scrolling
  */
 export const StickyHeader: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件' },
-      { id: 'age', label: '年齡', align: 'center', sortable: true },
-      { id: 'role', label: '職位' },
-      { id: 'department', label: '部門' },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
+      { id: 'age', label: 'Age', align: 'center', sortable: true },
+      { id: 'role', label: 'Role' },
+      { id: 'department', label: 'Department' },
     ],
     data: [...sampleUsers, ...sampleUsers, ...sampleUsers],
     maxHeight: 400,
@@ -394,22 +400,22 @@ export const StickyHeader: Story = {
 };
 
 /**
- * 展開圖標樣式 - 向下
- * 將展開圖標改為向下/向上樣式
+ * Expand icon style - downward
+ * Change expand icon to downward/upward style
  */
 export const ExpandIconDown: Story = {
   args: {
     columns: [
-      { id: 'name', label: '姓名', sortable: true },
-      { id: 'email', label: '電子郵件' },
-      { id: 'role', label: '職位' },
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
+      { id: 'role', label: 'Role' },
     ],
     data: sampleUsers,
     expandable: true,
     expandIconPosition: 'down',
     renderExpandedRow: (row: User) => (
       <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-        <Typography variant="subtitle2">詳細資訊</Typography>
+        <Typography variant="subtitle2">Details</Typography>
         <Typography variant="body2">{row.department}</Typography>
       </Box>
     ),
@@ -417,8 +423,8 @@ export const ExpandIconDown: Story = {
 };
 
 /**
- * 完整功能展示
- * 同時展示所有功能
+ * Full feature showcase
+ * Showcase all features simultaneously
  */
 export const FullFeatures: Story = {
   render: function FullFeaturesTable() {
@@ -428,28 +434,30 @@ export const FullFeatures: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          已選擇：{selected.length} 行 | 當前頁：{page}
+          Selected: {selected.length} rows | Current page：{page}
         </Typography>
         <DataTable
           columns={[
-            { id: 'name', label: '姓名', sortable: true, filterable: true },
+            { id: 'name', label: 'Name', sortable: true, filterable: true },
             {
               id: 'email',
-              label: '電子郵件',
+              label: 'Email',
               sortable: true,
               filterable: true,
             },
             {
               id: 'age',
-              label: '年齡',
+              label: 'Age',
               align: 'center',
               sortable: true,
-              render: (value) => <Chip label={`${value} 歲`} size="small" />,
+              render: (value) => (
+                <Chip label={`${value} years old`} size="small" />
+              ),
             },
-            { id: 'role', label: '職位', sortable: true, filterable: true },
+            { id: 'role', label: 'Role', sortable: true, filterable: true },
             {
               id: 'status',
-              label: '狀態',
+              label: 'Status',
               render: (value: 'active' | 'inactive' | 'pending') => {
                 const colorMap = {
                   active: 'success' as const,
@@ -457,9 +465,9 @@ export const FullFeatures: Story = {
                   pending: 'warning' as const,
                 };
                 const labelMap = {
-                  active: '啟用',
-                  inactive: '停用',
-                  pending: '待審核',
+                  active: 'Active',
+                  inactive: 'Inactive',
+                  pending: 'Pending',
                 };
                 return (
                   <Badge color={colorMap[value]} size="small">
@@ -477,7 +485,7 @@ export const FullFeatures: Story = {
           renderExpandedRow={(row: User) => (
             <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
               <Typography variant="subtitle2" gutterBottom>
-                詳細資訊
+                Details
               </Typography>
               <Box
                 sx={{
@@ -487,11 +495,11 @@ export const FullFeatures: Story = {
                 }}
               >
                 <Typography variant="body2" color="text.secondary">
-                  部門：
+                  Department：
                 </Typography>
                 <Typography variant="body2">{row.department}</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  入職日期：
+                  Hire Date：
                 </Typography>
                 <Typography variant="body2">{row.joinDate}</Typography>
               </Box>

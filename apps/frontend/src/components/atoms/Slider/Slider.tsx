@@ -6,34 +6,34 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { FieldError } from 'react-hook-form';
 
 /**
- * Slider 組件 - Atomic Design: Atom
+ * Slider Component - Atomic Design: Atom
  *
- * 滑桿控制項，與 react-hook-form 完美整合。
+ * Slider control, perfect integration with react-hook-form.
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Slider
- *   label="音量"
+ *   label="Volume"
  *   value={volume}
  *   onChange={(e, value) => setVolume(value)}
  *   min={0}
  *   max={100}
  * />
  *
- * // 帶刻度標記
+ * // With scale marks
  * <Slider
- *   label="優先級"
+ *   label="priority"
  *   marks={[
- *     { value: 0, label: '低' },
- *     { value: 50, label: '中' },
- *     { value: 100, label: '高' },
+ *     { value: 0, label: 'Low' },
+ *     { value: 50, label: 'Medium' },
+ *     { value: 100, label: 'High' },
  *   ]}
  * />
  *
- * // 範圍選擇
+ * // Range selection
  * <Slider
- *   label="價格範圍"
+ *   label="price range"
  *   value={[20, 80]}
  *   valueLabelDisplay="auto"
  * />
@@ -47,98 +47,98 @@ export interface SliderMark {
 
 export interface SliderProps {
   /**
-   * 組件標籤
+   * componentlabel
    */
   label?: string;
 
   /**
-   * 當前值（單一值或範圍）
+   * Current value（singlevalue or range）
    */
   value?: number | number[];
 
   /**
-   * 預設值
+   * defaultValue
    */
   defaultValue?: number | number[];
 
   /**
-   * 值變更時的回調
+   * callback on value change
    */
   onChange?: (event: Event, value: number | number[]) => void;
 
   /**
-   * 最小值
+   * minimum value
    */
   min?: number;
 
   /**
-   * 最大值
+   * maximumValue
    */
   max?: number;
 
   /**
-   * 步長
+   * step
    */
   step?: number;
 
   /**
-   * 刻度標記
+   * scale marks
    */
   marks?: boolean | SliderMark[];
 
   /**
-   * 值標籤顯示方式
+   * Valuelabeldisplay mode
    */
   valueLabelDisplay?: 'auto' | 'on' | 'off';
 
   /**
-   * 值標籤格式化函數
+   * Valuelabelformat function
    */
   valueLabelFormat?: (value: number) => string;
 
   /**
-   * 欄位錯誤（來自 react-hook-form）
+   * Field error（from react-hook-form）
    */
   error?: FieldError | string;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * helper text（displayed in non-error state）
    */
   helperText?: string;
 
   /**
-   * 是否必填
+   * whetherRequired
    */
   required?: boolean;
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 組件名稱（用於 form）
+   * component name (for form)
    */
   name?: string;
 
   /**
-   * 組件大小
+   * componentsize
    */
   size?: 'small' | 'medium';
 
   /**
-   * 組件顏色
+   * componentColor
    */
   color?: 'primary' | 'secondary';
 
   /**
-   * 方向
+   * direction
    */
   orientation?: 'horizontal' | 'vertical';
 }
 
 /**
- * Slider 組件
+ * Slider component
  */
 export const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
   {
@@ -164,7 +164,7 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(
   },
   ref,
 ) {
-  // 處理錯誤訊息
+  // handleError message
   const errorMessage = typeof error === 'string' ? error : error?.message;
   const hasError = Boolean(errorMessage);
 

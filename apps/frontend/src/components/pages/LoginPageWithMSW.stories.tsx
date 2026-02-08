@@ -9,9 +9,9 @@ import Box from '@mui/material/Box';
 import { mockTokens } from '@/mocks/fixtures/users';
 
 /**
- * LoginPage 與 MSW 整合範例
+ * LoginPage with MSW integration example
  *
- * 展示如何使用 MSW 模擬不同的 API 回應情境。
+ * Demonstrates how to use MSW to simulate different API response scenarios.
  */
 
 const meta = {
@@ -20,7 +20,8 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '使用 MSW 模擬 API 的完整登入頁面流程展示。',
+        component:
+          'Complete login page flow demonstration using MSW to simulate API.',
       },
     },
   },
@@ -31,11 +32,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 成功登入（無 2FA）
+ * Successful login (without 2FA)
  *
- * 測試帳號：
+ * Test account:
  * - Email: user@example.com
- * - 密碼: password
+ * - Password: password
  */
 export const SuccessLogin: Story = {
   render: () => {
@@ -52,14 +53,14 @@ export const SuccessLogin: Story = {
         setStatus('loading');
         setError(undefined);
 
-        // 模擬 API 請求
+        // Simulate API request
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         if (data.email === 'user@example.com' && data.password === 'password') {
           setStatus('success');
         } else {
           setStatus('error');
-          setError('電子郵件或密碼錯誤');
+          setError('Invalid email or password');
         }
       };
 
@@ -67,8 +68,8 @@ export const SuccessLogin: Story = {
         return (
           <AuthLayout>
             <Box sx={{ textAlign: 'center', width: '100%', maxWidth: 400 }}>
-              <AlertMessage severity="success" title="登入成功">
-                歡迎回來！正在導向儀表板...
+              <AlertMessage severity="success" title="Login Successful">
+                Welcome back! Redirecting to dashboard...
               </AlertMessage>
             </Box>
           </AuthLayout>
@@ -76,7 +77,7 @@ export const SuccessLogin: Story = {
       }
 
       return (
-        <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+        <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
           <Box sx={{ width: '100%' }}>
             <LoginForm
               onSubmit={handleSubmit}
@@ -85,9 +86,9 @@ export const SuccessLogin: Story = {
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                測試帳號 (直接登入):{'\n'}
+                Test account (direct login):{'\n'}
                 Email: user@example.com{'\n'}
-                密碼: password
+                Password: password
               </Box>
             </Box>
           </Box>
@@ -132,12 +133,12 @@ export const SuccessLogin: Story = {
 };
 
 /**
- * 需要 2FA 驗證
+ * Requires 2FA verification
  *
- * 測試帳號：
+ * Test account:
  * - Email: admin@example.com
- * - 密碼: password
- * - 2FA 驗證碼: 123456
+ * - Password: password
+ * - 2FA verification code: 123456
  */
 export const Requires2FA: Story = {
   render: () => {
@@ -161,7 +162,7 @@ export const Requires2FA: Story = {
           setTemporaryToken('temp-token-12345');
           setStep('2fa');
         } else {
-          setError('電子郵件或密碼錯誤');
+          setError('Invalid email or password');
         }
 
         setLoading(false);
@@ -176,7 +177,7 @@ export const Requires2FA: Story = {
         if (code === '123456') {
           setStep('success');
         } else {
-          setError('驗證碼錯誤');
+          setError('Invalid verification code');
         }
 
         setLoading(false);
@@ -186,8 +187,8 @@ export const Requires2FA: Story = {
         return (
           <AuthLayout>
             <Box sx={{ textAlign: 'center', width: '100%', maxWidth: 400 }}>
-              <AlertMessage severity="success" title="驗證成功">
-                正在導向儀表板...
+              <AlertMessage severity="success" title="Verification Successful">
+                Redirecting to dashboard...
               </AlertMessage>
             </Box>
           </AuthLayout>
@@ -196,7 +197,10 @@ export const Requires2FA: Story = {
 
       if (step === '2fa') {
         return (
-          <AuthLayout title="雙因素認證" subtitle="請輸入驗證碼">
+          <AuthLayout
+            title="Two-Factor Authentication"
+            subtitle="Please enter your verification code"
+          >
             <Box sx={{ width: '100%' }}>
               <TwoFactorForm
                 onSubmit={handle2FA}
@@ -211,7 +215,7 @@ export const Requires2FA: Story = {
                 sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}
               >
                 <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                  測試驗證碼: 123456
+                  Test verification code: 123456
                 </Box>
               </Box>
             </Box>
@@ -220,15 +224,15 @@ export const Requires2FA: Story = {
       }
 
       return (
-        <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+        <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
           <Box sx={{ width: '100%' }}>
             <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
             <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                測試帳號 (需要 2FA):{'\n'}
+                Test account (requires 2FA):{'\n'}
                 Email: admin@example.com{'\n'}
-                密碼: password{'\n'}
-                驗證碼: 123456
+                Password: password{'\n'}
+                Verification code: 123456
               </Box>
             </Box>
           </Box>
@@ -297,11 +301,11 @@ export const Requires2FA: Story = {
 };
 
 /**
- * 登入失敗 - 錯誤密碼
+ * Login failed - Wrong password
  */
 export const LoginError: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+    <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
       <Box sx={{ width: '100%' }}>
         <LoginForm
           onSubmit={async (_data) => {
@@ -311,8 +315,8 @@ export const LoginError: Story = {
         />
         <Box sx={{ mt: 2, p: 2, bgcolor: 'warning.lighter', borderRadius: 1 }}>
           <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-            此 story 示範錯誤處理{'\n'}
-            任何帳號密碼都會失敗
+            This story demonstrates error handling{'\n'}
+            Any credentials will fail
           </Box>
         </Box>
       </Box>

@@ -6,38 +6,38 @@ import StepContent from '@mui/material/StepContent';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Stepper 組件 - Atomic Design: Molecule
+ * Stepper Component - Atomic Design: Molecule
  *
- * 步驟指示器組件，用於顯示多步驟流程的進度。
+ * Stepper indicator component，for displaying multi-step process progress。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Stepper
  *   activeStep={1}
  *   steps={[
- *     { label: '選擇方案' },
- *     { label: '填寫資料' },
- *     { label: '確認付款' },
+ *     { label: 'Select Plan' },
+ *     { label: 'Fill Information' },
+ *     { label: 'Confirm payment' },
  *   ]}
  * />
  *
- * // 帶描述
+ * // With description
  * <Stepper
  *   activeStep={0}
  *   steps={[
- *     { label: '步驟一', description: '完成基本設定' },
- *     { label: '步驟二', description: '上傳必要文件' },
+ *     { label: 'Step 1', description: 'Complete basic settings' },
+ *     { label: 'Step 2', description: 'upload required files' },
  *   ]}
  * />
  *
- * // 垂直步驟條（帶內容）
+ * // Vertical stepper（With content）
  * <Stepper
  *   activeStep={1}
  *   orientation="vertical"
  *   steps={[
- *     { label: '步驟一', content: <Form1 /> },
- *     { label: '步驟二', content: <Form2 /> },
+ *     { label: 'Step 1', content: <Form1 /> },
+ *     { label: 'Step 2', content: <Form2 /> },
  *   ]}
  * />
  * ```
@@ -45,70 +45,70 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface StepItem {
   /**
-   * 步驟標籤
+   * Step label
    */
   label: string;
 
   /**
-   * 步驟描述（可選）
+   * StepDescription（Optional）
    */
   description?: string;
 
   /**
-   * 步驟內容（僅垂直模式）
+   * step content（vertical mode only）
    */
   content?: React.ReactNode;
 
   /**
-   * 是否為可選步驟
+   * whether is optional step
    */
   optional?: boolean;
 
   /**
-   * 是否已完成
+   * whetherAlreadycomplete
    */
   completed?: boolean;
 
   /**
-   * 是否有錯誤
+   * whether has error
    */
   error?: boolean;
 }
 
 export interface StepperProps {
   /**
-   * 步驟列表
+   * StepcolumnList
    */
   steps: StepItem[];
 
   /**
-   * 當前啟用的步驟索引
+   * current active step index
    */
   activeStep: number;
 
   /**
-   * 方向
+   * direction
    */
   orientation?: 'horizontal' | 'vertical';
 
   /**
-   * 非線性模式（允許跳過步驟）
+   * non-linear mode（Allow skip step）
    */
   nonLinear?: boolean;
 
   /**
-   * 替代標籤（將標籤置於圖示下方）
+   * alternative label (place label below icon)
    */
   alternativeLabel?: boolean;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Stepper 組件
+ * Stepper component
  */
 export const Stepper = forwardRef<HTMLDivElement, StepperProps>(
   function Stepper(
@@ -138,7 +138,7 @@ export const Stepper = forwardRef<HTMLDivElement, StepperProps>(
             <StepLabel
               optional={
                 step.optional ? (
-                  <span style={{ fontSize: '0.75rem' }}>選填</span>
+                  <span style={{ fontSize: '0.75rem' }}>Optional</span>
                 ) : step.description ? (
                   <span style={{ fontSize: '0.75rem' }}>
                     {step.description}

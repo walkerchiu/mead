@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '認證頁面的統一佈局模板，提供居中卡片、響應式設計和品牌識別。',
+          'Unified layout template for authentication pages, providing centered card, responsive design, and brand identity.',
       },
     },
   },
@@ -24,7 +24,7 @@ const meta = {
     background: {
       control: 'select',
       options: ['gradient', 'solid', 'image'],
-      description: '背景樣式',
+      description: 'Background style',
     },
   },
 } satisfies Meta<typeof AuthLayout>;
@@ -33,57 +33,57 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設樣式
- * 漸層背景
+ * Default style
+ * Gradient background
  */
 export const Default: Story = {
   args: {
-    title: '歡迎回來',
-    subtitle: '登入以繼續',
-    children: <Typography variant="body1">這裡放置表單組件</Typography>,
+    title: 'Welcome Back',
+    subtitle: 'Sign in to continue',
+    children: <Typography variant="body1">Form components go here</Typography>,
   },
 };
 
 /**
- * 不顯示 Logo
+ * Without Logo
  */
 export const NoLogo: Story = {
   args: {
     showLogo: false,
-    children: <Typography variant="body1">沒有 Logo 的佈局</Typography>,
+    children: <Typography variant="body1">Layout without logo</Typography>,
   },
 };
 
 /**
- * 不顯示 Footer
+ * Without Footer
  */
 export const NoFooter: Story = {
   args: {
-    title: '登入',
+    title: 'Sign In',
     showFooter: false,
-    children: <Typography variant="body1">沒有 Footer 的佈局</Typography>,
+    children: <Typography variant="body1">Layout without footer</Typography>,
   },
 };
 
 /**
- * 純色背景
+ * Solid background
  */
 export const SolidBackground: Story = {
   args: {
-    title: '登入',
+    title: 'Sign In',
     background: 'solid',
-    children: <Typography variant="body1">純色背景樣式</Typography>,
+    children: <Typography variant="body1">Solid background style</Typography>,
   },
 };
 
 /**
- * 完整 Login 頁面
- * 展示實際的登入表單
+ * Complete Login page
+ * Demonstrates actual login form
  */
 export const LoginPage: Story = {
   args: {
-    title: '歡迎回來',
-    subtitle: '登入以繼續使用',
+    title: 'Welcome Back',
+    subtitle: 'Sign in to continue',
     children: (
       <LoginForm
         onSubmit={async (data) => {
@@ -96,12 +96,12 @@ export const LoginPage: Story = {
 };
 
 /**
- * 2FA 頁面
+ * Two-Factor Authentication page
  */
 export const TwoFactorPage: Story = {
   args: {
-    title: '雙因素認證',
-    subtitle: '請輸入驗證碼',
+    title: 'Two-Factor Authentication',
+    subtitle: 'Please enter your verification code',
     children: (
       <TwoFactorForm
         onSubmit={async (code) => {
@@ -114,12 +114,12 @@ export const TwoFactorPage: Story = {
 };
 
 /**
- * 忘記密碼頁面
+ * Forgot Password page
  */
 export const ForgotPasswordPage: Story = {
   args: {
-    title: '重設密碼',
-    subtitle: '我們會發送重設連結到您的郵箱',
+    title: 'Reset Password',
+    subtitle: 'We will send a reset link to your email',
     children: (
       <ForgotPasswordForm
         onSubmit={async (data) => {
@@ -132,12 +132,12 @@ export const ForgotPasswordPage: Story = {
 };
 
 /**
- * 重設密碼頁面
+ * Reset Password page
  */
 export const ResetPasswordPage: Story = {
   args: {
-    title: '設定新密碼',
-    subtitle: '請輸入您的新密碼',
+    title: 'Set New Password',
+    subtitle: 'Please enter your new password',
     children: (
       <ResetPasswordForm
         onSubmit={async (data) => {
@@ -150,19 +150,19 @@ export const ResetPasswordPage: Story = {
 };
 
 /**
- * 自訂內容
- * 展示靈活性
+ * Custom content
+ * Demonstrates flexibility
  */
 export const CustomContent: Story = {
   args: {
-    title: '自訂內容',
+    title: 'Custom Content',
     children: (
       <Box sx={{ textAlign: 'center', p: 3 }}>
         <Typography variant="h6" gutterBottom>
-          這是自訂內容
+          This is custom content
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          AuthLayout 可以包含任何內容
+          AuthLayout can contain any content
         </Typography>
       </Box>
     ),
@@ -170,11 +170,11 @@ export const CustomContent: Story = {
 };
 
 /**
- * 小寬度
+ * Small width
  */
 export const SmallWidth: Story = {
   args: {
-    title: '登入',
+    title: 'Sign In',
     maxWidth: 360,
     children: (
       <LoginForm
@@ -186,11 +186,11 @@ export const SmallWidth: Story = {
 };
 
 /**
- * 大寬度
+ * Large width
  */
 export const LargeWidth: Story = {
   args: {
-    title: '登入',
+    title: 'Sign In',
     maxWidth: 600,
     children: (
       <Box sx={{ width: '100%' }}>
@@ -201,13 +201,13 @@ export const LargeWidth: Story = {
 };
 
 /**
- * 響應式測試
- * 在不同視窗大小測試
+ * Responsive test
+ * Test with different window sizes
  */
 export const ResponsiveTest: Story = {
   args: {
-    title: '響應式佈局',
-    subtitle: '調整瀏覽器視窗大小查看效果',
+    title: 'Responsive Layout',
+    subtitle: 'Resize the browser window to see the effect',
     children: <LoginForm onSubmit={async (data) => console.log(data)} />,
   },
   parameters: {

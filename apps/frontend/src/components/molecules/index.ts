@@ -1,8 +1,8 @@
 /**
- * Molecules - 組合組件
+ * Molecules - Composite Components
  *
- * Atomic Design 架構中由 Atoms 組合而成的組件。
- * 這些組件提供更完整的功能，通常用於特定的使用場景。
+ * Components composed of Atoms in the Atomic Design architecture.
+ * These components provide more complete functionality, typically used for specific use cases.
  */
 
 export { FormField, type FormFieldProps } from './FormField/FormField';

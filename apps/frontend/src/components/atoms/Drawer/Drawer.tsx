@@ -13,50 +13,58 @@ export type DrawerState = 'closed' | 'mini' | 'open';
 
 export interface DrawerComponentProps {
   /**
-   * 顯示狀態
+   * Display state
    */
   state?: DrawerState;
   /**
-   * Drawer 類型
-   * - temporary: 覆蓋在內容上方，可關閉（手機版）
-   * - persistent: 推開內容，可切換（桌面版）
-   * - permanent: 永久顯示（桌面版）
+   * Drawer type
+   * - temporary: Overlay on content, closable (mobile version)
+   * - persistent: Push content，Toggle（Desktop version）
+   * - permanent: Permanent display（Desktop version）
    */
   variant?: DrawerVariant;
   /**
-   * 錨點位置
+   * Anchor position
    */
   anchor?: 'left' | 'right';
   /**
-   * 完全展開時的寬度（px）
+   * width when fully expanded (px)
    */
   width?: number;
   /**
-   * 半展開（mini）時的寬度（px）
+   * width when half expanded (mini) (px)
    */
   miniWidth?: number;
   /**
-   * Drawer 內容
+   * Drawer Content
    */
   children?: ReactNode;
   /**
-   * 狀態變更回調
+   * state change callback
    */
   onStateChange?: (newState: DrawerState) => void;
   /**
-   * 是否顯示切換按鈕
+   * whether to show toggle button
    */
   showToggleButton?: boolean;
   /**
-   * Header 內容（顯示在最上方）
+   * custom toggle button content (if not provided, use default arrow icon)
+   */
+  toggleButtonContent?: ReactNode;
+  /**
+   * toggle button style
+   */
+  toggleButtonSx?: SxProps<Theme>;
+  /**
+   * header content (displayed at the top)
    */
   header?: ReactNode;
   /**
-   * Footer 內容（顯示在最下方）
+   * Footer Content（show at bottom）
    */
   footer?: ReactNode;
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -105,17 +113,17 @@ const StyledDrawer = styled(MuiDrawer, {
 });
 
 /**
- * Drawer 元件 - 支援三種狀態（關閉、半展開、完全展開）和三種模式（temporary, persistent, permanent）
+ * Drawer component - supportsthree states（close、halfexpanded、fully expanded）And three modes（temporary, persistent, permanent）
  *
- * 使用場景：
- * - temporary: 手機版側邊欄，覆蓋在內容上
- * - persistent: 桌面版側邊欄，可切換並推開主要內容
- * - permanent: 始終顯示的側邊欄
+ * use cases:
+ * - temporary: mobile version sidebar, overlays content
+ * - persistent: Desktop versionsidebar，Toggleand push mainContent
+ * - permanent: Always visible sidebar
  *
- * 狀態：
- * - closed: 完全關閉（僅 temporary 和 persistent）
- * - mini: 半展開，只顯示圖示
- * - open: 完全展開，顯示完整內容
+ * state：
+ * - closed: completely closed (only temporary and persistent)
+ * - mini: halfexpanded，only showicon
+ * - open: fully expanded，show fullContent
  */
 export function Drawer({
   state = 'open',
@@ -126,6 +134,8 @@ export function Drawer({
   children,
   onStateChange,
   showToggleButton = true,
+  toggleButtonContent,
+  toggleButtonSx,
   header,
   footer,
   sx,
@@ -137,10 +147,10 @@ export function Drawer({
     if (!onStateChange) return;
 
     if (variant === 'temporary') {
-      // temporary 模式：open <-> closed
+      // temporary mode：open <-> closed
       onStateChange(isOpen ? 'closed' : 'open');
     } else {
-      // persistent/permanent 模式：open <-> mini
+      // persistent/permanent mode：open <-> mini
       onStateChange(isMini ? 'open' : 'mini');
     }
   };
@@ -151,7 +161,7 @@ export function Drawer({
     }
   };
 
-  // temporary 使用標準 MuiDrawer
+  // temporary use standard MuiDrawer
   if (variant === 'temporary') {
     return (
       <MuiDrawer
@@ -184,12 +194,17 @@ export function Drawer({
             >
               {header}
               {showToggleButton && (
-                <IconButton onClick={handleClose} size="small">
-                  {anchor === 'left' ? (
-                    <ChevronLeftIcon />
-                  ) : (
-                    <ChevronRightIcon />
-                  )}
+                <IconButton
+                  onClick={handleClose}
+                  size="small"
+                  sx={toggleButtonSx}
+                >
+                  {toggleButtonContent ||
+                    (anchor === 'left' ? (
+                      <ChevronLeftIcon />
+                    ) : (
+                      <ChevronRightIcon />
+                    ))}
                 </IconButton>
               )}
             </Box>
@@ -205,7 +220,7 @@ export function Drawer({
     );
   }
 
-  // persistent/permanent 使用 StyledDrawer
+  // persistent/permanent use StyledDrawer
   return (
     <StyledDrawer
       variant={variant}
@@ -236,18 +251,23 @@ export function Drawer({
           >
             {!isMini && header}
             {showToggleButton && (
-              <IconButton onClick={handleToggle} size="small">
-                {isMini ? (
-                  anchor === 'left' ? (
-                    <ChevronRightIcon />
-                  ) : (
+              <IconButton
+                onClick={handleToggle}
+                size="small"
+                sx={toggleButtonSx}
+              >
+                {toggleButtonContent ||
+                  (isMini ? (
+                    anchor === 'left' ? (
+                      <ChevronRightIcon />
+                    ) : (
+                      <ChevronLeftIcon />
+                    )
+                  ) : anchor === 'left' ? (
                     <ChevronLeftIcon />
-                  )
-                ) : anchor === 'left' ? (
-                  <ChevronLeftIcon />
-                ) : (
-                  <ChevronRightIcon />
-                )}
+                  ) : (
+                    <ChevronRightIcon />
+                  ))}
               </IconButton>
             )}
           </Box>
@@ -263,8 +283,6 @@ export function Drawer({
           <Box
             sx={{
               p: 2,
-              display: 'flex',
-              justifyContent: isMini ? 'center' : 'flex-start',
             }}
           >
             {footer}

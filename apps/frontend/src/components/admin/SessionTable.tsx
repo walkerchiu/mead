@@ -97,7 +97,7 @@ export function SessionTable({
     }
   };
 
-  // 定義表格列
+  // Define table columns
   const columns: DataTableColumn<Session>[] = [
     {
       id: 'user',

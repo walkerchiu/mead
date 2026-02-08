@@ -10,20 +10,20 @@ import Alert from '@mui/material/Alert';
 import { useState } from 'react';
 
 /**
- * CheckboxGroup 結合了複選框和錯誤處理。
+ * CheckboxGroup combines checkboxes with error handling.
  *
- * ## 特色
- * - 與 react-hook-form 完美整合
- * - 支援橫向或縱向排列
- * - 自動顯示驗證錯誤
- * - 支援選項描述
- * - 支援多選
+ * ## Features
+ * - Perfect integration with react-hook-form
+ * - Support for horizontal or vertical layout
+ * - Automatic validation error display
+ * - Support for option descriptions
+ * - Support for multiple selection
  *
- * ## 使用場景
- * - 多選題
- * - 功能偏好設定
- * - 興趣選擇
- * - 權限管理
+ * ## Use Cases
+ * - Multiple choice questions
+ * - Feature preferences
+ * - Interest selection
+ * - Permission management
  */
 const meta = {
   title: 'Molecules/CheckboxGroup',
@@ -32,7 +32,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '複選框組組件,與 react-hook-form 完美整合。',
+        component:
+          'Checkbox group component with perfect react-hook-form integration.',
       },
     },
   },
@@ -49,34 +50,42 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// 常用選項資料
+// Common option data
 const interestOptions = [
-  { value: 'reading', label: '閱讀' },
-  { value: 'music', label: '音樂' },
-  { value: 'sports', label: '運動' },
-  { value: 'travel', label: '旅遊' },
+  { value: 'reading', label: 'Reading' },
+  { value: 'music', label: 'Music' },
+  { value: 'sports', label: 'Sports' },
+  { value: 'travel', label: 'Travel' },
 ];
 
 const featureOptions = [
   {
     value: 'notifications',
-    label: '接收通知',
-    description: '透過 Email 接收重要通知',
+    label: 'Receive Notifications',
+    description: 'Receive important notifications via email',
   },
-  { value: 'newsletter', label: '訂閱電子報', description: '每週接收最新消息' },
-  { value: 'marketing', label: '行銷資訊', description: '接收優惠和活動訊息' },
+  {
+    value: 'newsletter',
+    label: 'Subscribe to Newsletter',
+    description: 'Receive weekly updates',
+  },
+  {
+    value: 'marketing',
+    label: 'Marketing Info',
+    description: 'Receive promotional offers and event updates',
+  },
 ];
 
 const permissionOptions = [
-  { value: 'read', label: '讀取' },
-  { value: 'write', label: '寫入' },
-  { value: 'delete', label: '刪除' },
-  { value: 'admin', label: '管理員權限' },
+  { value: 'read', label: 'Read' },
+  { value: 'write', label: 'Write' },
+  { value: 'delete', label: 'Delete' },
+  { value: 'admin', label: 'Admin Access' },
 ];
 
 /**
- * 基本用法
- * 縱向排列的複選框
+ * Basic usage
+ * Checkboxes arranged vertically
  */
 export const Default: Story = {
   render: () => {
@@ -84,14 +93,14 @@ export const Default: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="興趣"
+          label="Interests"
           options={interestOptions}
           value={value}
           onChange={setValue}
-          helperText="請選擇您的興趣（可複選）"
+          helperText="Select your interests (multiple selection allowed)"
         />
         <Alert severity="info">
-          已選擇: {value.length > 0 ? value.join(', ') : '(尚未選擇)'}
+          Selected: {value.length > 0 ? value.join(', ') : '(none selected)'}
         </Alert>
       </Stack>
     );
@@ -99,8 +108,8 @@ export const Default: Story = {
 };
 
 /**
- * 帶預設值
- * 顯示已選取的選項
+ * With default value
+ * Display preselected options
  */
 export const WithDefaultValue: Story = {
   render: () => {
@@ -111,14 +120,14 @@ export const WithDefaultValue: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="興趣"
+          label="Interests"
           options={interestOptions}
           value={value}
           onChange={setValue}
-          helperText="預設已選擇閱讀和音樂"
+          helperText="Default selected: Reading and Music"
         />
         <Alert severity="info">
-          已選擇: {value.length > 0 ? value.join(', ') : '(尚未選擇)'}
+          Selected: {value.length > 0 ? value.join(', ') : '(none selected)'}
         </Alert>
       </Stack>
     );
@@ -126,20 +135,20 @@ export const WithDefaultValue: Story = {
 };
 
 /**
- * 帶錯誤訊息
- * 顯示驗證錯誤
+ * With error message
+ * Display validation errors
  */
 export const WithError: Story = {
   args: {
-    label: '興趣',
+    label: 'Interests',
     options: interestOptions,
-    error: '至少選擇一項興趣',
+    error: 'Select at least one interest',
   },
 };
 
 /**
- * 橫向排列
- * 選項水平排列
+ * Horizontal layout
+ * Options arranged horizontally
  */
 export const Row: Story = {
   render: () => {
@@ -147,15 +156,15 @@ export const Row: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="權限"
+          label="Permissions"
           options={permissionOptions}
           value={value}
           onChange={setValue}
           row
-          helperText="選擇使用者權限"
+          helperText="Select user permissions"
         />
         <Alert severity="info">
-          已選擇: {value.length > 0 ? value.join(', ') : '(尚未選擇)'}
+          Selected: {value.length > 0 ? value.join(', ') : '(none selected)'}
         </Alert>
       </Stack>
     );
@@ -163,40 +172,40 @@ export const Row: Story = {
 };
 
 /**
- * 必填欄位
- * 顯示必填標記
+ * Required field
+ * Display required indicator
  */
 export const Required: Story = {
   args: {
-    label: '興趣',
+    label: 'Interests',
     options: interestOptions,
     required: true,
-    helperText: '此欄位為必填',
+    helperText: 'This field is required',
   },
 };
 
 /**
- * 禁用狀態
- * 不可選擇
+ * Disabled state
+ * Not selectable
  */
 export const Disabled: Story = {
   render: () => {
     const [value] = useState<(string | number)[]>(['reading', 'music']);
     return (
       <CheckboxGroup
-        label="興趣"
+        label="Interests"
         options={interestOptions}
         value={value}
         disabled
-        helperText="此欄位已被禁用"
+        helperText="This field is disabled"
       />
     );
   },
 };
 
 /**
- * 部分選項禁用
- * 某些選項不可選擇
+ * Some options disabled
+ * Some options not selectable
  */
 export const WithDisabledOptions: Story = {
   render: () => {
@@ -204,23 +213,27 @@ export const WithDisabledOptions: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="權限"
+          label="Permissions"
           options={[
-            { value: 'read', label: '讀取' },
-            { value: 'write', label: '寫入' },
-            { value: 'delete', label: '刪除（需要更高權限）', disabled: true },
+            { value: 'read', label: 'Read' },
+            { value: 'write', label: 'Write' },
+            {
+              value: 'delete',
+              label: 'Delete (requires higher permissions)',
+              disabled: true,
+            },
             {
               value: 'admin',
-              label: '管理員權限（需要更高權限）',
+              label: 'Admin Access (requires higher permissions)',
               disabled: true,
             },
           ]}
           value={value}
           onChange={setValue}
-          helperText="某些權限需要更高級別"
+          helperText="Some permissions require higher level"
         />
         <Alert severity="info">
-          已選擇: {value.length > 0 ? value.join(', ') : '(尚未選擇)'}
+          Selected: {value.length > 0 ? value.join(', ') : '(none selected)'}
         </Alert>
       </Stack>
     );
@@ -228,8 +241,8 @@ export const WithDisabledOptions: Story = {
 };
 
 /**
- * 帶描述的選項
- * 每個選項都有說明文字
+ * With descriptions
+ * Each option has descriptive text
  */
 export const WithDescription: Story = {
   render: () => {
@@ -237,21 +250,21 @@ export const WithDescription: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="通知偏好"
+          label="Notification Preferences"
           options={featureOptions}
           value={value}
           onChange={setValue}
-          helperText="選擇您想要接收的通知類型"
+          helperText="Select the notification types you want to receive"
         />
-        <Alert severity="info">已選擇 {value.length} 項通知</Alert>
+        <Alert severity="info">Selected {value.length} notifications</Alert>
       </Stack>
     );
   },
 };
 
 /**
- * 全選/全不選功能
- * 提供一鍵全選
+ * Select All / Deselect All feature
+ * Provides one-click select all
  */
 export const WithSelectAll: Story = {
   render: function WithSelectAllComponent() {
@@ -267,17 +280,17 @@ export const WithSelectAll: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="興趣"
+          label="Interests"
           options={interestOptions}
           value={value}
           onChange={setValue}
-          helperText="請選擇您的興趣"
+          helperText="Select your interests"
         />
         <Button variant="outlined" onClick={handleSelectAll} fullWidth>
-          {isAllSelected ? '全不選' : '全選'}
+          {isAllSelected ? 'Deselect All' : 'Select All'}
         </Button>
         <Alert severity="info">
-          已選擇: {value.length} / {allValues.length}
+          Selected: {value.length} / {allValues.length}
         </Alert>
       </Stack>
     );
@@ -285,18 +298,18 @@ export const WithSelectAll: Story = {
 };
 
 /**
- * 完整表單範例
- * 使用 react-hook-form + Zod 驗證
+ * Complete form example
+ * Using react-hook-form + Zod validation
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
     const schema = z.object({
       interests: z
         .array(z.string())
-        .min(1, '至少選擇一項興趣')
-        .max(3, '最多只能選擇三項'),
+        .min(1, 'Select at least one interest')
+        .max(3, 'Maximum 3 selections allowed'),
       notifications: z.array(z.string()),
-      permissions: z.array(z.string()).min(1, '至少選擇一項權限'),
+      permissions: z.array(z.string()).min(1, 'Select at least one permission'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -321,31 +334,31 @@ export const FormExample: Story = {
 
     const onSubmit = async (data: FormData) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('表單資料:', data);
+      console.log('Form data:', data);
       alert(JSON.stringify(data, null, 2));
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={3}>
-          <Typography variant="h6">偏好設定</Typography>
+          <Typography variant="h6">Preference Settings</Typography>
 
           <Controller
             name="interests"
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="興趣"
+                label="Interests"
                 options={interestOptions}
                 {...field}
                 error={errors.interests}
-                helperText="選擇 1-3 項興趣"
+                helperText="Select 1-3 interests"
               />
             )}
           />
 
           <Alert severity={watchInterests.length > 3 ? 'error' : 'info'}>
-            已選擇 {watchInterests.length} 項 (上限 3 項)
+            Selected {watchInterests.length} items (limit 3 items)
           </Alert>
 
           <Controller
@@ -353,11 +366,11 @@ export const FormExample: Story = {
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="通知偏好"
+                label="Notification Preferences"
                 options={featureOptions}
                 {...field}
                 error={errors.notifications}
-                helperText="選擇您想要接收的通知"
+                helperText="Select the notifications you want to receive"
               />
             )}
           />
@@ -367,12 +380,12 @@ export const FormExample: Story = {
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="權限"
+                label="Permissions"
                 options={permissionOptions}
                 row
                 {...field}
                 error={errors.permissions}
-                helperText="至少選擇一項權限"
+                helperText="Select at least one permission"
               />
             )}
           />
@@ -382,12 +395,19 @@ export const FormExample: Story = {
             watchPermissions.length > 0) && (
             <Alert severity="success">
               <Typography variant="subtitle2" gutterBottom>
-                目前選擇：
+                Current Selection：
               </Typography>
               <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                <li>興趣: {watchInterests.join(', ') || '未選擇'}</li>
-                <li>通知: {watchNotifications.join(', ') || '未選擇'}</li>
-                <li>權限: {watchPermissions.join(', ') || '未選擇'}</li>
+                <li>
+                  Interests: {watchInterests.join(', ') || 'not selected'}
+                </li>
+                <li>
+                  Notifications:{' '}
+                  {watchNotifications.join(', ') || 'not selected'}
+                </li>
+                <li>
+                  Permissions: {watchPermissions.join(', ') || 'not selected'}
+                </li>
               </ul>
             </Alert>
           )}
@@ -398,7 +418,7 @@ export const FormExample: Story = {
             fullWidth
             loading={isSubmitting}
           >
-            提交
+            Submit
           </Button>
         </Stack>
       </form>
@@ -407,8 +427,8 @@ export const FormExample: Story = {
 };
 
 /**
- * 條件顯示範例
- * 根據選擇動態顯示內容
+ * Conditional Display Example
+ * Dynamically display content based on selection
  */
 export const ConditionalDisplay: Story = {
   render: function ConditionalDisplayComponent() {
@@ -417,35 +437,41 @@ export const ConditionalDisplay: Story = {
     return (
       <Stack spacing={3}>
         <CheckboxGroup
-          label="啟用功能"
+          label="Enable Features"
           options={[
-            { value: 'email', label: '電子郵件通知' },
-            { value: 'sms', label: '簡訊通知' },
-            { value: 'push', label: '推播通知' },
+            { value: 'email', label: 'Email Notifications' },
+            { value: 'sms', label: 'SMS Notifications' },
+            { value: 'push', label: 'Push Notifications' },
           ]}
           value={features}
           onChange={setFeatures}
-          helperText="選擇要啟用的通知功能"
+          helperText="Select notification features to enable"
         />
 
         {features.includes('email') && (
           <Alert severity="info">
-            ✉️ 電子郵件通知已啟用，將發送到您註冊的 Email
+            ✉️ Email notifications enabled, will be sent to your registered
+            email
           </Alert>
         )}
 
         {features.includes('sms') && (
-          <Alert severity="warning">📱 簡訊通知可能產生額外費用</Alert>
+          <Alert severity="warning">
+            📱 SMS notifications may incur additional charges
+          </Alert>
         )}
 
         {features.includes('push') && (
           <Alert severity="success">
-            🔔 推播通知已啟用，請確保瀏覽器允許通知
+            🔔 Push notifications enabled, please ensure browser allows
+            notifications
           </Alert>
         )}
 
         {features.length === 0 && (
-          <Alert severity="error">⚠️ 請至少選擇一種通知方式</Alert>
+          <Alert severity="error">
+            ⚠️ Please select at least one notification method
+          </Alert>
         )}
       </Stack>
     );
@@ -453,15 +479,15 @@ export const ConditionalDisplay: Story = {
 };
 
 /**
- * 問卷調查範例
- * 多個複選題組
+ * Survey Example
+ * Multiple checkbox question groups
  */
 export const SurveyExample: Story = {
   render: function SurveyExampleComponent() {
     const schema = z.object({
-      features: z.array(z.string()).min(1, '至少選擇一項功能'),
-      devices: z.array(z.string()).min(1, '至少選擇一項裝置'),
-      frequency: z.array(z.string()).min(1, '至少選擇一項頻率'),
+      features: z.array(z.string()).min(1, 'Select at least one feature'),
+      devices: z.array(z.string()).min(1, 'Select at least one device'),
+      frequency: z.array(z.string()).min(1, 'Select at least one frequency'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -486,26 +512,29 @@ export const SurveyExample: Story = {
       watch('frequency').length > 0;
 
     const onSubmit = (data: FormData) => {
-      alert('感謝您完成問卷！\n\n' + JSON.stringify(data, null, 2));
+      alert(
+        'Thank you for completing the survey!\n\n' +
+          JSON.stringify(data, null, 2),
+      );
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={3}>
-          <Typography variant="h6">產品使用調查</Typography>
+          <Typography variant="h6">Product Usage Survey</Typography>
 
           <Controller
             name="features"
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="1. 您最常使用哪些功能？"
+                label="1. Which features do you use most often？"
                 options={[
-                  { value: 'dashboard', label: '儀表板' },
-                  { value: 'reports', label: '報表分析' },
-                  { value: 'export', label: '資料匯出' },
-                  { value: 'collaboration', label: '協作功能' },
-                  { value: 'api', label: 'API 整合' },
+                  { value: 'dashboard', label: 'Dashboard' },
+                  { value: 'reports', label: 'Report Analysis' },
+                  { value: 'export', label: 'Data Export' },
+                  { value: 'collaboration', label: 'Collaboration' },
+                  { value: 'api', label: 'API Integration' },
                 ]}
                 {...field}
                 error={errors.features}
@@ -518,12 +547,12 @@ export const SurveyExample: Story = {
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="2. 您使用哪些裝置？"
+                label="2. Which devices do you use？"
                 options={[
-                  { value: 'desktop', label: '桌上型電腦' },
-                  { value: 'laptop', label: '筆記型電腦' },
-                  { value: 'tablet', label: '平板' },
-                  { value: 'mobile', label: '手機' },
+                  { value: 'desktop', label: 'Desktop Computer' },
+                  { value: 'laptop', label: 'Laptop' },
+                  { value: 'tablet', label: 'Tablet' },
+                  { value: 'mobile', label: 'Mobile Phone' },
                 ]}
                 row
                 {...field}
@@ -537,12 +566,12 @@ export const SurveyExample: Story = {
             control={control}
             render={({ field }) => (
               <CheckboxGroup
-                label="3. 您在哪些時段使用？"
+                label="3. When do you use it？"
                 options={[
-                  { value: 'morning', label: '早上 (6-12)' },
-                  { value: 'afternoon', label: '下午 (12-18)' },
-                  { value: 'evening', label: '晚上 (18-24)' },
-                  { value: 'night', label: '深夜 (0-6)' },
+                  { value: 'morning', label: 'Morning (6-12)' },
+                  { value: 'afternoon', label: 'Afternoon (12-18)' },
+                  { value: 'evening', label: 'Evening (18-24)' },
+                  { value: 'night', label: 'Night (0-6)' },
                 ]}
                 row
                 {...field}
@@ -552,11 +581,13 @@ export const SurveyExample: Story = {
           />
 
           {allAnswered && (
-            <Alert severity="success">已完成所有問題，請點擊提交</Alert>
+            <Alert severity="success">
+              completed all questions，please clickSubmit
+            </Alert>
           )}
 
           <Button type="submit" variant="contained" fullWidth>
-            提交問卷
+            Submitquestionnaire
           </Button>
         </Stack>
       </form>
@@ -565,8 +596,8 @@ export const SurveyExample: Story = {
 };
 
 /**
- * 最小/最大選擇限制
- * 限制選擇數量
+ * Minimum / Maximum Selection Limits
+ * Limit selection quantity
  */
 export const WithLimits: Story = {
   render: function WithLimitsComponent() {
@@ -585,18 +616,18 @@ export const WithLimits: Story = {
     return (
       <Stack spacing={2}>
         <CheckboxGroup
-          label="選擇您的前三名興趣"
+          label="Select your top three interests"
           options={[
-            { value: 'reading', label: '閱讀' },
-            { value: 'music', label: '音樂' },
-            { value: 'sports', label: '運動' },
-            { value: 'travel', label: '旅遊' },
-            { value: 'cooking', label: '烹飪' },
-            { value: 'gaming', label: '遊戲' },
+            { value: 'reading', label: 'Reading' },
+            { value: 'music', label: 'Music' },
+            { value: 'sports', label: 'Sports' },
+            { value: 'travel', label: 'Travel' },
+            { value: 'cooking', label: 'Cooking' },
+            { value: 'gaming', label: 'Gaming' },
           ]}
           value={value}
           onChange={handleChange}
-          helperText={`請選擇 ${MIN}-${MAX} 項`}
+          helperText={`Please select ${MIN}-${MAX} items`}
         />
 
         <Alert
@@ -608,13 +639,13 @@ export const WithLimits: Story = {
                 : 'success'
           }
         >
-          已選擇 {value.length} / {MAX} 項
-          {value.length < MIN && ` (至少需要 ${MIN} 項)`}
-          {value.length === MAX && ' (已達上限)'}
+          Selected {value.length} / {MAX} items
+          {value.length < MIN && ` (at least ${MIN} items needed)`}
+          {value.length === MAX && ' (limit reached)'}
         </Alert>
 
         <Button variant="contained" fullWidth disabled={!isValid}>
-          繼續
+          Continue
         </Button>
       </Stack>
     );

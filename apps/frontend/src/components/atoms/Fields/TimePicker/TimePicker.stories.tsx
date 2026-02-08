@@ -2,8 +2,6 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import InputAdornment from '@mui/material/InputAdornment';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { TimePicker } from './TimePicker';
 
 const meta = {
@@ -17,15 +15,6 @@ const meta = {
     label: 'Time',
     value: '',
     placeholder: 'hh:mm aa',
-    slotProps: {
-      input: {
-        endAdornment: (
-          <InputAdornment position="end" sx={{ mr: 1 }}>
-            <AccessTimeIcon sx={{ color: '#AFBACA' }} />
-          </InputAdornment>
-        ),
-      },
-    },
   },
   argTypes: {
     placeholder: {

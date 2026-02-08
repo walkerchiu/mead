@@ -5,20 +5,20 @@ import Typography from '@mui/material/Typography';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Pagination 組件 - Atomic Design: Molecule
+ * Pagination Component - Atomic Design: Molecule
  *
- * 分頁組件，用於在大量資料中導航。
+ * Pagination component，for navigating through large amounts of data。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Pagination
  *   count={10}
  *   page={1}
  *   onChange={(page) => console.log(page)}
  * />
  *
- * // 帶總數資訊
+ * // With total count
  * <Pagination
  *   count={10}
  *   page={1}
@@ -27,7 +27,7 @@ import { SxProps, Theme } from '@mui/material/styles';
  *   itemsPerPage={10}
  * />
  *
- * // 不同變體
+ * // Different variants
  * <Pagination count={10} variant="outlined" />
  * <Pagination count={10} shape="rounded" />
  * ```
@@ -35,100 +35,100 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface PaginationProps {
   /**
-   * 總頁數
+   * Total pages
    */
   count: number;
 
   /**
-   * 當前頁碼
+   * Current page
    */
   page: number;
 
   /**
-   * 頁碼變更時的回調
+   * Callback when page changes
    */
   onChange: (page: number) => void;
 
   /**
-   * 預設頁碼
+   * Default page number
    */
   defaultPage?: number;
 
   /**
-   * 顯示的按鈕數量（邊界按鈕除外）
+   * number of buttons to display（except boundary buttons）
    */
   siblingCount?: number;
 
   /**
-   * 邊界按鈕數量
+   * Number of boundary buttons
    */
   boundaryCount?: number;
 
   /**
-   * 是否顯示第一頁/最後一頁按鈕
+   * Whether to show first page/last page button
    */
   showFirstButton?: boolean;
   showLastButton?: boolean;
 
   /**
-   * 是否隱藏上一頁/下一頁按鈕
+   * whether to hide previous/next page buttons
    */
   hidePrevButton?: boolean;
   hideNextButton?: boolean;
 
   /**
-   * 組件大小
+   * componentsize
    */
   size?: 'small' | 'medium' | 'large';
 
   /**
-   * 組件變體
+   * component variant
    */
   variant?: 'text' | 'outlined';
 
   /**
-   * 按鈕形狀
+   * button shape
    */
   shape?: 'circular' | 'rounded';
 
   /**
-   * 組件顏色
+   * componentColor
    */
   color?: 'primary' | 'secondary' | 'standard';
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 是否顯示資訊文字（總筆數、當前範圍等）
+   * whether to show information text (total count, current range, etc.)
    */
   showInfo?: boolean;
 
   /**
-   * 總項目數（用於顯示資訊）
+   * total item count（Used to display information）
    */
   totalItems?: number;
 
   /**
-   * 每頁項目數（用於顯示資訊）
+   * items per page count（Used to display information）
    */
   itemsPerPage?: number;
 
   /**
-   * 自訂渲染函數
+   * customrender function
    */
   renderItem?: (item: unknown) => React.ReactNode;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Pagination 組件
+ * Pagination component
  */
 export const Pagination = forwardRef<HTMLElement, PaginationProps>(
   function Pagination(
@@ -164,7 +164,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
       onChange(value);
     };
 
-    // 計算當前頁面的項目範圍
+    // calculate current page item range
     const getItemRange = () => {
       if (!totalItems || !itemsPerPage) return null;
       const start = (page - 1) * itemsPerPage + 1;
@@ -206,7 +206,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
         />
         {showInfo && range && totalItems && (
           <Typography variant="body2" color="text.secondary">
-            顯示 {range.start}-{range.end} 筆，共 {totalItems} 筆
+            display {range.start}-{range.end} items，Total {totalItems} items
           </Typography>
         )}
       </Box>

@@ -8,31 +8,31 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { FieldError } from 'react-hook-form';
 
 /**
- * CheckboxGroup 組件 - Atomic Design: Molecule
+ * CheckboxGroup Component - Atomic Design: Molecule
  *
- * 複選框組,與 react-hook-form 完美整合。
+ * Checkbox group,Perfect integration with react-hook-form。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <CheckboxGroup
- *   label="興趣"
+ *   label="Interests"
  *   options={[
- *     { value: 'reading', label: '閱讀' },
- *     { value: 'music', label: '音樂' },
+ *     { value: 'reading', label: 'Reading' },
+ *     { value: 'music', label: 'Music' },
  *   ]}
  *   value={['reading']}
  *   onChange={(values) => console.log(values)}
  *   error={errors.interests}
  * />
  *
- * // 橫向排列
+ * // Horizontal layout
  * <CheckboxGroup
- *   label="功能"
+ *   label="Features"
  *   row
  *   options={[
- *     { value: 'notifications', label: '通知' },
- *     { value: 'marketing', label: '行銷資訊' },
+ *     { value: 'notifications', label: 'Notifications' },
+ *     { value: 'marketing', label: 'Marketing' },
  *   ]}
  * />
  * ```
@@ -47,58 +47,58 @@ export interface CheckboxOption {
 
 export interface CheckboxGroupProps {
   /**
-   * 組件標籤
+   * componentlabel
    */
   label?: string;
 
   /**
-   * 選項列表
+   * Option items list
    */
   options: CheckboxOption[];
 
   /**
-   * 當前選中的值列表
+   * Currently selected valuecolumnList
    */
   value?: (string | number)[];
 
   /**
-   * 值變更時的回調
+   * callback on value change
    */
   onChange?: (values: (string | number)[]) => void;
 
   /**
-   * 欄位錯誤（來自 react-hook-form）
+   * Field error（from react-hook-form）
    */
   error?: FieldError | string;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * helper text（displayed in non-error state）
    */
   helperText?: string;
 
   /**
-   * 是否必填
+   * whetherRequired
    */
   required?: boolean;
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 是否橫向排列
+   * whetherHorizontal layout
    */
   row?: boolean;
 
   /**
-   * 組件名稱（用於 form）
+   * component name (for form)
    */
   name?: string;
 }
 
 /**
- * CheckboxGroup 組件
+ * CheckboxGroup component
  */
 export const CheckboxGroup = forwardRef<
   HTMLFieldSetElement,
@@ -119,11 +119,11 @@ export const CheckboxGroup = forwardRef<
   },
   ref,
 ) {
-  // 處理錯誤訊息
+  // handleError message
   const errorMessage = typeof error === 'string' ? error : error?.message;
   const hasError = Boolean(errorMessage);
 
-  // 處理單個選項的勾選/取消
+  // handle single item selection/deselection
   const handleChange = (optionValue: string | number, checked: boolean) => {
     if (!onChange) return;
 

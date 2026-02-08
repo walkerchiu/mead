@@ -11,7 +11,7 @@ import { FormField, PasswordField, AlertMessage } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 
 /**
- * 登入表單組件 - Atomic Design: Organism
+ * Login Form Component - Atomic Design: Organism
  */
 
 export interface LoginFormProps {

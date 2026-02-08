@@ -12,7 +12,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '雙因素認證表單，用於輸入 6 位數驗證碼或備用碼。',
+        component:
+          'Two-factor authentication form for entering 6-digit verification code or backup code.',
       },
     },
   },
@@ -30,8 +31,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
- * 標準的 2FA 驗證表單
+ * Default state
+ * Standard 2FA verification form
  */
 export const Default: Story = {
   args: {
@@ -43,8 +44,8 @@ export const Default: Story = {
 };
 
 /**
- * 載入中
- * 驗證過程中的載入狀態
+ * Loading
+ * Loading state during verification process
  */
 export const Loading: Story = {
   args: {
@@ -54,19 +55,19 @@ export const Loading: Story = {
 };
 
 /**
- * 有錯誤
- * 顯示驗證失敗訊息
+ * With error
+ * Display verification failure message
  */
 export const WithError: Story = {
   args: {
-    error: '驗證碼錯誤，請重試',
+    error: 'Invalid verification code, please try again',
     onSubmit: async (code) => console.log(code),
   },
 };
 
 /**
- * 有返回按鈕
- * 顯示返回登入連結
+ * With back button
+ * Show return to login link
  */
 export const WithBackButton: Story = {
   args: {
@@ -76,8 +77,8 @@ export const WithBackButton: Story = {
 };
 
 /**
- * 互動式範例
- * 模擬完整的 2FA 驗證流程
+ * Interactive example
+ * Simulates complete 2FA verification flow
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -92,14 +93,14 @@ export const Interactive: Story = {
       setError(undefined);
       setSuccess(false);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 模擬驗證邏輯
+      // Simulate verification logic
       if (code === correctCode) {
         setSuccess(true);
       } else {
-        setError('驗證碼錯誤，請重試');
+        setError('Invalid verification code, please try again');
       }
 
       setLoading(false);
@@ -115,8 +116,8 @@ export const Interactive: Story = {
       <Box>
         {success ? (
           <Box sx={{ textAlign: 'center' }}>
-            <AlertMessage severity="success" title="驗證成功">
-              正在登入...
+            <AlertMessage severity="success" title="Verification Successful">
+              Logging in...
             </AlertMessage>
           </Box>
         ) : (
@@ -129,7 +130,7 @@ export const Interactive: Story = {
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                測試驗證碼: {correctCode}
+                Test verification code: {correctCode}
               </Box>
             </Box>
           </>
@@ -140,8 +141,8 @@ export const Interactive: Story = {
 };
 
 /**
- * 備用碼模式
- * 使用備用碼進行驗證
+ * Backup code mode
+ * Use backup code for verification
  */
 export const BackupCodeMode: Story = {
   render: function BackupCodeExample() {
@@ -154,7 +155,7 @@ export const BackupCodeMode: Story = {
         />
         <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
           <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-            提示：勾選「使用備用碼」可以輸入備用碼
+            Tip: Check "Use backup code" to enter a backup code
           </Box>
         </Box>
       </Box>
@@ -163,8 +164,8 @@ export const BackupCodeMode: Story = {
 };
 
 /**
- * 各種錯誤狀態
- * 展示不同的錯誤訊息
+ * Various error states
+ * Demonstrates different error messages
  */
 export const ErrorStates: Story = {
   render: () => (
@@ -172,21 +173,21 @@ export const ErrorStates: Story = {
       <Paper elevation={2} sx={{ p: 3 }}>
         <TwoFactorForm
           onSubmit={async (code) => console.log(code)}
-          error="驗證碼錯誤"
+          error="Invalid verification code"
         />
       </Paper>
 
       <Paper elevation={2} sx={{ p: 3 }}>
         <TwoFactorForm
           onSubmit={async (code) => console.log(code)}
-          error="驗證碼已過期，請重新登入"
+          error="Verification code has expired, please log in again"
         />
       </Paper>
 
       <Paper elevation={2} sx={{ p: 3 }}>
         <TwoFactorForm
           onSubmit={async (code) => console.log(code)}
-          error="嘗試次數過多，帳號已暫時鎖定"
+          error="Too many attempts, account temporarily locked"
         />
       </Paper>
     </Box>

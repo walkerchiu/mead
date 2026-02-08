@@ -7,9 +7,9 @@ import { AlertMessage } from '@/components/molecules';
 import Box from '@mui/material/Box';
 
 /**
- * LoginPage - 完整的登入頁面流程
+ * LoginPage - Complete login page flow
  *
- * 展示從登入到 2FA 驗證的完整流程。
+ * Demonstrates the complete flow from login to 2FA verification.
  */
 
 const meta = {
@@ -18,7 +18,8 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '完整的登入頁面，包含登入表單和 2FA 驗證流程。',
+        component:
+          'Complete login page including login form and 2FA verification flow.',
       },
     },
   },
@@ -29,11 +30,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 標準登入頁面
+ * Standard login page
  */
 export const Default: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+    <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
       <LoginForm
         onSubmit={async (data) => {
           console.log('Login:', data);
@@ -45,33 +46,33 @@ export const Default: Story = {
 };
 
 /**
- * 登入錯誤狀態
+ * Login error state
  */
 export const WithError: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+    <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
       <LoginForm
         onSubmit={async (data) => console.log(data)}
-        error="電子郵件或密碼錯誤"
+        error="Invalid email or password"
       />
     </AuthLayout>
   ),
 };
 
 /**
- * 載入中狀態
+ * Loading state
  */
 export const Loading: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+    <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
       <LoginForm onSubmit={async (data) => console.log(data)} loading={true} />
     </AuthLayout>
   ),
 };
 
 /**
- * 完整互動流程
- * 展示登入 → 2FA → 成功的完整流程
+ * Full interactive flow
+ * Demonstrates the complete flow: Login → 2FA → Success
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {
@@ -85,27 +86,27 @@ export const FullFlow: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 測試帳號：admin@example.com / password123 (需要 2FA)
-      // 測試帳號：user@example.com / password123 (直接登入)
+      // Test account: admin@example.com / password123 (requires 2FA)
+      // Test account: user@example.com / password123 (direct login)
       if (
         data.email === 'admin@example.com' &&
         data.password === 'password123'
       ) {
-        // 需要 2FA
+        // Requires 2FA
         setTemporaryToken('temp_token_12345');
         setStep('2fa');
       } else if (
         data.email === 'user@example.com' &&
         data.password === 'password123'
       ) {
-        // 直接登入成功
+        // Direct login success
         setStep('success');
       } else {
-        // 登入失敗
-        setError('電子郵件或密碼錯誤');
+        // Login failed
+        setError('Invalid email or password');
       }
 
       setLoading(false);
@@ -115,14 +116,14 @@ export const FullFlow: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 正確的驗證碼：123456
+      // Correct verification code: 123456
       if (code === '123456') {
         setStep('success');
       } else {
-        setError('驗證碼錯誤');
+        setError('Invalid verification code');
       }
 
       setLoading(false);
@@ -130,10 +131,10 @@ export const FullFlow: Story = {
 
     if (step === 'success') {
       return (
-        <AuthLayout title="登入成功">
+        <AuthLayout title="Login Successful">
           <Box sx={{ textAlign: 'center', width: '100%', maxWidth: 400 }}>
-            <AlertMessage severity="success" title="歡迎回來！">
-              正在導向儀表板...
+            <AlertMessage severity="success" title="Welcome Back!">
+              Redirecting to dashboard...
             </AlertMessage>
           </Box>
         </AuthLayout>
@@ -142,7 +143,10 @@ export const FullFlow: Story = {
 
     if (step === '2fa') {
       return (
-        <AuthLayout title="雙因素認證" subtitle="請輸入驗證碼">
+        <AuthLayout
+          title="Two-Factor Authentication"
+          subtitle="Please enter your verification code"
+        >
           <Box sx={{ width: '100%' }}>
             <TwoFactorForm
               onSubmit={handle2FA}
@@ -155,7 +159,7 @@ export const FullFlow: Story = {
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                測試驗證碼: 123456
+                Test verification code: 123456
               </Box>
             </Box>
           </Box>
@@ -164,7 +168,7 @@ export const FullFlow: Story = {
     }
 
     return (
-      <AuthLayout title="歡迎回來" subtitle="登入以繼續使用">
+      <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
         <Box sx={{ width: '100%' }}>
           <LoginForm onSubmit={handleLogin} loading={loading} error={error} />
           <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
@@ -172,13 +176,13 @@ export const FullFlow: Story = {
               component="pre"
               sx={{ fontSize: '0.75rem', m: 0, whiteSpace: 'pre-wrap' }}
             >
-              測試帳號 (需要 2FA):{'\n'}
+              Test account (requires 2FA):{'\n'}
               Email: admin@example.com{'\n'}
-              密碼: password123{'\n'}
+              Password: password123{'\n'}
               {'\n'}
-              測試帳號 (直接登入):{'\n'}
+              Test account (direct login):{'\n'}
               Email: user@example.com{'\n'}
-              密碼: password123
+              Password: password123
             </Box>
           </Box>
         </Box>
@@ -188,22 +192,30 @@ export const FullFlow: Story = {
 };
 
 /**
- * 純色背景
+ * Solid background
  */
 export const SolidBackground: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用" background="solid">
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to continue"
+      background="solid"
+    >
       <LoginForm onSubmit={async (data) => console.log(data)} />
     </AuthLayout>
   ),
 };
 
 /**
- * 無 Logo
+ * No logo
  */
 export const NoLogo: Story = {
   render: () => (
-    <AuthLayout title="歡迎回來" subtitle="登入以繼續使用" showLogo={false}>
+    <AuthLayout
+      title="Welcome Back"
+      subtitle="Sign in to continue"
+      showLogo={false}
+    >
       <LoginForm onSubmit={async (data) => console.log(data)} />
     </AuthLayout>
   ),

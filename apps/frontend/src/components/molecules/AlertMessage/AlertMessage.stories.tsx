@@ -7,18 +7,18 @@ import { Button } from '@/components/atoms';
 import Box from '@mui/material/Box';
 
 /**
- * AlertMessage 用於顯示重要訊息給用戶。
+ * AlertMessage is used to display important messages to users.
  *
- * ## 使用時機
- * - **Success**: 操作成功完成
- * - **Error**: 操作失敗或發生錯誤
- * - **Warning**: 需要注意的警告訊息
- * - **Info**: 一般資訊提示
+ * ## Use Cases
+ * - **Success**: Operation completed successfully
+ * - **Error**: Operation failed or error occurred
+ * - **Warning**: Warning messages that require attention
+ * - **Info**: General information prompts
  *
- * ## 最佳實踐
- * - 使用清晰簡潔的文字
- * - 重要訊息使用 title
- * - 提供關閉按鈕（對於非關鍵訊息）
+ * ## Best Practices
+ * - Use clear and concise text
+ * - Use title for important messages
+ * - Provide close button (for non-critical messages)
  */
 const meta = {
   title: 'Molecules/AlertMessage',
@@ -27,7 +27,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '統一的訊息顯示組件，支援成功、錯誤、警告和資訊四種類型。',
+        component:
+          'Unified message display component supporting four types: success, error, warning, and info.',
       },
     },
   },
@@ -36,16 +37,16 @@ const meta = {
     severity: {
       control: 'select',
       options: ['success', 'error', 'warning', 'info'],
-      description: '訊息類型',
+      description: 'Message type',
     },
     closable: {
       control: 'boolean',
-      description: '是否顯示關閉按鈕',
+      description: 'Show close button',
     },
     variant: {
       control: 'select',
       options: ['filled', 'outlined', 'standard'],
-      description: '視覺樣式',
+      description: 'Visual style',
     },
   },
   decorators: [
@@ -61,120 +62,120 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 成功訊息
- * 用於操作成功的回饋
+ * Success message
+ * Used for successful operation feedback
  */
 export const Success: Story = {
   args: {
     severity: 'success',
-    children: '操作已成功完成！',
+    children: 'Operation completed successfully!',
   },
 };
 
 /**
- * 錯誤訊息
- * 用於操作失敗或錯誤
+ * Error message
+ * Used for operation failures or errors
  */
 export const Error: Story = {
   args: {
     severity: 'error',
-    children: '操作失敗，請稍後再試。',
+    children: 'Operation failed. Please try again later.',
   },
 };
 
 /**
- * 警告訊息
- * 用於需要注意的情況
+ * Warning message
+ * Used for situations that require attention
  */
 export const Warning: Story = {
   args: {
     severity: 'warning',
-    children: '此操作無法復原，請謹慎操作。',
+    children: 'This action cannot be undone. Please proceed with caution.',
   },
 };
 
 /**
- * 資訊訊息
- * 用於一般提示
+ * Info message
+ * Used for general prompts
  */
 export const Info: Story = {
   args: {
     severity: 'info',
-    children: '您有 3 則未讀訊息。',
+    children: 'You have 3 unread messages.',
   },
 };
 
 /**
- * 帶標題
- * 提供更詳細的訊息結構
+ * With title
+ * Provides more detailed message structure
  */
 export const WithTitle: Story = {
   args: {
     severity: 'success',
-    title: '登入成功',
-    children: '歡迎回來！您已成功登入系統。',
+    title: 'Login Successful',
+    children: 'Welcome back! You have successfully logged in.',
   },
 };
 
 /**
- * 可關閉
- * 顯示關閉按鈕
+ * Closable
+ * Shows close button
  */
 export const Closable: Story = {
   args: {
     severity: 'info',
-    title: '新功能提示',
-    children: '我們剛剛發布了新功能，快來試試看！',
+    title: 'New Feature',
+    children: 'We just released new features. Check them out!',
     closable: true,
   },
 };
 
 /**
- * 不同變體
- * Filled、Outlined、Standard 三種樣式
+ * Different variants
+ * Three styles: Filled, Outlined, Standard
  */
 export const Variants: Story = {
   render: () => (
     <Stack spacing={2}>
       <AlertMessage severity="info" variant="filled">
-        Filled 樣式（預設）
+        Filled style (default)
       </AlertMessage>
       <AlertMessage severity="info" variant="outlined">
-        Outlined 樣式
+        Outlined style
       </AlertMessage>
       <AlertMessage severity="info" variant="standard">
-        Standard 樣式
+        Standard style
       </AlertMessage>
     </Stack>
   ),
 };
 
 /**
- * 所有類型
- * 展示四種訊息類型
+ * All severity types
+ * Shows all four message types
  */
 export const AllSeverities: Story = {
   render: () => (
     <Stack spacing={2}>
-      <AlertMessage severity="success" title="成功">
-        資料已成功儲存
+      <AlertMessage severity="success" title="Success">
+        Data saved successfully
       </AlertMessage>
-      <AlertMessage severity="error" title="錯誤">
-        無法連線到伺服器
+      <AlertMessage severity="error" title="Error">
+        Unable to connect to server
       </AlertMessage>
-      <AlertMessage severity="warning" title="警告">
-        您的密碼將在 7 天後過期
+      <AlertMessage severity="warning" title="Warning">
+        Your password will expire in 7 days
       </AlertMessage>
-      <AlertMessage severity="info" title="提示">
-        系統將在 5 分鐘後進行維護
+      <AlertMessage severity="info" title="Info">
+        System maintenance will begin in 5 minutes
       </AlertMessage>
     </Stack>
   ),
 };
 
 /**
- * 互動式範例
- * 可以關閉的訊息
+ * Interactive example
+ * Closable message
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -184,18 +185,18 @@ export const Interactive: Story = {
       <Stack spacing={2}>
         {!show && (
           <Button onClick={() => setShow(true)} variant="outlined">
-            顯示訊息
+            Show Message
           </Button>
         )}
 
         {show && (
           <AlertMessage
             severity="info"
-            title="提示"
+            title="Info"
             closable
             onClose={() => setShow(false)}
           >
-            這是一則可以關閉的訊息。點擊右側的 X 圖示關閉。
+            This is a closable message. Click the X icon on the right to close.
           </AlertMessage>
         )}
       </Stack>
@@ -204,8 +205,8 @@ export const Interactive: Story = {
 };
 
 /**
- * 表單驗證範例
- * 顯示驗證結果
+ * Form validation example
+ * Displays validation results
  */
 export const FormValidation: Story = {
   render: function FormValidationExample() {
@@ -213,9 +214,9 @@ export const FormValidation: Story = {
 
     const handleSubmit = () => {
       setStatus('idle');
-      // 模擬 API 請求
+      // Simulate API request
       setTimeout(() => {
-        // 隨機成功或失敗
+        // Random success or failure
         setStatus(Math.random() > 0.5 ? 'success' : 'error');
       }, 1000);
     };
@@ -223,28 +224,30 @@ export const FormValidation: Story = {
     return (
       <Stack spacing={2}>
         <Button onClick={handleSubmit} variant="contained">
-          提交表單
+          Submit Form
         </Button>
 
         {status === 'success' && (
           <AlertMessage
             severity="success"
-            title="提交成功"
+            title="Submission Successful"
             closable
             onClose={() => setStatus('idle')}
           >
-            您的表單已成功提交，我們會盡快處理。
+            Your form has been submitted successfully. We will process it
+            shortly.
           </AlertMessage>
         )}
 
         {status === 'error' && (
           <AlertMessage
             severity="error"
-            title="提交失敗"
+            title="Submission Failed"
             closable
             onClose={() => setStatus('idle')}
           >
-            提交過程中發生錯誤，請檢查您的網路連線後重試。
+            An error occurred during submission. Please check your network
+            connection and try again.
           </AlertMessage>
         )}
       </Stack>
@@ -253,22 +256,22 @@ export const FormValidation: Story = {
 };
 
 /**
- * 多行內容
- * 顯示較長的訊息
+ * Multi-line content
+ * Display longer messages
  */
 export const LongContent: Story = {
   args: {
     severity: 'warning',
-    title: '重要通知',
+    title: 'Important Notice',
     closable: true,
     children: (
       <>
-        <div>為了確保您的帳號安全，請注意以下事項：</div>
+        <div>To ensure your account security, please note the following:</div>
         <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-          <li>不要與他人分享您的密碼</li>
-          <li>定期更新密碼</li>
-          <li>啟用雙因素認證</li>
-          <li>注意可疑的登入活動</li>
+          <li>Do not share your password with others</li>
+          <li>Update your password regularly</li>
+          <li>Enable two-factor authentication</li>
+          <li>Watch for suspicious login activity</li>
         </ul>
       </>
     ),
@@ -276,15 +279,19 @@ export const LongContent: Story = {
 };
 
 /**
- * 通知堆疊
- * 多個訊息同時顯示
+ * Notification stack
+ * Multiple messages displayed simultaneously
  */
 export const NotificationStack: Story = {
   render: function NotificationStackExample() {
     const [notifications, setNotifications] = useState([
-      { id: 1, severity: 'success' as const, message: '檔案上傳成功' },
-      { id: 2, severity: 'info' as const, message: '您有新訊息' },
-      { id: 3, severity: 'warning' as const, message: '磁碟空間不足' },
+      {
+        id: 1,
+        severity: 'success' as const,
+        message: 'File uploaded successfully',
+      },
+      { id: 2, severity: 'info' as const, message: 'You have new messages' },
+      { id: 3, severity: 'warning' as const, message: 'Low disk space' },
     ]);
 
     const removeNotification = (id: number) => {
@@ -298,13 +305,17 @@ export const NotificationStack: Story = {
             const newId = Math.max(0, ...notifications.map((n) => n.id)) + 1;
             setNotifications([
               ...notifications,
-              { id: newId, severity: 'info', message: `新通知 #${newId}` },
+              {
+                id: newId,
+                severity: 'info',
+                message: `New notification #${newId}`,
+              },
             ]);
           }}
           variant="outlined"
           sx={{ mb: 2 }}
         >
-          新增通知
+          Add Notification
         </Button>
 
         <Stack spacing={1}>
@@ -325,8 +336,8 @@ export const NotificationStack: Story = {
 };
 
 /**
- * 帶重試按鈕
- * API 請求失敗時提供重試功能
+ * With retry button
+ * Provides retry functionality when API request fails
  */
 export const WithRetry: Story = {
   render: function WithRetryExample() {
@@ -336,7 +347,7 @@ export const WithRetry: Story = {
     const handleRetry = () => {
       setLoading(true);
       setError(false);
-      // 模擬 API 請求
+      // Simulate API request
       setTimeout(() => {
         setLoading(false);
         setError(Math.random() > 0.5);
@@ -346,23 +357,25 @@ export const WithRetry: Story = {
     return (
       <Stack spacing={2}>
         <Button onClick={handleRetry} variant="contained" disabled={loading}>
-          {loading ? '載入中...' : '發送請求'}
+          {loading ? 'Loading...' : 'Send Request'}
         </Button>
 
         {error && (
           <AlertMessage
             severity="error"
-            title="連線失敗"
+            title="Connection Failed"
             showRetry
-            retryText="重試"
+            retryText="Retry"
             onRetry={handleRetry}
           >
-            無法連線到伺服器，請檢查您的網路連線。
+            Unable to connect to server. Please check your network connection.
           </AlertMessage>
         )}
 
         {!error && !loading && (
-          <AlertMessage severity="success">請求成功完成！</AlertMessage>
+          <AlertMessage severity="success">
+            Request completed successfully!
+          </AlertMessage>
         )}
       </Stack>
     );
@@ -370,25 +383,26 @@ export const WithRetry: Story = {
 };
 
 /**
- * 自訂操作按鈕
- * 提供額外的操作選項
+ * Custom action button
+ * Provides additional action options
  */
 export const WithCustomAction: Story = {
   args: {
     severity: 'warning',
-    title: '密碼即將過期',
-    children: '您的密碼將在 7 天後過期，請及時更新密碼以保障帳號安全。',
+    title: 'Password Expiring Soon',
+    children:
+      'Your password will expire in 7 days. Please update it promptly to keep your account secure.',
     action: (
       <Button color="inherit" size="small" variant="outlined">
-        立即更新
+        Update Now
       </Button>
     ),
   },
 };
 
 /**
- * API 錯誤處理範例
- * 實際的 API 錯誤處理場景
+ * API error handling example
+ * Real-world API error handling scenario
  */
 export const ApiErrorHandling: Story = {
   render: function ApiErrorExample() {
@@ -398,7 +412,7 @@ export const ApiErrorHandling: Story = {
 
     const handleSubmit = () => {
       setStatus('loading');
-      // 模擬 API 請求
+      // Simulate API request
       setTimeout(() => {
         setStatus(Math.random() > 0.3 ? 'success' : 'error');
       }, 1500);
@@ -411,7 +425,7 @@ export const ApiErrorHandling: Story = {
     return (
       <Box sx={{ width: '500px' }}>
         <Stack spacing={2}>
-          <Typography variant="h6">儲存設定</Typography>
+          <Typography variant="h6">Save Settings</Typography>
 
           <Button
             onClick={handleSubmit}
@@ -419,29 +433,29 @@ export const ApiErrorHandling: Story = {
             disabled={status === 'loading'}
             fullWidth
           >
-            {status === 'loading' ? '儲存中...' : '儲存'}
+            {status === 'loading' ? 'Saving...' : 'Save'}
           </Button>
 
           {status === 'success' && (
             <AlertMessage
               severity="success"
-              title="儲存成功"
+              title="Saved Successfully"
               closable
               onClose={() => setStatus('idle')}
             >
-              您的設定已成功儲存。
+              Your settings have been saved successfully.
             </AlertMessage>
           )}
 
           {status === 'error' && (
             <AlertMessage
               severity="error"
-              title="儲存失敗"
+              title="Save Failed"
               showRetry
-              retryText="重新嘗試"
+              retryText="Try Again"
               onRetry={handleRetry}
             >
-              無法儲存設定，請稍後再試。
+              Unable to save settings. Please try again later.
             </AlertMessage>
           )}
         </Stack>
@@ -451,20 +465,20 @@ export const ApiErrorHandling: Story = {
 };
 
 /**
- * 表單驗證錯誤
- * 顯示多個驗證錯誤
+ * Form validation errors
+ * Display multiple validation errors
  */
 export const FormValidationErrors: Story = {
   render: () => (
     <Box sx={{ width: '500px' }}>
       <Stack spacing={2}>
-        <Typography variant="h6">表單驗證</Typography>
+        <Typography variant="h6">Form Validation</Typography>
 
-        <AlertMessage severity="error" title="表單驗證失敗">
+        <AlertMessage severity="error" title="Form Validation Failed">
           <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-            <li>電子郵件格式不正確</li>
-            <li>密碼長度至少需要 8 個字元</li>
-            <li>請勾選同意服務條款</li>
+            <li>Email format is incorrect</li>
+            <li>Password must be at least 8 characters</li>
+            <li>Please agree to the terms of service</li>
           </ul>
         </AlertMessage>
       </Stack>

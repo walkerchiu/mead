@@ -1,8 +1,8 @@
 /**
- * Organisms - 有機體組件
+ * Organisms - Organism Components
  *
- * Atomic Design 架構中由 Atoms 和 Molecules 組合而成的完整功能組件。
- * 這些組件通常包含完整的業務邏輯和互動流程。
+ * Complete functional components composed of Atoms and Molecules in Atomic Design architecture.
+ * These components typically contain complete business logic and interaction flows.
  */
 
 export {

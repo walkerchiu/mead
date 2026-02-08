@@ -1,8 +1,8 @@
 /**
- * Atoms - 基礎組件
+ * Atoms - Basic Components
  *
- * Atomic Design 架構中的最小單位組件。
- * 這些組件不依賴其他業務組件，只依賴 MUI 或其他第三方庫。
+ * The smallest unit components in the Atomic Design architecture.
+ * These components do not depend on other business components, only on MUI or other third-party libraries.
  */
 
 export {

@@ -13,17 +13,17 @@ const meta = {
     orientation: {
       control: 'select',
       options: ['horizontal', 'vertical'],
-      description: '分隔線方向',
+      description: 'Divider orientation',
     },
     variant: {
       control: 'select',
       options: ['fullWidth', 'inset', 'middle'],
-      description: '分隔線變體',
+      description: 'Divider variant',
     },
     textAlign: {
       control: 'select',
       options: ['left', 'center', 'right'],
-      description: '文字對齊方式',
+      description: 'Text alignment',
     },
   },
 } satisfies Meta<typeof Divider>;
@@ -34,9 +34,9 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography>上方內容</Typography>
+      <Typography>Content above</Typography>
       <Divider />
-      <Typography>下方內容</Typography>
+      <Typography>Content below</Typography>
     </Box>
   ),
 };
@@ -44,9 +44,9 @@ export const Default: Story = {
 export const WithText: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography>登入方式</Typography>
-      <Divider>或</Divider>
-      <Typography>其他選項</Typography>
+      <Typography>Login Options</Typography>
+      <Divider>OR</Divider>
+      <Typography>Other Options</Typography>
     </Box>
   ),
 };
@@ -54,7 +54,7 @@ export const WithText: Story = {
 export const TextAlignLeft: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Divider textAlign="left">左對齊</Divider>
+      <Divider textAlign="left">Left aligned</Divider>
     </Box>
   ),
 };
@@ -62,7 +62,7 @@ export const TextAlignLeft: Story = {
 export const TextAlignCenter: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Divider textAlign="center">置中</Divider>
+      <Divider textAlign="center">Center</Divider>
     </Box>
   ),
 };
@@ -70,7 +70,7 @@ export const TextAlignCenter: Story = {
 export const TextAlignRight: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Divider textAlign="right">右對齊</Divider>
+      <Divider textAlign="right">Right aligned</Divider>
     </Box>
   ),
 };
@@ -78,9 +78,9 @@ export const TextAlignRight: Story = {
 export const Middle: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography>內容區塊一</Typography>
+      <Typography>Content Block 1</Typography>
       <Divider variant="middle" />
-      <Typography>內容區塊二</Typography>
+      <Typography>Content Block 2</Typography>
     </Box>
   ),
 };
@@ -88,9 +88,9 @@ export const Middle: Story = {
 export const Inset: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography>列表項目一</Typography>
+      <Typography>List Item 1</Typography>
       <Divider variant="inset" />
-      <Typography>列表項目二</Typography>
+      <Typography>List Item 2</Typography>
     </Box>
   ),
 };
@@ -98,9 +98,9 @@ export const Inset: Story = {
 export const Vertical: Story = {
   render: () => (
     <Box sx={{ display: 'flex', alignItems: 'center', height: '100px' }}>
-      <Typography>左側</Typography>
+      <Typography>Left</Typography>
       <Divider orientation="vertical" flexItem sx={{ mx: 2 }} />
-      <Typography>右側</Typography>
+      <Typography>Right</Typography>
     </Box>
   ),
 };
@@ -108,11 +108,11 @@ export const Vertical: Story = {
 export const VerticalWithText: Story = {
   render: () => (
     <Box sx={{ display: 'flex', alignItems: 'center', height: '100px' }}>
-      <Typography>選項一</Typography>
+      <Typography>Option 1</Typography>
       <Divider orientation="vertical" flexItem sx={{ mx: 2 }}>
-        或
+        OR
       </Divider>
-      <Typography>選項二</Typography>
+      <Typography>Option 2</Typography>
     </Box>
   ),
 };
@@ -120,9 +120,9 @@ export const VerticalWithText: Story = {
 export const Light: Story = {
   render: () => (
     <Box sx={{ width: '400px', bgcolor: '#333', p: 2 }}>
-      <Typography sx={{ color: 'white' }}>深色背景</Typography>
+      <Typography sx={{ color: 'white' }}>Dark Background</Typography>
       <Divider light sx={{ my: 1 }} />
-      <Typography sx={{ color: 'white' }}>淺色分隔線</Typography>
+      <Typography sx={{ color: 'white' }}>Light divider</Typography>
     </Box>
   ),
 };
@@ -130,13 +130,13 @@ export const Light: Story = {
 export const InList: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography variant="h6">購物清單</Typography>
+      <Typography variant="h6">Shopping List</Typography>
       <Divider sx={{ my: 1 }} />
-      <Typography>蘋果</Typography>
+      <Typography>Apple</Typography>
       <Divider />
-      <Typography>香蕉</Typography>
+      <Typography>Banana</Typography>
       <Divider />
-      <Typography>橘子</Typography>
+      <Typography>Orange</Typography>
     </Box>
   ),
 };
@@ -144,14 +144,14 @@ export const InList: Story = {
 export const Section: Story = {
   render: () => (
     <Box sx={{ width: '400px' }}>
-      <Typography variant="h5">標題</Typography>
+      <Typography variant="h5">Title</Typography>
       <Typography variant="body2" color="text.secondary">
-        副標題描述
+        Subtitle description
       </Typography>
-      <Divider sx={{ my: 2 }}>第一節</Divider>
-      <Typography>第一節內容...</Typography>
-      <Divider sx={{ my: 2 }}>第二節</Divider>
-      <Typography>第二節內容...</Typography>
+      <Divider sx={{ my: 2 }}>Section 1</Divider>
+      <Typography>Section 1 content...</Typography>
+      <Divider sx={{ my: 2 }}>Section 2</Divider>
+      <Typography>Section 2 content...</Typography>
     </Box>
   ),
 };

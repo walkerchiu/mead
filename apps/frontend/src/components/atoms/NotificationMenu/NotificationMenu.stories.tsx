@@ -6,48 +6,53 @@ const mockNotifications: Notification[] = [
   {
     id: '1',
     type: 'info',
-    title: '系統維護通知',
-    message: '系統將於今晚 23:00 進行維護，預計維護時間 2 小時',
+    title: 'System Maintenance',
+    message:
+      'System maintenance scheduled for tonight at 11:00 PM, estimated duration 2 hours',
     timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
     read: false,
   },
   {
     id: '2',
     type: 'success',
-    title: '密碼已更新',
-    message: '您的密碼已成功更新，如非本人操作請立即聯繫客服',
+    title: 'Password Updated',
+    message:
+      'Your password has been successfully updated. If this was not you, please contact support immediately',
     timestamp: new Date(Date.now() - 60 * 60 * 1000), // 1 hour ago
     read: true,
   },
   {
     id: '3',
     type: 'warning',
-    title: '安全警告',
-    message: '檢測到來自新裝置的登入，地點：台北市，IP: 192.168.1.1',
+    title: 'Security Warning',
+    message:
+      'Login detected from a new device, Location: New York, IP: 192.168.1.1',
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
     read: false,
   },
   {
     id: '4',
     type: 'error',
-    title: '付款失敗',
-    message: '您的信用卡付款失敗，請檢查卡片資訊或更換付款方式',
+    title: 'Payment Failed',
+    message:
+      'Your credit card payment failed. Please check your card information or use a different payment method',
     timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
     read: false,
   },
   {
     id: '5',
     type: 'system',
-    title: '功能更新',
-    message: '系統已新增多項功能，請查看更新日誌了解詳情',
+    title: 'Feature Update',
+    message:
+      'New features have been added to the system. Check the changelog for details',
     timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     read: true,
   },
   {
     id: '6',
     type: 'info',
-    title: '活動通知',
-    message: '年度優惠活動開始了！立即查看限時優惠商品',
+    title: 'Event Notification',
+    message: 'Annual sale event has started! Check out limited-time offers now',
     timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     read: true,
   },

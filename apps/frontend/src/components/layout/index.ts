@@ -1,7 +1,7 @@
 /**
- * Layout - 佈局組件
+ * Layout - Layout Components
  *
- * 包含頁面級別的佈局組件，如導覽列、側邊欄等。
+ * Contains page-level layout components such as navigation bars, sidebars, etc.
  */
 
 export { MainAppBar, type MainAppBarProps } from './MainAppBar';

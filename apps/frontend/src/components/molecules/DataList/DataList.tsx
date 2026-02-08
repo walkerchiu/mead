@@ -27,28 +27,28 @@ import { Badge, Progress, Divider } from '@/components/atoms';
 import { Pagination } from '@/components/molecules';
 
 /**
- * DataList 組件 - Atomic Design: Molecule
+ * DataList Component - Atomic Design: Molecule
  *
- * 功能完整的數據列表組件，支援排序、篩選、高亮、展開/收合等功能。
+ * Full-featured data list component，supports sorting, filtering, highlighting, expand/collapse, and other features。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <DataList
  *   items={[
- *     { id: '1', title: '項目 1', subtitle: '描述' },
- *     { id: '2', title: '項目 2', subtitle: '描述' },
+ *     { id: '1', title: 'Item 1', subtitle: 'Description' },
+ *     { id: '2', title: 'Item 2', subtitle: 'Description' },
  *   ]}
  * />
  *
- * // 可展開的列表
+ * // Expandable list
  * <DataList
  *   items={items}
  *   expandable
- *   renderExpandedContent={(item) => <div>詳細內容</div>}
+ *   renderExpandedContent={(item) => <div>Detailed content</div>}
  * />
  *
- * // 可選擇的列表
+ * // Selectable list
  * <DataList
  *   items={items}
  *   selectable
@@ -59,32 +59,32 @@ import { Pagination } from '@/components/molecules';
 
 export interface DataListItem {
   /**
-   * 項目 ID
+   * Item ID
    */
   id: string | number;
 
   /**
-   * 主標題
+   * Main title
    */
   title: string;
 
   /**
-   * 副標題
+   * Subtitle
    */
   subtitle?: string;
 
   /**
-   * 圖示
+   * icon
    */
   icon?: React.ReactNode;
 
   /**
-   * 右側操作
+   * Right side actions
    */
   actions?: React.ReactNode;
 
   /**
-   * 徽章
+   * badge
    */
   badge?: {
     label: string;
@@ -99,94 +99,94 @@ export interface DataListItem {
   };
 
   /**
-   * 其他自訂屬性
+   * other custom properties
    */
   [key: string]: unknown;
 }
 
 export interface DataListProps {
   /**
-   * 列表項目
+   * columnListItem
    */
   items: DataListItem[];
 
   /**
-   * 是否載入中
+   * whether loading
    */
   loading?: boolean;
 
   /**
-   * 空數據提示
+   * empty data message
    */
   emptyText?: string;
 
   /**
-   * 是否可選擇
+   * whetherselectable
    */
   selectable?: boolean;
 
   /**
-   * 選中的項目
+   * selected items
    */
   selectedItems?: string[];
 
   /**
-   * 選擇變更回調
+   * selection change callback
    */
   onSelectionChange?: (selectedIds: string[]) => void;
 
   /**
-   * 是否可展開
+   * Whether expandable
    */
   expandable?: boolean;
 
   /**
-   * 渲染展開內容
+   * render expanded content
    */
   renderExpandedContent?: (item: DataListItem) => React.ReactNode;
 
   /**
-   * 高亮項目的條件
+   * HighhighlightItemcondition
    */
   highlightItem?: (item: DataListItem) => boolean;
 
   /**
-   * 高亮項目的顏色
+   * HighhighlightItemColor
    */
   highlightColor?: string;
 
   /**
-   * 項目點擊回調
+   * ItemClick callback
    */
   onItemClick?: (item: DataListItem) => void;
 
   /**
-   * 是否顯示分頁
+   * whether to showPagination
    */
   pagination?: boolean;
 
   /**
-   * 每頁項目數
+   * items per page count
    */
   pageSize?: number;
 
   /**
-   * 當前頁
+   * currentPage
    */
   page?: number;
 
   /**
-   * 總頁數
+   * Total pages
    */
   totalPages?: number;
 
   /**
-   * 頁面變更回調
+   * Page change callback
    */
   onPageChange?: (page: number) => void;
 
   /**
-   * 排序選項
+   * sortoptions
    */
   sortOptions?: Array<{
     value: string;
@@ -194,42 +194,42 @@ export interface DataListProps {
   }>;
 
   /**
-   * 當前排序
+   * currentsort
    */
   sortBy?: string;
 
   /**
-   * 排序變更回調
+   * sort change callback
    */
   onSortChange?: (sortBy: string) => void;
 
   /**
-   * 篩選輸入框的 placeholder
+   * FilterInputfield placeholder
    */
   filterPlaceholder?: string;
 
   /**
-   * 篩選值
+   * FilterValue
    */
   filterValue?: string;
 
   /**
-   * 篩選變更回調
+   * Filterchangecallback
    */
   onFilterChange?: (value: string) => void;
 
   /**
-   * 是否顯示分隔線
+   * whether to show divider
    */
   divider?: boolean;
 
   /**
-   * 展開圖標樣式（預設為 'right'）
+   * expand icon style (default: 'right')
    */
   expandIconPosition?: 'right' | 'down';
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -237,7 +237,7 @@ export interface DataListProps {
 export function DataList({
   items,
   loading = false,
-  emptyText = '沒有項目',
+  emptyText = 'noItem',
   selectable = false,
   selectedItems = [],
   onSelectionChange,
@@ -254,19 +254,19 @@ export function DataList({
   sortOptions,
   sortBy,
   onSortChange,
-  filterPlaceholder = '搜尋...',
+  filterPlaceholder = 'search...',
   filterValue = '',
   onFilterChange,
   divider = true,
   expandIconPosition = 'right',
   sx,
 }: DataListProps) {
-  // 展開狀態
+  // Expand state
   const [expandedItems, setExpandedItems] = useState<Set<string | number>>(
     new Set(),
   );
 
-  // 處理全選
+  // handleselect all
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       onSelectionChange?.(items.map((item) => String(item.id)));
@@ -275,7 +275,7 @@ export function DataList({
     }
   };
 
-  // 處理單選
+  // handlesingle select
   const handleSelectItem = (id: string | number, checked: boolean) => {
     const idStr = String(id);
     if (checked) {
@@ -285,7 +285,7 @@ export function DataList({
     }
   };
 
-  // 處理展開
+  // handleexpanded
   const handleExpandItem = (id: string | number) => {
     setExpandedItems((prev) => {
       const newSet = new Set(prev);
@@ -298,7 +298,7 @@ export function DataList({
     });
   };
 
-  // 載入中狀態
+  // loadingstate
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -307,7 +307,7 @@ export function DataList({
     );
   }
 
-  // 空數據狀態
+  // empty datastate
   if (items.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: 'center', ...sx }}>
@@ -321,7 +321,7 @@ export function DataList({
 
   return (
     <Paper sx={{ width: '100%', ...sx }}>
-      {/* 工具欄 */}
+      {/* toolbar */}
       {(sortOptions || onFilterChange || selectable) && (
         <Box
           sx={{
@@ -353,10 +353,10 @@ export function DataList({
 
           {sortOptions && sortBy !== undefined && onSortChange && (
             <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>排序</InputLabel>
+              <InputLabel>sort</InputLabel>
               <Select
                 value={sortBy}
-                label="排序"
+                label="sort"
                 onChange={(e) => onSortChange(e.target.value)}
               >
                 {sortOptions.map((option) => (
@@ -370,7 +370,7 @@ export function DataList({
         </Box>
       )}
 
-      {/* 列表 */}
+      {/* columnList */}
       <List sx={{ p: 0 }}>
         {items.map((item, index) => {
           const isSelected = selectedItems.includes(String(item.id));
@@ -438,7 +438,7 @@ export function DataList({
                 </ListItemButton>
               </ListItem>
 
-              {/* 展開內容 */}
+              {/* Expanded content */}
               {expandable && (
                 <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                   <Box sx={{ px: 3, py: 2, bgcolor: 'grey.50' }}>
@@ -453,7 +453,7 @@ export function DataList({
         })}
       </List>
 
-      {/* 分頁 */}
+      {/* Pagination */}
       {pagination && totalPages && onPageChange && (
         <Box
           sx={{

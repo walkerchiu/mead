@@ -16,10 +16,10 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const basicSteps = [
-  { label: '選擇方案' },
-  { label: '填寫資料' },
-  { label: '確認付款' },
-  { label: '完成' },
+  { label: 'Select Plan' },
+  { label: 'Fill Information' },
+  { label: 'Confirm Payment' },
+  { label: 'Complete' },
 ];
 
 export const Default: Story = {
@@ -47,10 +47,10 @@ export const WithDescription: Story = {
   args: {
     activeStep: 1,
     steps: [
-      { label: '帳號設定', description: '建立您的帳號' },
-      { label: '個人資料', description: '填寫基本資訊' },
-      { label: '驗證', description: '驗證您的電子郵件' },
-      { label: '完成', description: '開始使用' },
+      { label: 'Account Setup', description: 'Create your account' },
+      { label: 'Personal Info', description: 'Fill in basic information' },
+      { label: 'Verification', description: 'Verify your email' },
+      { label: 'Complete', description: 'Start using' },
     ],
   },
 };
@@ -59,10 +59,10 @@ export const WithOptional: Story = {
   args: {
     activeStep: 1,
     steps: [
-      { label: '基本資料' },
-      { label: '聯絡資訊', optional: true },
-      { label: '公司資訊', optional: true },
-      { label: '確認送出' },
+      { label: 'Basic Information' },
+      { label: 'Contact Information', optional: true },
+      { label: 'Company Information', optional: true },
+      { label: 'Confirm Submission' },
     ],
   },
 };
@@ -71,9 +71,9 @@ export const WithError: Story = {
   args: {
     activeStep: 1,
     steps: [
-      { label: '步驟一', completed: true },
-      { label: '步驟二', error: true },
-      { label: '步驟三' },
+      { label: 'Step One', completed: true },
+      { label: 'Step Two', error: true },
+      { label: 'Step Three' },
     ],
   },
 };
@@ -90,10 +90,10 @@ export const Interactive: Story = {
   render: () => {
     const [activeStep, setActiveStep] = useState(0);
     const steps = [
-      { label: '選擇產品' },
-      { label: '輸入配送資訊' },
-      { label: '選擇付款方式' },
-      { label: '確認訂單' },
+      { label: 'Select Product' },
+      { label: 'Enter Shipping Info' },
+      { label: 'Choose Payment Method' },
+      { label: 'Confirm Order' },
     ];
 
     const handleNext = () => {
@@ -113,16 +113,16 @@ export const Interactive: Story = {
         <Stepper activeStep={activeStep} steps={steps} />
         <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
           <Button disabled={activeStep === 0} onClick={handleBack}>
-            上一步
+            Previous
           </Button>
           <Button
             variant="contained"
             disabled={activeStep === steps.length - 1}
             onClick={handleNext}
           >
-            下一步
+            Next
           </Button>
-          <Button onClick={handleReset}>重置</Button>
+          <Button onClick={handleReset}>Reset</Button>
         </Box>
       </Box>
     );
@@ -135,20 +135,20 @@ export const Vertical: Story = {
     orientation: 'vertical',
     steps: [
       {
-        label: '選擇活動類型',
-        description: '選擇您要建立的活動類型',
+        label: 'Choose Event Type',
+        description: 'Select the type of event you want to create',
       },
       {
-        label: '填寫活動詳情',
-        description: '提供活動的基本資訊',
+        label: 'Fill Event Details',
+        description: 'Provide basic information about the event',
       },
       {
-        label: '設定時間和地點',
-        description: '選擇活動的日期、時間和地點',
+        label: 'Set Time and Location',
+        description: 'Choose the date, time, and location of the event',
       },
       {
-        label: '審核並發布',
-        description: '檢查所有資訊並發布活動',
+        label: 'Review and Publish',
+        description: 'Check all information and publish the event',
       },
     ],
   },
@@ -160,39 +160,39 @@ export const VerticalWithContent: Story = {
 
     const steps = [
       {
-        label: '選擇設定',
+        label: 'Choose Settings',
         content: (
           <Box>
-            <Typography>請選擇您的偏好設定。</Typography>
+            <Typography>Please choose your preference settings.</Typography>
             <Box sx={{ mt: 2 }}>
               <Button variant="contained" onClick={() => setActiveStep(1)}>
-                繼續
+                Continue
               </Button>
             </Box>
           </Box>
         ),
       },
       {
-        label: '建立帳號',
+        label: 'Create Account',
         content: (
           <Box>
-            <Typography>請填寫您的帳號資訊。</Typography>
+            <Typography>Please fill in your account information.</Typography>
             <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-              <Button onClick={() => setActiveStep(0)}>返回</Button>
+              <Button onClick={() => setActiveStep(0)}>Back</Button>
               <Button variant="contained" onClick={() => setActiveStep(2)}>
-                繼續
+                Continue
               </Button>
             </Box>
           </Box>
         ),
       },
       {
-        label: '完成',
+        label: 'Complete',
         content: (
           <Box>
-            <Typography>設定已完成！</Typography>
+            <Typography>Setup complete!</Typography>
             <Box sx={{ mt: 2 }}>
-              <Button onClick={() => setActiveStep(0)}>重新開始</Button>
+              <Button onClick={() => setActiveStep(0)}>Start Over</Button>
             </Box>
           </Box>
         ),
@@ -213,9 +213,9 @@ export const NonLinear: Story = {
     const [completed, setCompleted] = useState<{ [k: number]: boolean }>({});
 
     const steps = [
-      { label: '基本資訊' },
-      { label: '聯絡方式' },
-      { label: '偏好設定' },
+      { label: 'Basic Information' },
+      { label: 'Contact Details' },
+      { label: 'Preferences' },
     ];
 
     const handleComplete = () => {
@@ -239,7 +239,7 @@ export const NonLinear: Story = {
         />
         <Box sx={{ mt: 3 }}>
           <Button variant="contained" onClick={handleComplete}>
-            {activeStep === steps.length - 1 ? '完成' : '完成此步驟'}
+            {activeStep === steps.length - 1 ? 'Finish' : 'Complete Step'}
           </Button>
         </Box>
       </Box>
@@ -252,10 +252,10 @@ export const RegistrationFlow: Story = {
     const [activeStep, setActiveStep] = useState(0);
 
     const steps = [
-      { label: '建立帳號', description: '輸入電子郵件和密碼' },
-      { label: '個人資料', description: '提供基本資訊' },
-      { label: '驗證', description: '驗證您的電子郵件' },
-      { label: '完成', description: '開始使用服務' },
+      { label: 'Create Account', description: 'Enter email and password' },
+      { label: 'Personal Info', description: 'Provide basic information' },
+      { label: 'Verification', description: 'Verify your email' },
+      { label: 'Complete', description: 'Start using the service' },
     ];
 
     return (
@@ -275,7 +275,7 @@ export const RegistrationFlow: Story = {
               disabled={activeStep === 0}
               onClick={() => setActiveStep(activeStep - 1)}
             >
-              返回
+              Back
             </Button>
             <Button
               variant="contained"
@@ -283,7 +283,7 @@ export const RegistrationFlow: Story = {
                 setActiveStep(Math.min(activeStep + 1, steps.length - 1))
               }
             >
-              {activeStep === steps.length - 1 ? '完成' : '下一步'}
+              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
             </Button>
           </Box>
         </Box>

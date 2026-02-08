@@ -4,27 +4,27 @@ import MuiAvatarGroup from '@mui/material/AvatarGroup';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Avatar 組件 - Atomic Design: Atom
+ * Avatar Component - Atomic Design: Atom
  *
- * 頭像組件，用於顯示使用者圖片或文字縮寫。
+ * Avatar component for displaying user images or text initials.
  *
  * @example
  * ```tsx
- * // 圖片頭像
- * <Avatar src="/avatar.jpg" alt="使用者名稱" />
+ * // Image avatar
+ * <Avatar src="/avatar.jpg" alt="Username" />
  *
- * // 文字頭像
- * <Avatar>王小明</Avatar>
+ * // textavatar
+ * <Avatar>John Wang</Avatar>
  *
- * // 縮寫頭像
+ * // initial avatar
  * <Avatar>WX</Avatar>
  *
- * // 不同尺寸
+ * // Different sizes
  * <Avatar size="small">S</Avatar>
  * <Avatar size="medium">M</Avatar>
  * <Avatar size="large">L</Avatar>
  *
- * // 頭像組
+ * // Avatar group
  * <AvatarGroup max={4}>
  *   <Avatar src="/user1.jpg" />
  *   <Avatar src="/user2.jpg" />
@@ -35,54 +35,54 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface AvatarProps {
   /**
-   * 圖片來源
+   * imageSource
    */
   src?: string;
 
   /**
-   * 替代文字
+   * alternative text
    */
   alt?: string;
 
   /**
-   * 子元素（文字或縮寫）
+   * Children（textorInitial）
    */
   children?: React.ReactNode;
 
   /**
-   * 組件大小
+   * componentsize
    */
   size?: 'small' | 'medium' | 'large' | number;
 
   /**
-   * 組件變體
+   * component variant
    */
   variant?: 'circular' | 'rounded' | 'square';
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 export interface AvatarGroupProps {
   /**
-   * 子元素（Avatar 組件）
+   * Children（Avatar component）
    */
   children: React.ReactNode;
 
   /**
-   * 最大顯示數量
+   * maximum display count
    */
   max?: number;
 
   /**
-   * 間距
+   * Spacing
    */
   spacing?: 'small' | 'medium' | number;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -94,13 +94,13 @@ const sizeMap = {
 };
 
 /**
- * Avatar 組件
+ * Avatar component
  */
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
   { src, alt, children, size = 'medium', variant = 'circular', sx, ...props },
   ref,
 ) {
-  // 處理尺寸
+  // handleSize
   let sizeSx = {};
   if (typeof size === 'number') {
     sizeSx = { width: size, height: size };
@@ -123,8 +123,8 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar(
 });
 
 /**
- * AvatarGroup 組件
- * 用於顯示多個頭像的群組
+ * AvatarGroup component
+ * group for displaying multiple avatars
  */
 export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(
   function AvatarGroupComponent(

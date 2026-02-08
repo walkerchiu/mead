@@ -6,23 +6,23 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 /**
- * Progress 組件 - Atomic Design: Atom
+ * Progress Component - Atomic Design: Atom
  *
- * 進度指示器組件，支援線性和圓形兩種樣式。
+ * Progress indicator component, supports linear and circular styles.
  *
  * @example
  * ```tsx
- * // 線性進度條
+ * // Linear progress bar
  * <Progress type="linear" value={60} />
  *
- * // 圓形進度指示器
+ * // Circular progress indicator
  * <Progress type="circular" value={75} />
  *
- * // 不確定狀態（載入中）
+ * // indeterminate state（loading）
  * <Progress type="linear" />
  * <Progress type="circular" />
  *
- * // 帶標籤的進度條
+ * // Progress bar with label
  * <Progress type="linear" value={80} showLabel />
  * <Progress type="circular" value={50} showLabel />
  * ```
@@ -30,34 +30,34 @@ import Typography from '@mui/material/Typography';
 
 export interface ProgressProps {
   /**
-   * 進度類型
+   * Progress type
    */
   type?: 'linear' | 'circular';
 
   /**
-   * 進度值（0-100）
+   * progress value（0-100）
    */
   value?: number;
 
   /**
-   * 變體
-   * - linear: 支援 'determinate' | 'indeterminate' | 'buffer' | 'query'
-   * - circular: 僅支援 'determinate' | 'indeterminate'
+   * Variant
+   * - linear: supports 'determinate' | 'indeterminate' | 'buffer' | 'query'
+   * - circular: only supports 'determinate' | 'indeterminate'
    */
   variant?: 'determinate' | 'indeterminate' | 'buffer' | 'query';
 
   /**
-   * 是否顯示標籤
+   * whether to showlabel
    */
   showLabel?: boolean;
 
   /**
-   * 標籤格式化函數
+   * labelformat function
    */
   labelFormatter?: (value: number) => string;
 
   /**
-   * 顏色
+   * Color
    */
   color?:
     | 'primary'
@@ -69,23 +69,23 @@ export interface ProgressProps {
     | 'inherit';
 
   /**
-   * 尺寸（僅圓形進度有效）
+   * Size（only valid for circular progress）
    */
   size?: number;
 
   /**
-   * 厚度（僅圓形進度有效）
+   * thickness（only valid for circular progress）
    */
   thickness?: number;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * LinearProgress 組件（內部使用）
+ * LinearProgress component（internal use）
  */
 const LinearProgressComponent = forwardRef<HTMLDivElement, ProgressProps>(
   function LinearProgress(
@@ -137,7 +137,7 @@ const LinearProgressComponent = forwardRef<HTMLDivElement, ProgressProps>(
 );
 
 /**
- * CircularProgress 組件（內部使用）
+ * CircularProgress component（internal use）
  */
 const CircularProgressComponent = forwardRef<HTMLDivElement, ProgressProps>(
   function CircularProgress(
@@ -154,7 +154,7 @@ const CircularProgressComponent = forwardRef<HTMLDivElement, ProgressProps>(
     },
     ref,
   ) {
-    // CircularProgress 僅支援 determinate 和 indeterminate，若傳入其他值則使用 indeterminate
+    // CircularProgress only supports determinate and indeterminate, if other value is passed, use indeterminate
     const circularVariant: 'determinate' | 'indeterminate' =
       variant === 'determinate' || variant === 'indeterminate'
         ? variant
@@ -213,7 +213,7 @@ const CircularProgressComponent = forwardRef<HTMLDivElement, ProgressProps>(
 );
 
 /**
- * Progress 統一組件
+ * Progress unifiedcomponent
  */
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   function Progress({ type = 'linear', ...props }, ref) {

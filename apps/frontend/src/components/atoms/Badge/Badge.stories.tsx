@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     badgeContent: {
       control: 'text',
-      description: '徽章內容',
+      description: 'Badge content',
     },
     color: {
       control: 'select',
@@ -25,12 +25,12 @@ const meta = {
         'success',
         'warning',
       ],
-      description: '顏色',
+      description: 'Color',
     },
     variant: {
       control: 'select',
       options: ['standard', 'dot'],
-      description: '變體',
+      description: 'Variant',
     },
   },
 } satisfies Meta<typeof Badge>;
@@ -38,7 +38,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// 簡單的圖示替代
+// Simple icon replacement
 const MailIcon = () => (
   <Box
     sx={{
@@ -170,10 +170,10 @@ export const CustomContent: Story = {
             justifyContent: 'center',
           }}
         >
-          產品
+          Product
         </Box>
       </Badge>
-      <Badge badgeContent="熱門" color="error">
+      <Badge badgeContent="Hot" color="error">
         <Box
           sx={{
             width: 60,
@@ -185,7 +185,7 @@ export const CustomContent: Story = {
             justifyContent: 'center',
           }}
         >
-          商品
+          Item
         </Box>
       </Badge>
       <Badge badgeContent="🔥" color="warning">
@@ -200,7 +200,7 @@ export const CustomContent: Story = {
             justifyContent: 'center',
           }}
         >
-          特價
+          On Sale
         </Box>
       </Badge>
     </Box>
@@ -326,7 +326,7 @@ export const OnlineStatus: Story = {
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Avatar sx={{ bgcolor: '#1976d2' }}>在線</Avatar>
+        <Avatar sx={{ bgcolor: '#1976d2' }}>Online</Avatar>
       </Badge>
       <Badge
         variant="dot"
@@ -334,7 +334,7 @@ export const OnlineStatus: Story = {
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Avatar sx={{ bgcolor: '#dc004e' }}>離線</Avatar>
+        <Avatar sx={{ bgcolor: '#dc004e' }}>Offline</Avatar>
       </Badge>
       <Badge
         variant="dot"
@@ -342,7 +342,7 @@ export const OnlineStatus: Story = {
         overlap="circular"
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Avatar sx={{ bgcolor: '#f57c00' }}>忙碌</Avatar>
+        <Avatar sx={{ bgcolor: '#f57c00' }}>Busy</Avatar>
       </Badge>
     </Box>
   ),

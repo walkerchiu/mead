@@ -79,7 +79,7 @@ export default function ForgotPasswordForm() {
 
       <FormField
         {...register('email')}
-        label={tv('email.required').includes('email') ? 'Email' : '電子郵件'}
+        label={tv('email.required').includes('email') ? 'Email' : 'Email'}
         type="email"
         fullWidth
         margin="normal"

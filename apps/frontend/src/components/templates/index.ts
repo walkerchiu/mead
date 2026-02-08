@@ -1,8 +1,12 @@
 /**
- * Templates - 模板組件
+ * Templates - Template Components
  *
- * Atomic Design 架構中的頁面模板層。
- * 提供一致的頁面佈局和結構。
+ * Page template layer in Atomic Design architecture.
+ * Provides consistent page layout and structure.
  */
 
 export { AuthLayout, type AuthLayoutProps } from './AuthLayout/AuthLayout';
+export {
+  DashboardLayout,
+  type DashboardLayoutProps,
+} from './DashboardLayout/DashboardLayout';

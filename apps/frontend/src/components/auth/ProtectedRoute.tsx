@@ -20,7 +20,7 @@ export function useAuthReady() {
 }
 
 /**
- * 檢查用戶是否有指定權限
+ * Check if user has specified permissions
  */
 function hasPermission(requiredPermission: string): boolean {
   const token = getAccessToken();
@@ -29,26 +29,26 @@ function hasPermission(requiredPermission: string): boolean {
   const payload = parseJwt(token);
   if (!payload) return false;
 
-  // 檢查 accessScopes（scope 級別權限，例如 ADMIN_SCOPE）
+  // Check access scopes（Scope level permissions, e.g., ADMIN_SCOPE）
   const accessScopes = payload.accessScopes as string[] | undefined;
 
-  // 如果所需權限是 scope（以 _SCOPE 結尾），直接在 accessScopes 中檢查
+  // If required permission is a scope (ends with _SCOPE), check directly in accessScopes
   if (requiredPermission.endsWith('_SCOPE')) {
     return accessScopes?.includes(requiredPermission) || false;
   }
 
-  // Admin 有所有非 scope 級別的權限
+  // Admin has all non-scope level permissions
   if (accessScopes?.includes('ADMIN_SCOPE')) {
     return true;
   }
 
-  // 檢查 roles（詳細權限，例如 sessions:read_all）
+  // Check roles（Detailed permissions, e.g., sessions:read_all）
   const roles = payload.roles as
     | Array<{ scope: string; roleNames: string[] }>
     | undefined;
   if (!roles || !Array.isArray(roles)) return false;
 
-  // 遍歷所有 scope 的權限
+  // iterate all scope permissions
   for (const role of roles) {
     if (
       role.roleNames &&
@@ -85,13 +85,13 @@ export default function ProtectedRoute({
 
     const check = async () => {
       try {
-        // ✅ 優先檢查是否已認證（避免重複調用 refreshAccessToken）
+        // ✅ prioritize checking whether authenticated（avoid repeated calls to refreshAccessToken）
         if (isAuthenticated()) {
           console.log(
             '[ProtectedRoute] Already authenticated, setting authReady to true',
           );
 
-          // 檢查權限
+          // check permissions
           if (requiredPermission && !hasPermission(requiredPermission)) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
@@ -105,13 +105,13 @@ export default function ProtectedRoute({
           return;
         }
 
-        // ⚠️ 沒有 token，等待一小段時間讓 useAuthInit 完成初始化
-        // useAuthInit 會在應用啟動時自動調用 initializeAuth()
+        // ⚠️ no token，Wait a moment for useAuthInit initialization complete
+        // useAuthInit will automatically call initializeAuth() on application startup
         await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // 再次檢查是否已認證（可能 useAuthInit 已經恢復了 session）
+        // check again whether authenticated (useAuthInit may have already recovered session)
         if (isAuthenticated()) {
-          // 檢查權限
+          // check permissions
           if (requiredPermission && !hasPermission(requiredPermission)) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
@@ -125,14 +125,14 @@ export default function ProtectedRoute({
           return;
         }
 
-        // 最後手段：嘗試用 refresh token 恢復（僅在 useAuthInit 失敗時）
+        // last resort: try using refresh token to recover (only when useAuthInit fails)
         console.log(
           '[ProtectedRoute] useAuthInit did not restore session, trying refresh token...',
         );
         const refreshed = await refreshAccessToken('protected-route-fallback');
 
         if (refreshed) {
-          // 檢查權限
+          // check permissions
           if (requiredPermission && !hasPermission(requiredPermission)) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
@@ -156,12 +156,12 @@ export default function ProtectedRoute({
     check();
   }, [requiredPermission, router, t]);
 
-  // 認證檢查中 - 顯示載入畫面
+  // Authentication checking - show loading screen
   if (checking) {
     return <DashboardSkeleton />;
   }
 
-  // 認證錯誤 - 顯示錯誤訊息
+  // Authentication error - displayError message
   if (error) {
     return (
       <ErrorDisplay
@@ -177,12 +177,12 @@ export default function ProtectedRoute({
     );
   }
 
-  // 未認證 - 正在導向登入頁（不渲染任何內容）
+  // not authenticated - redirecting tologinPage（render nothingContent）
   if (!authed) {
     return <DashboardSkeleton />;
   }
 
-  // 已認證 - 使用 Context 通知子组件
+  // authenticated - use Context NotificationsChildcomponent
   return (
     <AuthReadyContext.Provider value={authReady}>
       {children}

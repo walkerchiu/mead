@@ -23,7 +23,7 @@ const RadioIcon = <span className="WindRadio-icon" />;
 export interface RadioProps extends Omit<MuiRadioProps, 'color' | 'size'> {
   size?: RadioSize;
   /**
-   * 自訂顏色（支援任意色碼）
+   * Custom color (supports any color code)
    */
   color?: string;
 }

@@ -4,23 +4,23 @@ import { DashboardSkeleton } from './DashboardSkeleton';
 import Box from '@mui/material/Box';
 
 /**
- * DashboardSkeleton 是 Dashboard 頁面載入骨架屏組件。
+ * DashboardSkeleton is the loading skeleton component for Dashboard pages.
  *
- * ## 使用時機
- * - Dashboard 頁面載入時
- * - 受保護頁面的認證檢查時
- * - 資料擷取過程中
+ * ## When to Use
+ * - When Dashboard page is loading
+ * - During authentication check for protected pages
+ * - During data fetching
  *
- * ## 特性
- * - 模擬 AppBar 和內容區域
- * - 包含標題、描述、按鈕骨架
- * - 半透明背景色
- * - Material UI Skeleton 動畫
+ * ## Features
+ * - Simulates AppBar and content area
+ * - Includes title, description, button skeletons
+ * - Semi-transparent background
+ * - Material UI Skeleton animation
  *
- * ## 最佳實踐
- * - 用於 ProtectedRoute 組件
- * - 在資料載入前顯示
- * - 改善頁面載入體驗
+ * ## Best Practices
+ * - Use in ProtectedRoute component
+ * - Display before data loads
+ * - Improve page loading experience
  */
 const meta = {
   title: 'Atoms/Skeleton/DashboardSkeleton',
@@ -30,7 +30,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dashboard 頁面載入骨架屏，模擬完整的 Dashboard 結構，提供載入時的視覺回饋。',
+          'Dashboard page loading skeleton that simulates complete Dashboard structure, providing visual feedback during loading.',
       },
     },
   },
@@ -41,14 +41,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設顯示
- * 標準的 Dashboard 骨架屏
+ * Default display
+ * Standard Dashboard skeleton
  */
 export const Default: Story = {};
 
 /**
- * 深色背景
- * 在深色背景下的顯示效果
+ * Dark background
+ * Display effect on dark background
  */
 export const DarkBackground: Story = {
   decorators: [
@@ -61,8 +61,8 @@ export const DarkBackground: Story = {
 };
 
 /**
- * 淺色背景
- * 在淺色背景下的顯示效果
+ * Light background
+ * Display effect on light background
  */
 export const LightBackground: Story = {
   decorators: [
@@ -75,8 +75,8 @@ export const LightBackground: Story = {
 };
 
 /**
- * 完整頁面範例
- * 模擬實際載入場景
+ * Full page example
+ * Simulate actual loading scenario
  */
 export const FullPageExample: Story = {
   render: () => (
@@ -87,8 +87,8 @@ export const FullPageExample: Story = {
 };
 
 /**
- * 多個骨架屏
- * 展示多個連續的骨架屏（模擬多次重新載入）
+ * Multiple skeletons
+ * Show multiple continuous skeletons (simulate multiple reloads)
  */
 export const Multiple: Story = {
   render: () => (
@@ -101,8 +101,8 @@ export const Multiple: Story = {
 };
 
 /**
- * 與實際內容對比
- * 展示骨架屏與實際內容的對應關係
+ * Comparison with actual content
+ * Show correspondence between skeleton and actual content
  */
 export const ComparisonWithActual: Story = {
   render: () => (
@@ -198,8 +198,8 @@ export const ComparisonWithActual: Story = {
 };
 
 /**
- * 載入序列動畫
- * 模擬從骨架屏到實際內容的轉換
+ * Loading sequence animation
+ * Simulate transition from skeleton to actual content
  */
 export const LoadingSequence: Story = {
   render: function LoadingSequenceExample() {
@@ -298,8 +298,8 @@ export const LoadingSequence: Story = {
 };
 
 /**
- * 不同視窗大小
- * 展示在不同螢幕尺寸下的表現
+ * Different viewport sizes
+ * Show performance on different screen sizes
  */
 export const DifferentViewportSizes: Story = {
   render: () => (

@@ -4,14 +4,14 @@ import { AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
 import Link from 'next/link';
 import React from 'react';
 
-// 默認的 menu items（使用 i18n 中的標籤）
+// Default menu items (using labels from i18n)
 const defaultMenuItems = createSettingsMenuItems({
   onHelpClick: () => console.log('Help clicked'),
   onAboutClick: () => console.log('About clicked'),
   helpUrl: '/help',
   aboutUrl: '/about',
-  helpLabel: '說明文件', // 對應 i18n: components.settingsMenu.help
-  aboutLabel: '關於', // 對應 i18n: components.settingsMenu.about
+  helpLabel: 'Help Documentation', // Corresponds to i18n: components.settingsMenu.help
+  aboutLabel: 'About', // Corresponds to i18n: components.settingsMenu.about
 });
 
 /**

@@ -11,7 +11,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '重設密碼表單，用於設定新密碼。',
+        component: 'Reset password form for setting a new password.',
       },
     },
   },
@@ -29,7 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
+ * Default state
  */
 export const Default: Story = {
   args: {
@@ -41,7 +41,7 @@ export const Default: Story = {
 };
 
 /**
- * 載入中
+ * Loading
  */
 export const Loading: Story = {
   args: {
@@ -51,17 +51,17 @@ export const Loading: Story = {
 };
 
 /**
- * 有錯誤
+ * With error
  */
 export const WithError: Story = {
   args: {
-    error: '密碼重設失敗，請重試',
+    error: 'Password reset failed, please try again',
     onSubmit: async (data) => console.log(data),
   },
 };
 
 /**
- * 成功狀態
+ * Success state
  */
 export const Success: Story = {
   args: {
@@ -71,7 +71,7 @@ export const Success: Story = {
 };
 
 /**
- * Token 無效
+ * Token invalid
  */
 export const TokenInvalid: Story = {
   args: {
@@ -81,7 +81,7 @@ export const TokenInvalid: Story = {
 };
 
 /**
- * 互動式範例
+ * Interactive example
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -96,14 +96,14 @@ export const Interactive: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 模擬驗證
+      // Simulate validation
       if (data.password.length >= 8) {
         setSuccess(true);
       } else {
-        setError('密碼太短');
+        setError('Password is too short');
       }
 
       setLoading(false);

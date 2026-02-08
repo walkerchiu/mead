@@ -9,32 +9,32 @@ import Button from '@mui/material/Button';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Card 組件 - Atomic Design: Molecule
+ * Card Component - Atomic Design: Molecule
  *
- * 卡片組件，用於顯示包含圖片、標題、內容和操作的資訊卡片。
+ * Card component，for displaying information cards with images, titles, content, and actions。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Card
- *   title="卡片標題"
- *   content="這是卡片內容"
+ *   title="Card Title"
+ *   content="This is card content"
  * />
  *
- * // 帶圖片
+ * // With image
  * <Card
  *   image="/image.jpg"
- *   title="卡片標題"
- *   content="這是卡片內容"
+ *   title="Card Title"
+ *   content="This is card content"
  * />
  *
- * // 帶操作按鈕
+ * // With action button
  * <Card
- *   title="文章標題"
- *   content="文章摘要..."
+ *   title="Article title"
+ *   content="Article summary..."
  *   actions={[
- *     { label: '閱讀更多', onClick: handleRead },
- *     { label: '分享', variant: 'outlined', onClick: handleShare },
+ *     { label: 'Read more', onClick: handleRead },
+ *     { label: 'Share', variant: 'outlined', onClick: handleShare },
  *   ]}
  * />
  * ```
@@ -42,22 +42,22 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface CardAction {
   /**
-   * 按鈕文字
+   * Buttontext
    */
   label: string;
 
   /**
-   * 點擊時的回調
+   * callback on click
    */
   onClick?: () => void;
 
   /**
-   * 按鈕變體
+   * ButtonVariant
    */
   variant?: 'text' | 'outlined' | 'contained';
 
   /**
-   * 按鈕顏色
+   * ButtonColor
    */
   color?:
     | 'inherit'
@@ -69,85 +69,85 @@ export interface CardAction {
     | 'warning';
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 }
 
 export interface CardProps {
   /**
-   * 卡片標題
+   * card title
    */
   title?: string | React.ReactNode;
 
   /**
-   * 卡片副標題
+   * card subtitle
    */
   subheader?: string | React.ReactNode;
 
   /**
-   * 頭像
+   * avatar
    */
   avatar?: React.ReactNode;
 
   /**
-   * 圖片 URL
+   * image URL
    */
   image?: string;
 
   /**
-   * 圖片高度
+   * image height
    */
   imageHeight?: number;
 
   /**
-   * 圖片替代文字
+   * image alt text
    */
   imageAlt?: string;
 
   /**
-   * 卡片內容
+   * cardContent
    */
   content?: React.ReactNode;
 
   /**
-   * 操作按鈕列表
+   * Action buttoncolumnList
    */
   actions?: CardAction[];
 
   /**
-   * 右上角操作按鈕
+   * Top right action button
    */
   headerAction?: React.ReactNode;
 
   /**
-   * 是否可點擊
+   * whether clickable
    */
   clickable?: boolean;
 
   /**
-   * 點擊時的回調
+   * callback on click
    */
   onClick?: () => void;
 
   /**
-   * 提升程度（陰影）
+   * elevation（Shadow）
    */
   elevation?: number;
 
   /**
-   * 變體
+   * Variant
    */
   variant?: 'elevation' | 'outlined';
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Card 組件
+ * Card component
  */
 export const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   {

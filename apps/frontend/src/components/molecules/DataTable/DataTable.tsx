@@ -25,33 +25,33 @@ import { Progress } from '@/components/atoms';
 import { Pagination } from '@/components/molecules';
 
 /**
- * DataTable 組件 - Atomic Design: Molecule
+ * DataTable Component - Atomic Design: Molecule
  *
- * 功能完整的數據表格組件，支援排序、篩選、高亮、展開/收合等功能。
+ * Full-featured data table component，supports sorting, filtering, highlighting, expand/collapse, and other features。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <DataTable
  *   columns={[
- *     { id: 'name', label: '姓名', sortable: true },
- *     { id: 'age', label: '年齡', sortable: true },
+ *     { id: 'name', label: 'Name', sortable: true },
+ *     { id: 'age', label: 'Age', sortable: true },
  *   ]}
  *   data={[
- *     { id: '1', name: '王小明', age: 25 },
- *     { id: '2', name: '李小華', age: 30 },
+ *     { id: '1', name: 'John Wang', age: 25 },
+ *     { id: '2', name: 'Lisa Lee', age: 30 },
  *   ]}
  * />
  *
- * // 可展開的表格
+ * // Expandable table
  * <DataTable
  *   columns={columns}
  *   data={data}
  *   expandable
- *   renderExpandedRow={(row) => <div>展開內容：{row.detail}</div>}
+ *   renderExpandedRow={(row) => <div>Expanded content：{row.detail}</div>}
  * />
  *
- * // 可選擇的表格
+ * // Selectable table
  * <DataTable
  *   columns={columns}
  *   data={data}
@@ -63,149 +63,149 @@ import { Pagination } from '@/components/molecules';
 
 export interface DataTableColumn<T = unknown> {
   /**
-   * 列 ID（對應數據的鍵）
+   * Column ID（Corresponds to data key）
    */
   id: string;
 
   /**
-   * 列標題
+   * columnTitle
    */
   label: string;
 
   /**
-   * 是否可排序
+   * whether sortable
    */
   sortable?: boolean;
 
   /**
-   * 是否可篩選
+   * whether filterable
    */
   filterable?: boolean;
 
   /**
-   * 列寬度
+   * column width
    */
   width?: number | string;
 
   /**
-   * 對齊方式
+   * alignment
    */
   align?: 'left' | 'center' | 'right';
 
   /**
-   * 自訂渲染函數
+   * customrender function
    */
   render?: (value: unknown, row: T) => React.ReactNode;
 
   /**
-   * 自訂排序函數
+   * custom sort function
    */
   sortFn?: (a: T, b: T) => number;
 
   /**
-   * 自訂篩選函數
+   * customFilterfunction
    */
   filterFn?: (row: T, filterValue: string) => boolean;
 }
 
 export interface DataTableProps<T = unknown> {
   /**
-   * 列定義
+   * column definition
    */
   columns: DataTableColumn<T>[];
 
   /**
-   * 數據
+   * data
    */
   data: T[];
 
   /**
-   * 是否載入中
+   * whether loading
    */
   loading?: boolean;
 
   /**
-   * 空數據提示
+   * empty data message
    */
   emptyText?: string;
 
   /**
-   * 是否可選擇
+   * whetherselectable
    */
   selectable?: boolean;
 
   /**
-   * 選中的行
+   * Selected rows
    */
   selectedRows?: string[];
 
   /**
-   * 選擇變更回調
+   * selection change callback
    */
   onSelectionChange?: (selectedIds: string[]) => void;
 
   /**
-   * 是否可展開
+   * Whether expandable
    */
   expandable?: boolean;
 
   /**
-   * 渲染展開內容
+   * render expanded content
    */
   renderExpandedRow?: (row: T) => React.ReactNode;
 
   /**
-   * 高亮行的條件
+   * Highlighted rowscondition
    */
   highlightRow?: (row: T) => boolean;
 
   /**
-   * 高亮行的顏色
+   * Highlighted rowsColor
    */
   highlightColor?: string;
 
   /**
-   * 行點擊回調
+   * rowClick callback
    */
   onRowClick?: (row: T) => void;
 
   /**
-   * 是否顯示分頁
+   * whether to showPagination
    */
   pagination?: boolean;
 
   /**
-   * 每頁行數
+   * perPagerowcount
    */
   pageSize?: number;
 
   /**
-   * 當前頁
+   * currentPage
    */
   page?: number;
 
   /**
-   * 總頁數
+   * Total pages
    */
   totalPages?: number;
 
   /**
-   * 頁面變更回調
+   * Page change callback
    */
   onPageChange?: (page: number) => void;
 
   /**
-   * 表格高度（固定表頭時使用）
+   * table row height (used when fixed header)
    */
   maxHeight?: number | string;
 
   /**
-   * 展開圖標樣式（預設為 'right'）
+   * expand icon style (default: 'right')
    */
   expandIconPosition?: 'right' | 'down';
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -214,7 +214,7 @@ export function DataTable<T extends { id: string | number }>({
   columns,
   data,
   loading = false,
-  emptyText = '沒有數據',
+  emptyText = 'nodata',
   selectable = false,
   selectedRows = [],
   onSelectionChange,
@@ -232,26 +232,26 @@ export function DataTable<T extends { id: string | number }>({
   expandIconPosition = 'right',
   sx,
 }: DataTableProps<T>) {
-  // 排序狀態
+  // sortstate
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');
 
-  // 篩選狀態
+  // Filterstate
   const [filters, setFilters] = useState<Record<string, string>>({});
 
-  // 展開狀態
+  // Expand state
   const [expandedRows, setExpandedRows] = useState<Set<string | number>>(
     new Set(),
   );
 
-  // 處理排序
+  // handlesort
   const handleSort = (columnId: string) => {
     const isAsc = orderBy === columnId && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
     setOrderBy(columnId);
   };
 
-  // 處理篩選
+  // handleFilter
   const handleFilter = (columnId: string, value: string) => {
     setFilters((prev) => ({
       ...prev,
@@ -259,7 +259,7 @@ export function DataTable<T extends { id: string | number }>({
     }));
   };
 
-  // 處理全選
+  // handleselect all
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       onSelectionChange?.(processedData.map((row) => String(row.id)));
@@ -268,7 +268,7 @@ export function DataTable<T extends { id: string | number }>({
     }
   };
 
-  // 處理單選
+  // handlesingle select
   const handleSelectRow = (id: string | number, checked: boolean) => {
     const idStr = String(id);
     if (checked) {
@@ -278,7 +278,7 @@ export function DataTable<T extends { id: string | number }>({
     }
   };
 
-  // 處理展開
+  // handleexpanded
   const handleExpandRow = (id: string | number) => {
     setExpandedRows((prev) => {
       const newSet = new Set(prev);
@@ -291,11 +291,11 @@ export function DataTable<T extends { id: string | number }>({
     });
   };
 
-  // 處理數據（篩選和排序）
+  // handledata（filter and sort）
   const processedData = useMemo(() => {
     let result = [...data];
 
-    // 篩選
+    // Filter
     Object.entries(filters).forEach(([columnId, filterValue]) => {
       if (filterValue) {
         const column = columns.find((col) => col.id === columnId);
@@ -309,7 +309,7 @@ export function DataTable<T extends { id: string | number }>({
       }
     });
 
-    // 排序
+    // sort
     if (orderBy) {
       const column = columns.find((col) => col.id === orderBy);
       result.sort((a, b) => {
@@ -338,7 +338,7 @@ export function DataTable<T extends { id: string | number }>({
     return result;
   }, [data, filters, orderBy, order, columns]);
 
-  // 載入中狀態
+  // loadingstate
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
@@ -347,7 +347,7 @@ export function DataTable<T extends { id: string | number }>({
     );
   }
 
-  // 空數據狀態
+  // empty datastate
   if (data.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: 'center', ...sx }}>
@@ -365,7 +365,7 @@ export function DataTable<T extends { id: string | number }>({
       <TableContainer sx={{ maxHeight }}>
         <Table stickyHeader>
           <TableHead>
-            {/* 篩選行 */}
+            {/* Filterrow */}
             {columns.some((col) => col.filterable) && (
               <TableRow>
                 {selectable && <TableCell />}
@@ -375,7 +375,7 @@ export function DataTable<T extends { id: string | number }>({
                     {column.filterable && (
                       <TextField
                         size="small"
-                        placeholder={`篩選 ${column.label}`}
+                        placeholder={`Filter ${column.label}`}
                         value={filters[column.id] || ''}
                         onChange={(e) =>
                           handleFilter(column.id, e.target.value)
@@ -389,7 +389,7 @@ export function DataTable<T extends { id: string | number }>({
               </TableRow>
             )}
 
-            {/* 表頭行 */}
+            {/* Header row */}
             <TableRow>
               {selectable && (
                 <TableCell padding="checkbox">
@@ -489,7 +489,7 @@ export function DataTable<T extends { id: string | number }>({
                     ))}
                   </TableRow>
 
-                  {/* 展開行 */}
+                  {/* expandedrow */}
                   {expandable && (
                     <TableRow>
                       <TableCell
@@ -513,7 +513,7 @@ export function DataTable<T extends { id: string | number }>({
         </Table>
       </TableContainer>
 
-      {/* 分頁 */}
+      {/* Pagination */}
       {pagination && totalPages && onPageChange && (
         <Box
           sx={{

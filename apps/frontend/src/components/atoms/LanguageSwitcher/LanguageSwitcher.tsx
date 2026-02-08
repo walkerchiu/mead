@@ -34,7 +34,7 @@ const LANGUAGES: Record<
   'zh-TW': {
     label: 'Traditional Chinese',
     flag: '🇹🇼',
-    nativeName: '繁體中文',
+    nativeName: 'Traditional Chinese',
   },
 };
 

@@ -11,7 +11,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '忘記密碼表單，用於請求密碼重設連結。',
+        component: 'Forgot password form for requesting password reset link.',
       },
     },
   },
@@ -29,7 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
+ * Default state
  */
 export const Default: Story = {
   args: {
@@ -41,7 +41,7 @@ export const Default: Story = {
 };
 
 /**
- * 載入中
+ * Loading
  */
 export const Loading: Story = {
   args: {
@@ -51,18 +51,18 @@ export const Loading: Story = {
 };
 
 /**
- * 有錯誤
+ * With error
  */
 export const WithError: Story = {
   args: {
-    error: '找不到此電子郵件地址',
+    error: 'Email address not found',
     onSubmit: async (data) => console.log(data),
   },
 };
 
 /**
- * 成功狀態
- * 顯示郵件已發送訊息
+ * Success state
+ * Show email sent message
  */
 export const Success: Story = {
   args: {
@@ -72,7 +72,7 @@ export const Success: Story = {
 };
 
 /**
- * 預填 Email
+ * With default email
  */
 export const WithDefaultEmail: Story = {
   args: {
@@ -82,8 +82,8 @@ export const WithDefaultEmail: Story = {
 };
 
 /**
- * 互動式範例
- * 模擬完整流程
+ * Interactive example
+ * Simulates complete flow
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -95,14 +95,14 @@ export const Interactive: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 模擬驗證
+      // Simulate validation
       if (data.email.includes('@')) {
         setSuccess(true);
       } else {
-        setError('電子郵件格式錯誤');
+        setError('Invalid email format');
       }
 
       setLoading(false);

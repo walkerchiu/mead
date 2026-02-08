@@ -18,22 +18,22 @@ import {
 } from '@mui/material';
 
 /**
- * Modal 組件提供各種常見的對話框模式。
+ * Modal component provides various common dialog patterns.
  *
- * **功能特色**:
- * - 多種變體（預設、確認、警告、錯誤、資訊、成功）
- * - 自訂尺寸（xs, sm, md, lg, xl）
- * - 全螢幕模式
- * - 可滾動內容
- * - 自訂動作按鈕（含載入狀態）
- * - 響應式設計（手機自動全螢幕）
+ * **Features**:
+ * - Multiple variants (default, confirm, alert, warning, error, info, success)
+ * - Custom sizes (xs, sm, md, lg, xl)
+ * - Fullscreen mode
+ * - Scrollable content
+ * - Custom action buttons (with loading state)
+ * - Responsive design (auto fullscreen on mobile)
  *
- * **常見使用場景**:
- * - 確認操作對話框
- * - 表單輸入對話框
- * - 警告/錯誤提示
- * - 資訊展示
- * - 內容預覽
+ * **Common Use Cases**:
+ * - Confirmation dialogs
+ * - Form input dialogs
+ * - Warning/error alerts
+ * - Information display
+ * - Content preview
  */
 const meta = {
   title: 'Organisms/Modal',

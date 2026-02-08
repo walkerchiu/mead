@@ -12,7 +12,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '完整的登入表單組件，包含 email、密碼輸入和驗證。',
+        component:
+          'Complete login form component with email, password input and validation.',
       },
     },
     msw: {
@@ -33,8 +34,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
- * 標準的登入表單
+ * Default state
+ * Standard login form
  */
 export const Default: Story = {
   args: {
@@ -46,8 +47,8 @@ export const Default: Story = {
 };
 
 /**
- * 載入中
- * 提交表單後的載入狀態
+ * Loading
+ * Loading state after form submission
  */
 export const Loading: Story = {
   args: {
@@ -57,19 +58,19 @@ export const Loading: Story = {
 };
 
 /**
- * 有錯誤
- * 顯示登入失敗訊息
+ * With error
+ * Display login failure message
  */
 export const WithError: Story = {
   args: {
-    error: '電子郵件或密碼錯誤',
+    error: 'Invalid email or password',
     onSubmit: async (data) => console.log(data),
   },
 };
 
 /**
- * 預填 Email
- * Email 欄位已預填
+ * With default email
+ * Email field is pre-filled
  */
 export const WithDefaultEmail: Story = {
   args: {
@@ -79,8 +80,8 @@ export const WithDefaultEmail: Story = {
 };
 
 /**
- * 不顯示忘記密碼
- * 隱藏忘記密碼連結
+ * No forgot password
+ * Hide forgot password link
  */
 export const NoForgotPassword: Story = {
   args: {
@@ -90,8 +91,8 @@ export const NoForgotPassword: Story = {
 };
 
 /**
- * 互動式範例
- * 模擬完整的登入流程
+ * Interactive example
+ * Simulates complete login flow
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -104,17 +105,17 @@ export const Interactive: Story = {
       setError(undefined);
       setSuccess(false);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 模擬驗證邏輯
+      // Simulate validation logic
       if (
         data.email === 'admin@example.com' &&
         data.password === 'password123'
       ) {
         setSuccess(true);
       } else {
-        setError('電子郵件或密碼錯誤');
+        setError('Invalid email or password');
       }
 
       setLoading(false);
@@ -124,8 +125,8 @@ export const Interactive: Story = {
       <Box>
         {success && (
           <Box sx={{ mb: 3 }}>
-            <AlertMessage severity="success" title="登入成功">
-              歡迎回來！正在導向儀表板...
+            <AlertMessage severity="success" title="Login Successful">
+              Welcome back! Redirecting to dashboard...
             </AlertMessage>
           </Box>
         )}
@@ -139,9 +140,9 @@ export const Interactive: Story = {
             />
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-                測試帳號：
+                Test Account:
                 {'\n'}Email: admin@example.com
-                {'\n'}密碼: password123
+                {'\n'}Password: password123
               </Box>
             </Box>
           </>
@@ -152,8 +153,8 @@ export const Interactive: Story = {
 };
 
 /**
- * 各種錯誤狀態
- * 展示不同的錯誤訊息
+ * Various error states
+ * Demonstrates different error messages
  */
 export const ErrorStates: Story = {
   render: () => (
@@ -161,21 +162,21 @@ export const ErrorStates: Story = {
       <Paper elevation={2} sx={{ p: 3 }}>
         <LoginForm
           onSubmit={async (data) => console.log(data)}
-          error="電子郵件或密碼錯誤"
+          error="Invalid email or password"
         />
       </Paper>
 
       <Paper elevation={2} sx={{ p: 3 }}>
         <LoginForm
           onSubmit={async (data) => console.log(data)}
-          error="帳號已被鎖定，請聯繫管理員"
+          error="Account has been locked, please contact administrator"
         />
       </Paper>
 
       <Paper elevation={2} sx={{ p: 3 }}>
         <LoginForm
           onSubmit={async (data) => console.log(data)}
-          error="伺服器連線失敗，請稍後再試"
+          error="Server connection failed, please try again later"
         />
       </Paper>
     </Box>

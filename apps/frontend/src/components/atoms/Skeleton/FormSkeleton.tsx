@@ -1,20 +1,20 @@
 /**
- * FormSkeleton - 表單載入骨架屏
- * 用於表單載入時的佔位符，提供更好的使用者體驗
+ * FormSkeleton - Form loading skeleton
+ * Placeholder for form loading, provides better user experience
  */
 
 import { Box, Skeleton, Stack } from '@mui/material';
 
 interface FormSkeletonProps {
-  /** 輸入欄位數量 */
+  /** Number of input fields */
   fields?: number;
-  /** 是否顯示標題 */
+  /** whether to showTitle */
   showTitle?: boolean;
-  /** 是否顯示副標題 */
+  /** whether to show secondaryTitle */
   showSubtitle?: boolean;
-  /** 是否顯示按鈕 */
+  /** whether to show button */
   showButton?: boolean;
-  /** 是否顯示連結 */
+  /** whether to show links */
   showLinks?: boolean;
 }
 

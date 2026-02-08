@@ -32,8 +32,8 @@ const LOGIN_MUTATION = gql`
 `;
 
 /**
- * 測試組件：簡單的登入表單
- * 用來驗證 Apollo Client + MSW 的集成
+ * Test component: Simple login form
+ * Used to verify Apollo Client + MSW integration
  */
 function TestLoginForm() {
   const [email, setEmail] = useState('customer@example.com');
@@ -54,22 +54,22 @@ function TestLoginForm() {
       const data = response.data?.login;
 
       if (data.__typename === 'AuthResponse') {
-        setResult(`✅ 登入成功！用戶: ${data.user.email}`);
+        setResult(`✅ Login successful! User: ${data.user.email}`);
       } else if (data.__typename === 'TwoFactorLoginResponse') {
-        setResult(`🔐 需要 2FA 驗證: ${data.message}`);
+        setResult(`🔐 2FA verification required: ${data.message}`);
       }
     } catch (err: any) {
-      setResult(`❌ 錯誤: ${err.message}`);
+      setResult(`❌ Error: ${err.message}`);
     }
   };
 
   return (
     <Box sx={{ maxWidth: 400, p: 3 }}>
       <Typography variant="h5" gutterBottom>
-        測試登入表單
+        Test Login Form
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        這個表單使用 Apollo Client + MSW 模擬 GraphQL API
+        This form uses Apollo Client + MSW to mock GraphQL API
       </Typography>
 
       <form onSubmit={handleSubmit}>
@@ -96,7 +96,7 @@ function TestLoginForm() {
             disabled={loading}
             fullWidth
           >
-            {loading ? '登入中...' : '登入'}
+            {loading ? 'Logging in...' : 'login'}
           </Button>
 
           {error && <Alert severity="error">{error.message}</Alert>}
@@ -119,16 +119,16 @@ function TestLoginForm() {
 
       <Box sx={{ mt: 3, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
         <Typography variant="caption" display="block" gutterBottom>
-          <strong>測試帳號：</strong>
+          <strong>Test Accounts:</strong>
         </Typography>
         <Typography variant="caption" display="block">
-          • customer@example.com / {MOCK_PASSWORD} (無 2FA)
+          • customer@example.com / {MOCK_PASSWORD} (without 2FA)
         </Typography>
         <Typography variant="caption" display="block">
-          • customer2fa@example.com / {MOCK_PASSWORD} (啟用 2FA)
+          • customer2fa@example.com / {MOCK_PASSWORD} (with 2FA enabled)
         </Typography>
         <Typography variant="caption" display="block">
-          • 錯誤密碼會顯示錯誤訊息
+          • Wrong password will display error message
         </Typography>
       </Box>
     </Box>
@@ -136,13 +136,13 @@ function TestLoginForm() {
 }
 
 /**
- * Apollo Client + MSW 集成測試
+ * Apollo Client + MSW Integration Test
  *
- * 這個 story 展示：
- * 1. Apollo Client 正確配置
- * 2. MSW 正確攔截 GraphQL 請求
- * 3. useMutation hook 正常運作
- * 4. 錯誤處理正確
+ * This story demonstrates:
+ * 1. Apollo Client correctly configured
+ * 2. MSW correctly intercepts GraphQL requests
+ * 3. useMutation hook works properly
+ * 4. Error handling is correct
  */
 const meta = {
   title: 'Example/Apollo + MSW Test',
@@ -151,7 +151,7 @@ const meta = {
     layout: 'centered',
     msw: {
       handlers: [
-        // 這個 handler 會覆蓋全局的 handler
+        // This handler will override the global handler
         graphql.mutation('Login', ({ variables }) => {
           const { email, password } = variables as {
             email: string;
@@ -205,18 +205,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態：顯示登入表單，可以測試不同的登入情境
+ * Default state: Shows login form, can test different login scenarios
  */
 export const Default: Story = {};
 
 /**
- * 登入成功（無 2FA）
- * 預填 customer@example.com / Password123!
+ * login successful（without 2FA）
+ * Pre-filled with customer@example.com / Password123!
  */
 export const LoginSuccess: Story = {};
 
 /**
- * 需要 2FA 驗證
- * 預填 customer2fa@example.com / Password123!
+ * 2FA verification required
+ * Pre-filled with customer2fa@example.com / Password123!
  */
 export const LoginWith2FA: Story = {};

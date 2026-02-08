@@ -1,6 +1,6 @@
 /**
- * DashboardSkeleton - Dashboard 載入骨架屏
- * 用於 Dashboard 頁面載入時的佔位符
+ * DashboardSkeleton - Dashboard loading skeleton
+ * Placeholder for Dashboard page loading
  */
 
 import { Box, Container, Paper, Skeleton, Stack } from '@mui/material';

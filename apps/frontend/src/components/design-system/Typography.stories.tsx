@@ -8,9 +8,9 @@ import {
 import { useTheme } from '@mui/material/styles';
 
 /**
- * Typography 設計系統
+ * Typography Design System
  *
- * 展示應用程式中使用的所有文字樣式，包括標題、正文、按鈕文字等。
+ * Displays all text styles used in the application, including headings, body text, button text, etc.
  */
 
 const TypographySystem = () => {
@@ -44,110 +44,111 @@ const TypographySystem = () => {
   return (
     <Box sx={{ p: 3, maxWidth: 1200 }}>
       <MuiTypography variant="h4" gutterBottom>
-        排版系統
+        Typography System
       </MuiTypography>
       <MuiTypography variant="body1" color="text.secondary" paragraph>
-        應用程式使用的完整排版系統，包括所有文字變體和樣式。
+        Complete typography system used in the application, including all text
+        variants and styles.
       </MuiTypography>
 
-      {/* 標題 */}
+      {/* Headings */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          標題 (Headings)
+          Headings
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <TypographyExample
             variant="h1"
-            description="最大標題，用於頁面主標題"
+            description="Largest heading, used for main page titles"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="h2"
-            description="次級標題，用於主要區塊標題"
+            description="Secondary heading, used for main section titles"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="h3"
-            description="三級標題，用於內容區塊標題"
+            description="Third-level heading, used for content section titles"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="h4"
-            description="四級標題，用於子區塊標題"
+            description="Fourth-level heading, used for subsection titles"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="h5"
-            description="五級標題，用於組件標題"
+            description="Fifth-level heading, used for component titles"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="h6"
-            description="六級標題，用於小節標題"
+            description="Sixth-level heading, used for minor section titles"
           />
         </Paper>
       </Box>
 
-      {/* 正文 */}
+      {/* Body Text */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          正文 (Body)
+          Body Text
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <TypographyExample
             variant="body1"
-            description="主要正文文字，用於一般內容"
+            description="Primary body text, used for general content"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="body2"
-            description="次要正文文字，用於輔助內容"
+            description="Secondary body text, used for supporting content"
           />
         </Paper>
       </Box>
 
-      {/* 副標題和標註 */}
+      {/* subtitle and caption */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          副標題與標註
+          Subtitles and Captions
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <TypographyExample
             variant="subtitle1"
-            description="較大的副標題，用於卡片或列表項目"
+            description="Larger subtitle, used for cards or list items"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="subtitle2"
-            description="較小的副標題，用於次要資訊"
+            description="Smaller subtitle, used for secondary information"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="caption"
-            description="小字標註，用於提示或說明文字"
+            description="Small caption text, used for hints or explanatory text"
           />
           <Divider sx={{ my: 2 }} />
           <TypographyExample
             variant="overline"
-            description="大寫標籤文字，用於分類標籤"
+            description="Uppercase label text, used for category labels"
           />
         </Paper>
       </Box>
 
-      {/* 按鈕文字 */}
+      {/* Button Text */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          按鈕文字
+          Button Text
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
-          <TypographyExample variant="button" description="按鈕文字樣式" />
+          <TypographyExample variant="button" description="Button text style" />
         </Paper>
       </Box>
 
-      {/* 字重 */}
+      {/* font weight */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          字重 (Font Weight)
+          Font Weight
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -170,14 +171,14 @@ const TypographySystem = () => {
         </Paper>
       </Box>
 
-      {/* 文字對齊 */}
+      {/* Text Alignment */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          文字對齊
+          Text Alignment
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <MuiTypography align="left" gutterBottom>
-            Left aligned text (預設)
+            Left aligned text (default)
           </MuiTypography>
           <MuiTypography align="center" gutterBottom>
             Center aligned text
@@ -193,71 +194,73 @@ const TypographySystem = () => {
         </Paper>
       </Box>
 
-      {/* 文字顏色 */}
+      {/* Text Colors */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          文字顏色
+          Text Colors
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <MuiTypography color="text.primary">
-              Primary text - 主要文字顏色
+              Primary text - Primary text color
             </MuiTypography>
             <MuiTypography color="text.secondary">
-              Secondary text - 次要文字顏色
+              Secondary text - Secondary text color
             </MuiTypography>
             <MuiTypography color="text.disabled">
-              Disabled text - 禁用文字顏色
+              Disabled text - Disabled text color
             </MuiTypography>
             <MuiTypography color="primary">
-              Primary color - 主色調
+              Primary color - Primary color
             </MuiTypography>
             <MuiTypography color="secondary">
-              Secondary color - 輔助色
+              Secondary color - Secondary color
             </MuiTypography>
-            <MuiTypography color="error">Error color - 錯誤色</MuiTypography>
+            <MuiTypography color="error">
+              Error color - Error color
+            </MuiTypography>
             <MuiTypography color="warning">
-              Warning color - 警告色
+              Warning color - Warning color
             </MuiTypography>
-            <MuiTypography color="info">Info color - 資訊色</MuiTypography>
+            <MuiTypography color="info">Info color - Info color</MuiTypography>
             <MuiTypography color="success">
-              Success color - 成功色
+              Success color - Success color
             </MuiTypography>
           </Box>
         </Paper>
       </Box>
 
-      {/* 使用範例 */}
+      {/* usage examples */}
       <Box sx={{ mb: 6 }}>
         <MuiTypography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          實際使用範例
+          Real-world Usage Examples
         </MuiTypography>
         <Paper sx={{ p: 3 }}>
           <MuiTypography variant="h4" gutterBottom>
-            文章標題
+            Article Title
           </MuiTypography>
           <MuiTypography
             variant="subtitle1"
             color="text.secondary"
             gutterBottom
           >
-            作者：王小明 • 發布於 2026年2月6日
+            Author: John Smith • Published on February 6, 2026
           </MuiTypography>
           <MuiTypography variant="body1" paragraph>
-            這是文章的第一段落。Lorem ipsum dolor sit amet, consectetur
-            adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-            dolore magna aliqua.
+            This is the first paragraph of the article.Lorem ipsum dolor sit
+            amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
+            ut labore et dolore magna aliqua.
           </MuiTypography>
           <MuiTypography variant="h6" gutterBottom sx={{ mt: 3 }}>
-            小節標題
+            Subsection Title
           </MuiTypography>
           <MuiTypography variant="body2" paragraph>
-            這是文章的第二段落，使用較小的字體。Ut enim ad minim veniam, quis
-            nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-            consequat.
+            This is the second paragraph of the article, using smaller font.Ut
+            enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
+            ut aliquip ex ea commodo consequat.
           </MuiTypography>
           <MuiTypography variant="caption" color="text.secondary">
-            * 這是一個註解或免責聲明
+            * This is a note or disclaimer
           </MuiTypography>
         </Paper>
       </Box>

@@ -3,14 +3,14 @@ import { UserMenu, createUserMenuItems } from './UserMenu';
 import { AppBar, Toolbar, Typography, Box } from '@mui/material';
 
 const mockUser = {
-  name: '王小明',
-  email: 'wang@example.com',
+  name: 'John Doe',
+  email: 'john.doe@example.com',
   avatar: 'https://i.pravatar.cc/150?img=1',
   role: 'Admin',
   status: 'online' as const,
 };
 
-// 默認的 menu items（使用 i18n 中的標籤）
+// Default menu items (using labels from i18n)
 const defaultMenuItems = createUserMenuItems({
   onAccountClick: () => console.log('Account settings clicked'),
   onProfileClick: () => console.log('Profile clicked'),
@@ -19,10 +19,10 @@ const defaultMenuItems = createUserMenuItems({
   accountUrl: '/settings/account',
   profileUrl: '/settings/profile',
   securityUrl: '/settings/security',
-  accountLabel: '帳號設定', // 對應 i18n: components.userMenu.account
-  profileLabel: '個人資料', // 對應 i18n: components.userMenu.profile
-  securityLabel: '安全設定', // 對應 i18n: components.userMenu.security
-  logoutLabel: '登出', // 對應 i18n: components.userMenu.logout
+  accountLabel: 'Account Settings', // Corresponds to i18n: components.userMenu.account
+  profileLabel: 'Profile', // Corresponds to i18n: components.userMenu.profile
+  securityLabel: 'Security', // Corresponds to i18n: components.userMenu.security
+  logoutLabel: 'Logout', // Corresponds to i18n: components.userMenu.logout
 });
 
 /**
@@ -181,8 +181,8 @@ export const WithNameAndStatus: Story = {
 export const WithoutAvatar: Story = {
   args: {
     user: {
-      name: '張小華',
-      email: 'chang@example.com',
+      name: 'Emily Chen',
+      email: 'emily.chen@example.com',
       status: 'online',
     },
     menuItems: defaultMenuItems,
@@ -208,7 +208,7 @@ export const WithRole: Story = {
 export const WithoutEmail: Story = {
   args: {
     user: {
-      name: '李大明',
+      name: 'Michael Brown',
       avatar: 'https://i.pravatar.cc/150?img=5',
     },
     menuItems: defaultMenuItems,
@@ -502,13 +502,13 @@ export const MinimalSetup: Story = {
     user: mockUser,
     showName: true,
     showStatus: true,
-    // 只包含帳號設定和登出
+    // Only includes account settings and logout
     menuItems: createUserMenuItems({
       onAccountClick: () => console.log('Account clicked'),
       onLogout: () => console.log('Logout clicked'),
       accountUrl: '/settings/account',
-      accountLabel: '帳號設定',
-      logoutLabel: '登出',
+      accountLabel: 'Account Settings',
+      logoutLabel: 'Logout',
     }),
   },
   render: (args) => (

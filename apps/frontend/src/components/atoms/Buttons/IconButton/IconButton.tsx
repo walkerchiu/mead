@@ -37,7 +37,7 @@ const StyledIconButton = styled(MuiIconButton, {
 export interface IconButtonProps extends Omit<MuiIconButtonProps, 'color'> {
   variant?: IconButtonVariant;
   /**
-   * 覆蓋 icon 顏色，未提供則使用 token 預設值
+   * Override icon color, uses token default if not provided
    */
   iconColor?: string;
 }

@@ -5,19 +5,19 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { TextField } from './TextField';
 
 /**
- * TextField 是基本的文字輸入組件。
+ * TextField is the basic text input component.
  *
- * ## 使用時機
- * - 單行文字輸入（姓名、Email、電話等）
- * - 密碼輸入
- * - 數字輸入
- * - 日期選擇
+ * ## When to Use
+ * - Single-line text input (name, email, phone, etc.)
+ * - Password input
+ * - Number input
+ * - Date selection
  *
- * ## 最佳實踐
- * - 總是提供清晰的 label
- * - 使用 helperText 提供額外說明
- * - 錯誤時顯示具體的錯誤訊息
- * - 使用適當的 type 屬性（email、password、number 等）
+ * ## Best Practices
+ * - Always provide a clear label
+ * - Use helperText to provide additional instructions
+ * - Show specific error messages when there are errors
+ * - Use appropriate type attribute (email, password, number, etc.)
  */
 const meta = {
   title: 'Atoms/TextField',
@@ -26,7 +26,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '基於 MUI TextField 的封裝，提供統一的輸入框樣式和行為。',
+        component:
+          'Wrapper around MUI TextField providing unified input field styles and behavior.',
       },
     },
   },
@@ -40,41 +41,41 @@ const meta = {
     },
     label: {
       control: 'text',
-      description: '輸入框的標籤',
+      description: 'Label for the input field',
     },
     placeholder: {
       control: 'text',
-      description: '輸入框的佔位符',
+      description: 'Placeholder text for the input field',
     },
     helperText: {
       control: 'text',
-      description: '輔助文字或錯誤訊息',
+      description: 'Helper text or error message',
     },
     error: {
       control: 'boolean',
-      description: '是否顯示錯誤狀態',
+      description: 'Whether to show error state',
     },
     disabled: {
       control: 'boolean',
-      description: '是否停用輸入框',
+      description: 'Whether input field is disabled',
     },
     required: {
       control: 'boolean',
-      description: '是否為必填欄位',
+      description: 'Whether field is required',
     },
     fullWidth: {
       control: 'boolean',
-      description: '是否佔滿父容器寬度',
+      description: 'Whether to span full width of parent container',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: '輸入框尺寸',
+      description: 'Size of the input field',
     },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'tel', 'url'],
-      description: '輸入類型',
+      description: 'Input type',
     },
   },
   decorators: [
@@ -90,113 +91,118 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 基本用法
- * 簡單的文字輸入框
+ * Basic usage
+ * Simple text input field
  */
 export const Default: Story = {
   args: {
-    label: '姓名',
-    placeholder: '請輸入您的姓名',
+    label: 'Name',
+    placeholder: 'Enter your name',
   },
 };
 
 /**
- * 帶輔助文字
- * 提供額外的說明或提示
+ * With helper text
+ * Provides additional instructions or hints
  */
 export const WithHelperText: Story = {
   args: {
     label: 'Email',
     type: 'email',
     placeholder: 'user@example.com',
-    helperText: '我們不會分享您的電子郵件地址',
+    helperText: "We won't share your email address",
   },
 };
 
 /**
- * 必填欄位
- * 使用 required 屬性標記必填
+ * Required field
+ * Marked as required using the required attribute
  */
 export const Required: Story = {
   args: {
-    label: '使用者名稱',
+    label: 'Username',
     required: true,
-    helperText: '此欄位為必填',
+    helperText: 'This field is required',
   },
 };
 
 /**
- * 錯誤狀態
- * 顯示驗證錯誤
+ * Error state
+ * Displays validation errors
  */
 export const Error: Story = {
   args: {
-    label: '密碼',
+    label: 'Password',
     type: 'password',
     error: true,
-    helperText: '密碼長度必須至少 8 個字元',
+    helperText: 'Password must be at least 8 characters',
     defaultValue: '123',
   },
 };
 
 /**
- * 停用狀態
- * 輸入框不可編輯
+ * Disabled state
+ * Input field is not editable
  */
 export const Disabled: Story = {
   args: {
     label: 'Email',
     disabled: true,
     defaultValue: 'user@example.com',
-    helperText: '此欄位無法修改',
+    helperText: 'This field cannot be modified',
   },
 };
 
 /**
- * 密碼輸入
- * 使用 password 類型隱藏輸入內容
+ * Password input
+ * Uses password type to hide input content
  */
 export const Password: Story = {
   args: {
-    label: '密碼',
+    label: 'Password',
     type: 'password',
-    placeholder: '請輸入密碼',
-    helperText: '至少 8 個字元，包含大小寫字母和數字',
+    placeholder: 'Enter password',
+    helperText:
+      'At least 8 characters, including uppercase, lowercase letters and numbers',
   },
 };
 
 /**
- * 數字輸入
- * 使用 number 類型限制只能輸入數字
+ * Number input
+ * Uses number type to restrict to numeric input only
  */
 export const Number: Story = {
   args: {
-    label: '年齡',
+    label: 'Age',
     type: 'number',
-    helperText: '請輸入您的年齡',
+    helperText: 'Enter your age',
   },
 };
 
 /**
- * 所有輸入類型
- * 展示不同的輸入類型
+ * All input types
+ * Demonstrates different input types
  */
 export const InputTypes: Story = {
   render: () => (
     <Stack spacing={2}>
-      <TextField label="文字" type="text" placeholder="一般文字" />
+      <TextField label="Text" type="text" placeholder="General text" />
       <TextField label="Email" type="email" placeholder="user@example.com" />
-      <TextField label="密碼" type="password" placeholder="輸入密碼" />
-      <TextField label="電話" type="tel" placeholder="0912-345-678" />
-      <TextField label="網址" type="url" placeholder="https://example.com" />
-      <TextField label="數字" type="number" defaultValue="42" />
+      <TextField
+        label="Password"
+        type="password"
+        placeholder="Enter password"
+      />
+      <TextField label="Phone" type="tel" placeholder="0912-345-678" />
+      <TextField label="URL" type="url" placeholder="https://example.com" />
+      <TextField label="Number" type="number" defaultValue="42" />
     </Stack>
   ),
 };
 
 /**
- * 表單範例
- * 典型的登入表單欄位
+ * Form example
+ * Typical login form fields
  */
 export const FormExample: Story = {
   render: () => (
@@ -208,26 +214,26 @@ export const FormExample: Story = {
         required
       />
       <TextField
-        label="密碼"
+        label="Password"
         type="password"
-        placeholder="輸入密碼"
+        placeholder="Enter password"
         required
-        helperText="至少 8 個字元"
+        helperText="At least 8 characters"
       />
     </Stack>
   ),
 };
 
 /**
- * 尺寸變化
- * Small 和 Medium 兩種尺寸
+ * Size variations
+ * Small, Medium, and Large sizes
  */
 export const Sizes: Story = {
   render: () => (
     <Stack spacing={2}>
-      <TextField label="Small Size" size="small" defaultValue="小尺寸" />
-      <TextField label="Medium Size" size="medium" defaultValue="中等尺寸" />
-      <TextField label="Large Size" size="large" defaultValue="大尺寸" />
+      <TextField label="Small Size" size="small" defaultValue="Small size" />
+      <TextField label="Medium Size" size="medium" defaultValue="Medium size" />
+      <TextField label="Large Size" size="large" defaultValue="Large size" />
     </Stack>
   ),
 };

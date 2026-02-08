@@ -69,7 +69,7 @@ export function RevokeSessionModal({
         onSuccess?.();
         handleClose();
       } else {
-        // 撤銷失敗，顯示錯誤訊息
+        // Revoke failed, show error message
         const errorMsg = result.data?.revokeSession?.message || '';
         const errorKey = errorMsg ? getErrorTranslationKey(errorMsg) : null;
         const friendlyError = errorKey

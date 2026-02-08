@@ -16,17 +16,17 @@ import {
 } from '@mui/icons-material';
 
 /**
- * FormField 結合了 TextField 和錯誤處理。
+ * FormField combines TextField with error handling.
  *
- * ## 特色
- * - 與 react-hook-form 完美整合
- * - 自動顯示驗證錯誤
- * - 支援 Zod schema 驗證
- * - 保留 TextField 的所有功能
+ * ## Features
+ * - Perfect integration with react-hook-form
+ * - Automatic validation error display
+ * - Support for Zod schema validation
+ * - Retains all TextField functionality
  *
- * ## 使用場景
- * - 任何需要驗證的表單欄位
- * - 與 react-hook-form 一起使用
+ * ## Use Cases
+ * - Any form field requiring validation
+ * - Use with react-hook-form
  */
 const meta = {
   title: 'Molecules/FormField',
@@ -36,7 +36,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '結合 TextField 和錯誤處理的表單欄位，與 react-hook-form 完美整合。',
+          'Form field combining TextField and error handling with perfect react-hook-form integration.',
       },
     },
   },
@@ -54,67 +54,70 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 基本用法
- * 沒有錯誤的正常狀態
+ * Basic usage
+ * Normal state without errors
  */
 export const Default: Story = {
   args: {
     label: 'Email',
     placeholder: 'user@example.com',
-    helperText: '請輸入您的電子郵件地址',
+    helperText: 'Please enter your email address',
   },
 };
 
 /**
- * 帶錯誤訊息
- * 顯示驗證錯誤
+ * With error message
+ * Display validation errors
  */
 export const WithError: Story = {
   args: {
-    label: '使用者名稱',
+    label: 'Username',
     defaultValue: 'ab',
-    error: '使用者名稱必須至少 3 個字元',
+    error: 'Username must be at least 3 characters',
   },
 };
 
 /**
- * react-hook-form 錯誤物件
- * 接受 FieldError 物件
+ * react-hook-form error object
+ * Accepts FieldError object
  */
 export const WithFieldError: Story = {
   args: {
-    label: '密碼',
+    label: 'Password',
     type: 'password',
     defaultValue: '123',
     error: {
       type: 'minLength',
-      message: '密碼長度必須至少 8 個字元',
+      message: 'Password must be at least 8 characters',
     },
   },
 };
 
 /**
- * 必填欄位
+ * Required field
  */
 export const Required: Story = {
   args: {
     label: 'Email',
     required: true,
-    helperText: '此欄位為必填',
+    helperText: 'This field is required',
   },
 };
 
 /**
- * 完整的表單範例
- * 使用 react-hook-form + Zod 驗證
+ * Complete form example
+ * Using react-hook-form + Zod validation
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
-    // 定義 Zod schema
+    // Define Zod schema
     const schema = z.object({
-      email: z.string().email('請輸入有效的電子郵件地址'),
-      username: z.string().min(3, '使用者名稱至少需要 3 個字元'),
-      age: z.number().min(18, '您必須年滿 18 歲').max(120, '請輸入有效的年齡'),
+      email: z.string().email('Please enter a valid email address'),
+      username: z.string().min(3, 'Username must be at least 3 characters'),
+      age: z
+        .number()
+        .min(18, 'You must be 18 or older')
+        .max(120, 'Please enter a valid age'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -128,16 +131,16 @@ export const FormExample: Story = {
     });
 
     const onSubmit = async (data: FormData) => {
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('表單資料:', data);
-      alert('提交成功！查看 Console');
+      console.log('Form data:', data);
+      alert('Submitted successfully! Check Console');
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">註冊表單</Typography>
+          <Typography variant="h6">Registration Form</Typography>
 
           <FormField
             label="Email"
@@ -145,23 +148,23 @@ export const FormExample: Story = {
             placeholder="user@example.com"
             {...register('email')}
             error={errors.email}
-            helperText="我們不會分享您的 Email"
+            helperText="We won't share your email"
           />
 
           <FormField
-            label="使用者名稱"
-            placeholder="輸入使用者名稱"
+            label="Username"
+            placeholder="Enter username"
             {...register('username')}
             error={errors.username}
-            helperText="至少 3 個字元"
+            helperText="At least 3 characters"
           />
 
           <FormField
-            label="年齡"
+            label="Age"
             type="number"
             {...register('age', { valueAsNumber: true })}
             error={errors.age}
-            helperText="必須年滿 18 歲"
+            helperText="Must be 18 or older"
           />
 
           <Button
@@ -170,7 +173,7 @@ export const FormExample: Story = {
             fullWidth
             loading={isSubmitting}
           >
-            提交
+            Submit
           </Button>
         </Stack>
       </form>
@@ -179,14 +182,14 @@ export const FormExample: Story = {
 };
 
 /**
- * 登入表單範例
- * 簡單的 Email + 密碼表單
+ * Login form example
+ * Simple Email + Password form
  */
 export const LoginForm: Story = {
   render: function LoginFormComponent() {
     const schema = z.object({
-      email: z.string().email('請輸入有效的 Email'),
-      password: z.string().min(8, '密碼至少需要 8 個字元'),
+      email: z.string().email('Please enter a valid email'),
+      password: z.string().min(8, 'Password must be at least 8 characters'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -201,14 +204,14 @@ export const LoginForm: Story = {
 
     const onSubmit = async (data: FormData) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('登入資料:', data);
-      alert('登入成功！');
+      console.log('Login data:', data);
+      alert('Login successful!');
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">登入</Typography>
+          <Typography variant="h6">Login</Typography>
 
           <FormField
             label="Email"
@@ -219,9 +222,9 @@ export const LoginForm: Story = {
           />
 
           <FormField
-            label="密碼"
+            label="Password"
             type="password"
-            placeholder="輸入密碼"
+            placeholder="Enter password"
             {...register('password')}
             error={errors.password}
           />
@@ -232,7 +235,7 @@ export const LoginForm: Story = {
             fullWidth
             loading={isSubmitting}
           >
-            登入
+            Login
           </Button>
         </Stack>
       </form>
@@ -241,13 +244,13 @@ export const LoginForm: Story = {
 };
 
 /**
- * 即時驗證
- * 使用 mode: 'onChange' 進行即時驗證
+ * Realtime validation
+ * Using mode: 'onChange' for realtime validation
  */
 export const RealtimeValidation: Story = {
   render: function RealtimeValidationComponent() {
     const schema = z.object({
-      email: z.string().email('請輸入有效的 Email'),
+      email: z.string().email('Please enter a valid email'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -258,7 +261,7 @@ export const RealtimeValidation: Story = {
       formState: { errors },
     } = useForm<FormData>({
       resolver: zodResolver(schema),
-      mode: 'onChange', // 即時驗證
+      mode: 'onChange', // Realtime validation
     });
 
     const onSubmit = (data: FormData) => {
@@ -269,7 +272,7 @@ export const RealtimeValidation: Story = {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">
-            開始輸入即可看到即時驗證
+            Start typing to see realtime validation
           </Typography>
 
           <FormField
@@ -280,7 +283,9 @@ export const RealtimeValidation: Story = {
             error={errors.email}
           />
 
-          {!errors.email && <Alert severity="success">Email 格式正確！</Alert>}
+          {!errors.email && (
+            <Alert severity="success">Email format is correct!</Alert>
+          )}
         </Stack>
       </form>
     );
@@ -288,114 +293,139 @@ export const RealtimeValidation: Story = {
 };
 
 /**
- * 帶前綴文字
- * 顯示單位或標籤在欄位前面（數值自動靠右）
+ * With start adornment
+ * Display unit or label before the field (numbers auto-align right)
  */
 export const WithStartAdornment: Story = {
   args: {
-    label: '價格',
+    label: 'Price',
     type: 'number',
     startAdornment: '$',
     placeholder: '0.00',
-    helperText: '請輸入產品價格（數值自動靠右對齊）',
+    helperText: 'Enter product price (numbers auto-align right)',
   },
 };
 
 /**
- * 帶後綴文字
- * 顯示單位在欄位後面
+ * With end adornment
+ * Display unit after the field
  */
 export const WithEndAdornment: Story = {
   args: {
-    label: '重量',
+    label: 'Weight',
     type: 'number',
     endAdornment: 'kg',
     placeholder: '0',
-    helperText: '請輸入商品重量',
+    helperText: 'Enter product weight',
   },
 };
 
 /**
- * 前綴和後綴同時使用
- * 顯示貨幣符號和單位
+ * With both adornments
+ * Display currency symbol and unit
  */
 export const WithBothAdornments: Story = {
   args: {
-    label: '金額',
+    label: 'Amount',
     type: 'number',
     startAdornment: '$',
     endAdornment: 'USD',
     placeholder: '0.00',
-    helperText: '請輸入金額（美元）',
+    helperText: 'Enter amount (USD)',
   },
 };
 
 /**
- * 帶圖示前綴
- * 使用 MUI 圖示作為前綴
+ * With icon start
+ * Using MUI icon as prefix
  */
 export const WithIconStart: Story = {
   args: {
-    label: '搜尋',
+    label: 'Search',
     startAdornment: <SearchIcon />,
-    placeholder: '輸入關鍵字搜尋...',
+    placeholder: 'Enter keywords to search...',
   },
 };
 
 /**
- * 帶圖示後綴
- * 使用 MUI 圖示作為後綴
+ * With icon end
+ * Using MUI icon as suffix
  */
 export const WithIconEnd: Story = {
   args: {
-    label: '使用者名稱',
+    label: 'Username',
     endAdornment: <PersonIcon />,
-    placeholder: '請輸入使用者名稱',
+    placeholder: 'Enter username',
   },
 };
 
 /**
- * 各種單位範例
- * 展示不同的單位標籤
+ * Various Unit Examples
+ * Demonstrates different unit labels
  */
 export const UnitsExamples: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">各種單位範例</Typography>
+      <Typography variant="h6">Various Unit Examples</Typography>
 
       <FormField
-        label="價格"
+        label="Price"
         type="number"
         startAdornment="$"
         placeholder="0.00"
       />
 
-      <FormField label="折扣" type="number" endAdornment="%" placeholder="0" />
+      <FormField
+        label="Discount"
+        type="number"
+        endAdornment="%"
+        placeholder="0"
+      />
 
-      <FormField label="重量" type="number" endAdornment="kg" placeholder="0" />
+      <FormField
+        label="Weight"
+        type="number"
+        endAdornment="kg"
+        placeholder="0"
+      />
 
-      <FormField label="距離" type="number" endAdornment="km" placeholder="0" />
+      <FormField
+        label="Distance"
+        type="number"
+        endAdornment="km"
+        placeholder="0"
+      />
 
-      <FormField label="溫度" type="number" endAdornment="°C" placeholder="0" />
+      <FormField
+        label="Temperature"
+        type="number"
+        endAdornment="°C"
+        placeholder="0"
+      />
 
-      <FormField label="容量" type="number" endAdornment="L" placeholder="0" />
+      <FormField
+        label="Volume"
+        type="number"
+        endAdornment="L"
+        placeholder="0"
+      />
     </Stack>
   ),
 };
 
 /**
- * 各種圖示範例
- * 展示不同的圖示裝飾
+ * Various Icon Examples
+ * Demonstrates different icon decorations
  */
 export const IconExamples: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">各種圖示範例</Typography>
+      <Typography variant="h6">Various Icon Examples</Typography>
 
       <FormField
-        label="搜尋"
+        label="Search"
         startAdornment={<SearchIcon />}
-        placeholder="輸入關鍵字..."
+        placeholder="Enter keywords..."
       />
 
       <FormField
@@ -405,30 +435,30 @@ export const IconExamples: Story = {
       />
 
       <FormField
-        label="電話"
+        label="Phone"
         startAdornment={<PhoneIcon />}
         placeholder="+886 912 345 678"
       />
 
       <FormField
-        label="使用者名稱"
+        label="Username"
         startAdornment={<PersonIcon />}
         placeholder="username"
       />
 
       <FormField
-        label="密碼"
+        label="Password"
         type="password"
         startAdornment={<LockIcon />}
-        placeholder="輸入密碼"
+        placeholder="Enter password"
       />
     </Stack>
   ),
 };
 
 /**
- * 貨幣輸入範例
- * 實際的金額輸入應用
+ * Currency Input Example
+ * Actual amount input application
  */
 export const CurrencyInput: Story = {
   render: function CurrencyInputComponent() {
@@ -439,7 +469,7 @@ export const CurrencyInput: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0 && num <= 1000000;
         },
-        { message: '金額必須在 0 到 1,000,000 之間' },
+        { message: 'Amount must be between 0 and 1,000,000' },
       ),
       discount: z.string().refine(
         (val) => {
@@ -447,7 +477,7 @@ export const CurrencyInput: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0 && num <= 100;
         },
-        { message: '折扣必須在 0% 到 100% 之間' },
+        { message: 'Discount must be between 0% and 100%' },
       ),
     });
 
@@ -467,7 +497,7 @@ export const CurrencyInput: Story = {
       },
     });
 
-    // 解析格式化的數字字串
+    // parse formatted number string
     const parseNumber = (str: string | undefined) => {
       if (!str || str === '') return 0;
       const cleaned = str.replace(/,/g, '');
@@ -487,30 +517,30 @@ export const CurrencyInput: Story = {
       const finalDisc = parseNumber(data.discount);
       const final = finalAmt * (1 - finalDisc / 100);
       alert(
-        `原價: $${finalAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n` +
-          `折扣: ${finalDisc}%\n` +
-          `實付: $${final.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+        `Original: $${finalAmt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n` +
+          `Discount: ${finalDisc}%\n` +
+          `Final: $${final.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       );
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">商品價格計算</Typography>
+          <Typography variant="h6">Product Price Calculation</Typography>
 
           <Controller
             name="amount"
             control={control}
             render={({ field }) => (
               <FormField
-                label="商品原價"
+                label="Original Price"
                 formatNumber
                 decimalPlaces={2}
                 startAdornment="$"
                 endAdornment="USD"
                 {...field}
                 error={errors.amount}
-                helperText="請輸入商品原價"
+                helperText="Enter Original Price"
               />
             )}
           />
@@ -520,28 +550,28 @@ export const CurrencyInput: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="折扣"
+                label="Discount"
                 formatNumber
                 decimalPlaces={0}
                 endAdornment="%"
                 {...field}
                 error={errors.discount}
-                helperText="請輸入折扣百分比"
+                helperText="Enter Discount percentage"
               />
             )}
           />
 
           <Alert severity="info">
             <Typography variant="body2">
-              <strong>原價：</strong>$
+              <strong>Original:</strong>$
               {amount.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
               <br />
-              <strong>折扣：</strong>
+              <strong>Discount:</strong>
               {discount}%<br />
-              <strong>實付金額：</strong>$
+              <strong>Final Amount:</strong>$
               {finalAmount.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
@@ -550,7 +580,7 @@ export const CurrencyInput: Story = {
           </Alert>
 
           <Button type="submit" variant="contained" fullWidth>
-            確認價格
+            Confirm Price
           </Button>
         </Stack>
       </form>
@@ -559,20 +589,20 @@ export const CurrencyInput: Story = {
 };
 
 /**
- * 產品規格表單
- * 實際的產品資訊輸入應用
+ * Product Specification Form
+ * Actual product information input application
  */
 export const ProductSpecForm: Story = {
   render: function ProductSpecFormComponent() {
     const schema = z.object({
-      name: z.string().min(1, '請輸入產品名稱'),
+      name: z.string().min(1, 'Enter product name'),
       price: z.string().refine(
         (val) => {
           if (!val) return false;
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0;
         },
-        { message: '價格不能為負數' },
+        { message: 'Price cannot be negative' },
       ),
       weight: z.string().refine(
         (val) => {
@@ -580,7 +610,7 @@ export const ProductSpecForm: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0;
         },
-        { message: '重量不能為負數' },
+        { message: 'Weight cannot be negative' },
       ),
       length: z.string().refine(
         (val) => {
@@ -588,7 +618,7 @@ export const ProductSpecForm: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0;
         },
-        { message: '長度不能為負數' },
+        { message: 'Length cannot be negative' },
       ),
       width: z.string().refine(
         (val) => {
@@ -596,7 +626,7 @@ export const ProductSpecForm: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0;
         },
-        { message: '寬度不能為負數' },
+        { message: 'Width cannot be negative' },
       ),
       height: z.string().refine(
         (val) => {
@@ -604,7 +634,7 @@ export const ProductSpecForm: Story = {
           const num = parseFloat(val.replace(/,/g, ''));
           return !isNaN(num) && num >= 0;
         },
-        { message: '高度不能為負數' },
+        { message: 'Height cannot be negative' },
       ),
     });
 
@@ -630,35 +660,35 @@ export const ProductSpecForm: Story = {
     const onSubmit = async (data: FormData) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // 將格式化的字串轉換回數字顯示
+      // Convert formatted string back to number for display
       const parseNumber = (str: string) =>
         parseFloat(str.replace(/,/g, '')) || 0;
 
-      console.log('產品資料（原始值）:', data);
+      console.log('Product data (raw values):', data);
       alert(
-        `產品名稱: ${data.name}\n` +
-          `售價: $${parseNumber(data.price).toLocaleString()} TWD\n` +
-          `重量: ${parseNumber(data.weight).toLocaleString()} kg\n` +
-          `長度: ${parseNumber(data.length).toLocaleString()} cm\n` +
-          `寬度: ${parseNumber(data.width).toLocaleString()} cm\n` +
-          `高度: ${parseNumber(data.height).toLocaleString()} cm`,
+        `Product Name: ${data.name}\n` +
+          `Price: $${parseNumber(data.price).toLocaleString()} TWD\n` +
+          `Weight: ${parseNumber(data.weight).toLocaleString()} kg\n` +
+          `Length: ${parseNumber(data.length).toLocaleString()} cm\n` +
+          `Width: ${parseNumber(data.width).toLocaleString()} cm\n` +
+          `Height: ${parseNumber(data.height).toLocaleString()} cm`,
       );
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">新增產品</Typography>
+          <Typography variant="h6">Add Product</Typography>
 
           <Controller
             name="name"
             control={control}
             render={({ field }) => (
               <FormField
-                label="產品名稱"
+                label="Product Name"
                 {...field}
                 error={errors.name}
-                placeholder="輸入產品名稱"
+                placeholder="Enter Product Name"
               />
             )}
           />
@@ -668,7 +698,7 @@ export const ProductSpecForm: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="售價"
+                label="Price"
                 formatNumber
                 decimalPlaces={2}
                 startAdornment="$"
@@ -684,7 +714,7 @@ export const ProductSpecForm: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="重量"
+                label="Weight"
                 formatNumber
                 decimalPlaces={2}
                 endAdornment="kg"
@@ -695,7 +725,7 @@ export const ProductSpecForm: Story = {
           />
 
           <Typography variant="subtitle2" sx={{ mt: 2 }}>
-            尺寸規格
+            Dimensions
           </Typography>
 
           <Controller
@@ -703,7 +733,7 @@ export const ProductSpecForm: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="長度"
+                label="Length"
                 formatNumber
                 decimalPlaces={1}
                 endAdornment="cm"
@@ -718,7 +748,7 @@ export const ProductSpecForm: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="寬度"
+                label="Width"
                 formatNumber
                 decimalPlaces={1}
                 endAdornment="cm"
@@ -733,7 +763,7 @@ export const ProductSpecForm: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="高度"
+                label="Height"
                 formatNumber
                 decimalPlaces={1}
                 endAdornment="cm"
@@ -749,7 +779,7 @@ export const ProductSpecForm: Story = {
             fullWidth
             loading={isSubmitting}
           >
-            儲存產品
+            Save Product
           </Button>
         </Stack>
       </form>
@@ -758,70 +788,70 @@ export const ProductSpecForm: Story = {
 };
 
 /**
- * 文字對齊方式
- * 展示不同的對齊選項
+ * Text Alignment
+ * Demonstrates different alignment options
  */
 export const TextAlignment: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">文字對齊方式</Typography>
+      <Typography variant="h6">Text Alignment</Typography>
 
       <FormField
-        label="靠左對齊（預設）"
+        label="Left aligned (default)"
         textAlign="left"
         defaultValue="Left aligned text"
         helperText="textAlign='left'"
       />
 
       <FormField
-        label="靠右對齊"
+        label="Right aligned"
         textAlign="right"
         defaultValue="Right aligned text"
         helperText="textAlign='right'"
       />
 
       <FormField
-        label="置中對齊"
+        label="Center aligned"
         textAlign="center"
         defaultValue="Center aligned text"
         helperText="textAlign='center'"
       />
 
       <FormField
-        label="自動對齊（數值）"
+        label="Auto aligned (numbers)"
         type="number"
         textAlign="auto"
         defaultValue={12345}
-        helperText="textAlign='auto' - 數值自動靠右"
+        helperText="textAlign='auto' - Numbers auto-align right"
       />
 
       <FormField
-        label="自動對齊（文字）"
+        label="Auto aligned (text)"
         textAlign="auto"
         defaultValue="Auto aligned text"
-        helperText="textAlign='auto' - 文字自動靠左"
+        helperText="textAlign='auto' - Text auto-aligns left"
       />
 
       <FormField
-        label="強制靠左（數值）"
+        label="Force left (numbers)"
         type="number"
         textAlign="left"
         defaultValue={12345}
-        helperText="數值也可以強制靠左"
+        helperText="Numbers can be forced left"
       />
     </Stack>
   ),
 };
 
 /**
- * 帶圖示的登入表單
- * 結合圖示裝飾的實際應用
+ * Login Form with Icons
+ * Practical application with icon decoration
  */
 export const LoginWithIcons: Story = {
   render: function LoginWithIconsComponent() {
     const schema = z.object({
-      email: z.string().email('請輸入有效的 Email'),
-      password: z.string().min(8, '密碼至少需要 8 個字元'),
+      email: z.string().email('Enter valid email'),
+      password: z.string().min(8, 'Password must be at least 8 characters'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -836,14 +866,14 @@ export const LoginWithIcons: Story = {
 
     const onSubmit = async (data: FormData) => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('登入資料:', data);
-      alert('登入成功！');
+      console.log('Login data:', data);
+      alert('Login successful!');
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">登入</Typography>
+          <Typography variant="h6">Login</Typography>
 
           <FormField
             label="Email"
@@ -855,10 +885,10 @@ export const LoginWithIcons: Story = {
           />
 
           <FormField
-            label="密碼"
+            label="Password"
             type="password"
             startAdornment={<LockIcon />}
-            placeholder="輸入密碼"
+            placeholder="Enter password"
             {...register('password')}
             error={errors.password}
           />
@@ -869,7 +899,7 @@ export const LoginWithIcons: Story = {
             fullWidth
             loading={isSubmitting}
           >
-            登入
+            Login
           </Button>
         </Stack>
       </form>
@@ -878,148 +908,152 @@ export const LoginWithIcons: Story = {
 };
 
 /**
- * 數字格式化 - 基本千分位
- * 自動加入千分位符號
+ * Number Formatting - Basic Thousands
+ * Auto-add thousands separator
  */
 export const NumberFormatting: Story = {
   args: {
-    label: '金額',
+    label: 'Amount',
     formatNumber: true,
     startAdornment: '$',
     defaultValue: '1234567.89',
-    helperText: '數字會自動加入千分位符號',
+    helperText: 'Numbers will auto-add thousands separator',
   },
 };
 
 /**
- * 數字格式化 - 對比
- * 格式化與非格式化的對比
+ * Number Formatting - Comparison
+ * Comparison between formatted and unformatted
  */
 export const NumberFormattingComparison: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">格式化對比</Typography>
+      <Typography variant="h6">Formatting Comparison</Typography>
 
       <FormField
-        label="未格式化"
+        label="Unformatted"
         type="number"
         startAdornment="$"
         defaultValue={1234567.89}
-        helperText="type='number' - 無千分位符號"
+        helperText="type='number' - No thousands separator"
       />
 
       <FormField
-        label="已格式化"
+        label="Formatted"
         formatNumber
         startAdornment="$"
         defaultValue="1234567.89"
-        helperText="formatNumber={true} - 自動加入千分位"
+        helperText="formatNumber={true} - Auto-add thousands separator"
       />
 
       <Alert severity="info">
-        啟用 formatNumber 後，輸入時會移除格式方便編輯，失焦後自動格式化顯示
+        When formatNumber is enabled, formatting is removed on focus for easier
+        editing, and automatically formatted on blur
       </Alert>
     </Stack>
   ),
 };
 
 /**
- * 數字格式化 - 不同語系
- * 展示不同語系的格式化規則
+ * Number Formatting - Different Locales
+ * Demonstrates formatting rules for different locales
  */
 export const NumberFormattingLocales: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">不同語系的格式化</Typography>
+      <Typography variant="h6">Formatting for Different Locales</Typography>
 
       <FormField
-        label="美國格式 (en-US)"
+        label="US Format (en-US)"
         formatNumber
         numberLocale="en-US"
         startAdornment="$"
         defaultValue="1234567.89"
-        helperText="1,234,567.89 - 使用逗號和點"
+        helperText="1,234,567.89 - Uses comma and dot"
       />
 
       <FormField
-        label="台灣格式 (zh-TW)"
+        label="Taiwan Format (zh-TW)"
         formatNumber
         numberLocale="zh-TW"
         startAdornment="$"
         defaultValue="1234567.89"
-        helperText="1,234,567.89 - 與 en-US 相同"
+        helperText="1,234,567.89 - Same as en-US"
       />
 
       <FormField
-        label="德國格式 (de-DE)"
+        label="German Format (de-DE)"
         formatNumber
         numberLocale="de-DE"
         startAdornment="€"
         defaultValue="1234567.89"
-        helperText="1.234.567,89 - 使用點和逗號（相反）"
+        helperText="1.234.567,89 - Uses dot and comma (reversed)"
       />
 
-      <Alert severity="info">不同語系有不同的千分位和小數點符號規則</Alert>
+      <Alert severity="info">
+        Different locales have different rules for thousands and decimal
+        separators
+      </Alert>
     </Stack>
   ),
 };
 
 /**
- * 數字格式化 - 小數位數控制
- * 控制顯示的小數位數
+ * Number Formatting - Decimal Places Control
+ * Control the number of decimal places displayed
  */
 export const NumberFormattingDecimalPlaces: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">小數位數控制</Typography>
+      <Typography variant="h6">Decimal Places Control</Typography>
 
       <FormField
-        label="無小數限制"
+        label="No decimal limit"
         formatNumber
         startAdornment="$"
         defaultValue="1234.56789"
-        helperText="decimalPlaces 未設定 - 顯示所有小數"
+        helperText="decimalPlaces not set - Show all decimals"
       />
 
       <FormField
-        label="2 位小數"
+        label="2 decimal places"
         formatNumber
         decimalPlaces={2}
         startAdornment="$"
         defaultValue="1234.56789"
-        helperText="decimalPlaces={2} - 固定 2 位小數"
+        helperText="decimalPlaces={2} - Fixed 2 decimal places"
       />
 
       <FormField
-        label="0 位小數"
+        label="0 decimal places"
         formatNumber
         decimalPlaces={0}
         defaultValue="1234.56789"
-        helperText="decimalPlaces={0} - 只顯示整數"
+        helperText="decimalPlaces={0} - Only show integers"
       />
 
       <FormField
-        label="4 位小數"
+        label="4 decimal places"
         formatNumber
         decimalPlaces={4}
         startAdornment="$"
         defaultValue="1234.5678"
-        helperText="decimalPlaces={4} - 4 位小數（精確計算用）"
+        helperText="decimalPlaces={4} - 4 decimal places (for precise calculations)"
       />
     </Stack>
   ),
 };
 
 /**
- * 數字格式化 - 實際應用範例
- * 結合格式化的完整表單
+ * Number Formatting - Real World Example
+ * Complete form with formatting
  */
 export const NumberFormattingRealWorld: Story = {
   render: function NumberFormattingRealWorldComponent() {
     const schema = z.object({
-      salary: z.string().min(1, '請輸入年薪'),
-      bonus: z.string().min(1, '請輸入獎金'),
-      investment: z.string().min(1, '請輸入投資金額'),
+      salary: z.string().min(1, 'Enter Annual Salary'),
+      bonus: z.string().min(1, 'Enter Bonus'),
+      investment: z.string().min(1, 'Enter Investment Amount'),
     });
 
     type FormData = z.infer<typeof schema>;
@@ -1039,7 +1073,7 @@ export const NumberFormattingRealWorld: Story = {
       },
     });
 
-    // 計算總額
+    // Calculate total amount
     const parseNumber = (str: string) => {
       if (!str) return 0;
       return parseFloat(str.replace(/,/g, '')) || 0;
@@ -1051,33 +1085,33 @@ export const NumberFormattingRealWorld: Story = {
     const total = salary + bonus + investment;
 
     const onSubmit = (data: FormData) => {
-      console.log('表單資料（原始值）:', data);
+      console.log('Form data (raw values):', data);
       alert(
-        `年薪: $${parseNumber(data.salary).toLocaleString()}\n` +
-          `獎金: $${parseNumber(data.bonus).toLocaleString()}\n` +
-          `投資: $${parseNumber(data.investment).toLocaleString()}\n` +
-          `總計: $${total.toLocaleString()}`,
+        `Annual Salary: $${parseNumber(data.salary).toLocaleString()}\n` +
+          `Bonus: $${parseNumber(data.bonus).toLocaleString()}\n` +
+          `Investment: $${parseNumber(data.investment).toLocaleString()}\n` +
+          `Total: $${total.toLocaleString()}`,
       );
     };
 
     return (
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
-          <Typography variant="h6">財務規劃表單</Typography>
+          <Typography variant="h6">Financial Planning Form</Typography>
 
           <Controller
             name="salary"
             control={control}
             render={({ field }) => (
               <FormField
-                label="年薪"
+                label="Annual Salary"
                 formatNumber
                 decimalPlaces={2}
                 startAdornment="$"
                 endAdornment="TWD"
                 {...field}
                 error={errors.salary}
-                helperText="請輸入您的年薪"
+                helperText="Enter your annual salary"
               />
             )}
           />
@@ -1087,14 +1121,14 @@ export const NumberFormattingRealWorld: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="年終獎金"
+                label="Year-end Bonus"
                 formatNumber
                 decimalPlaces={2}
                 startAdornment="$"
                 endAdornment="TWD"
                 {...field}
                 error={errors.bonus}
-                helperText="請輸入預期的年終獎金"
+                helperText="Enter expected year-end bonus"
               />
             )}
           />
@@ -1104,21 +1138,21 @@ export const NumberFormattingRealWorld: Story = {
             control={control}
             render={({ field }) => (
               <FormField
-                label="投資金額"
+                label="Investment Amount"
                 formatNumber
                 decimalPlaces={2}
                 startAdornment="$"
                 endAdornment="TWD"
                 {...field}
                 error={errors.investment}
-                helperText="請輸入計劃投資金額"
+                helperText="Enter planned investment amount"
               />
             )}
           />
 
           <Alert severity="success">
             <Typography variant="body2">
-              <strong>總收入預估：</strong>$
+              <strong>Total Income Estimate:</strong>$
               {total.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
@@ -1128,11 +1162,12 @@ export const NumberFormattingRealWorld: Story = {
           </Alert>
 
           <Alert severity="info">
-            所有數值會自動格式化為千分位顯示，但提交時保持原始數值
+            All numbers will be formatted with thousands separator for display,
+            but maintain original values when submitting
           </Alert>
 
           <Button type="submit" variant="contained" fullWidth>
-            提交
+            Submit
           </Button>
         </Stack>
       </form>
@@ -1141,8 +1176,8 @@ export const NumberFormattingRealWorld: Story = {
 };
 
 /**
- * 數字格式化 - 互動示範
- * 即時展示格式化效果
+ * Number Formatting - Interactive Demo
+ * Real-time formatting effect display
  */
 export const NumberFormattingInteractive: Story = {
   render: function NumberFormattingInteractiveComponent() {
@@ -1165,32 +1200,32 @@ export const NumberFormattingInteractive: Story = {
 
     return (
       <Stack spacing={2}>
-        <Typography variant="h6">互動式格式化展示</Typography>
+        <Typography variant="h6">Interactive Formatting Demo</Typography>
 
         <Controller
           name="amount"
           control={control}
           render={({ field }) => (
             <FormField
-              label="輸入金額"
+              label="Enter Amount"
               formatNumber
               decimalPlaces={2}
               startAdornment="$"
               {...field}
-              helperText="聚焦時移除格式，失焦時自動格式化"
+              helperText="Remove format on focus, auto-format on blur"
             />
           )}
         />
 
         <Alert severity="info">
           <Typography variant="body2">
-            <strong>當前輸入值：</strong>
+            <strong>Current Input Value:</strong>
             {amount}
             <br />
-            <strong>數值：</strong>
+            <strong>Numeric Value:</strong>
             {numericValue}
             <br />
-            <strong>格式化顯示：</strong>
+            <strong>Formatted Display:</strong>
             {numericValue.toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -1200,12 +1235,12 @@ export const NumberFormattingInteractive: Story = {
 
         <Alert severity="warning">
           <Typography variant="body2">
-            <strong>使用提示：</strong>
+            <strong>Usage Tips:</strong>
             <br />
-            • 點擊欄位聚焦時，會顯示原始數值方便編輯
+            • When focused, displays raw numeric value for easier editing
             <br />
-            • 點擊其他地方失焦後，會自動格式化顯示
-            <br />• 表單提交時會取得原始數值（無逗號）
+            • When blurred, automatically formats the display
+            <br />• Form submission receives raw numeric value (without commas)
           </Typography>
         </Alert>
       </Stack>

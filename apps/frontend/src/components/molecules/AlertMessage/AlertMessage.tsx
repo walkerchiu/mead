@@ -6,42 +6,42 @@ import CloseIcon from '@mui/icons-material/Close';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 /**
- * AlertMessage 組件 - Atomic Design: Molecule
+ * AlertMessage Component - Atomic Design: Molecule
  *
- * **用途：所有內嵌訊息顯示**
+ * **Purpose: All inline message display**
  *
- * 適用場景：
- * - 表單驗證結果
- * - 操作成功/失敗回饋
- * - API 錯誤提示
- * - 頁面內通知
- * - 警告和資訊提示
+ * Use cases:
+ * - Form validation results
+ * - Operation success/failure feedback
+ * - API error messages
+ * - In-page notification
+ * - Warning and information prompts
  *
- * **注意**：頁面級錯誤請使用 ErrorDisplay 組件
+ * **Note**：For page-level errors, use ErrorDisplay component
  *
  * @example
  * ```tsx
- * // 基本使用
+ * // basic usage
  * <AlertMessage severity="success">
- *   操作已成功完成
+ *   Operation completed successfully
  * </AlertMessage>
  *
- * // 帶重試功能
+ * // With retry feature
  * <AlertMessage
  *   severity="error"
  *   showRetry
  *   onRetry={handleRetry}
  * >
- *   無法連線到伺服器
+ *   Unable to connect to server
  * </AlertMessage>
  *
- * // 帶標題和自訂操作
+ * // with title and custom actions
  * <AlertMessage
  *   severity="warning"
- *   title="警告"
- *   action={<Button size="small">了解更多</Button>}
+ *   title="Warning"
+ *   action={<Button size="small">Learn more</Button>}
  * >
- *   您的密碼即將過期
+ *   Your password will expire soon
  * </AlertMessage>
  * ```
  */
@@ -51,48 +51,48 @@ export interface AlertMessageProps extends Omit<
   'title' | 'action'
 > {
   /**
-   * 訊息類型
+   * message type
    */
   severity?: 'success' | 'error' | 'warning' | 'info';
 
   /**
-   * 標題（可選）
+   * Title（Optional）
    */
   title?: string;
 
   /**
-   * 是否可關閉
+   * whetherclosable
    */
   closable?: boolean;
 
   /**
-   * 關閉時的回調
+   * callback on close
    */
   onClose?: () => void;
 
   /**
-   * 是否顯示重試按鈕
+   * whether to showRetryButton
    */
   showRetry?: boolean;
 
   /**
-   * 重試按鈕文字
+   * RetryButtontext
    */
   retryText?: string;
 
   /**
-   * 重試回調函數
+   * Retrycallback function
    */
   onRetry?: () => void;
 
   /**
-   * 自訂操作按鈕（會取代重試按鈕）
+   * custom action button (will replace retry button)
    */
   action?: React.ReactNode;
 }
 
 /**
- * AlertMessage 組件 - 用於所有內嵌訊息顯示
+ * AlertMessage component - for all inline message display
  */
 export function AlertMessage({
   severity = 'info',
@@ -100,20 +100,20 @@ export function AlertMessage({
   closable = false,
   onClose,
   showRetry = false,
-  retryText = '重試',
+  retryText = 'Retry',
   onRetry,
   action,
   children,
   ...props
 }: AlertMessageProps) {
-  // 決定 action 內容
+  // determine action Content
   let actionContent: React.ReactNode = undefined;
 
   if (action) {
-    // 優先使用自訂 action
+    // prioritize usingcustom action
     actionContent = action;
   } else if (showRetry && onRetry) {
-    // 顯示重試按鈕
+    // show retry button
     actionContent = (
       <Button
         color="inherit"
@@ -125,10 +125,10 @@ export function AlertMessage({
       </Button>
     );
   } else if (closable && onClose) {
-    // 顯示關閉按鈕
+    // Show close button
     actionContent = (
       <IconButton
-        aria-label="關閉"
+        aria-label="close"
         color="inherit"
         size="small"
         onClick={onClose}

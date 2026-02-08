@@ -9,17 +9,17 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 /**
- * AuthLayout 模板 - Atomic Design: Template
+ * AuthLayout Template - Atomic Design: Template
  *
- * 認證頁面的統一佈局模板，包含：
- * - 居中的卡片容器
- * - 響應式設計
- * - 品牌 Logo/標題區域
- * - Footer 連結
+ * Unified layout template for authentication pages, includes:
+ * - Centered card container
+ * - Responsive design
+ * - Brand Logo/Title area
+ * - Footer links
  *
  * @example
  * ```tsx
- * <AuthLayout title="歡迎回來">
+ * <AuthLayout title="Welcome back">
  *   <LoginForm onSubmit={handleLogin} />
  * </AuthLayout>
  * ```
@@ -27,43 +27,43 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 export interface AuthLayoutProps {
   /**
-   * 子組件內容 (通常是表單)
+   * ChildcomponentContent (typically a form)
    */
   children: ReactNode;
 
   /**
-   * 頁面標題
+   * Page title
    */
   title?: string;
 
   /**
-   * 副標題/描述
+   * Subtitle/Description
    */
   subtitle?: string;
 
   /**
-   * 是否顯示 Logo
+   * whether to show Logo
    */
   showLogo?: boolean;
 
   /**
-   * 是否顯示 Footer
+   * whether to show Footer
    */
   showFooter?: boolean;
 
   /**
-   * 背景顏色模式
+   * Background color mode
    */
   background?: 'gradient' | 'solid' | 'image';
 
   /**
-   * 最大寬度
+   * Maximum width
    */
   maxWidth?: number;
 }
 
 /**
- * AuthLayout 組件
+ * AuthLayout component
  */
 export function AuthLayout({
   children,
@@ -77,7 +77,7 @@ export function AuthLayout({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // 背景樣式
+  // background style
   const getBackgroundStyle = () => {
     switch (background) {
       case 'gradient':
@@ -109,7 +109,7 @@ export function AuthLayout({
         ...getBackgroundStyle(),
       }}
     >
-      {/* 主要內容區域 */}
+      {/* Main content area */}
       <Container
         maxWidth="lg"
         sx={{
@@ -130,7 +130,7 @@ export function AuthLayout({
             backgroundColor: 'background.paper',
           }}
         >
-          {/* Logo 區域 */}
+          {/* logo area */}
           {showLogo && (
             <Box
               sx={{
@@ -174,7 +174,7 @@ export function AuthLayout({
             </Box>
           )}
 
-          {/* 表單內容 */}
+          {/* formContent */}
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
             {children}
           </Box>

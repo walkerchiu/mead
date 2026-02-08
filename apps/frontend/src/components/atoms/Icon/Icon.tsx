@@ -3,42 +3,42 @@ import Box from '@mui/material/Box';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Icon 組件 - Atomic Design: Atom
+ * Icon Component - Atomic Design: Atom
  *
- * 圖示組件，用於顯示各種圖示。
+ * Icon component for displaying various icons.
  *
  * @example
  * ```tsx
- * // Emoji 圖示
+ * // Emoji icon
  * <Icon>🏠</Icon>
  * <Icon size="large">⭐</Icon>
  *
- * // 帶顏色
+ * // With color
  * <Icon color="primary">❤️</Icon>
  *
- * // 自訂大小
+ * // Custom size
  * <Icon fontSize={32}>🎨</Icon>
  * ```
  */
 
 export interface IconProps {
   /**
-   * 圖示內容（emoji、SVG 或自訂內容）
+   * Icon content (emoji, SVG or custom content)
    */
   children: React.ReactNode;
 
   /**
-   * 預設大小
+   * Default size
    */
   size?: 'small' | 'medium' | 'large';
 
   /**
-   * 自訂字體大小（像素）
+   * Custom font size (pixels)
    */
   fontSize?: number;
 
   /**
-   * 顏色
+   * Color
    */
   color?:
     | 'inherit'
@@ -52,7 +52,7 @@ export interface IconProps {
     | string;
 
   /**
-   * 自訂樣式
+   * Custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -75,7 +75,7 @@ const colorMap = {
 };
 
 /**
- * Icon 組件
+ * Icon component
  */
 export const Icon = forwardRef<HTMLDivElement, IconProps>(function Icon(
   { children, size = 'medium', fontSize, color = 'inherit', sx, ...props },

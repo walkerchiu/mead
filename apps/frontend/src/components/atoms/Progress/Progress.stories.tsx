@@ -14,20 +14,20 @@ const meta = {
     type: {
       control: 'select',
       options: ['linear', 'circular'],
-      description: '進度類型',
+      description: 'Progress type',
     },
     value: {
       control: { type: 'range', min: 0, max: 100, step: 1 },
-      description: '進度值',
+      description: 'Progress value',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
-      description: '顏色',
+      description: 'Color',
     },
     showLabel: {
       control: 'boolean',
-      description: '是否顯示標籤',
+      description: 'Whether to show label',
     },
   },
 } satisfies Meta<typeof Progress>;
@@ -181,7 +181,7 @@ export const CustomLabel: Story = {
         type="circular"
         value={60}
         showLabel
-        labelFormatter={(v) => `${v}個`}
+        labelFormatter={(v) => `${v}items`}
         size={60}
       />
       <Progress
@@ -195,7 +195,7 @@ export const CustomLabel: Story = {
         type="circular"
         value={90}
         showLabel
-        labelFormatter={(v) => `完成度\n${v}%`}
+        labelFormatter={(v) => `Progress\n${v}%`}
         size={80}
       />
     </Box>

@@ -30,19 +30,19 @@ const StyledButton = styled(MuiButton, {
 });
 
 /**
- * Button 組件 - Atomic Design: Atom
+ * Button Component - Atomic Design: Atom
  *
- * 基於 MUI Button 的封裝，提供統一的按鈕樣式和行為。
- * 支援載入狀態、全寬度、各種尺寸和顏色變體。
+ * Wrapper based on MUI Button, provides unified button styles and behavior.
+ * Supports loading state, full width, various sizes and color variants.
  *
  * @example
  * ```tsx
  * <Button variant="contained" color="primary">
- *   點擊我
+ *   click me
  * </Button>
  *
  * <Button variant="outlined" loading>
- *   載入中...
+ *   loading...
  * </Button>
  * ```
  */
@@ -52,34 +52,34 @@ export interface ButtonProps extends Omit<
   'endIcon' | 'startIcon' | 'variant'
 > {
   /**
-   * 是否顯示載入狀態
-   * 載入時按鈕會被停用，並顯示載入指示器
+   * whether to show loading state
+   * button will be disabled when loading，and show loading indicator
    */
   loading?: boolean;
 
   /**
-   * 按鈕是否佔滿父容器寬度
+   * Whether button fills parent container width
    */
   fullWidth?: boolean;
 
   /**
-   * 開始圖示（loading 時會被替換）
+   * Start icon（Will be replaced when loading）
    */
   startIcon?: React.ReactNode;
 
   /**
-   * 結束圖示
+   * End icon
    */
   endIcon?: React.ReactNode;
 
   /**
-   * 按鈕樣式
+   * Button style
    */
   variant?: ButtonVariant;
 }
 
 /**
- * Button 組件
+ * Button component
  */
 export function Button({
   children,

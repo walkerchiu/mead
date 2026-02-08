@@ -118,7 +118,7 @@ export default function TwoFactorSettings() {
 
       enqueueSnackbar(t('enableSuccess'), { variant: 'success' });
 
-      // ✅ 在成功提示後非同步更新狀態
+      // ✅ Asynchronously update state after success message
       refetch();
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, t('verificationFailed'));
@@ -161,7 +161,7 @@ export default function TwoFactorSettings() {
 
       enqueueSnackbar(t('disableSuccess'), { variant: 'success' });
 
-      // ✅ 在成功提示後非同步更新狀態
+      // ✅ Asynchronously update state after success message
       refetch();
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, t('verificationFailed'));

@@ -28,29 +28,29 @@ import {
 
 export interface MainAppBarProps {
   /**
-   * 頁面標題
+   * Page title text
    */
   title?: string;
   /**
-   * Logo 元素（ReactNode，例如圖片或自訂元素）
+   * Logo element (ReactNode, e.g., image or custom element)
    */
   logo?: ReactNode;
   /**
-   * 標題/Logo 的超連結路徑（點擊後導航的位置）
+   * Link URL for title/logo (optional)
    */
   titleLink?: string;
   /**
-   * 是否顯示返回按鈕（預設：false）
+   * Whether to show back button (default: false)
    */
   showBackButton?: boolean;
   /**
-   * 返回路徑（預設：/dashboard）
+   * Back path (default: /dashboard)
    */
   backPath?: string;
 
-  // 使用者相關
+  // User related
   /**
-   * 使用者資訊
+   * User information
    */
   user?: {
     name: string;
@@ -60,119 +60,127 @@ export interface MainAppBarProps {
     status?: 'online' | 'away' | 'busy' | 'offline';
   };
 
-  // 通知相關
+  // Notification related
   /**
-   * 通知列表
+   * Notification list
    */
   notifications?: Notification[];
   /**
-   * 未讀通知數量
+   * Unread notification count
    */
   unreadNotificationCount?: number;
   /**
-   * 點擊通知時的回調
+   * Callback when notification is clicked
    */
   onNotificationClick?: (notification: Notification) => void;
   /**
-   * 全部標記為已讀的回調
+   * Callback for mark all as read
    */
   onMarkAllNotificationsRead?: () => void;
   /**
-   * 查看全部通知的回調
+   * Callback for view all notifications
    */
   onViewAllNotifications?: () => void;
   /**
-   * 清除全部通知的回調
+   * Callback for clear all notifications
    */
   onClearAllNotifications?: () => void;
 
-  // 設定相關
+  // Settings related
   /**
-   * 當前主題
+   * Current theme
    */
   currentTheme?: 'light' | 'dark' | 'system';
   /**
-   * 主題變更的回調
+   * Callback when theme changes
    */
   onThemeChange?: (theme: 'light' | 'dark' | 'system') => void;
   /**
-   * 說明文件點擊的回調
+   * Callback when help is clicked
    */
   onHelpClick?: () => void;
   /**
-   * 關於點擊的回調
+   * Callback when about is clicked
    */
   onAboutClick?: () => void;
 
-  // 使用者操作
+  // User actions
   /**
-   * 帳號設定點擊的回調
+   * Callback when account settings is clicked
    */
   onAccountClick?: () => void;
   /**
-   * 個人資料點擊的回調
+   * Callback when profile is clicked
    */
   onProfileClick?: () => void;
   /**
-   * 安全設定點擊的回調
+   * Callback when security settings is clicked
    */
   onSecurityClick?: () => void;
   /**
-   * 登出的回調
+   * Callback when logout is clicked
    */
   onLogout?: () => void;
   /**
-   * 帳號設定 URL（預設：/settings/account）
+   * Account settings URL (default: /settings/account)
    */
   accountUrl?: string;
   /**
-   * 個人資料 URL（預設：/settings/profile）
+   * Profile URL (default: /settings/profile)
    */
   profileUrl?: string;
   /**
-   * 安全設定 URL（預設：/settings/security）
+   * Security settings URL (default: /settings/security)
    */
   securityUrl?: string;
 
-  // 顯示控制
+  // Display control
   /**
-   * 是否顯示通知功能（預設：true）
+   * Whether to show notification feature (default: true)
    */
   showNotifications?: boolean;
   /**
-   * 是否顯示使用者選單（預設：true）
+   * Whether to show user menu (default: true)
    */
   showUserMenu?: boolean;
   /**
-   * 是否顯示設定選單（預設：true）
+   * Whether to show settings menu (default: true)
    */
   showSettings?: boolean;
   /**
-   * 是否在 UserMenu 顯示使用者名稱（預設：false，響應式）
+   * Whether to show user name in UserMenu (default: false, responsive)
    */
   showUserName?: boolean;
   /**
-   * 是否顯示使用者狀態指示器（預設：false）
+   * Whether to show user status indicator (default: false)
    */
   showUserStatus?: boolean;
   /**
-   * 是否在通知、使用者、設定按鈕之間使用分隔線（預設：false）
+   * Whether to use dividers between notification, user, and settings buttons (default: false)
    */
   useButtonDividers?: boolean;
   /**
-   * 是否在語言切換前顯示分隔線（預設：true）
+   * Whether to show divider before language switcher (default: true)
    */
   separateLanguageSwitcher?: boolean;
   /**
-   * 使用者選單使用純圖示模式（與其他圖示統一風格，預設：false）
+   * User menu uses pure icon mode (unified style with other icons, default: false)
    */
   userIconMode?: boolean;
+  /**
+   * Custom content to the right of title (between title and right-side buttons)
+   */
+  centerContent?: ReactNode;
+  /**
+   * Extra action buttons to the left of notification button (between left content and right-side buttons)
+   */
+  extraActions?: ReactNode;
 }
 
 /**
- * 統一的應用程式導覽列元件
- * 包含標題/Logo、通知中心、語言切換、使用者選單、設定選單
- * 可選的返回按鈕和超連結功能
+ * Unified application navigation bar component
+ * Includes title/Logo, notification center, language switcher, user menu, and settings menu
+ * Optional back button and hyperlink functionality
  */
 export function MainAppBar({
   title,
@@ -206,6 +214,8 @@ export function MainAppBar({
   useButtonDividers = false,
   separateLanguageSwitcher = true,
   userIconMode = false,
+  centerContent,
+  extraActions,
 }: MainAppBarProps) {
   const router = useRouter();
   const tUser = useTranslations('components.userMenu');
@@ -215,7 +225,7 @@ export function MainAppBar({
     router.push(backPath);
   };
 
-  // 創建 UserMenu items (使用 i18n 標籤)
+  // Create UserMenu items (using i18n labels)
   const userMenuItems: UserMenuItem[] = createUserMenuItems({
     onAccountClick,
     onProfileClick,
@@ -230,7 +240,7 @@ export function MainAppBar({
     logoutLabel: tUser('logout'),
   });
 
-  // 創建 SettingsMenu items (使用 i18n 標籤)
+  // Create SettingsMenu items (using i18n labels)
   const settingsMenuItems: SettingsMenuItem[] = createSettingsMenuItems({
     onHelpClick,
     onAboutClick,
@@ -238,7 +248,7 @@ export function MainAppBar({
     aboutLabel: tSettings('about'),
   });
 
-  // 渲染標題/Logo 內容
+  // Render title/Logo content
   const renderTitleContent = () => {
     const content = (
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -251,7 +261,7 @@ export function MainAppBar({
       </Box>
     );
 
-    // 如果有設定連結，使用 Link 包裹
+    // If link is set, wrap with Link
     if (titleLink) {
       return (
         <MuiLink
@@ -278,7 +288,7 @@ export function MainAppBar({
   return (
     <AppBar position="static">
       <Toolbar>
-        {/* 左側：返回按鈕 + Logo + 標題 */}
+        {/* Left: Back button + Logo + Title */}
         {showBackButton && (
           <IconButton
             edge="start"
@@ -291,9 +301,31 @@ export function MainAppBar({
           </IconButton>
         )}
 
-        <Box sx={{ flexGrow: 1 }}>{renderTitleContent()}</Box>
+        {/* Title area (left side) */}
+        {(logo || title) && (
+          <Box sx={{ flexGrow: 0 }}>{renderTitleContent()}</Box>
+        )}
 
-        {/* 右側：功能按鈕群 */}
+        {/* Center custom content */}
+        {centerContent && (
+          <Box
+            sx={{ flexGrow: 0, mx: 2, display: 'flex', alignItems: 'center' }}
+          >
+            {centerContent}
+          </Box>
+        )}
+
+        {/* Spacer */}
+        <Box sx={{ flexGrow: 1 }} />
+
+        {/* Extra action buttons */}
+        {extraActions && (
+          <Box sx={{ mr: 2, display: 'flex', alignItems: 'center' }}>
+            {extraActions}
+          </Box>
+        )}
+
+        {/* Right: Feature button group */}
         <Box
           sx={{
             display: 'flex',
@@ -301,7 +333,7 @@ export function MainAppBar({
             alignItems: 'center',
           }}
         >
-          {/* 第一組：通知 */}
+          {/* Group 1: Notifications */}
           {showNotifications && (
             <NotificationMenu
               color="inherit"
@@ -315,7 +347,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 分隔線 1（可選） */}
+          {/* Divider 1 (optional) */}
           {useButtonDividers && showNotifications && showUserMenu && user && (
             <Divider
               orientation="vertical"
@@ -327,7 +359,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 第二組：使用者選單 */}
+          {/* Group 2: User menu */}
           {showUserMenu && user && (
             <UserMenu
               color="inherit"
@@ -340,7 +372,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 分隔線 2（可選） */}
+          {/* Divider 2 (optional) */}
           {useButtonDividers && showUserMenu && user && showSettings && (
             <Divider
               orientation="vertical"
@@ -352,7 +384,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 第三組：系統設定 */}
+          {/* Group 3: System settings */}
           {showSettings && (
             <SettingsMenu
               color="inherit"
@@ -364,7 +396,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 語言切換前的分隔線（可選，預設顯示） */}
+          {/* Divider before language switcher (optional, default shown) */}
           {separateLanguageSwitcher && (
             <Divider
               orientation="vertical"
@@ -376,7 +408,7 @@ export function MainAppBar({
             />
           )}
 
-          {/* 第四組：語言切換 */}
+          {/* Group 4: Language switcher */}
           <LanguageSwitcher color="inherit" size="medium" />
         </Box>
       </Toolbar>

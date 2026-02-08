@@ -7,30 +7,30 @@ import { SxProps, Theme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 
 /**
- * Accordion 組件 - Atomic Design: Molecule
+ * Accordion Component - Atomic Design: Molecule
  *
- * 手風琴/折疊面板組件，用於顯示可展開的內容區塊。
+ * Accordion/collapsible panel component，for displaying expandable content blocks。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Accordion
  *   items={[
- *     { title: '問題一', content: '答案一' },
- *     { title: '問題二', content: '答案二' },
+ *     { title: 'Question 1', content: 'Answer 1' },
+ *     { title: 'Question 2', content: 'Answer 2' },
  *   ]}
  * />
  *
- * // 預設展開
+ * // Default expanded
  * <Accordion
  *   defaultExpanded={0}
  *   items={[
- *     { title: '章節一', content: <Chapter1 /> },
- *     { title: '章節二', content: <Chapter2 /> },
+ *     { title: 'Chapter 1', content: <Chapter1 /> },
+ *     { title: 'Chapter 2', content: <Chapter2 /> },
  *   ]}
  * />
  *
- * // 受控模式
+ * // controlled mode
  * <Accordion
  *   expanded={expandedPanel}
  *   onChange={setExpandedPanel}
@@ -41,85 +41,85 @@ import Box from '@mui/material/Box';
 
 export interface AccordionItem {
   /**
-   * 標題
+   * Title
    */
   title: string | React.ReactNode;
 
   /**
-   * 內容
+   * Content
    */
   content: React.ReactNode;
 
   /**
-   * 副標題/描述
+   * Subtitle/Description
    */
   subtitle?: string | React.ReactNode;
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 自訂圖示
+   * customicon
    */
   icon?: React.ReactNode;
 }
 
 export interface AccordionProps {
   /**
-   * 折疊面板項目列表
+   * Accordion panel items list
    */
   items: AccordionItem[];
 
   /**
-   * 當前展開的面板索引（受控）
+   * Currently expanded panel index (controlled)
    */
   expanded?: number | false;
 
   /**
-   * 預設展開的面板索引
+   * default expanded panel index
    */
   defaultExpanded?: number | false;
 
   /**
-   * 展開狀態變更時的回調
+   * callback on expand state change
    */
   onChange?: (expandedIndex: number | false) => void;
 
   /**
-   * 是否允許多個面板同時展開
+   * whether allow multiple panels expanded simultaneously
    */
   multiple?: boolean;
 
   /**
-   * 展開圖示
+   * expandedicon
    */
-  expandIcon?: React.ReactNode;
+  expandicon?: React.ReactNode;
 
   /**
-   * 是否顯示分隔線
+   * whether to show divider
    */
   disableGutters?: boolean;
 
   /**
-   * 是否提升樣式（陰影）
+   * whetherElevation style（Shadow）
    */
   elevation?: number;
 
   /**
-   * 是否為方形（無圓角）
+   * whetherIs square（no rounded corners）
    */
   square?: boolean;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Accordion 組件
+ * Accordion component
  */
 export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
   function Accordion(
@@ -129,7 +129,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
       defaultExpanded = false,
       onChange,
       multiple = false,
-      expandIcon,
+      expandicon,
       disableGutters = false,
       elevation = 1,
       square = false,
@@ -188,7 +188,7 @@ export const Accordion = forwardRef<HTMLDivElement, AccordionProps>(
             square={square}
           >
             <AccordionSummary
-              expandIcon={expandIcon || item.icon}
+              expandIcon={expandicon || item.icon}
               aria-controls={`panel${index}-content`}
               id={`panel${index}-header`}
             >

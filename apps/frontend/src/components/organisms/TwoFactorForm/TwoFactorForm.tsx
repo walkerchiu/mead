@@ -42,7 +42,7 @@ export function TwoFactorForm({
       onSubmit={handleManualSubmit}
       sx={{ width: '100%', maxWidth: 400, textAlign: 'center' }}
     >
-      {/* 動態提示文字 */}
+      {/* Dynamic hint text */}
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
         {isBackupCode ? t('subtitleBackup') : t('codeInfo')}
       </Typography>

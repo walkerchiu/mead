@@ -2,48 +2,49 @@ import { TextField, TextFieldProps } from '@/components/atoms';
 import { forwardRef, useState, useEffect } from 'react';
 import { FieldError } from 'react-hook-form';
 import { InputAdornment } from '@mui/material';
+import type { TextFieldOwnerState } from '@mui/material/TextField';
 
 /**
- * FormField 組件 - Atomic Design: Molecule
+ * FormField Component - Atomic Design: Molecule
  *
- * 結合 TextField 和錯誤處理的表單欄位組件。
- * 與 react-hook-form 完美集成，自動顯示驗證錯誤。
+ * Form field component combining TextField and error handling.
+ * Perfect integration with react-hook-form, automatically displays validation errors.
  *
  * @example
  * ```tsx
- * // 與 react-hook-form 使用
+ * // With react-hook-form
  * <FormField
  *   label="Email"
  *   {...register('email')}
  *   error={errors.email}
  * />
  *
- * // 帶單位
+ * // With units
  * <FormField
- *   label="價格"
+ *   label="Price"
  *   startAdornment="$"
  *   endAdornment="USD"
  *   {...register('price')}
  * />
  *
- * // 帶圖示
+ * // With icon
  * <FormField
- *   label="搜尋"
+ *   label="Search"
  *   startAdornment={<SearchIcon />}
  *   {...register('search')}
  * />
  *
- * // 數字格式化（千分位）
+ * // Number formatting (thousands separator)
  * <FormField
- *   label="金額"
+ *   label="Amount"
  *   formatNumber
  *   startAdornment="$"
  *   {...register('amount')}
  * />
  *
- * // 自訂對齊方式
+ * // Custom text alignment
  * <FormField
- *   label="數量"
+ *   label="Quantity"
  *   textAlign="right"
  *   {...register('quantity')}
  * />
@@ -52,49 +53,49 @@ import { InputAdornment } from '@mui/material';
 
 export interface FormFieldProps extends Omit<
   TextFieldProps,
-  'error' | 'helperText'
+  'error' | 'helperText' | 'slotProps'
 > {
   /**
-   * 欄位錯誤（來自 react-hook-form）
-   * 可以是 FieldError 物件或字串
+   * Field error (from react-hook-form)
+   * Can be FieldError object or string
    */
   error?: FieldError | string;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * Helper text (displayed when not in error state)
    */
   helperText?: string;
 
   /**
-   * 欄位前綴（開始位置）
-   * 可以是文字、圖示或自訂元件
+   * Field prefix (start position)
+   * Can be text, icon, or custom component
    */
   startAdornment?: React.ReactNode;
 
   /**
-   * 欄位後綴（結束位置）
-   * 可以是文字、圖示或自訂元件
+   * Field suffix (end position)
+   * Can be text, icon, or custom component
    */
   endAdornment?: React.ReactNode;
 
   /**
-   * 文字對齊方式
-   * - 'left': 靠左對齊（預設）
-   * - 'right': 靠右對齊（數值欄位建議使用）
-   * - 'center': 置中對齊
-   * - 'auto': number 類型自動靠右，其他靠左
+   * Text alignment
+   * - 'left': Align left (default)
+   * - 'right': Align right (recommended for numeric fields)
+   * - 'center': Center alignment
+   * - 'auto': number type auto-aligns right, others left
    */
   textAlign?: 'left' | 'right' | 'center' | 'auto';
 
   /**
-   * 是否格式化數字（加入千分位符號）
-   * 只適用於數值輸入
-   * 注意：啟用此功能時，type 會自動改為 "text"
+   * Whether to format numbers (add thousands separator)
+   * Only applies to numeric input
+   * Note: When enabled, type will be automatically changed to "text"
    */
   formatNumber?: boolean;
 
   /**
-   * 數字格式化的語系（預設：'en-US'）
+   * Number formatting locale (default: 'en-US')
    * - 'en-US': 1,234,567.89
    * - 'zh-TW': 1,234,567.89
    * - 'de-DE': 1.234.567,89
@@ -102,16 +103,16 @@ export interface FormFieldProps extends Omit<
   numberLocale?: string;
 
   /**
-   * 小數位數（預設：undefined，不限制）
+   * Decimal places (default: undefined, no limit)
    */
   decimalPlaces?: number;
 }
 
 /**
- * FormField 組件
+ * FormField Component
  *
- * 處理 react-hook-form 的 error 物件，
- * 自動提取錯誤訊息並顯示
+ * Handles react-hook-form error objects,
+ * automatically extracts and displays error messages
  */
 export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
   function FormField(
@@ -131,15 +132,15 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     },
     ref,
   ) {
-    // 處理錯誤訊息
+    // Handle error message
     const errorMessage = typeof error === 'string' ? error : error?.message;
     const hasError = Boolean(errorMessage);
 
-    // 數字格式化狀態
+    // Number formatting state
     const [displayValue, setDisplayValue] = useState<string>('');
     const [isFocused, setIsFocused] = useState(false);
 
-    // 格式化數字的輔助函數
+    // Helper function for formatting numbers
     const formatNumberValue = (num: number | string): string => {
       if (num === '' || num === null || num === undefined) return '';
 
@@ -155,13 +156,13 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       return formatter.format(numValue);
     };
 
-    // 解析格式化的數字字串
+    // Parse formatted number string
     const parseFormattedNumber = (formatted: string): string => {
-      // 移除千分位符號，保留小數點和負號
+      // Remove thousands separator, keep decimal point and negative sign
       return formatted.replace(/[^\d.-]/g, '');
     };
 
-    // 初始化顯示值
+    // Initialize display value
     useEffect(() => {
       if (formatNumber && (value !== undefined || defaultValue !== undefined)) {
         const initialValue = value ?? defaultValue;
@@ -175,7 +176,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       }
     }, []);
 
-    // 當外部值改變時更新顯示值（僅在非聚焦時）
+    // Update display value when external value changes (only when not focused)
     useEffect(() => {
       if (formatNumber && !isFocused && value !== undefined) {
         if (value === '' || value === null) {
@@ -186,19 +187,19 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       }
     }, [value, isFocused, formatNumber]);
 
-    // 處理格式化數字的輸入
+    // Handle formatted number input
     const handleFormattedNumberChange = (
       e: React.ChangeEvent<HTMLInputElement>,
     ) => {
       const inputValue = e.target.value;
 
-      // 移除格式，只保留數字
+      // Remove formatting, keep only numbers
       const rawValue = parseFormattedNumber(inputValue);
 
-      // 更新顯示值（不格式化，讓用戶可以輸入）
+      // Update display value (without formatting, allow user input)
       setDisplayValue(inputValue);
 
-      // 傳遞原始數字值給父組件
+      // Pass raw numeric value to parent component
       if (onChange) {
         const syntheticEvent = {
           ...e,
@@ -211,11 +212,11 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       }
     };
 
-    // 處理聚焦
+    // Handle focus
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(true);
       if (formatNumber && displayValue) {
-        // 聚焦時移除格式，方便編輯
+        // Remove formatting on focus for easier editing
         const rawValue = parseFormattedNumber(displayValue);
         setDisplayValue(rawValue);
       }
@@ -224,11 +225,11 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       }
     };
 
-    // 處理失焦
+    // Handle blur
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       setIsFocused(false);
       if (formatNumber && e.target.value) {
-        // 失焦時格式化數字
+        // Format number on blur
         const formatted = formatNumberValue(e.target.value);
         setDisplayValue(formatted);
       }
@@ -237,7 +238,7 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       }
     };
 
-    // 決定文字對齊方式
+    // Determine text alignment
     let finalTextAlign: 'left' | 'right' | 'center' = 'left';
     if (textAlign === 'auto') {
       finalTextAlign =
@@ -246,10 +247,10 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
       finalTextAlign = textAlign;
     }
 
-    // 決定最終的 type
+    // Determine final type
     const finalType = formatNumber ? 'text' : props.type;
 
-    // 決定最終的 value 和 onChange
+    // Determine final value and onChange
     const finalValue = formatNumber
       ? isFocused
         ? displayValue
@@ -258,27 +259,73 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
     const finalOnChange = formatNumber ? handleFormattedNumberChange : onChange;
     const finalDefaultValue = formatNumber ? undefined : defaultValue;
 
-    // 建立 InputProps
-    const inputProps = {
-      ...props.InputProps,
-      startAdornment: startAdornment ? (
-        <InputAdornment position="start">{startAdornment}</InputAdornment>
-      ) : (
-        props.InputProps?.startAdornment
-      ),
-      endAdornment: endAdornment ? (
-        <InputAdornment position="end">{endAdornment}</InputAdornment>
-      ) : (
-        props.InputProps?.endAdornment
-      ),
-      sx: {
-        ...props.InputProps?.sx,
-        '& input': {
-          textAlign: finalTextAlign,
-        },
-        '& textarea': {
-          textAlign: finalTextAlign,
-        },
+    // Number input stepper logic:
+    // 1. Always hide native browser spinner for number type (to avoid conflicts with custom stepper)
+    // 2. Only show custom stepper when there are no adornments and formatNumber is false
+    const hasStartAdornment = Boolean(startAdornment);
+    const hasEndAdornment = Boolean(endAdornment);
+    const shouldHideNumberSpinner = props.type === 'number';
+    const shouldUseCustomStepper =
+      props.type === 'number' &&
+      !hasStartAdornment &&
+      !hasEndAdornment &&
+      !formatNumber;
+
+    // Build slotProps - adapted for new TextField API
+    const slotProps = {
+      input: (_ownerState: TextFieldOwnerState) => {
+        const inputProps: {
+          sx: Record<string, unknown>;
+          startAdornment?: React.ReactNode;
+          endAdornment?: React.ReactNode;
+        } = {
+          sx: {
+            '& input': {
+              textAlign: finalTextAlign,
+            },
+            '& textarea': {
+              textAlign: finalTextAlign,
+            },
+            // Add padding at InputBase-root level when adornment exists
+            ...(startAdornment && {
+              paddingLeft: '16px !important',
+            }),
+            ...(endAdornment && {
+              paddingRight: '16px !important',
+            }),
+          },
+        };
+
+        if (startAdornment) {
+          inputProps.startAdornment = (
+            <InputAdornment
+              position="start"
+              sx={{
+                marginRight: '8px',
+              }}
+            >
+              {startAdornment}
+            </InputAdornment>
+          );
+        }
+
+        if (endAdornment) {
+          inputProps.endAdornment = (
+            <InputAdornment
+              position="end"
+              sx={{
+                marginLeft: '8px',
+                minWidth: '20px',
+                display: 'flex',
+                justifyContent: 'flex-end',
+              }}
+            >
+              {endAdornment}
+            </InputAdornment>
+          );
+        }
+
+        return inputProps;
       },
     };
 
@@ -294,7 +341,9 @@ export const FormField = forwardRef<HTMLDivElement, FormFieldProps>(
         onChange={finalOnChange}
         onFocus={handleFocus}
         onBlur={handleBlur}
-        InputProps={inputProps}
+        hideNumberSpinner={shouldHideNumberSpinner}
+        useCustomStepper={shouldUseCustomStepper}
+        slotProps={slotProps}
       />
     );
   },

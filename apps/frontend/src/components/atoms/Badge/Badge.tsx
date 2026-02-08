@@ -3,47 +3,47 @@ import MuiBadge from '@mui/material/Badge';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Badge 組件 - Atomic Design: Atom
+ * Badge Component - Atomic Design: Atom
  *
- * 徽章組件，用於顯示通知計數或狀態指示器。
+ * Badge component for displaying notification counts or status indicators.
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Badge badgeContent={4} color="primary">
- *   <MailIcon />
+ *   <Mailicon />
  * </Badge>
  *
- * // 最大數字
+ * // Maximum number
  * <Badge badgeContent={100} max={99} color="error">
- *   <NotificationIcon />
+ *   <Notificationicon />
  * </Badge>
  *
- * // 圓點徽章
+ * // dot badge
  * <Badge variant="dot" color="success">
  *   <Avatar />
  * </Badge>
  *
- * // 自訂內容
+ * // customContent
  * <Badge badgeContent="new" color="secondary">
- *   <ProductIcon />
+ *   <Producticon />
  * </Badge>
  * ```
  */
 
 export interface BadgeProps {
   /**
-   * 子元素（被徽章包裹的內容）
+   * Children（Wrapped by badge content）
    */
   children: React.ReactNode;
 
   /**
-   * 徽章內容
+   * badgeContent
    */
   badgeContent?: React.ReactNode;
 
   /**
-   * 顏色
+   * Color
    */
   color?:
     | 'default'
@@ -55,22 +55,22 @@ export interface BadgeProps {
     | 'warning';
 
   /**
-   * 變體
+   * Variant
    */
   variant?: 'standard' | 'dot';
 
   /**
-   * 最大數字（超過會顯示為 max+）
+   * maximum number (exceeds will display as max+)
    */
   max?: number;
 
   /**
-   * 是否顯示為零
+   * whether to showIs zero
    */
   showZero?: boolean;
 
   /**
-   * 徽章位置
+   * badgePosition
    */
   anchorOrigin?: {
     vertical: 'top' | 'bottom';
@@ -78,23 +78,23 @@ export interface BadgeProps {
   };
 
   /**
-   * 是否隱藏
+   * whether hidden
    */
   invisible?: boolean;
 
   /**
-   * 重疊方式
+   * overlap mode
    */
   overlap?: 'rectangular' | 'circular';
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Badge 組件
+ * Badge component
  */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   {

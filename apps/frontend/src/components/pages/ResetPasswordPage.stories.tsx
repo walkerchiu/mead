@@ -10,7 +10,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '重設密碼頁面，用戶可以設定新密碼。',
+        component: 'Reset password page where users can set a new password.',
       },
     },
   },
@@ -21,11 +21,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
+ * Default state
  */
 export const Default: Story = {
   render: () => (
-    <AuthLayout title="重設密碼" subtitle="請輸入您的新密碼">
+    <AuthLayout
+      title="Reset Password"
+      subtitle="Please enter your new password"
+    >
       <ResetPasswordForm
         onSubmit={async (data) => {
           console.log('Reset password:', data);
@@ -37,21 +40,24 @@ export const Default: Story = {
 };
 
 /**
- * 有錯誤
+ * With error
  */
 export const WithError: Story = {
   render: () => (
-    <AuthLayout title="重設密碼" subtitle="請輸入您的新密碼">
+    <AuthLayout
+      title="Reset Password"
+      subtitle="Please enter your new password"
+    >
       <ResetPasswordForm
         onSubmit={async (data) => console.log(data)}
-        error="密碼重設失敗，請重試"
+        error="Password reset failed, please try again"
       />
     </AuthLayout>
   ),
 };
 
 /**
- * 成功狀態
+ * Success state
  */
 export const Success: Story = {
   render: () => (
@@ -65,7 +71,7 @@ export const Success: Story = {
 };
 
 /**
- * Token 無效
+ * Invalid token
  */
 export const TokenInvalid: Story = {
   render: () => (
@@ -79,7 +85,7 @@ export const TokenInvalid: Story = {
 };
 
 /**
- * 完整流程
+ * Full flow
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {
@@ -94,14 +100,14 @@ export const FullFlow: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 驗證密碼強度
+      // Validate password strength
       if (data.password.length >= 8) {
         setSuccess(true);
       } else {
-        setError('密碼太短');
+        setError('Password is too short');
       }
 
       setLoading(false);
@@ -109,8 +115,8 @@ export const FullFlow: Story = {
 
     return (
       <AuthLayout
-        title={success ? undefined : '重設密碼'}
-        subtitle={success ? undefined : '請輸入您的新密碼'}
+        title={success ? undefined : 'Reset Password'}
+        subtitle={success ? undefined : 'Please enter your new password'}
       >
         <Box sx={{ width: '100%' }}>
           <ResetPasswordForm

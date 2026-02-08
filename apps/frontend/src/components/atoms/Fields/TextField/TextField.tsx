@@ -1,5 +1,5 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import ArrowDropDownicon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpicon from '@mui/icons-material/ArrowDropUp';
 import Box from '@mui/material/Box';
 import InputAdornment from '@mui/material/InputAdornment';
 import MuiTextField, {
@@ -16,22 +16,22 @@ export interface TextFieldProps extends Omit<
   'variant' | 'size'
 > {
   /**
-   * 輸入框變體
+   * Input variant
    * @default 'outlined'
    */
   variant?: 'outlined';
   /**
-   * 輸入框尺寸
+   * Input size
    */
   size?: TextFieldSize;
   /**
-   * 是否隱藏 number input 的上下箭頭
+   * Whether to hide number input arrows
    * @default true
    */
   hideNumberSpinner?: boolean;
   /**
-   * 是否使用自訂 number stepper
-   * - 預設：type=number 時為 true
+   * whether to use custom number stepper
+   * - default：type=number when it is true
    */
   useCustomStepper?: boolean;
 }
@@ -70,9 +70,9 @@ const StyledTextField = styled(MuiTextField, {
 });
 
 /**
- * TextField 組件
+ * TextField component
  *
- * 使用 forwardRef 以支援 ref 轉發。
+ * Using forwardRef to support ref forwarding.
  */
 export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(
   function TextField(
@@ -116,14 +116,14 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(
     const customStepper = useMemo(() => {
       if (!resolvedUseCustomStepper || !isNumberType) return null;
       return (
-        <InputAdornment position="end" sx={{ mr: 1.5 }}>
+        <InputAdornment position="end" sx={{ ml: 1.5 }}>
           <Box
             sx={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 0.1,
+              gap: 0,
               color: (theme) => theme.palette.grey[300],
               '& svg': {
                 color: (theme) => theme.palette.grey[300],
@@ -141,14 +141,16 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(
                 border: 0,
                 background: 'transparent',
                 padding: 0,
+                margin: 0,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: props.disabled ? 'not-allowed' : 'pointer',
-                lineHeight: 1,
+                lineHeight: 0.5,
+                height: '12px',
               }}
             >
-              <ArrowDropUpIcon fontSize="small" />
+              <ArrowDropUpicon fontSize="small" />
             </Box>
             <Box
               component="button"
@@ -161,14 +163,16 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(
                 border: 0,
                 background: 'transparent',
                 padding: 0,
+                margin: 0,
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: props.disabled ? 'not-allowed' : 'pointer',
-                lineHeight: 1,
+                lineHeight: 0.5,
+                height: '12px',
               }}
             >
-              <ArrowDropDownIcon fontSize="small" />
+              <ArrowDropDownicon fontSize="small" />
             </Box>
           </Box>
         </InputAdornment>
@@ -212,8 +216,19 @@ export const TextField = forwardRef<HTMLDivElement, TextFieldProps>(
           ) : (
             existingEndAdornment
           );
+
+        // When there is custom stepper, add paddingRight to ensure spacing with border
+        const needsStepperPadding = resolvedUseCustomStepper && isNumberType;
+        const mergedSx = needsStepperPadding
+          ? {
+              ...(resolvedInput.sx ?? {}),
+              paddingRight: '8px !important',
+            }
+          : resolvedInput.sx;
+
         return {
           ...resolvedInput,
+          sx: mergedSx,
           endAdornment: mergedEndAdornment,
         };
       },

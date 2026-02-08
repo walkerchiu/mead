@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import type {} from '../../../../theme/palette'; // Storybook 裡的 augmentation import 改成 相對路徑，避免路徑別名在 story 的 TS context 裡失效
+import type {} from '../../../../theme/palette'; // Use relative path for augmentation import in Storybook to avoid path alias issues in story TS context
 import { ActionButton } from './ActionButton';
 
 const meta = {
@@ -20,17 +20,17 @@ const meta = {
     variant: {
       control: 'select',
       options: ['default', 'standard', 'outline'],
-      description: 'Action button 樣式',
+      description: 'Action button variant',
     },
     shape: {
       control: 'select',
       options: ['circle', 'pill'],
-      description: 'Outline 形狀',
+      description: 'Outline shape',
     },
     size: {
       control: 'select',
       options: ['sm', 'lg'],
-      description: '尺寸（sm=32, lg=40） pill 形狀專用',
+      description: 'Size (sm=32, lg=40) for pill shape only',
     },
     children: {
       control: false,
@@ -38,7 +38,7 @@ const meta = {
     },
     disabled: {
       control: 'boolean',
-      description: '是否停用',
+      description: 'Whether to disable',
     },
   },
 } satisfies Meta<typeof ActionButton>;

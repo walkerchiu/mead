@@ -5,35 +5,35 @@ import Box from '@mui/material/Box';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Tabs 組件 - Atomic Design: Molecule
+ * Tabs Component - Atomic Design: Molecule
  *
- * 分頁標籤組件，用於在多個內容面板之間切換。
+ * Tab component，for switching between multiple content panels。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Tabs
  *   tabs={[
- *     { label: '標籤一', content: <div>內容一</div> },
- *     { label: '標籤二', content: <div>內容二</div> },
+ *     { label: 'Tab 1', content: <div>Content 1</div> },
+ *     { label: 'Tab 2', content: <div>Content 2</div> },
  *   ]}
  * />
  *
- * // 受控組件
+ * // Controlled component
  * <Tabs
  *   value={activeTab}
  *   onChange={setActiveTab}
  *   tabs={[
- *     { label: '個人資料', content: <ProfileForm /> },
- *     { label: '安全設定', content: <SecurityForm /> },
+ *     { label: 'Profile', content: <ProfileForm /> },
+ *     { label: 'Security settings', content: <SecurityForm /> },
  *   ]}
  * />
  *
- * // 帶圖示
+ * // With icon
  * <Tabs
  *   tabs={[
- *     { label: '首頁', icon: <HomeIcon />, content: <Home /> },
- *     { label: '設定', icon: <SettingsIcon />, content: <Settings /> },
+ *     { label: 'Home', icon: <Homeicon />, content: <Home /> },
+ *     { label: 'Settings', icon: <Settingsicon />, content: <Settings /> },
  *   ]}
  * />
  * ```
@@ -41,79 +41,79 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface TabItem {
   /**
-   * 標籤文字
+   * labeltext
    */
   label: string;
 
   /**
-   * 標籤圖示（僅支援 ReactElement，不支援 null 或 string）
+   * label icon（only supports ReactElement, does not support null or string）
    */
   icon?: React.ReactElement;
 
   /**
-   * 標籤內容
+   * labelContent
    */
   content: React.ReactNode;
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 圖示位置
+   * iconPosition
    */
   iconPosition?: 'start' | 'end' | 'top' | 'bottom';
 }
 
 export interface TabsProps {
   /**
-   * 標籤列表
+   * labelcolumnList
    */
   tabs: TabItem[];
 
   /**
-   * 當前啟用的標籤索引
+   * currently active tab index
    */
   value?: number;
 
   /**
-   * 預設啟用的標籤索引
+   * default active tab index
    */
   defaultValue?: number;
 
   /**
-   * 標籤變更時的回調
+   * labelchange callback
    */
   onChange?: (value: number) => void;
 
   /**
-   * 標籤方向
+   * labeldirection
    */
   orientation?: 'horizontal' | 'vertical';
 
   /**
-   * 標籤變體
+   * labelVariant
    */
   variant?: 'standard' | 'scrollable' | 'fullWidth';
 
   /**
-   * 指示器顏色
+   * Indicator color
    */
   indicatorColor?: 'primary' | 'secondary';
 
   /**
-   * 文字顏色
+   * text color
    */
   textColor?: 'primary' | 'secondary' | 'inherit';
 
   /**
-   * 是否置中
+   * whetherCenter
    */
   centered?: boolean;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
@@ -138,7 +138,7 @@ function TabPanel({ children, value, index }: TabPanelProps) {
 }
 
 /**
- * Tabs 組件
+ * Tabs component
  */
 export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
   {

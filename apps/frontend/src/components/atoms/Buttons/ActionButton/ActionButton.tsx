@@ -54,15 +54,15 @@ export interface ActionButtonProps extends Omit<
 > {
   variant?: ActionButtonVariant;
   /**
-   * 覆蓋 icon 顏色，未提供則使用 token 預設值
+   * Override icon color, uses token default if not provided
    */
   iconColor?: string;
   /**
-   * 外觀形狀（circle/pill）
+   * Outline shape (circle/pill)
    */
   shape?: ActionButtonShape;
   /**
-   * 尺寸（sm=32, lg=40）
+   * Size (sm=32, lg=40) for pill shape only
    */
   size?: ActionButtonSize;
 }

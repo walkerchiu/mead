@@ -5,8 +5,8 @@ import { ArrowBack } from '@mui/icons-material';
 import type { Notification } from '@/components/atoms';
 
 const mockUser = {
-  name: '王小明',
-  email: 'wang@example.com',
+  name: 'John Doe',
+  email: 'john.doe@example.com',
   avatar: 'https://i.pravatar.cc/150?img=1',
   role: 'Admin',
   status: 'online' as const,
@@ -16,49 +16,50 @@ const mockNotifications: Notification[] = [
   {
     id: '1',
     type: 'info',
-    title: '系統維護通知',
-    message: '系統將於今晚 23:00 進行維護，預計維護時間 2 小時',
+    title: 'System Maintenance',
+    message:
+      'System maintenance scheduled for tonight at 11:00 PM, estimated duration 2 hours',
     timestamp: new Date(Date.now() - 5 * 60 * 1000),
     read: false,
   },
   {
     id: '2',
     type: 'success',
-    title: '密碼已更新',
-    message: '您的密碼已成功更新',
+    title: 'Password Updated',
+    message: 'Your password has been successfully updated',
     timestamp: new Date(Date.now() - 60 * 60 * 1000),
     read: true,
   },
   {
     id: '3',
     type: 'warning',
-    title: '安全警告',
-    message: '檢測到來自新裝置的登入',
+    title: 'Security Warning',
+    message: 'Login detected from a new device',
     timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
     read: false,
   },
 ];
 
 /**
- * MainAppBar 是統一的應用程式導覽列元件
+ * MainAppBar is a unified application navigation bar component
  *
- * **特性**:
- * - 支援文字標題或 Logo
- * - 標題/Logo 可設定超連結
- * - 通知中心（鈴鐺 + Badge）
- * - 語言切換器
- * - 使用者選單（頭像 + 個人操作）
- * - 設定選單（主題切換 + 說明 + 關於）
- * - 響應式設計
+ * **Features**:
+ * - Supports text title or Logo
+ * - Title/Logo can be set as a hyperlink
+ * - Notification center (bell icon + Badge)
+ * - Language switcher
+ * - User menu (avatar + personal actions)
+ * - Settings menu (theme toggle + help + about)
+ * - Responsive design
  *
- * **設計原則**:
- * - AppBar 為全域導航，始終顯示網站標題/Logo
- * - 頁面層級操作（如返回按鈕）應放在頁面內容區域，不在 AppBar 中
+ * **Design Principles**:
+ * - AppBar is for global navigation, always displays site title/Logo
+ * - Page-level actions (like back buttons) should be placed in the page content area, not in the AppBar
  *
- * **使用場景**:
- * - 應用程式頂部導覽列
- * - 管理後台頁面標題列
- * - Dashboard 頁面 header
+ * **Use Cases**:
+ * - Application top navigation bar
+ * - Admin panel page header
+ * - Dashboard page header
  */
 const meta = {
   title: 'Layout/MainAppBar',
@@ -139,7 +140,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設的文字標題樣式（不含使用者資訊）
+ * Default text title style (without user information)
  */
 export const Default: Story = {
   render: (args) => (
@@ -156,7 +157,7 @@ export const Default: Story = {
 };
 
 /**
- * 完整功能展示：通知 + 使用者 + 設定 + 語言
+ * Full featured display: notifications + user + settings + language
  */
 export const FullFeatured: Story = {
   render: (args) => (
@@ -199,7 +200,7 @@ export const FullFeatured: Story = {
 };
 
 /**
- * 所有按鈕都有分隔線
+ * All buttons with dividers
  */
 export const WithAllDividers: Story = {
   render: (args) => (
@@ -240,7 +241,7 @@ export const WithAllDividers: Story = {
 };
 
 /**
- * 無分隔線（緊密排列）
+ * Without dividers (compact layout)
  */
 export const WithoutDividers: Story = {
   render: (args) => (
@@ -270,7 +271,7 @@ export const WithoutDividers: Story = {
 };
 
 /**
- * 僅語言切換有分隔線（預設）
+ * Only language switcher separated (default)
  */
 export const OnlyLanguageSeparated: Story = {
   render: (args) => (
@@ -300,7 +301,7 @@ export const OnlyLanguageSeparated: Story = {
 };
 
 /**
- * 帶有通知和使用者資訊
+ * With notifications and user information
  */
 export const WithNotificationsAndUser: Story = {
   render: (args) => (
@@ -328,7 +329,7 @@ export const WithNotificationsAndUser: Story = {
 };
 
 /**
- * 使用者選單顯示名稱
+ * User menu displays name
  */
 export const WithUserName: Story = {
   render: (args) => (
@@ -356,7 +357,7 @@ export const WithUserName: Story = {
 };
 
 /**
- * 無使用者頭像（顯示縮寫）
+ * Without user avatar (shows initials)
  */
 export const WithoutUserAvatar: Story = {
   render: (args) => (
@@ -370,8 +371,8 @@ export const WithoutUserAvatar: Story = {
   args: {
     title: 'Dashboard',
     user: {
-      name: '張小華',
-      email: 'chang@example.com',
+      name: 'Emily Chen',
+      email: 'emily@example.com',
       status: 'online',
     },
     showUserName: true,
@@ -387,7 +388,7 @@ export const WithoutUserAvatar: Story = {
 };
 
 /**
- * 通知數量超過 99
+ * Notification count over 99
  */
 export const ManyNotifications: Story = {
   render: (args) => (
@@ -414,7 +415,7 @@ export const ManyNotifications: Story = {
 };
 
 /**
- * 無通知
+ * No notifications
  */
 export const NoNotifications: Story = {
   render: (args) => (
@@ -441,7 +442,7 @@ export const NoNotifications: Story = {
 };
 
 /**
- * 標題帶有超連結
+ * Title with link
  */
 export const WithTitleLink: Story = {
   render: (args) => (
@@ -468,7 +469,7 @@ export const WithTitleLink: Story = {
 };
 
 /**
- * 使用 Logo（文字 Logo 示例）
+ * With Logo (text logo example)
  */
 export const WithLogo: Story = {
   render: (args) => (
@@ -513,7 +514,7 @@ export const WithLogo: Story = {
 };
 
 /**
- * 隱藏通知功能
+ * Hide notifications feature
  */
 export const WithoutNotifications: Story = {
   render: (args) => (
@@ -532,7 +533,7 @@ export const WithoutNotifications: Story = {
 };
 
 /**
- * 隱藏使用者選單
+ * Hide user menu
  */
 export const WithoutUserMenu: Story = {
   render: (args) => (
@@ -551,7 +552,7 @@ export const WithoutUserMenu: Story = {
 };
 
 /**
- * 隱藏設定選單
+ * Hide settings menu
  */
 export const WithoutSettings: Story = {
   render: (args) => (
@@ -571,7 +572,7 @@ export const WithoutSettings: Story = {
 };
 
 /**
- * Admin View 示例
+ * Admin View example
  */
 export const AdminView: Story = {
   render: (args) => (
@@ -630,7 +631,7 @@ export const AdminView: Story = {
 };
 
 /**
- * 響應式設計示例（手機版）
+ * Responsive design example (mobile view)
  */
 export const MobileView: Story = {
   render: (args) => (
@@ -669,7 +670,7 @@ export const MobileView: Story = {
 };
 
 /**
- * Dashboard Header 完整示例（與前端實作一致）
+ * Complete Dashboard Header example (consistent with frontend implementation)
  */
 export const DashboardHeader: Story = {
   render: () => (
@@ -726,7 +727,7 @@ export const DashboardHeader: Story = {
 };
 
 /**
- * 僅 Logo 不含標題
+ * Logo only without title
  */
 export const LogoOnly: Story = {
   render: (args) => (
@@ -764,11 +765,11 @@ export const LogoOnly: Story = {
 };
 
 /**
- * 設定頁面範例（正確的導航模式）
+ * Settings page example (correct navigation pattern)
  *
- * 展示正確的設計模式：
- * - AppBar 顯示網站標題/Logo（全域導航）
- * - 返回按鈕放在頁面內容區域（頁面層級操作）
+ * Demonstrates the correct design pattern:
+ * - AppBar displays site title/Logo (global navigation)
+ * - Back button placed in page content area (page-level action)
  */
 export const SettingsPagePattern: Story = {
   render: () => (
@@ -803,7 +804,7 @@ export const SettingsPagePattern: Story = {
         onAboutClick={() => console.log('About clicked')}
       />
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        {/* 返回按鈕放在頁面內容區域 */}
+        {/* Back button placed in page content area */}
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <IconButton
             onClick={() => console.log('Navigate back to dashboard')}
@@ -813,30 +814,34 @@ export const SettingsPagePattern: Story = {
             <ArrowBack />
           </IconButton>
           <Box>
-            <Typography variant="h4">帳號設定</Typography>
+            <Typography variant="h4">Account Settings</Typography>
           </Box>
         </Box>
         <Typography variant="body2" color="text.secondary" paragraph>
-          這是正確的設計模式範例：
+          This is an example of the correct design pattern:
         </Typography>
         <ul>
           <li>
-            <strong>AppBar</strong> - 顯示網站標題「Wind
-            Dashboard」（全域導航，所有頁面一致）
+            <strong>AppBar</strong> - Displays site title "Wind Dashboard"
+            (global navigation, consistent across all pages)
           </li>
           <li>
-            <strong>返回按鈕</strong> - 放在頁面內容區域（頁面層級操作）
+            <strong>Back button</strong> - Placed in page content area
+            (page-level action)
           </li>
           <li>
-            <strong>頁面標題</strong> - 在內容區域顯示，不在 AppBar 中
+            <strong>Page title</strong> - Displayed in content area, not in
+            AppBar
           </li>
         </ul>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          這樣的設計讓使用者清楚區分：
+          This design helps users clearly distinguish:
         </Typography>
         <ul>
-          <li>點擊 AppBar 左側的 Logo/標題 → 回到首頁/Dashboard</li>
-          <li>點擊頁面內的返回按鈕 → 返回上一頁</li>
+          <li>
+            Click AppBar Logo/title on the left → Return to home/Dashboard
+          </li>
+          <li>Click back button in page → Return to previous page</li>
         </ul>
       </Container>
     </Box>

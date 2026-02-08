@@ -20,23 +20,23 @@ type Story = StoryObj<typeof meta>;
 const sampleItems: DataListItem[] = [
   {
     id: '1',
-    title: '重要通知',
-    subtitle: '系統將於今晚進行維護',
-    badge: { label: '緊急', color: 'error' },
+    title: 'Important Notification',
+    subtitle: 'System maintenance scheduled for tonight',
+    badge: { label: 'Urgent', color: 'error' },
     priority: 'high',
   },
   {
     id: '2',
-    title: '新功能上線',
-    subtitle: '我們推出了全新的儀表板',
-    badge: { label: '新', color: 'info' },
+    title: 'New Feature Launch',
+    subtitle: 'We have launched a brand new dashboard',
+    badge: { label: 'New', color: 'info' },
     priority: 'normal',
   },
   {
     id: '3',
-    title: '會議提醒',
-    subtitle: '明天下午 2 點開會',
-    badge: { label: '待辦', color: 'warning' },
+    title: 'Meeting Reminder',
+    subtitle: 'Meeting tomorrow at 2 PM',
+    badge: { label: 'To Do', color: 'warning' },
     priority: 'normal',
   },
 ];
@@ -62,7 +62,7 @@ export const Expandable: Story = {
     expandable: true,
     renderExpandedContent: (item) => (
       <Box>
-        <Typography variant="body2">詳細內容：{item.subtitle}</Typography>
+        <Typography variant="body2">Details: {item.subtitle}</Typography>
       </Box>
     ),
   },
@@ -74,7 +74,7 @@ export const Selectable: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          已選擇：{selected.length} 項
+          Selected: {selected.length} items
         </Typography>
         <DataList
           items={sampleItems}
@@ -110,7 +110,7 @@ export const ExpandIconDown: Story = {
     expandIconPosition: 'down',
     renderExpandedContent: (item) => (
       <Box>
-        <Typography variant="body2">詳細內容：{item.subtitle}</Typography>
+        <Typography variant="body2">Details: {item.subtitle}</Typography>
       </Box>
     ),
   },
@@ -135,8 +135,8 @@ export const FullFeatures: Story = {
         filterValue={filter}
         onFilterChange={setFilter}
         sortOptions={[
-          { value: 'title', label: '標題' },
-          { value: 'priority', label: '優先級' },
+          { value: 'title', label: 'Title' },
+          { value: 'priority', label: 'Priority' },
         ]}
         sortBy={sort}
         onSortChange={setSort}

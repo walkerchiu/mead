@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          '頭像組件，用於顯示使用者圖片或文字縮寫。支援多種尺寸、形狀和頭像組功能。',
+          'Avatar component for displaying user pictures or text initials. Supports multiple sizes, shapes, and avatar group features.',
       },
     },
   },
@@ -17,25 +17,25 @@ const meta = {
   argTypes: {
     src: {
       control: 'text',
-      description: '圖片來源',
+      description: 'Image source',
     },
     alt: {
       control: 'text',
-      description: '替代文字',
+      description: 'Alternative text',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: '頭像大小',
+      description: 'Avatar size',
     },
     variant: {
       control: 'select',
       options: ['circular', 'rounded', 'square'],
-      description: '頭像形狀',
+      description: 'Avatar shape',
     },
     children: {
       control: 'text',
-      description: '文字內容或縮寫',
+      description: 'Text content or initials',
     },
   },
 } satisfies Meta<typeof Avatar>;
@@ -45,20 +45,20 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    children: '王',
+    children: 'W',
   },
 };
 
 export const WithImage: Story = {
   args: {
     src: 'https://i.pravatar.cc/150?img=1',
-    alt: '使用者頭像',
+    alt: 'User Avatar',
   },
 };
 
 export const WithText: Story = {
   args: {
-    children: '王小明',
+    children: 'WX',
   },
 };
 
@@ -91,7 +91,7 @@ export const Large: Story = {
 
 export const CustomSize: Story = {
   args: {
-    children: '大',
+    children: 'XL',
     size: 80,
   },
 };
@@ -147,11 +147,11 @@ export const Group: Story = {
 export const GroupWithText: Story = {
   render: () => (
     <AvatarGroup max={3}>
-      <Avatar>王</Avatar>
-      <Avatar>李</Avatar>
-      <Avatar>張</Avatar>
-      <Avatar>陳</Avatar>
-      <Avatar>林</Avatar>
+      <Avatar>W</Avatar>
+      <Avatar>L</Avatar>
+      <Avatar>Z</Avatar>
+      <Avatar>C</Avatar>
+      <Avatar>K</Avatar>
     </AvatarGroup>
   ),
 };

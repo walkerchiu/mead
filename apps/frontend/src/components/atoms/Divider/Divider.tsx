@@ -3,22 +3,22 @@ import MuiDivider from '@mui/material/Divider';
 import { SxProps, Theme } from '@mui/material/styles';
 
 /**
- * Divider 組件 - Atomic Design: Atom
+ * Divider Component - Atomic Design: Atom
  *
- * 分隔線組件，用於分隔內容區塊。
+ * Divider component for separating content blocks.
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <Divider />
  *
- * // 帶文字的分隔線
- * <Divider>或</Divider>
+ * // With textDivider
+ * <Divider>or</Divider>
  *
- * // 垂直分隔線
+ * // Vertical divider
  * <Divider orientation="vertical" />
  *
- * // 不同變體
+ * // Different variants
  * <Divider variant="middle" />
  * <Divider variant="inset" />
  * ```
@@ -26,48 +26,48 @@ import { SxProps, Theme } from '@mui/material/styles';
 
 export interface DividerProps {
   /**
-   * 子元素（文字內容）
+   * Children（Text content）
    */
   children?: React.ReactNode;
 
   /**
-   * 方向
+   * direction
    */
   orientation?: 'horizontal' | 'vertical';
 
   /**
-   * 變體
+   * Variant
    */
   variant?: 'fullWidth' | 'inset' | 'middle';
 
   /**
-   * 文字對齊方式（僅當有 children 時有效）
+   * text alignment (only valid when there are children)
    */
   textAlign?: 'left' | 'center' | 'right';
 
   /**
-   * 是否為彈性項目
+   * whetherFlexibleItem
    */
   flexItem?: boolean;
 
   /**
-   * 是否絕對定位
+   * whether absolute positioning
    */
   absolute?: boolean;
 
   /**
-   * 是否為淺色
+   * whether light theme
    */
   light?: boolean;
 
   /**
-   * 自訂樣式
+   * custom style
    */
   sx?: SxProps<Theme>;
 }
 
 /**
- * Divider 組件
+ * Divider component
  */
 export const Divider = forwardRef<HTMLHRElement, DividerProps>(function Divider(
   {

@@ -4,18 +4,18 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Button } from './Button';
 
 /**
- * Button 是最基礎的互動元件，用於觸發操作。
+ * Button is the most basic interactive component used to trigger actions.
  *
- * ## 使用時機
- * - 提交表單
- * - 觸發對話框
- * - 導航到其他頁面
- * - 執行任何用戶操作
+ * ## When to Use
+ * - Submit forms
+ * - Trigger dialogs
+ * - Navigate to other pages
+ * - Execute any user action
  *
- * ## 變體選擇
- * - **contained**: 最重要的操作（如「提交」、「確認」）
- * - **outlined**: 次要操作（如「取消」、「返回」）
- * - **text**: 較不重要的操作（如「了解更多」）
+ * ## Variant Selection
+ * - **contained**: Most important actions (e.g., "Submit", "Confirm")
+ * - **outlined**: Secondary actions (e.g., "Cancel", "Back")
+ * - **text**: Less important actions (e.g., "Learn More")
  */
 const meta = {
   title: 'Atoms/Button',
@@ -24,7 +24,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '基於 MUI Button 的封裝，提供統一的按鈕樣式和載入狀態支援。',
+        component:
+          'Wrapper around MUI Button providing unified button styles and loading state support.',
       },
     },
   },
@@ -41,24 +42,24 @@ const meta = {
         'tagText',
         'iconGradient',
       ],
-      description: '按鈕的視覺樣式',
+      description: 'Visual style of the button',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: '按鈕的尺寸',
+      description: 'Size of the button',
     },
     loading: {
       control: 'boolean',
-      description: '是否顯示載入狀態',
+      description: 'Whether to show loading state',
     },
     disabled: {
       control: 'boolean',
-      description: '是否停用按鈕',
+      description: 'Whether button is disabled',
     },
     fullWidth: {
       control: 'boolean',
-      description: '是否佔滿父容器寬度',
+      description: 'Whether button spans full width of parent container',
     },
   },
 } satisfies Meta<typeof Button>;
@@ -67,69 +68,69 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 主要按鈕樣式 (Contained)
- * 用於最重要的操作，如提交表單、確認動作等
+ * Primary button style (Contained)
+ * Used for most important actions, such as form submission, confirmation, etc.
  */
 export const Primary: Story = {
   args: {
-    children: '主要按鈕',
+    children: 'Primary Button',
     variant: 'contained',
     color: 'primary',
   },
 };
 
 /**
- * 次要按鈕樣式 (Outlined)
- * 用於次要操作，如取消、返回等
+ * Secondary button style (Outlined)
+ * Used for secondary actions, such as cancel, back, etc.
  */
 export const Secondary: Story = {
   args: {
-    children: '次要按鈕',
+    children: 'Secondary Button',
     variant: 'outlined',
     color: 'secondary',
   },
 };
 
 /**
- * 文字按鈕 (Text)
- * 用於較不重要的操作
+ * Text button
+ * Used for less important actions
  */
 export const Text: Story = {
   args: {
-    children: '文字按鈕',
+    children: 'Text Button',
     variant: 'text',
   },
 };
 
 /**
- * 載入狀態
- * 當執行非同步操作時顯示
+ * Loading state
+ * Displayed when executing asynchronous operations
  */
 export const Loading: Story = {
   args: {
-    children: '處理中...',
+    children: 'Processing...',
     loading: true,
   },
 };
 
 /**
- * 停用狀態
- * 當操作暫時不可用時
+ * Disabled state
+ * When action is temporarily unavailable
  */
 export const Disabled: Story = {
   args: {
-    children: '停用按鈕',
+    children: 'Disabled Button',
     disabled: true,
   },
 };
 
 /**
- * 全寬度按鈕
- * 佔滿父容器的整個寬度
+ * Full width button
+ * Spans the entire width of parent container
  */
 export const FullWidth: Story = {
   args: {
-    children: '全寬度按鈕',
+    children: 'Full Width Button',
     fullWidth: true,
   },
   decorators: [
@@ -142,15 +143,15 @@ export const FullWidth: Story = {
 };
 
 /**
- * 所有尺寸
- * 小、中、大三種尺寸
+ * All sizes
+ * Three sizes: small, medium, large
  */
 export const Sizes: Story = {
   render: () => (
     <Stack direction="row" spacing={2} alignItems="center">
-      <Button size="small">小按鈕</Button>
-      <Button size="medium">中按鈕</Button>
-      <Button size="large">大按鈕</Button>
+      <Button size="small">Small Button</Button>
+      <Button size="medium">Medium Button</Button>
+      <Button size="large">Large Button</Button>
     </Stack>
   ),
 };
@@ -193,8 +194,8 @@ export const WithAddIcon: Story = {
 };
 
 /**
- * 所有變體組合
- * Contained、Outlined、Text、Elevated、Tag、Icon Gradient
+ * All variant combinations
+ * Contained, Outlined, Text, Elevated, Tag, Icon Gradient
  */
 export const Variants: Story = {
   render: () => (
@@ -212,13 +213,13 @@ export const Variants: Story = {
       </Stack>
       <Stack direction="row" spacing={2}>
         <Button variant="contained" color="error">
-          刪除
+          Delete
         </Button>
         <Button variant="outlined" color="error">
-          取消
+          Cancel
         </Button>
         <Button variant="text" color="error">
-          了解更多
+          Learn More
         </Button>
       </Stack>
     </Stack>
@@ -226,17 +227,17 @@ export const Variants: Story = {
 };
 
 /**
- * 表單操作示例
- * 典型的表單提交和取消按鈕組合
+ * Form actions example
+ * Typical form submit and cancel button combination
  */
 export const FormActions: Story = {
   render: () => (
     <Stack direction="row" spacing={2}>
       <Button variant="outlined" color="inherit">
-        取消
+        Cancel
       </Button>
       <Button variant="contained" color="primary">
-        提交
+        Submit
       </Button>
     </Stack>
   ),

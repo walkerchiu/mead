@@ -10,19 +10,19 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 /**
- * PasswordField 組件 - Atomic Design: Molecule
+ * PasswordField Component - Atomic Design: Molecule
  *
- * 專為密碼輸入設計的組件，提供：
- * - 顯示/隱藏密碼切換
- * - 密碼強度指示器（可選）
- * - 密碼要求提示
+ * Component specifically designed for password input，provides：
+ * - Show/hide password toggle
+ * - Password strength indicator (optional)
+ * - Password requirement hints
  *
  * @example
  * ```tsx
  * <PasswordField
- *   label="密碼"
+ *   label="password"
  *   showStrength
- *   helperText="至少 8 個字元，包含大小寫字母和數字"
+ *   helperText="At least 8 characters, including uppercase and lowercase letters and numbers"
  * />
  * ```
  */
@@ -32,25 +32,25 @@ export interface PasswordFieldProps extends Omit<
   'type' | 'error' | 'helperText'
 > {
   /**
-   * 是否顯示密碼強度指示器
+   * Whether to show password strength indicator
    */
   showStrength?: boolean;
 
   /**
-   * 欄位錯誤（來自 react-hook-form）
-   * 可以是 FieldError 物件或字串或 boolean
+   * Field error（from react-hook-form）
+   * can be FieldError object or string or boolean
    */
   error?: FieldError | string | boolean;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * helper text（displayed in non-error state）
    */
   helperText?: string;
 }
 
 /**
- * 計算密碼強度
- * 返回 0-100 的分數和描述
+ * calculate password strength
+ * returns 0-100 score and description
  */
 function calculatePasswordStrength(password: string): {
   score: number;
@@ -63,37 +63,37 @@ function calculatePasswordStrength(password: string): {
 
   let score = 0;
 
-  // 長度檢查
+  // length check
   if (password.length >= 8) score += 25;
   if (password.length >= 12) score += 10;
   if (password.length >= 16) score += 10;
 
-  // 包含小寫字母
+  // contains lowercase letters
   if (/[a-z]/.test(password)) score += 15;
 
-  // 包含大寫字母
+  // contains uppercase letters
   if (/[A-Z]/.test(password)) score += 15;
 
-  // 包含數字
+  // Contains digits
   if (/\d/.test(password)) score += 15;
 
-  // 包含特殊字元
+  // contains special characters
   if (/[^a-zA-Z\d]/.test(password)) score += 10;
 
-  // 確定標籤和顏色
+  // confirm label and color
   if (score < 30) {
-    return { score, label: '弱', color: 'error' };
+    return { score, label: 'Weak', color: 'error' };
   } else if (score < 60) {
-    return { score, label: '中等', color: 'warning' };
+    return { score, label: 'medium level', color: 'warning' };
   } else if (score < 80) {
-    return { score, label: '強', color: 'info' };
+    return { score, label: 'strong', color: 'info' };
   } else {
-    return { score, label: '非常強', color: 'success' };
+    return { score, label: 'very strong', color: 'success' };
   }
 }
 
 /**
- * PasswordField 組件
+ * PasswordField component
  */
 export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
   function PasswordField(
@@ -103,7 +103,7 @@ export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
     const [showPassword, setShowPassword] = useState(false);
     const [internalValue, setInternalValue] = useState('');
 
-    // 使用外部 value 或內部 state
+    // use external value orinternal state
     const currentValue = value !== undefined ? String(value) : internalValue;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +122,7 @@ export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
       event.preventDefault();
     };
 
-    // 處理錯誤訊息
+    // handleError message
     const errorMessage =
       typeof error === 'object' && error !== null && 'message' in error
         ? (error as FieldError).message
@@ -132,7 +132,7 @@ export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
 
     const hasError = Boolean(error);
 
-    // 計算密碼強度
+    // calculate password strength
     const strength = showStrength
       ? calculatePasswordStrength(currentValue)
       : null;
@@ -151,7 +151,7 @@ export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  aria-label="切換密碼顯示"
+                  aria-label="togglepassworddisplay"
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
                   edge="end"

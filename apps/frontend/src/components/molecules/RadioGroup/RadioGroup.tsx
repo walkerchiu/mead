@@ -8,30 +8,30 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { FieldError } from 'react-hook-form';
 
 /**
- * RadioGroup 組件 - Atomic Design: Molecule
+ * RadioGroup Component - Atomic Design: Molecule
  *
- * 單選按鈕組，與 react-hook-form 完美整合。
+ * Radio button group，Perfect integration with react-hook-form。
  *
  * @example
  * ```tsx
- * // 基本用法
+ * // Basic usage
  * <RadioGroup
- *   label="性別"
+ *   label="Gender"
  *   options={[
- *     { value: 'male', label: '男性' },
- *     { value: 'female', label: '女性' },
+ *     { value: 'male', label: 'Male' },
+ *     { value: 'female', label: 'Female' },
  *   ]}
  *   {...register('gender')}
  *   error={errors.gender}
  * />
  *
- * // 橫向排列
+ * // Horizontal layout
  * <RadioGroup
- *   label="訂閱方案"
+ *   label="Subscription plan"
  *   row
  *   options={[
- *     { value: 'monthly', label: '月付' },
- *     { value: 'yearly', label: '年付' },
+ *     { value: 'monthly', label: 'Monthly' },
+ *     { value: 'yearly', label: 'Yearly' },
  *   ]}
  * />
  * ```
@@ -46,58 +46,58 @@ export interface RadioOption {
 
 export interface RadioGroupProps {
   /**
-   * 組件標籤
+   * componentlabel
    */
   label?: string;
 
   /**
-   * 選項列表
+   * Option items list
    */
   options: RadioOption[];
 
   /**
-   * 當前選中的值
+   * Currently selected value
    */
   value?: string | number;
 
   /**
-   * 值變更時的回調
+   * callback on value change
    */
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 
   /**
-   * 欄位錯誤（來自 react-hook-form）
+   * Field error（from react-hook-form）
    */
   error?: FieldError | string;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * helper text（displayed in non-error state）
    */
   helperText?: string;
 
   /**
-   * 是否必填
+   * whetherRequired
    */
   required?: boolean;
 
   /**
-   * 是否禁用
+   * Whether disabled
    */
   disabled?: boolean;
 
   /**
-   * 是否橫向排列
+   * whetherHorizontal layout
    */
   row?: boolean;
 
   /**
-   * 組件名稱（用於 form）
+   * component name (for form)
    */
   name?: string;
 }
 
 /**
- * RadioGroup 組件
+ * RadioGroup component
  */
 export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
   function RadioGroup(
@@ -116,7 +116,7 @@ export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
     },
     ref,
   ) {
-    // 處理錯誤訊息
+    // handleError message
     const errorMessage = typeof error === 'string' ? error : error?.message;
     const hasError = Boolean(errorMessage);
 

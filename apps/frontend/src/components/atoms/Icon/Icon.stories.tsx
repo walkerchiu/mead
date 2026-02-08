@@ -13,7 +13,7 @@ const meta = {
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: '圖示大小',
+      description: 'Icon size',
     },
     color: {
       control: 'select',
@@ -27,7 +27,7 @@ const meta = {
         'success',
         'disabled',
       ],
-      description: '圖示顏色',
+      description: 'Icon color',
     },
   },
 } satisfies Meta<typeof Icon>;
@@ -143,12 +143,12 @@ export const WithLabels: Story = {
   render: () => (
     <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
       {[
-        { icon: '🏠', label: '首頁' },
-        { icon: '⚙️', label: '設定' },
-        { icon: '👤', label: '個人資料' },
-        { icon: '📧', label: '郵件' },
-        { icon: '🔔', label: '通知' },
-        { icon: '💬', label: '訊息' },
+        { icon: '🏠', label: 'Home' },
+        { icon: '⚙️', label: 'Settings' },
+        { icon: '👤', label: 'Profile' },
+        { icon: '📧', label: 'Mail' },
+        { icon: '🔔', label: 'Notifications' },
+        { icon: '💬', label: 'Messages' },
       ].map((item) => (
         <Box
           key={item.label}
@@ -184,7 +184,7 @@ export const InButton: Story = {
         }}
       >
         <Icon color="inherit">🏠</Icon>
-        <Typography>首頁</Typography>
+        <Typography>Home</Typography>
       </Box>
       <Box
         sx={{
@@ -200,7 +200,7 @@ export const InButton: Story = {
         }}
       >
         <Icon color="inherit">⚙️</Icon>
-        <Typography>設定</Typography>
+        <Typography>Settings</Typography>
       </Box>
       <Box
         sx={{
@@ -216,7 +216,7 @@ export const InButton: Story = {
         }}
       >
         <Icon color="inherit">🗑️</Icon>
-        <Typography>刪除</Typography>
+        <Typography>Delete</Typography>
       </Box>
     </Box>
   ),
@@ -237,11 +237,11 @@ export const NavigationIcons: Story = {
       }}
     >
       {[
-        { icon: '🏠', label: '首頁', active: true },
-        { icon: '🔍', label: '探索', active: false },
-        { icon: '💬', label: '訊息', active: false },
-        { icon: '🔔', label: '通知', active: false },
-        { icon: '👤', label: '個人資料', active: false },
+        { icon: '🏠', label: 'Home', active: true },
+        { icon: '🔍', label: 'Explore', active: false },
+        { icon: '💬', label: 'Messages', active: false },
+        { icon: '🔔', label: 'Notifications', active: false },
+        { icon: '👤', label: 'Profile', active: false },
       ].map((item) => (
         <Box
           key={item.label}
@@ -277,10 +277,10 @@ export const StatusIcons: Story = {
   render: () => (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {[
-        { icon: '✅', label: '成功', color: 'success' },
-        { icon: '❌', label: '錯誤', color: 'error' },
-        { icon: '⚠️', label: '警告', color: 'warning' },
-        { icon: 'ℹ️', label: '資訊', color: 'info' },
+        { icon: '✅', label: 'Success', color: 'success' },
+        { icon: '❌', label: 'Error', color: 'error' },
+        { icon: '⚠️', label: 'Warning', color: 'warning' },
+        { icon: 'ℹ️', label: 'Info', color: 'info' },
       ].map((item) => (
         <Box
           key={item.label}
@@ -301,7 +301,7 @@ export const StatusIcons: Story = {
           <Box>
             <Typography variant="subtitle2">{item.label}</Typography>
             <Typography variant="body2" color="text.secondary">
-              這是一個{item.label}訊息的範例
+              This is a {item.label} message example
             </Typography>
           </Box>
         </Box>

@@ -6,19 +6,19 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 
 /**
- * CodeInput 是專門用於輸入驗證碼的組件。
+ * CodeInput is a component specifically designed for verification code input.
  *
- * ## 特色功能
- * - 自動聚焦到下一個輸入框
- * - 支援貼上完整驗證碼
- * - 退格鍵自動回到上一個框
- * - 只允許數字輸入
- * - 輸入完成自動觸發回調
+ * ## Features
+ * - Auto-focus to next input box
+ * - Support pasting complete verification code
+ * - Backspace auto-returns to previous box
+ * - Only allow numeric input
+ * - Auto-trigger callback on completion
  *
- * ## 使用場景
- * - 2FA 雙因素認證
- * - Email 或簡訊驗證碼
- * - 重設密碼驗證
+ * ## Use Cases
+ * - 2FA two-factor authentication
+ * - Email or SMS verification code
+ * - Password reset verification
  */
 const meta = {
   title: 'Atoms/CodeInput',
@@ -27,7 +27,8 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: '專為驗證碼輸入設計的組件，提供流暢的輸入體驗。',
+        component:
+          'Component designed for verification code input, providing smooth input experience.',
       },
     },
   },
@@ -42,21 +43,21 @@ const meta = {
   argTypes: {
     length: {
       control: { type: 'number', min: 4, max: 8 },
-      description: '驗證碼長度',
+      description: 'Verification code length',
     },
     error: {
       control: 'boolean',
-      description: '是否顯示錯誤狀態',
+      description: 'Whether to show error state',
     },
     disabled: {
       control: 'boolean',
-      description: '是否停用輸入',
+      description: 'Whether to disable input',
     },
     onChange: {
-      description: '驗證碼變更時的回調',
+      description: 'Callback when verification code changes',
     },
     onComplete: {
-      description: '輸入完成時的回調',
+      description: 'Callback when input is complete',
     },
   },
 } satisfies Meta<typeof CodeInput>;
@@ -65,8 +66,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 基本用法
- * 6位數驗證碼輸入
+ * Basic usage
+ * 6-digit verification code input
  */
 export const Default: Story = {
   render: function DefaultExample() {
@@ -75,22 +76,23 @@ export const Default: Story = {
     return (
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" gutterBottom>
-          6 位數驗證碼
+          6-digit verification code
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          最常見的驗證碼長度，用於 Email 或簡訊驗證
+          Most common verification code length, used for email or SMS
+          verification
         </Typography>
 
         <CodeInput length={6} value={code} onChange={setCode} />
 
         <Alert severity="info" sx={{ mt: 2, textAlign: 'left' }}>
           <Typography variant="body2">
-            <strong>當前輸入：</strong>
-            {code || '(尚未輸入)'}
+            <strong>Current Input:</strong>
+            {code || '(not entered yet)'}
             <br />
-            <strong>長度：</strong>
+            <strong>Length:</strong>
             {code.length} / 6<br />
-            <strong>範例：</strong>試試輸入 123456
+            <strong>Example:</strong>Try entering 123456
           </Typography>
         </Alert>
       </Box>
@@ -99,8 +101,8 @@ export const Default: Story = {
 };
 
 /**
- * 4位數驗證碼
- * 較短的驗證碼（如 PIN 碼）
+ * 4-digit verification code
+ * Shorter verification code (e.g., PIN code)
  */
 export const FourDigits: Story = {
   render: function FourDigitsExample() {
@@ -109,22 +111,22 @@ export const FourDigits: Story = {
     return (
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" gutterBottom>
-          4 位數驗證碼
+          4-digit verification code
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          較短的驗證碼，常用於 ATM PIN 碼、手機解鎖
+          Shorter verification code, commonly used for ATM PIN, phone unlock
         </Typography>
 
         <CodeInput length={4} value={code} onChange={setCode} />
 
         <Alert severity="info" sx={{ mt: 2, textAlign: 'left' }}>
           <Typography variant="body2">
-            <strong>當前輸入：</strong>
-            {code || '(尚未輸入)'}
+            <strong>Current Input:</strong>
+            {code || '(not entered yet)'}
             <br />
-            <strong>長度：</strong>
+            <strong>Length:</strong>
             {code.length} / 4<br />
-            <strong>範例：</strong>試試輸入 1234
+            <strong>Example:</strong>Try entering 1234
           </Typography>
         </Alert>
       </Box>
@@ -133,8 +135,8 @@ export const FourDigits: Story = {
 };
 
 /**
- * 8位數驗證碼
- * 較長的驗證碼
+ * 8-digit verification code
+ * Longer verification code
  */
 export const EightDigits: Story = {
   render: function EightDigitsExample() {
@@ -143,22 +145,23 @@ export const EightDigits: Story = {
     return (
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" gutterBottom>
-          8 位數驗證碼
+          8-digit verification code
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          較長的驗證碼，提供更高的安全性，用於敏感操作
+          Longer verification code, provides higher security, used for sensitive
+          operations
         </Typography>
 
         <CodeInput length={8} value={code} onChange={setCode} />
 
         <Alert severity="info" sx={{ mt: 2, textAlign: 'left' }}>
           <Typography variant="body2">
-            <strong>當前輸入：</strong>
-            {code || '(尚未輸入)'}
+            <strong>Current Input:</strong>
+            {code || '(not entered yet)'}
             <br />
-            <strong>長度：</strong>
+            <strong>Length:</strong>
             {code.length} / 8<br />
-            <strong>範例：</strong>試試輸入 12345678
+            <strong>Example:</strong>Try entering 12345678
           </Typography>
         </Alert>
       </Box>
@@ -167,8 +170,8 @@ export const EightDigits: Story = {
 };
 
 /**
- * 錯誤狀態
- * 驗證失敗時顯示紅色邊框
+ * Error state
+ * Display red border when verification fails
  */
 export const Error: Story = {
   args: {
@@ -179,8 +182,8 @@ export const Error: Story = {
 };
 
 /**
- * 停用狀態
- * 輸入框不可編輯
+ * Disabled state
+ * Input boxes are not editable
  */
 export const Disabled: Story = {
   args: {
@@ -191,8 +194,8 @@ export const Disabled: Story = {
 };
 
 /**
- * 互動式範例
- * 展示輸入完成後的回調
+ * Interactive Example
+ * Demonstrate callback after completion
  */
 export const Interactive: Story = {
   render: function InteractiveCodeInput() {
@@ -201,16 +204,16 @@ export const Interactive: Story = {
 
     const handleComplete = (value: string) => {
       setCompleted(true);
-      console.log('驗證碼輸入完成:', value);
+      console.log('Verification code input complete:', value);
     };
 
     return (
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" gutterBottom>
-          請輸入 6 位數驗證碼
+          Enter 6-digit verification code
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          驗證碼已發送到您的郵箱
+          Verification code has been sent to your email
         </Typography>
 
         <CodeInput
@@ -221,12 +224,12 @@ export const Interactive: Story = {
         />
 
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          當前輸入: {code || '(尚未輸入)'}
+          Current Input: {code || '(not entered yet)'}
         </Typography>
 
         {completed && (
           <Alert severity="success" sx={{ mt: 2 }}>
-            驗證碼輸入完成！
+            Verification code input complete!
           </Alert>
         )}
       </Box>
@@ -235,8 +238,8 @@ export const Interactive: Story = {
 };
 
 /**
- * 驗證流程範例
- * 完整的驗證碼輸入與驗證流程
+ * Verification Flow Example
+ * Complete verification code input and verification flow
  */
 export const VerificationFlow: Story = {
   render: function VerificationFlowExample() {
@@ -249,13 +252,13 @@ export const VerificationFlow: Story = {
     const handleComplete = (value: string) => {
       setStatus('verifying');
 
-      // 模擬 API 驗證
+      // Simulate API verification
       setTimeout(() => {
         if (value === correctCode) {
           setStatus('success');
         } else {
           setStatus('error');
-          setCode(''); // 清空錯誤的驗證碼
+          setCode(''); // Clear incorrect verification code
         }
       }, 1000);
     };
@@ -263,10 +266,10 @@ export const VerificationFlow: Story = {
     return (
       <Box sx={{ textAlign: 'center', width: '400px' }}>
         <Typography variant="h6" gutterBottom>
-          雙因素認證
+          Two-Factor Authentication
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-          請輸入發送到您郵箱的 6 位數驗證碼
+          Enter the 6-digit verification code sent to your email
         </Typography>
 
         <CodeInput
@@ -281,16 +284,22 @@ export const VerificationFlow: Story = {
         <Box sx={{ mt: 2, minHeight: '60px' }}>
           {status === 'idle' && (
             <Typography variant="caption" color="text.secondary">
-              提示：正確的驗證碼是 {correctCode}
+              Hint: The correct verification code is {correctCode}
             </Typography>
           )}
 
-          {status === 'verifying' && <Alert severity="info">驗證中...</Alert>}
+          {status === 'verifying' && (
+            <Alert severity="info">Verifying...</Alert>
+          )}
 
-          {status === 'success' && <Alert severity="success">驗證成功！</Alert>}
+          {status === 'success' && (
+            <Alert severity="success">Verification successful!</Alert>
+          )}
 
           {status === 'error' && (
-            <Alert severity="error">驗證碼錯誤，請重試</Alert>
+            <Alert severity="error">
+              Verification code is incorrect, please try again
+            </Alert>
           )}
         </Box>
       </Box>
@@ -299,8 +308,8 @@ export const VerificationFlow: Story = {
 };
 
 /**
- * 貼上測試
- * 測試貼上完整驗證碼的功能
+ * Paste Test
+ * Test the paste complete verification code feature
  */
 export const PasteTest: Story = {
   render: function PasteTestExample() {
@@ -309,16 +318,17 @@ export const PasteTest: Story = {
     return (
       <Box sx={{ textAlign: 'center' }}>
         <Typography variant="h6" gutterBottom>
-          貼上測試
+          Paste Test
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          試試複製這個驗證碼並貼到輸入框：<strong>789012</strong>
+          Try copying this verification code and pasting it into the input box:
+          <strong>789012</strong>
         </Typography>
 
         <CodeInput length={6} value={code} onChange={setCode} />
 
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          當前值: {code || '(尚未輸入)'}
+          Current value: {code || '(not entered yet)'}
         </Typography>
       </Box>
     );

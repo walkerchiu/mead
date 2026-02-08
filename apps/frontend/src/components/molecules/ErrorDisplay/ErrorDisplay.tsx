@@ -1,36 +1,36 @@
 /**
- * ErrorDisplay - 頁面級錯誤顯示組件
+ * ErrorDisplay - Page-level error display component
  *
- * **用途：頁面級錯誤顯示**
+ * **Purpose: Page-level error display**
  *
- * 適用場景：
- * - 404 頁面未找到
- * - 403 權限不足
- * - 500 伺服器錯誤
- * - 網路連線失敗
- * - Session 過期
- * - 資料載入失敗
+ * Use cases:
+ * - 404 Page not found
+ * - 403 Insufficient permissions
+ * - 500 Server error
+ * - Network connection failed
+ * - Session Expired
+ * - Data load failed
  *
- * **注意**：表單內或頁面內的內嵌訊息請使用 AlertMessage 組件
+ * **Note**：For inline messages within forms or pages, use AlertMessage component
  *
  * @example
  * ```tsx
- * // 404 錯誤
+ * // 404 Error
  * <ErrorDisplay
- *   title="頁面未找到"
- *   message="您訪問的頁面不存在或已被移除。"
+ *   title="Page not found"
+ *   message="The page you visited does not exist or has been removed。"
  *   severity="error"
  *   showRetry
- *   retryText="返回首頁"
+ *   retryText="Back to home"
  *   onRetry={() => router.push('/')}
  * />
  *
- * // 權限不足
+ * // Insufficient permissions
  * <ErrorDisplay
- *   title="權限不足"
- *   message="您沒有權限訪問此頁面。"
+ *   title="Insufficient permissions"
+ *   message="You do not have permission to access this page。"
  *   severity="warning"
- *   action={<Button variant="contained">申請權限</Button>}
+ *   action={<Button variant="contained">Request permission</Button>}
  * />
  * ```
  */
@@ -44,23 +44,23 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
 
 interface ErrorDisplayProps {
-  /** 錯誤標題 */
+  /** ErrorTitle */
   title?: string;
-  /** 錯誤訊息 */
+  /** Error message */
   message: string;
-  /** 錯誤嚴重性 */
+  /** error severity */
   severity?: ErrorSeverity;
-  /** 是否顯示重試按鈕 */
+  /** whether to showRetryButton */
   showRetry?: boolean;
-  /** 重試按鈕文字 */
+  /** RetryButtontext */
   retryText?: string;
-  /** 重試回調函數 */
+  /** Retrycallback function */
   onRetry?: () => void;
-  /** 額外操作按鈕 */
+  /** extraAction button */
   action?: React.ReactNode;
-  /** 圖示大小 */
+  /** iconsize */
   iconSize?: number;
-  /** 最小高度 */
+  /** minimumheight */
   minHeight?: string;
 }
 
@@ -71,16 +71,16 @@ const iconMap = {
 };
 
 /**
- * ErrorDisplay - 頁面級錯誤顯示組件
+ * ErrorDisplay - Page-level error display component
  *
- * 佔據大空間，中央顯示大圖示和錯誤訊息，適合作為整個頁面或主要內容區域的錯誤提示。
+ * occupies large space, center displays large icon and error message, suitable as error display for entire page or main content area。
  */
 export function ErrorDisplay({
   title,
   message,
   severity = 'error',
   showRetry = false,
-  retryText = '重試',
+  retryText = 'Retry',
   onRetry,
   action,
   iconSize = 80,

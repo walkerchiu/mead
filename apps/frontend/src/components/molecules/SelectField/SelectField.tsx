@@ -11,71 +11,71 @@ import { FieldError } from 'react-hook-form';
 import type { TextFieldProps } from '@mui/material/TextField';
 
 /**
- * SelectField 組件 - Atomic Design: Molecule
+ * SelectField Component - Atomic Design: Molecule
  *
- * 結合 TextField Select 和錯誤處理的下拉選單組件。
- * 與 react-hook-form 完美集成，支援單選、多選、分組、圖示和搜尋功能。
+ * Dropdown select component combining TextField Select and error handling。
+ * Perfect integration with react-hook-form, supports single select, multi-select, grouping, icon and search featuress。
  *
  * @example
  * ```tsx
- * // 單選
+ * // Single select
  * <SelectField
- *   label="國家"
+ *   label="Country"
  *   options={[
- *     { value: 'tw', label: '台灣' },
- *     { value: 'us', label: '美國' },
+ *     { value: 'tw', label: 'Taiwan' },
+ *     { value: 'us', label: 'USA' },
  *   ]}
  *   {...register('country')}
  *   error={errors.country}
  * />
  *
- * // 多選
+ * // multi-select
  * <SelectField
- *   label="興趣"
+ *   label="Interests"
  *   multiple
  *   options={[
- *     { value: 'music', label: '音樂' },
- *     { value: 'sports', label: '運動' },
+ *     { value: 'music', label: 'Music' },
+ *     { value: 'sports', label: 'Sports' },
  *   ]}
  *   {...register('interests')}
  *   error={errors.interests}
  * />
  *
- * // 分組選項
+ * // grouping options
  * <SelectField
- *   label="城市"
+ *   label="City"
  *   options={[
- *     { group: '北部', value: 'taipei', label: '台北' },
- *     { group: '北部', value: 'taoyuan', label: '桃園' },
- *     { group: '南部', value: 'kaohsiung', label: '高雄' },
+ *     { group: 'North', value: 'taipei', label: 'Taipei' },
+ *     { group: 'North', value: 'taoyuan', label: 'Taoyuan' },
+ *     { group: 'South', value: 'kaohsiung', label: 'HighXiong' },
  *   ]}
  * />
  *
- * // 帶圖示的選項
+ * // options with icon
  * <SelectField
- *   label="天氣"
+ *   label="Weather"
  *   options={[
- *     { value: 'sunny', label: '晴天', icon: <Icon>☀️</Icon> },
- *     { value: 'rainy', label: '下雨', icon: <Icon>🌧️</Icon> },
+ *     { value: 'sunny', label: 'Sunny', icon: <icon>☀️</icon> },
+ *     { value: 'rainy', label: 'Rainy', icon: <icon>🌧️</icon> },
  *   ]}
  * />
  *
- * // 可搜尋選單
+ * // cansearchmenu
  * <SelectField
- *   label="國家"
+ *   label="Country"
  *   searchable
  *   options={countryOptions}
- *   placeholder="搜尋國家"
+ *   placeholder="search countries"
  * />
  *
- * // 完整功能（搜尋 + 分組 + 圖示 + 多選）
+ * // full features (search + grouping + icon + multi-select)
  * <SelectField
- *   label="活動"
+ *   label="active"
  *   searchable
  *   multiple
  *   options={[
- *     { group: '戶外', value: 'hiking', label: '登山', icon: <Icon>🥾</Icon> },
- *     { group: '室內', value: 'reading', label: '閱讀', icon: <Icon>📖</Icon> },
+ *     { group: 'Outdoor', value: 'hiking', label: 'Hiking', icon: <icon>🥾</icon> },
+ *     { group: 'Indoor', value: 'reading', label: 'Reading', icon: <icon>📖</icon> },
  *   ]}
  * />
  * ```
@@ -87,7 +87,7 @@ export interface SelectOption {
   disabled?: boolean;
   group?: string;
   /**
-   * 選項圖示（支援 emoji、Icon 組件或任何 ReactNode）
+   * optionsicon（supports emoji、icon componentorany ReactNode）
    */
   icon?: React.ReactNode;
 }
@@ -97,56 +97,56 @@ export interface SelectFieldProps extends Omit<
   'error' | 'helperText' | 'select'
 > {
   /**
-   * 選項列表
+   * Option items list
    */
   options: SelectOption[];
 
   /**
-   * 欄位錯誤（來自 react-hook-form）
+   * Field error（from react-hook-form）
    */
   error?: FieldError | string;
 
   /**
-   * 輔助文字（非錯誤狀態時顯示）
+   * helper text（displayed in non-error state）
    */
   helperText?: string;
 
   /**
-   * 是否多選
+   * whethermulti-select
    */
   multiple?: boolean;
 
   /**
-   * 多選時是否顯示為 Chips
+   * whether to show as chips in multi-select
    */
   renderChips?: boolean;
 
   /**
-   * 多選時是否顯示 checkbox
+   * whether to show in multi-select checkbox
    */
   showCheckbox?: boolean;
 
   /**
-   * 空值時的提示文字
+   * placeholder text when empty
    */
   placeholder?: string;
 
   /**
-   * 是否啟用搜尋功能（使用 Autocomplete）
+   * whetheractivesearchFeatures（use Autocomplete）
    */
   searchable?: boolean;
 
   /**
-   * 搜尋時無結果的提示文字
+   * searchWhenno results messagetext
    */
   noOptionsText?: string;
 }
 
 /**
- * SelectField 組件
+ * SelectField component
  *
- * 處理 react-hook-form 的 error 物件，
- * 自動提取錯誤訊息並顯示
+ * handle react-hook-form  error object，
+ * autoextractError messageanddisplay
  */
 export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
   function SelectField(
@@ -159,17 +159,17 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
       showCheckbox = true,
       placeholder,
       searchable = false,
-      noOptionsText = '沒有選項',
+      noOptionsText = 'nooptions',
       value,
       ...props
     },
     ref,
   ) {
-    // 處理錯誤訊息
+    // handleError message
     const errorMessage = typeof error === 'string' ? error : error?.message;
     const hasError = Boolean(errorMessage);
 
-    // 如果啟用搜尋功能，使用 Autocomplete
+    // ifactivesearchFeatures，use Autocomplete
     if (searchable) {
       return (
         <Autocomplete
@@ -261,7 +261,7 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
       );
     }
 
-    // 將選項按 group 分組
+    // willoptionsby group Grouping
     const groupedOptions = options.reduce(
       (acc, option) => {
         const group = option.group || '';
@@ -277,10 +277,10 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
     const hasGroups =
       Object.keys(groupedOptions).filter((key) => key !== '').length > 0;
 
-    // 渲染選項
+    // renderoptions
     const renderOptions = () => {
       if (hasGroups) {
-        // 有分組的選項
+        // hasGroupingoptions
         return Object.entries(groupedOptions)
           .map(([group, groupOptions]) => {
             if (group === '') {
@@ -342,7 +342,7 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
           .flat();
       }
 
-      // 無分組的選項
+      // noGroupingoptions
       return options.map((option) => (
         <MenuItem
           key={option.value}
@@ -362,7 +362,7 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
       ));
     };
 
-    // 多選時的 renderValue
+    // multi-selectWhen renderValue
     const renderValue =
       multiple && renderChips
         ? (selected: unknown) => {

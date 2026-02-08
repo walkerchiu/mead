@@ -20,22 +20,22 @@ import {
 } from '@mui/icons-material';
 
 /**
- * Drawer 元件提供側邊欄功能，支援三種狀態和三種模式。
+ * Drawer component provides sidebar functionality, supporting three states and three modes.
  *
- * **狀態（State）**:
- * - `closed`: 完全關閉（僅 temporary 和 persistent）
- * - `mini`: 半展開，只顯示圖示
- * - `open`: 完全展開，顯示完整內容
+ * **States**:
+ * - `closed`: Completely closed (temporary and persistent only)
+ * - `mini`: Semi-expanded, showing icons only
+ * - `open`: Fully expanded, showing complete content
  *
- * **模式（Variant）**:
- * - `temporary`: 覆蓋在內容上方，適合手機版
- * - `persistent`: 推開主要內容，適合桌面版可切換側邊欄
- * - `permanent`: 永久顯示，適合桌面版固定側邊欄
+ * **Variants**:
+ * - `temporary`: Overlays content, suitable for mobile
+ * - `persistent`: Pushes main content, suitable for toggleable desktop sidebar
+ * - `permanent`: Permanently displayed, suitable for fixed desktop sidebar
  *
- * **使用場景**:
- * - 應用程式導航側邊欄
- * - 設定面板
- * - 通知面板
+ * **Use Cases**:
+ * - Application navigation sidebar
+ * - Settings panel
+ * - Notification panel
  */
 const meta = {
   title: 'Organisms/Drawer',

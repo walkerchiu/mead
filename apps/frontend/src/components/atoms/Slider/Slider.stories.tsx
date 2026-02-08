@@ -12,38 +12,38 @@ const meta = {
   argTypes: {
     label: {
       control: 'text',
-      description: '滑桿標籤',
+      description: 'Slider label',
     },
     min: {
       control: 'number',
-      description: '最小值',
+      description: 'Minimum value',
     },
     max: {
       control: 'number',
-      description: '最大值',
+      description: 'Maximum value',
     },
     step: {
       control: 'number',
-      description: '步長',
+      description: 'Step',
     },
     disabled: {
       control: 'boolean',
-      description: '是否禁用',
+      description: 'Whether to disable',
     },
     size: {
       control: 'select',
       options: ['small', 'medium'],
-      description: '滑桿大小',
+      description: 'Slider size',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary'],
-      description: '滑桿顏色',
+      description: 'Slider color',
     },
     valueLabelDisplay: {
       control: 'select',
       options: ['auto', 'on', 'off'],
-      description: '值標籤顯示方式',
+      description: 'Value label display mode',
     },
   },
 } satisfies Meta<typeof Slider>;
@@ -53,7 +53,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    label: '音量',
+    label: 'Volume',
     defaultValue: 50,
     min: 0,
     max: 100,
@@ -62,30 +62,30 @@ export const Default: Story = {
 
 export const WithHelperText: Story = {
   args: {
-    label: '亮度',
+    label: 'Brightness',
     defaultValue: 75,
-    helperText: '調整螢幕亮度',
+    helperText: 'Adjust screen brightness',
   },
 };
 
 export const WithError: Story = {
   args: {
-    label: '年齡',
+    label: 'Age',
     defaultValue: 15,
-    error: { type: 'min', message: '年齡必須大於 18 歲' },
+    error: { type: 'min', message: 'Age must be greater than 18' },
   },
 };
 
 export const WithMarks: Story = {
   args: {
-    label: '優先級',
+    label: 'Priority',
     defaultValue: 50,
     marks: [
-      { value: 0, label: '低' },
-      { value: 25, label: '中低' },
-      { value: 50, label: '中' },
-      { value: 75, label: '中高' },
-      { value: 100, label: '高' },
+      { value: 0, label: 'Low' },
+      { value: 25, label: 'MediumLow' },
+      { value: 50, label: 'Medium' },
+      { value: 75, label: 'MediumHigh' },
+      { value: 100, label: 'High' },
     ],
     step: 25,
   },
@@ -93,7 +93,7 @@ export const WithMarks: Story = {
 
 export const WithAllMarks: Story = {
   args: {
-    label: '評分',
+    label: 'Rating',
     defaultValue: 5,
     min: 0,
     max: 10,
@@ -105,7 +105,7 @@ export const WithAllMarks: Story = {
 
 export const Range: Story = {
   args: {
-    label: '價格範圍',
+    label: 'Price Range',
     defaultValue: [20, 80],
     min: 0,
     max: 100,
@@ -116,7 +116,7 @@ export const Range: Story = {
 
 export const Small: Story = {
   args: {
-    label: '小尺寸滑桿',
+    label: 'Small slider',
     defaultValue: 30,
     size: 'small',
   },
@@ -124,16 +124,16 @@ export const Small: Story = {
 
 export const Disabled: Story = {
   args: {
-    label: '已禁用',
+    label: 'Disabled',
     defaultValue: 60,
     disabled: true,
-    helperText: '此設定目前無法修改',
+    helperText: 'This setting cannot be modified currently',
   },
 };
 
 export const Temperature: Story = {
   args: {
-    label: '溫度（°C）',
+    label: 'Temperature (°C)',
     defaultValue: 22,
     min: 10,
     max: 35,
@@ -154,11 +154,11 @@ export const Interactive: Story = {
     return (
       <div style={{ width: '300px' }}>
         <Slider
-          label="音量控制"
+          label="Volume Control"
           value={value}
           onChange={(_, newValue) => setValue(newValue as number)}
           valueLabelDisplay="on"
-          helperText={`當前音量: ${value}%`}
+          helperText={`Current volume: ${value}%`}
         />
       </div>
     );
@@ -169,7 +169,7 @@ export const Vertical: Story = {
   render: () => (
     <div style={{ height: '300px', display: 'flex', justifyContent: 'center' }}>
       <Slider
-        label="垂直滑桿"
+        label="Vertical Slider"
         defaultValue={60}
         orientation="vertical"
         valueLabelDisplay="on"

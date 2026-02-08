@@ -1,8 +1,8 @@
 /**
- * Pages - 頁面組件 (Storybook 專用)
+ * Pages - Page Components (Storybook only)
  *
- * 完整頁面的展示，用於 Storybook。
- * 實際頁面在 app/ 目錄中。
+ * Complete page display for Storybook.
+ * Actual pages are in the app/ directory.
  */
 
-// 所有頁面都是透過 stories 展示，不需要導出組件
+// All pages are through stories display，no need to export components

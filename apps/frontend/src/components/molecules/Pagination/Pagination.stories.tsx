@@ -13,31 +13,31 @@ const meta = {
   argTypes: {
     count: {
       control: { type: 'number', min: 1, max: 100 },
-      description: '總頁數',
+      description: 'Total pages',
     },
     page: {
       control: { type: 'number', min: 1 },
-      description: '當前頁碼',
+      description: 'Current page number',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: '組件大小',
+      description: 'Component size',
     },
     variant: {
       control: 'select',
       options: ['text', 'outlined'],
-      description: '組件變體',
+      description: 'Component variant',
     },
     shape: {
       control: 'select',
       options: ['circular', 'rounded'],
-      description: '按鈕形狀',
+      description: 'Button shape',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary', 'standard'],
-      description: '組件顏色',
+      description: 'Component color',
     },
   },
 } satisfies Meta<typeof Pagination>;
@@ -134,7 +134,7 @@ export const Interactive: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          當前頁碼: {page}
+          Current page: {page}
         </Typography>
         <Pagination count={10} page={page} onChange={setPage} />
       </Box>
@@ -151,7 +151,7 @@ export const WithInfoInteractive: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          當前頁碼: {page} / 10
+          Current page: {page} / 10
         </Typography>
         <Pagination
           count={Math.ceil(totalItems / itemsPerPage)}
@@ -172,7 +172,7 @@ export const ManyPages: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          當前頁碼: {page} / 100
+          Current page: {page} / 100
         </Typography>
         <Pagination
           count={100}
@@ -204,7 +204,7 @@ export const CustomSiblingCount: Story = {
         </Box>
         <Box>
           <Typography variant="body2" sx={{ mb: 1 }}>
-            siblingCount = 1 (預設)
+            siblingCount = 1 (default)
           </Typography>
           <Pagination
             count={20}
@@ -236,7 +236,7 @@ export const Variants: Story = {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Box>
           <Typography variant="body2" sx={{ mb: 1 }}>
-            Text (預設)
+            Text (default)
           </Typography>
           <Pagination
             count={10}
@@ -294,7 +294,7 @@ export const TablePagination: Story = {
     return (
       <Box sx={{ width: '100%' }}>
         <Typography variant="h6" gutterBottom>
-          使用者列表
+          User List
         </Typography>
         <Box
           sx={{
@@ -306,7 +306,7 @@ export const TablePagination: Story = {
           }}
         >
           <Typography variant="body2" color="text.secondary">
-            [表格內容會顯示在這裡]
+            [Table content will be displayed here]
           </Typography>
         </Box>
         <Pagination

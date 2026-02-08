@@ -17,16 +17,18 @@ type Story = StoryObj<typeof meta>;
 
 const sampleItems = [
   {
-    title: '什麼是 React？',
-    content: 'React 是一個用於建構使用者介面的 JavaScript 函式庫。',
+    title: 'What is React?',
+    content: 'React is a JavaScript library for building user interfaces.',
   },
   {
-    title: '什麼是 TypeScript？',
-    content: 'TypeScript 是 JavaScript 的超集合，添加了靜態型別檢查。',
+    title: 'What is TypeScript?',
+    content:
+      'TypeScript is a superset of JavaScript that adds static type checking.',
   },
   {
-    title: '什麼是 Next.js？',
-    content: 'Next.js 是一個基於 React 的全端框架，支援 SSR 和 SSG。',
+    title: 'What is Next.js?',
+    content:
+      'Next.js is a full-stack framework based on React, supporting SSR and SSG.',
   },
 ];
 
@@ -47,29 +49,37 @@ export const WithSubtitle: Story = {
   args: {
     items: [
       {
-        title: '個人資料',
-        subtitle: '管理您的基本資訊',
+        title: 'Personal Information',
+        subtitle: 'Manage your basic information',
         content: (
           <Box>
-            <Typography>在這裡您可以更新您的姓名、電子郵件等資訊。</Typography>
+            <Typography>
+              Here you can update your name, email, and other information.
+            </Typography>
           </Box>
         ),
       },
       {
-        title: '安全設定',
-        subtitle: '密碼與雙因素驗證',
+        title: 'Security Settings',
+        subtitle: 'Password and two-factor authentication',
         content: (
           <Box>
-            <Typography>修改密碼、啟用雙因素驗證以保護您的帳戶。</Typography>
+            <Typography>
+              Change password and enable two-factor authentication to protect
+              your account.
+            </Typography>
           </Box>
         ),
       },
       {
-        title: '通知偏好',
-        subtitle: '自訂您的通知設定',
+        title: 'Notification Preferences',
+        subtitle: 'Customize your notification settings',
         content: (
           <Box>
-            <Typography>選擇您想接收的通知類型和頻率。</Typography>
+            <Typography>
+              Choose the types and frequency of notifications you want to
+              receive.
+            </Typography>
           </Box>
         ),
       },
@@ -80,9 +90,16 @@ export const WithSubtitle: Story = {
 export const WithDisabled: Story = {
   args: {
     items: [
-      { title: '可用項目一', content: '這個項目可以展開' },
-      { title: '禁用項目', content: '這個項目被禁用了', disabled: true },
-      { title: '可用項目二', content: '這個項目也可以展開' },
+      { title: 'Available Item One', content: 'This item can be expanded' },
+      {
+        title: 'Disabled Item',
+        content: 'This item is disabled',
+        disabled: true,
+      },
+      {
+        title: 'Available Item Two',
+        content: 'This item can also be expanded',
+      },
     ],
   },
 };
@@ -114,7 +131,7 @@ export const Controlled: Story = {
     return (
       <Box sx={{ width: '600px' }}>
         <Typography variant="body2" sx={{ mb: 2 }}>
-          當前展開面板: {expanded !== false ? expanded : '無'}
+          Currently expanded panel: {expanded !== false ? expanded : 'None'}
         </Typography>
         <Accordion
           items={sampleItems}
@@ -130,28 +147,29 @@ export const FAQ: Story = {
   args: {
     items: [
       {
-        title: '如何註冊帳號？',
+        title: 'How do I register an account?',
         content:
-          '點擊右上角的「註冊」按鈕，填寫必要資訊即可完成註冊。您需要提供有效的電子郵件地址。',
+          'Click the "Sign Up" button in the top right corner and fill in the required information to complete registration. You will need to provide a valid email address.',
       },
       {
-        title: '忘記密碼怎麼辦？',
+        title: 'What if I forget my password?',
         content:
-          '在登入頁面點擊「忘記密碼」連結，輸入您的電子郵件地址，系統會發送重設密碼的連結給您。',
+          'Click the "Forgot Password" link on the login page, enter your email address, and the system will send you a password reset link.',
       },
       {
-        title: '如何變更個人資料？',
+        title: 'How do I change my personal information?',
         content:
-          '登入後進入「設定」頁面，點擊「個人資料」標籤，即可編輯您的資訊。記得儲存變更。',
+          'After logging in, go to the "Settings" page, click the "Personal Information" tab, and you can edit your information. Remember to save your changes.',
       },
       {
-        title: '支援哪些付款方式？',
-        content: '我們支援信用卡、金融卡、PayPal 和銀行轉帳等多種付款方式。',
+        title: 'What payment methods are supported?',
+        content:
+          'We support various payment methods including credit cards, debit cards, PayPal, and bank transfers.',
       },
       {
-        title: '如何聯絡客服？',
+        title: 'How do I contact customer support?',
         content:
-          '您可以透過電子郵件 support@example.com 或使用網站內的即時聊天功能聯絡我們。',
+          'You can contact us via email at support@example.com or use the live chat feature on the website.',
       },
     ],
     defaultExpanded: 0,
@@ -162,12 +180,12 @@ export const Documentation: Story = {
   args: {
     items: [
       {
-        title: '快速開始',
-        subtitle: '5 分鐘快速上手',
+        title: 'Quick Start',
+        subtitle: 'Get started in 5 minutes',
         content: (
           <Box>
             <Typography variant="subtitle2" gutterBottom>
-              安裝
+              Installation
             </Typography>
             <Typography
               variant="body2"
@@ -177,32 +195,34 @@ export const Documentation: Story = {
               npm install @mui/material
             </Typography>
             <Typography variant="subtitle2" gutterBottom sx={{ mt: 2 }}>
-              基本使用
+              Basic Usage
             </Typography>
             <Typography variant="body2">
-              匯入所需的組件並在您的應用程式中使用。
-            </Typography>
-          </Box>
-        ),
-      },
-      {
-        title: 'API 參考',
-        subtitle: '完整的 API 文件',
-        content: (
-          <Box>
-            <Typography variant="body2">
-              查看完整的 API 文件以了解所有可用的屬性和方法。
+              Import the required components and use them in your application.
             </Typography>
           </Box>
         ),
       },
       {
-        title: '範例',
-        subtitle: '實際使用範例',
+        title: 'API Reference',
+        subtitle: 'Complete API documentation',
         content: (
           <Box>
             <Typography variant="body2">
-              瀏覽各種實際使用範例，了解如何在不同場景中使用組件。
+              View the complete API documentation to learn about all available
+              properties and methods.
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        title: 'Examples',
+        subtitle: 'Practical usage examples',
+        content: (
+          <Box>
+            <Typography variant="body2">
+              Browse various practical examples to learn how to use components
+              in different scenarios.
             </Typography>
           </Box>
         ),
@@ -227,16 +247,16 @@ export const RichContent: Story = {
                     bgcolor: 'success.main',
                   }}
                 />
-                <Typography>已完成</Typography>
+                <Typography>Completed</Typography>
               </Box>
             ),
             content: (
               <Box>
                 <Typography variant="body2" paragraph>
-                  這個任務已經完成。
+                  This task has been completed.
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  完成時間: 2026-02-06 10:30
+                  Completed at: 2026-02-06 10:30
                 </Typography>
               </Box>
             ),
@@ -252,16 +272,16 @@ export const RichContent: Story = {
                     bgcolor: 'warning.main',
                   }}
                 />
-                <Typography>進行中</Typography>
+                <Typography>In Progress</Typography>
               </Box>
             ),
             content: (
               <Box>
                 <Typography variant="body2" paragraph>
-                  這個任務正在進行中。
+                  This task is currently in progress.
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  預計完成: 2026-02-07
+                  Expected completion: 2026-02-07
                 </Typography>
               </Box>
             ),

@@ -22,7 +22,7 @@ const meta = {
     },
     color: {
       control: 'text',
-      description: '自訂顏色（任意色碼）',
+      description: 'Custom color (any color code)',
     },
     checked: {
       control: false,

@@ -10,7 +10,8 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: '忘記密碼頁面，用戶可以請求密碼重設連結。',
+        component:
+          'Forgot password page where users can request a password reset link.',
       },
     },
   },
@@ -21,13 +22,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 預設狀態
+ * Default state
  */
 export const Default: Story = {
   render: () => (
     <AuthLayout
-      title="忘記密碼？"
-      subtitle="輸入您的電子郵件，我們將發送重設連結"
+      title="Forgot Password?"
+      subtitle="Enter your email and we'll send you a reset link"
     >
       <ForgotPasswordForm
         onSubmit={async (data) => {
@@ -40,24 +41,24 @@ export const Default: Story = {
 };
 
 /**
- * 有錯誤
+ * With error
  */
 export const WithError: Story = {
   render: () => (
     <AuthLayout
-      title="忘記密碼？"
-      subtitle="輸入您的電子郵件，我們將發送重設連結"
+      title="Forgot Password?"
+      subtitle="Enter your email and we'll send you a reset link"
     >
       <ForgotPasswordForm
         onSubmit={async (data) => console.log(data)}
-        error="找不到此電子郵件地址"
+        error="Email address not found"
       />
     </AuthLayout>
   ),
 };
 
 /**
- * 成功狀態
+ * Success state
  */
 export const Success: Story = {
   render: () => (
@@ -71,7 +72,7 @@ export const Success: Story = {
 };
 
 /**
- * 完整流程
+ * Full flow
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {
@@ -83,14 +84,14 @@ export const FullFlow: Story = {
       setLoading(true);
       setError(undefined);
 
-      // 模擬 API 請求
+      // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // 驗證 email
+      // Validate email
       if (data.email.includes('@')) {
         setSuccess(true);
       } else {
-        setError('電子郵件格式錯誤');
+        setError('Invalid email format');
       }
 
       setLoading(false);
@@ -98,8 +99,12 @@ export const FullFlow: Story = {
 
     return (
       <AuthLayout
-        title={success ? undefined : '忘記密碼？'}
-        subtitle={success ? undefined : '輸入您的電子郵件，我們將發送重設連結'}
+        title={success ? undefined : 'Forgot Password?'}
+        subtitle={
+          success
+            ? undefined
+            : "Enter your email and we'll send you a reset link"
+        }
       >
         <Box sx={{ width: '100%' }}>
           <ForgotPasswordForm

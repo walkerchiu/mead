@@ -3,9 +3,9 @@ import { Box, Typography, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 /**
- * Colors 設計系統
+ * Colors Design System
  *
- * 展示應用程式中使用的所有顏色，包括主色調、輔助色、狀態色等。
+ * Displays all colors used in the application, including primary colors, secondary colors, state colors, etc.
  */
 
 const ColorPalette = () => {
@@ -74,16 +74,17 @@ const ColorPalette = () => {
   return (
     <Box sx={{ p: 3, maxWidth: 1200 }}>
       <Typography variant="h4" gutterBottom>
-        色彩系統
+        Color System
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        應用程式使用的完整色彩系統，基於 Material-UI 主題配置。
+        Complete color system used in the application, based on Material-UI
+        theme configuration.
       </Typography>
 
-      {/* 主要顏色 */}
+      {/* Primary Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          主要顏色
+          Primary Colors
         </Typography>
         <Box
           sx={{
@@ -125,7 +126,7 @@ const ColorPalette = () => {
         </Box>
       </Box>
 
-      {/* Primary 色階 */}
+      {/* Primary shades */}
       {theme.palette.primary && (
         <ColorShades
           colorName="Primary"
@@ -137,7 +138,7 @@ const ColorPalette = () => {
         />
       )}
 
-      {/* Secondary 色階 */}
+      {/* Secondary shades */}
       {theme.palette.secondary && (
         <ColorShades
           colorName="Secondary"
@@ -149,10 +150,10 @@ const ColorPalette = () => {
         />
       )}
 
-      {/* 文字顏色 */}
+      {/* Text Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          文字顏色
+          Text Colors
         </Typography>
         <Box
           sx={{
@@ -230,10 +231,10 @@ const ColorPalette = () => {
         </Box>
       </Box>
 
-      {/* 背景顏色 */}
+      {/* Background Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          背景顏色
+          Background Colors
         </Typography>
         <Box
           sx={{
@@ -255,10 +256,10 @@ const ColorPalette = () => {
         </Box>
       </Box>
 
-      {/* 灰階 */}
+      {/* Grayscale */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          灰階
+          Grayscale
         </Typography>
         <Box
           sx={{
@@ -281,10 +282,10 @@ const ColorPalette = () => {
         </Box>
       </Box>
 
-      {/* 使用範例 */}
+      {/* Usage Examples */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          使用範例
+          Usage Examples
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Paper
