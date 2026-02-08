@@ -2,121 +2,121 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Introduction/Welcome" />
 
-# 歡迎使用 Wind Storybook
+# Welcome to Wind Storybook
 
-這是 Wind 專案的 Storybook 組件庫，基於 **Atomic Design** 原則構建。
+This is the Wind project's Storybook component library, built on **Atomic Design** principles.
 
-## 🎯 什麼是 Atomic Design？
+## 🎯 What is Atomic Design?
 
-Atomic Design 是一種設計系統方法論，將 UI 組件分為五個層級：
+Atomic Design is a design system methodology that organizes UI components into five levels:
 
 ```
-Atoms（原子）→ Molecules（分子）→ Organisms（有機體）→ Templates（模板）→ Pages（頁面）
+Atoms → Molecules → Organisms → Templates → Pages
 ```
 
-### 📦 組件層級
+### 📦 Component Levels
 
-#### 1. **Atoms** (原子)
+#### 1. **Atoms**
 
-最基礎的 UI 元素，不可再分割。
+The most basic UI elements that cannot be broken down further.
 
-範例：
+Examples:
 
-- `Button` - 按鈕組件
-- `TextField` - 輸入框
-- `CodeInput` - 驗證碼輸入
+- `Button` - Button component
+- `TextField` - Input field
+- `CodeInput` - Verification code input
 
-**何時使用**：當你需要最基本的 UI 元素時。
+**When to use**: When you need the most basic UI elements.
 
-#### 2. **Molecules** (分子)
+#### 2. **Molecules**
 
-由多個 Atoms 組合而成，具有特定功能。
+Composed of multiple Atoms with specific functionality.
 
-範例：
+Examples:
 
-- `FormField` - 表單欄位（TextField + Label + Error）
-- `PasswordField` - 密碼輸入框（TextField + 顯示/隱藏按鈕 + 強度指示器）
-- `AlertMessage` - 提示訊息
+- `FormField` - Form field (TextField + Label + Error)
+- `PasswordField` - Password input (TextField + Show/Hide button + Strength indicator)
+- `AlertMessage` - Alert message
 
-**何時使用**：當你需要組合多個基礎元素完成特定功能時。
+**When to use**: When you need to combine multiple basic elements for specific functionality.
 
-#### 3. **Organisms** (有機體)
+#### 3. **Organisms**
 
-由 Molecules 和 Atoms 組成的完整功能模組。
+Complete functional modules composed of Molecules and Atoms.
 
-範例：
+Examples:
 
-- `LoginForm` - 登入表單
-- `TwoFactorForm` - 雙因素認證表單
-- `ForgotPasswordForm` - 忘記密碼表單
+- `LoginForm` - Login form
+- `TwoFactorForm` - Two-factor authentication form
+- `ForgotPasswordForm` - Forgot password form
 
-**何時使用**：當你需要完整的功能模組（如表單、卡片）時。
+**When to use**: When you need complete functional modules (forms, cards, etc.).
 
-#### 4. **Templates** (模板)
+#### 4. **Templates**
 
-定義頁面結構和佈局。
+Define page structure and layout.
 
-範例：
+Examples:
 
-- `AuthLayout` - 認證頁面佈局
+- `AuthLayout` - Authentication page layout
 
-**何時使用**：當你需要統一的頁面佈局時。
+**When to use**: When you need unified page layouts.
 
-#### 5. **Pages** (頁面)
+#### 5. **Pages**
 
-完整的頁面展示（僅用於 Storybook）。
+Complete page displays (for Storybook only).
 
-範例：
+Examples:
 
-- `LoginPage` - 完整登入頁面流程
-- `ForgotPasswordPage` - 忘記密碼頁面
+- `LoginPage` - Complete login page flow
+- `ForgotPasswordPage` - Forgot password page
 
-**何時使用**：用於展示完整的用戶流程和互動。
+**When to use**: To demonstrate complete user flows and interactions.
 
 ---
 
-## 🚀 快速開始
+## 🚀 Quick Start
 
-### 瀏覽組件
+### Browse Components
 
-在左側導航欄中：
+In the left sidebar:
 
-1. **Atoms** - 查看基礎組件
-2. **Molecules** - 查看組合組件
-3. **Organisms** - 查看功能模組
-4. **Templates** - 查看頁面模板
-5. **Pages** - 查看完整頁面流程
+1. **Atoms** - View basic components
+2. **Molecules** - View composite components
+3. **Organisms** - View functional modules
+4. **Templates** - View page templates
+5. **Pages** - View complete page flows
 
-### 測試組件
+### Test Components
 
-每個組件都有多個 **Stories**（情境展示）：
+Each component has multiple **Stories** (scenario displays):
 
-- **Default** - 預設狀態
-- **Loading** - 載入狀態
-- **Error** - 錯誤狀態
-- **Interactive** - 互動式範例
+- **Default** - Default state
+- **Loading** - Loading state
+- **Error** - Error state
+- **Interactive** - Interactive example
 
-### 使用 Controls
+### Use Controls
 
-點擊 **Controls** 標籤，可以即時調整組件 props：
+Click the **Controls** tab to adjust component props in real-time:
 
-- 修改文字內容
-- 切換狀態（disabled, loading）
-- 調整樣式（variant, color, size）
+- Modify text content
+- Toggle states (disabled, loading)
+- Adjust styles (variant, color, size)
 
 ---
 
-## �� 開發指南
+## 🛠️ Development Guide
 
-### Story-First 開發流程
+### Story-First Development Flow
 
-1. **在 Storybook 中開發 UI**
+1. **Develop UI in Storybook**
 
    ```bash
    pnpm storybook
    ```
 
-2. **創建組件和 Stories**
+2. **Create Components and Stories**
 
    ```tsx
    // Button.tsx
@@ -126,20 +126,20 @@ Atoms（原子）→ Molecules（分子）→ Organisms（有機體）→ Templa
 
    // Button.stories.tsx
    export const Default: Story = {
-     args: { children: '點擊我' },
+     args: { children: 'Click me' },
    };
 
    export const Loading: Story = {
-     args: { children: '載入中', loading: true },
+     args: { children: 'Loading', loading: true },
    };
    ```
 
-3. **測試所有狀態**
-   - 在 Storybook 中預覽
-   - 使用 Controls 測試不同 props
-   - 檢查響應式設計
+3. **Test All States**
+   - Preview in Storybook
+   - Test different props using Controls
+   - Check responsive design
 
-4. **整合到 Next.js 頁面**
+4. **Integrate into Next.js Pages**
 
    ```tsx
    // app/login/page.tsx
@@ -150,13 +150,13 @@ Atoms（原子）→ Molecules（分子）→ Organisms（有機體）→ Templa
    }
    ```
 
-### 命名規範
+### Naming Conventions
 
-- **組件**：PascalCase（例如：`LoginForm`）
-- **檔案**：與組件同名（例如：`LoginForm.tsx`）
-- **Stories**：組件名.stories.tsx（例如：`LoginForm.stories.tsx`）
+- **Components**: PascalCase (e.g., `LoginForm`)
+- **Files**: Same as component name (e.g., `LoginForm.tsx`)
+- **Stories**: ComponentName.stories.tsx (e.g., `LoginForm.stories.tsx`)
 
-### 目錄結構
+### Directory Structure
 
 ```text
 src/components/
@@ -179,50 +179,50 @@ src/components/
 
 ---
 
-## 🎨 設計原則
+## 🎨 Design Principles
 
-### 1. 單一職責
+### 1. Single Responsibility
 
-每個組件只做一件事，並把它做好。
+Each component does one thing and does it well.
 
-### 2. 組合優於繼承
+### 2. Composition Over Inheritance
 
-使用組合（Composition）而非繼承構建複雜組件。
+Use composition rather than inheritance to build complex components.
 
-### 3. Props 驅動
+### 3. Props-Driven
 
-組件應該是無狀態的，通過 props 控制行為。
+Components should be stateless, controlled through props.
 
-### 4. 一致性
+### 4. Consistency
 
-保持命名、樣式、行為的一致性。
-
----
-
-## 🔧 技術棧
-
-- **Storybook 10.2.1** - 組件展示和文檔
-- **Next.js 16** - 應用框架
-- **React 19** - UI 函式庫
-- **MUI 6** - Material-UI 組件庫
-- **TypeScript** - 類型安全
-- **MSW** - API Mock
-- **React Hook Form** - 表單處理
-- **Zod** - Schema 驗證
+Maintain consistency in naming, styling, and behavior.
 
 ---
 
-## 📖 更多資源
+## 🔧 Tech Stack
 
-- [Storybook 文檔](https://storybook.js.org/docs)
-- [Atomic Design 原則](https://bradfrost.com/blog/post/atomic-web-design/)
-- [MUI 文檔](https://mui.com/)
-- [Next.js 文檔](https://nextjs.org/docs)
+- **Storybook 10.2.1** - Component showcase and documentation
+- **Next.js 16** - Application framework
+- **React 19** - UI library
+- **MUI 6** - Material-UI component library
+- **TypeScript** - Type safety
+- **MSW** - API mocking
+- **React Hook Form** - Form handling
+- **Zod** - Schema validation
 
 ---
 
-## 🎉 開始探索
+## 📖 More Resources
 
-選擇左側導航欄中的任何組件開始探索！
+- [Storybook Documentation](https://storybook.js.org/docs)
+- [Atomic Design Principles](https://bradfrost.com/blog/post/atomic-web-design/)
+- [MUI Documentation](https://mui.com/)
+- [Next.js Documentation](https://nextjs.org/docs)
 
-建議從 **Atoms/Button** 開始，逐步了解整個設計系統。
+---
+
+## 🎉 Start Exploring
+
+Choose any component from the left sidebar to start exploring!
+
+We recommend starting with **Atoms/Button** to gradually understand the entire design system.

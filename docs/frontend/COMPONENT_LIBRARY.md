@@ -57,6 +57,7 @@
       - [MainAppBar](#mainappbar)
     - [🔵 Templates（模板）](#-templates模板)
       - [AuthLayout](#authlayout)
+      - [DashboardLayout](#dashboardlayout)
     - [📄 Pages（Storybook 頁面）](#-pagesstorybook-頁面)
   - [🚀 開發指南](#-開發指南)
     - [建立新組件](#建立新組件)
@@ -191,7 +192,8 @@ apps/frontend/src/components/
 │   └── MainAppBar/
 │
 ├── templates/          # 頁面模板（佈局）
-│   └── AuthLayout/
+│   ├── AuthLayout/
+│   └── DashboardLayout/
 │
 └── pages/              # Storybook 頁面故事
     ├── LoginPage.stories.tsx
@@ -1184,8 +1186,101 @@ interface DataListProps {
 
 **功能**:
 
-- 側邊欄導航
-- 選單項目管理
+- 側邊欄導航組件
+- 支援三種狀態：Open（完全展開）、Mini（圖示模式）、Closed（關閉）
+- 支援可展開選單（Expandable Menu）with 遞迴巢狀結構
+- 支援三種 Mini 模式行為：
+  - **Hide**: 隱藏子選單（預設）
+  - **Popover**: 滑鼠 hover 時顯示 Popper 浮動選單
+  - **Expand**: 點擊時暫時展開為 Open 狀態
+- 響應式設計（手機版自動切換為 temporary variant）
+- 支援自訂切換按鈕樣式
+
+**Props**:
+
+```typescript
+interface SidebarMenuItem {
+  id: string;
+  label: string;
+  icon?: ReactNode;
+  path?: string;
+  onClick?: () => void;
+  divider?: boolean;
+  expandable?: boolean; // 是否可展開
+  children?: SidebarMenuItem[]; // 子選單項目
+  defaultExpanded?: boolean; // 預設展開狀態
+}
+
+interface SidebarProps {
+  items: SidebarMenuItem[];
+  activeItemId?: string;
+  state?: DrawerState; // 'open' | 'mini' | 'closed'
+  onStateChange?: (state: DrawerState) => void;
+  variant?: DrawerVariant; // 'temporary' | 'persistent' | 'permanent'
+  anchor?: 'left' | 'right';
+  width?: number; // Open 寬度（預設 240）
+  miniWidth?: number; // Mini 寬度（預設 64）
+  header?: ReactNode; // Sidebar Header
+  footer?: ReactNode; // Sidebar Footer
+  responsive?: boolean; // 響應式設計
+  mobileBreakpoint?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  miniExpandBehavior?: 'hide' | 'popover' | 'expand'; // Mini 模式子選單行為
+  bgcolor?: string; // 背景顏色
+  color?: string; // 文字顏色
+  activeBackgroundColor?: string; // Active 項目背景顏色
+  hoverBackgroundColor?: string; // Hover 項目背景顏色
+  toggleButtonContent?: ReactNode; // 切換按鈕自訂內容
+  toggleButtonSx?: SxProps<Theme>; // 切換按鈕樣式
+}
+```
+
+**使用範例**:
+
+```tsx
+// 基本用法
+<Sidebar
+  items={[
+    { id: 'home', label: 'Home', icon: <HomeIcon />, path: '/' },
+    { id: 'about', label: 'About', icon: <InfoIcon />, path: '/about' },
+  ]}
+  activeItemId="home"
+  state="open"
+  onStateChange={setState}
+/>
+
+// 帶可展開選單
+<Sidebar
+  items={[
+    {
+      id: 'products',
+      label: 'Products',
+      icon: <ProductIcon />,
+      expandable: true,
+      children: [
+        { id: 'product-1', label: 'Product 1', path: '/products/1' },
+        { id: 'product-2', label: 'Product 2', path: '/products/2' },
+      ],
+    },
+  ]}
+/>
+
+// Mini 模式 + Popover 行為
+<Sidebar
+  items={menuItems}
+  state="mini"
+  miniExpandBehavior="popover"
+  onStateChange={setState}
+/>
+
+// 自訂樣式
+<Sidebar
+  items={menuItems}
+  bgcolor="#1e293b"
+  color="#fff"
+  activeBackgroundColor="rgba(59, 130, 246, 0.2)"
+  hoverBackgroundColor="rgba(255, 255, 255, 0.05)"
+/>
+```
 
 **Storybook**: ✅ `Sidebar.stories.tsx`
 
@@ -1302,8 +1397,10 @@ interface MainAppBarProps {
   showNotifications?: boolean; // 顯示通知鈴鐺
   showUserMenu?: boolean; // 顯示使用者選單
   showSettings?: boolean; // 顯示設定選單
-  currentTheme?: 'light' | 'dark'; // 當前主題
-  onThemeChange?: (theme: 'light' | 'dark') => void;
+  currentTheme?: 'light' | 'dark' | 'system'; // 當前主題
+  onThemeChange?: (theme: 'light' | 'dark' | 'system') => void;
+  centerContent?: ReactNode; // 標題右側的自訂內容
+  extraActions?: ReactNode; // 通知按鈕左側的額外操作按鈕
   onAccountClick?: () => void;
   onProfileClick?: () => void;
   onSecurityClick?: () => void;
@@ -1372,6 +1469,131 @@ interface MainAppBarProps {
   <LoginForm />
 </AuthLayout>
 ```
+
+**Storybook**: ✅ `AuthLayout.stories.tsx`
+
+---
+
+#### DashboardLayout
+
+**路徑**: `components/templates/DashboardLayout/`
+
+**功能**:
+
+- 完整的儀表板佈局模板
+- 組合 MainAppBar + Sidebar + Content Area
+- 響應式設計（手機版自動隱藏 Sidebar）
+- Sidebar 支援三種狀態切換（Open/Mini/Closed）
+- 固定 AppBar 和 Sidebar
+- 主要內容區域自動填充剩餘空間
+- MainAppBar 寬度根據 Sidebar 狀態自動調整
+
+**Props**:
+
+```typescript
+interface DashboardLayoutProps {
+  children: ReactNode; // 主要內容區域
+  title?: string; // 頁面標題
+  logo?: ReactNode; // AppBar Logo
+  titleLink?: string; // AppBar 標題連結
+  user?: UserInfo; // 使用者資訊
+  sidebarItems: SidebarMenuItem[]; // Sidebar 選單項目
+  activeSidebarItemId?: string; // 當前活動的 Sidebar 項目
+  sidebarHeader?: ReactNode; // Sidebar Header
+  sidebarFooter?: ReactNode; // Sidebar Footer
+  sidebarInitialState?: DrawerState; // Sidebar 初始狀態（預設 'open'）
+  sidebarWidth?: number; // Sidebar 寬度（預設 240）
+  notifications?: Notification[]; // 通知列表
+  unreadNotificationCount?: number; // 未讀通知數量
+  showUserName?: boolean; // 顯示使用者名稱（預設 false）
+  showUserStatus?: boolean; // 顯示使用者狀態（預設 false）
+  userIconMode?: boolean; // 使用圖示模式（預設 true）
+  currentTheme?: 'light' | 'dark' | 'system'; // 當前主題（預設 'light'）
+  onThemeChange?: (theme: 'light' | 'dark' | 'system') => void;
+  onAccountClick?: () => void;
+  onProfileClick?: () => void;
+  onSecurityClick?: () => void;
+  onLogout?: () => void;
+  onHelpClick?: () => void;
+  onAboutClick?: () => void;
+  onNotificationClick?: (notification: Notification) => void;
+  onMarkAllNotificationsRead?: () => void;
+  onViewAllNotifications?: () => void;
+  onClearAllNotifications?: () => void;
+  sidebarBgColor?: string; // Sidebar 背景顏色
+  sidebarColor?: string; // Sidebar 文字顏色
+  sidebarActiveBackgroundColor?: string; // Sidebar Active 背景顏色
+  sidebarHoverBackgroundColor?: string; // Sidebar Hover 背景顏色
+  centerContent?: ReactNode; // MainAppBar 中間自訂內容
+  extraActions?: ReactNode; // MainAppBar 額外操作按鈕
+  sidebarToggleButtonContent?: ReactNode; // Sidebar 切換按鈕自訂內容
+  sidebarToggleButtonSx?: SxProps<Theme>; // Sidebar 切換按鈕樣式
+}
+```
+
+**使用範例**:
+
+```tsx
+// 基本用法
+<DashboardLayout
+  title="Wind Dashboard"
+  logo={<Logo />}
+  user={user}
+  sidebarItems={menuItems}
+  activeSidebarItemId="dashboard"
+  notifications={notifications}
+  unreadNotificationCount={2}
+>
+  <YourPageContent />
+</DashboardLayout>
+
+// 完整功能
+<DashboardLayout
+  title="Wind Dashboard"
+  logo={<Logo />}
+  user={user}
+  sidebarItems={menuItems}
+  activeSidebarItemId="dashboard"
+  sidebarHeader={<Header />}
+  sidebarFooter={<Footer />}
+  notifications={notifications}
+  unreadNotificationCount={3}
+  showUserName={true}
+  showUserStatus={true}
+  userIconMode={true}
+  currentTheme="light"
+  sidebarInitialState="open"
+  onThemeChange={(theme) => setTheme(theme)}
+  onAccountClick={() => router.push('/settings/account')}
+  onLogout={handleLogout}
+>
+  <YourPageContent />
+</DashboardLayout>
+
+// 自訂 Sidebar 樣式
+<DashboardLayout
+  title="Custom Dashboard"
+  user={user}
+  sidebarItems={menuItems}
+  sidebarBgColor="#1e293b"
+  sidebarColor="#fff"
+  sidebarActiveBackgroundColor="rgba(59, 130, 246, 0.2)"
+  sidebarHoverBackgroundColor="rgba(255, 255, 255, 0.05)"
+>
+  <YourPageContent />
+</DashboardLayout>
+```
+
+**特性**:
+
+- ✅ 響應式設計（<md 自動切換為 temporary Sidebar）
+- ✅ Sidebar 三種狀態無縫切換
+- ✅ MainAppBar 動態寬度調整（避免與 Sidebar 重疊）
+- ✅ 固定定位確保捲動時 AppBar 和 Sidebar 保持可見
+- ✅ 完整的主題支援（light/dark/system）
+- ✅ 自訂樣式支援
+
+**Storybook**: ✅ `DashboardLayout.stories.tsx`
 
 ---
 
@@ -1572,7 +1794,7 @@ pnpm storybook
    - 佈局組件
      - Drawer
      - Modal
-     - Sidebar
+     - Sidebar（支援 Expandable Menu、三種 Mini 模式行為）
    - 認證表單
      - LoginForm
      - ForgotPasswordForm
@@ -1580,10 +1802,11 @@ pnpm storybook
      - TwoFactorForm
 
 6. Layout（佈局組件）
-   - MainAppBar（全域導航，不包含頁面層級操作）
+   - MainAppBar（全域導航，支援 centerContent、extraActions）
 
 7. Templates（模板）
-   - AuthLayout
+   - AuthLayout（認證頁面佈局）
+   - DashboardLayout（儀表板佈局，結合 MainAppBar + Sidebar）
 
 8. Pages（完整頁面）
    - LoginPage
