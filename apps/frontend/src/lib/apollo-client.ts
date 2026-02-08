@@ -20,6 +20,9 @@ import {
   refreshAccessToken,
   setApolloClientRef,
 } from './auth';
+import { createRetryLink } from './apollo-retry-link';
+import { createTimeoutLink } from './apollo-timeout-link';
+import { apolloConfig } from './apollo.config';
 
 const httpLink = createHttpLink({
   uri:
@@ -73,6 +76,20 @@ const resolvePendingRequests = () => {
   pendingRequests.forEach((callback) => callback());
   pendingRequests = [];
 };
+
+// Timeout Link: 請求超時處理
+// 從環境變數讀取配置，支援 per-operation 覆蓋
+const timeoutLink = createTimeoutLink({
+  timeout: apolloConfig.timeout.default,
+});
+
+// Retry Link: 自動重試失敗的請求
+// 從環境變數讀取配置，支援 per-operation 覆蓋
+const retryLink = createRetryLink({
+  maxRetries: apolloConfig.retry.maxRetries,
+  initialDelay: apolloConfig.retry.initialDelay,
+  maxDelay: apolloConfig.retry.maxDelay,
+});
 
 // 錯誤轉換 Link：將技術性錯誤訊息轉換為友善訊息（僅限登入操作）
 const errorTransformLink = new ApolloLink((operation, forward) => {
@@ -308,6 +325,17 @@ const wsLink =
     : null;
 
 // Split link: subscriptions 用 WS，其他用 HTTP
+// Link chain order: timeout → retry → errorTransform → error → lang → auth → http
+const httpLinkChain = from([
+  timeoutLink,
+  retryLink,
+  errorTransformLink,
+  errorLink,
+  langLink,
+  authLink,
+  httpLink,
+]);
+
 const splitLink =
   typeof window !== 'undefined' && wsLink
     ? split(
@@ -319,9 +347,9 @@ const splitLink =
           );
         },
         wsLink,
-        from([errorTransformLink, errorLink, langLink, authLink, httpLink]),
+        httpLinkChain,
       )
-    : from([errorTransformLink, errorLink, langLink, authLink, httpLink]);
+    : httpLinkChain;
 
 // 建立 Apollo Client
 export const createApolloClient = () => {

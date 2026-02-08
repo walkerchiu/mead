@@ -187,6 +187,16 @@ export const logout = async (): Promise<void> => {
   // 清除前端 tokens（必須在後端調用之後）
   clearAuthTokens();
 
+  // 清除錯誤追蹤的使用者資訊
+  if (typeof window !== 'undefined') {
+    try {
+      const { clearErrorTrackingUser } = await import('./error-user-tracking');
+      clearErrorTrackingUser();
+    } catch (error) {
+      console.error('[Auth] Failed to clear error tracking user:', error);
+    }
+  }
+
   // 導向登入頁
   if (typeof window !== 'undefined') {
     window.location.href = getLoginPath();

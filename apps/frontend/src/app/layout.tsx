@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Noto_Sans_TC, Roboto, Roboto_Mono } from 'next/font/google';
+import { ClientErrorBoundary } from '@/components/errors';
 import './globals.css';
 
 const roboto = Roboto({
@@ -28,7 +29,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       className={`${roboto.variable} ${notoSansTc.variable} ${robotoMono.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        <ClientErrorBoundary>{children}</ClientErrorBoundary>
+      </body>
     </html>
   );
 }

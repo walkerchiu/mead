@@ -8,6 +8,7 @@ import React, {
   ReactNode,
 } from 'react';
 import { getAccessToken, parseJwt, refreshAccessToken } from '@/lib/auth';
+import { setErrorTrackingUser } from '@/lib/error-user-tracking';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -54,6 +55,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(true);
         setAccessScopes(scopes);
         setIsAdmin(scopes.includes('ADMIN_SCOPE'));
+
+        // Set user information for error tracking
+        if (payload?.sub && payload?.email) {
+          setErrorTrackingUser({
+            id: payload.sub as string,
+            email: payload.email as string,
+            username: (payload.email as string).split('@')[0],
+          });
+        }
       } else {
         console.log('[AuthProvider] No token available');
         setIsAuthenticated(false);

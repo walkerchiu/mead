@@ -22,6 +22,12 @@
       - [Email 配置](#email-配置)
       - [其他配置](#其他配置)
     - [Frontend (.env)](#frontend-env)
+      - [GraphQL API 配置](#graphql-api-配置)
+      - [Apollo Client 配置](#apollo-client-配置)
+      - [應用程式配置](#應用程式配置)
+      - [功能開關](#功能開關)
+      - [錯誤追蹤配置 (Sentry)](#錯誤追蹤配置-sentry)
+      - [配置驗證](#配置驗證)
   - [🔒 密碼同步](#-密碼同步)
     - [PostgreSQL 密碼](#postgresql-密碼)
     - [RabbitMQ 密碼](#rabbitmq-密碼)
@@ -42,6 +48,9 @@
     - [問題 2: JWT 認證失敗](#問題-2-jwt-認證失敗)
     - [問題 3: CORS 錯誤](#問題-3-cors-錯誤)
     - [問題 4: 環境變數未載入](#問題-4-環境變數未載入)
+    - [問題 5: Apollo Client 配置警告](#問題-5-apollo-client-配置警告)
+    - [問題 6: Sentry 未收到錯誤](#問題-6-sentry-未收到錯誤)
+    - [問題 7: GraphQL 端點連線失敗](#問題-7-graphql-端點連線失敗)
   - [📚 環境變數載入順序](#-環境變數載入順序)
     - [Next.js (Frontend)](#nextjs-frontend)
     - [NestJS (Backend)](#nestjs-backend)
@@ -208,11 +217,83 @@ pnpm dev
 
 ### Frontend (.env)
 
-| 變數                           | 說明             | 範例                            | 必填 |
-| ------------------------------ | ---------------- | ------------------------------- | ---- |
-| `NEXT_PUBLIC_GRAPHQL_ENDPOINT` | GraphQL API 地址 | `http://localhost:4000/graphql` | ✅   |
-| `NEXT_PUBLIC_APP_NAME`         | 應用名稱         | `Wind`                          | ❌   |
-| `NEXT_PUBLIC_APP_URL`          | 應用 URL         | `http://localhost:3000`         | ❌   |
+Frontend 使用 Next.js 框架,所有環境變數都使用 `NEXT_PUBLIC_` 前綴以便在客戶端可用。共有 **14 個環境變數**,涵蓋 API 配置、Apollo Client、功能開關和錯誤追蹤。
+
+#### GraphQL API 配置
+
+| 變數                              | 說明                                   | 範例                            | 必填 |
+| --------------------------------- | -------------------------------------- | ------------------------------- | ---- |
+| `NEXT_PUBLIC_GRAPHQL_ENDPOINT`    | GraphQL HTTP 端點 URL                  | `http://localhost:4000/graphql` | ✅   |
+| `NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT` | GraphQL WebSocket 端點 (Subscriptions) | `ws://localhost:4000/graphql`   | ❌   |
+
+#### Apollo Client 配置
+
+| 變數                                     | 說明                | 預設值  | 範圍        | 必填 |
+| ---------------------------------------- | ------------------- | ------- | ----------- | ---- |
+| `NEXT_PUBLIC_APOLLO_TIMEOUT`             | 請求超時時間 (毫秒) | `30000` | 5000-300000 | ❌   |
+| `NEXT_PUBLIC_APOLLO_MAX_RETRIES`         | 最大重試次數        | `3`     | 0-10        | ❌   |
+| `NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY` | 首次重試延遲 (毫秒) | `300`   | 100-60000   | ❌   |
+| `NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY`     | 最大重試延遲 (毫秒) | `10000` | 100-60000   | ❌   |
+
+**說明**：
+
+- 使用指數退避策略重試
+- 不會重試認證錯誤 (UNAUTHENTICATED)、授權錯誤 (FORBIDDEN)、驗證錯誤 (BAD_USER_INPUT)
+- 超出範圍的值會自動調整並記錄警告
+
+**重試間隔範例**：`300ms` → `600ms` → `1200ms` → ...
+
+#### 應用程式配置
+
+| 變數                   | 說明             | 範例                    | 必填 |
+| ---------------------- | ---------------- | ----------------------- | ---- |
+| `NEXT_PUBLIC_APP_NAME` | 應用程式顯示名稱 | `Wind` / `Wind (Dev)`   | ❌   |
+| `NEXT_PUBLIC_APP_URL`  | 應用程式基礎 URL | `http://localhost:3000` | ❌   |
+
+#### 功能開關
+
+| 變數                           | 說明                    | 預設值  | 必填 |
+| ------------------------------ | ----------------------- | ------- | ---- |
+| `NEXT_PUBLIC_ENABLE_2FA`       | 啟用/停用雙因素認證功能 | `true`  | ❌   |
+| `NEXT_PUBLIC_ENABLE_ANALYTICS` | 啟用/停用分析追蹤功能   | `false` | ❌   |
+
+#### 錯誤追蹤配置 (Sentry)
+
+| 變數                      | 說明                                 | 範例                                    | 必填 |
+| ------------------------- | ------------------------------------ | --------------------------------------- | ---- |
+| `NEXT_PUBLIC_SENTRY_DSN`  | Sentry 錯誤追蹤服務 DSN              | `https://xxx@o123.ingest.sentry.io/456` | ❌   |
+| `NEXT_PUBLIC_APP_VERSION` | 應用程式版本號 (Semantic Versioning) | `1.2.3`                                 | ❌   |
+| `NEXT_PUBLIC_BUILD_ID`    | 建構 ID (通常由 CI/CD 生成)          | `build-2024-01-15-001`                  | ❌   |
+| `NEXT_PUBLIC_COMMIT_SHA`  | Git Commit SHA (CI/CD 生成)          | `a1b2c3d4e5f6`                          | ❌   |
+
+**說明**：
+
+- 留空 `NEXT_PUBLIC_SENTRY_DSN` 則不啟用 Sentry
+- 建議 UAT 和 Production 使用不同的 Sentry 專案
+- 從 https://sentry.io 取得 DSN
+
+#### 配置驗證
+
+所有配置值會在應用啟動時自動驗證:
+
+```bash
+# Timeout 驗證
+NEXT_PUBLIC_APOLLO_TIMEOUT=100  # 太低,自動調整為 5000ms
+
+# Max Retries 驗證
+NEXT_PUBLIC_APOLLO_MAX_RETRIES=100  # 太高,自動調整為 10
+```
+
+開發環境啟動時會顯示配置資訊:
+
+```text
+[Apollo Config] Initialized with: {
+  timeout: '30000ms',
+  maxRetries: 3,
+  initialDelay: '300ms',
+  maxDelay: '10000ms'
+}
+```
 
 ---
 
@@ -263,6 +344,22 @@ NODE_ENV=development pnpm dev
 **Frontend**: 使用 `.env`
 
 ```bash
+# .env (開發環境完整配置)
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
+NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT=ws://localhost:4000/graphql
+NEXT_PUBLIC_APOLLO_TIMEOUT=30000
+NEXT_PUBLIC_APOLLO_MAX_RETRIES=3
+NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
+NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=10000
+NEXT_PUBLIC_APP_NAME=Wind (Local)
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_ENABLE_2FA=true
+NEXT_PUBLIC_ENABLE_ANALYTICS=false
+NEXT_PUBLIC_SENTRY_DSN=
+NEXT_PUBLIC_APP_VERSION=0.1.0
+NEXT_PUBLIC_BUILD_ID=
+NEXT_PUBLIC_COMMIT_SHA=
+
 pnpm dev
 ```
 
@@ -288,7 +385,24 @@ NODE_ENV=production pnpm start
 
 ```bash
 cp .env.production.example .env.production
-vim .env.production  # 填入生產 API 地址
+vim .env.production  # 填入生產配置
+
+# .env.production (生產環境完整配置)
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://api.yourapp.com/graphql
+NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT=wss://api.yourapp.com/graphql
+NEXT_PUBLIC_APOLLO_TIMEOUT=60000           # 生產環境使用較長超時
+NEXT_PUBLIC_APOLLO_MAX_RETRIES=5           # 更多重試次數
+NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
+NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=15000   # 允許更長延遲
+NEXT_PUBLIC_APP_NAME=Wind
+NEXT_PUBLIC_APP_URL=https://yourapp.com
+NEXT_PUBLIC_ENABLE_2FA=true
+NEXT_PUBLIC_ENABLE_ANALYTICS=true          # 生產必須啟用
+NEXT_PUBLIC_SENTRY_DSN=your-prod-dsn       # 生產必須啟用
+NEXT_PUBLIC_APP_VERSION=1.2.3
+NEXT_PUBLIC_BUILD_ID=$(date +%Y%m%d%H%M%S)
+NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
+
 pnpm build
 pnpm start
 ```
@@ -461,6 +575,65 @@ CORS_ORIGIN=http://localhost:3000
 - `NEXT_PUBLIC_` 前綴的變數會暴露給瀏覽器
 - 伺服器端變數不需要 `NEXT_PUBLIC_` 前綴
 
+**解決步驟**：
+
+```bash
+# 1. 確認變數名稱有 NEXT_PUBLIC_ 前綴
+NEXT_PUBLIC_APOLLO_TIMEOUT=30000  # ✅ 正確
+
+# 2. 重啟開發服務器
+pnpm dev
+
+# 3. 清除 Next.js 快取
+rm -rf .next
+pnpm dev
+```
+
+### 問題 5: Apollo Client 配置警告
+
+**症狀**：Console 顯示配置調整警告
+
+```text
+[Apollo Config] Timeout 100ms is too low, using minimum: 5000ms
+```
+
+**解決**：檢查並修正 `.env` 中的值,使用合理範圍
+
+```bash
+NEXT_PUBLIC_APOLLO_TIMEOUT=30000     # 5000-300000
+NEXT_PUBLIC_APOLLO_MAX_RETRIES=3     # 0-10
+```
+
+### 問題 6: Sentry 未收到錯誤
+
+**症狀**：生產環境錯誤未上報到 Sentry
+
+**檢查清單**：
+
+1. ✅ 確認 `NEXT_PUBLIC_SENTRY_DSN` 已設定且格式正確
+2. ✅ 檢查 Sentry 專案設定
+3. ✅ 測試環境手動觸發錯誤
+
+```typescript
+// 測試 Sentry
+throw new Error('Test Sentry Integration');
+```
+
+### 問題 7: GraphQL 端點連線失敗
+
+**症狀**：所有 GraphQL 請求都失敗
+
+**檢查清單**：
+
+1. ✅ 確認 `NEXT_PUBLIC_GRAPHQL_ENDPOINT` 正確
+2. ✅ 確認後端服務運行中
+3. ✅ 檢查網路連線和 CORS 設定
+
+```bash
+# 測試端點是否可訪問
+curl http://localhost:4000/graphql
+```
+
 ---
 
 ## 📚 環境變數載入順序
@@ -485,11 +658,20 @@ CORS_ORIGIN=http://localhost:3000
 
 ## 📖 相關文檔
 
+**專案文檔**：
+
 - [Docker Setup](../getting-started/DOCKER_SETUP.md) - Docker 配置與安全指南
 - [CLI Guide](../getting-started/CLI_GUIDE.md) - CLI 使用完整說明
+- [Error Handling Guide](../frontend/ERROR_HANDLING_GUIDE.md) - 完整錯誤處理指南
+- [Apollo Configuration](../frontend/APOLLO_CONFIGURATION.md) - Apollo Client 配置
+- [Apollo Configuration Examples](../frontend/APOLLO_CONFIGURATION_EXAMPLES.md) - 代碼範例
+
+**外部文檔**：
+
 - [Next.js 環境變數](https://nextjs.org/docs/app/building-your-application/configuring/environment-variables)
 - [NestJS Configuration](https://docs.nestjs.com/techniques/configuration)
 - [12-Factor App: Config](https://12factor.net/config)
+- [Sentry Documentation](https://docs.sentry.io/)
 
 ---
 
