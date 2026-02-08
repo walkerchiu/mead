@@ -1,6 +1,5 @@
-export { Radio, type RadioProps } from './Radio';
-export { Switch, type SwitchProps } from './Switch';
 export { TextField, type TextFieldProps } from './TextField';
+export { TextArea, type TextAreaProps } from './TextArea';
 export { Search, type SearchProps } from './Search';
 export {
   DatePicker,
@@ -12,3 +11,5 @@ export {
   type TimePickerProps,
   type TimePickerState,
 } from './TimePicker';
+export { Radio, type RadioProps } from './Radio';
+export { Switch, type SwitchProps } from './Switch';

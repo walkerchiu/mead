@@ -1,6 +1,6 @@
 {
   "forbidden": {
-    "noUserInfo": "無法取得使用者資訊",
+    "noUserInfo": "無法取得用戶資訊",
     "requireScope": "需要 {scope} 訪問權限",
     "requireAnyScope": "需要以下任一訪問權限：{scopes}",
     "requirePermission": "需要 {permission} 權限",

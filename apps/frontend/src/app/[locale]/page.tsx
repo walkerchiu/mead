@@ -1,55 +1,82 @@
 'use client';
 
-import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import Stack from '@mui/material/Stack';
+import { Button } from '@/components/atoms';
+import {
+  ArrowForward as ArrowForwardIcon,
+  Dashboard as DashboardIcon,
+} from '@mui/icons-material';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/routing';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
 
 export default function Home() {
   const t = useTranslations('pages.home');
   const router = useRouter();
 
   return (
-    <Container maxWidth="lg">
+    <Box
+      sx={{
+        minHeight: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: '#ffffff',
+      }}
+    >
       <Box
         sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 4,
+          textAlign: 'center',
+          px: 3,
+          maxWidth: 1200,
         }}
       >
-        <Typography variant="h2" component="h1" gutterBottom>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            color: '#1a1a1a',
+            mb: 1,
+          }}
+        >
           {t('title')}
         </Typography>
-        <Typography variant="h5" color="text.secondary" textAlign="center">
+
+        <Typography
+          variant="body1"
+          sx={{ color: '#666', mb: 4, fontSize: '1.1rem' }}
+        >
           {t('subtitle')}
         </Typography>
-        <Typography variant="body1" color="text.secondary" textAlign="center">
-          {t('description')}
-        </Typography>
-        <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => router.push('/login')}
-          >
-            {t('login')}
-          </Button>
+
+        <Box sx={{ mb: 6, display: 'flex', justifyContent: 'center' }}>
           <Button
             variant="outlined"
             size="large"
+            startIcon={<DashboardIcon />}
+            endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
             onClick={() => router.push('/dashboard')}
+            sx={{
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              px: 4,
+              py: 1.25,
+              fontSize: '1rem',
+              fontWeight: 600,
+              borderRadius: 2,
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: 'primary.50',
+              },
+            }}
           >
-            {t('dashboard')}
+            {t('goToDashboard')}
           </Button>
-        </Stack>
+        </Box>
       </Box>
-    </Container>
+    </Box>
   );
 }

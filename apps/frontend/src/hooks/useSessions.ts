@@ -5,7 +5,8 @@ import { useQuery } from '@apollo/client/react';
 import { SESSIONS_QUERY } from '@/lib/session-management-queries';
 
 interface SessionFilters {
-  userId?: string;
+  userId?: string; // 保留向後兼容
+  userSearch?: string; // 統一用戶搜尋 (email、名稱或 ID)
   status?: 'ACTIVE' | 'EXPIRED' | 'REVOKED';
   ipAddress?: string;
   deviceInfo?: string;
@@ -16,6 +17,7 @@ interface SessionFilters {
   lastUsedBefore?: string;
   revokedBy?: string;
   revokedAfter?: string;
+  revokedMethod?: string;
 }
 
 export interface UseSessionsOptions {
@@ -42,6 +44,7 @@ export interface Session {
   revokedMethod?: string;
   browser?: string;
   os?: string;
+  isCurrent?: boolean;
 }
 
 export interface PageInfo {

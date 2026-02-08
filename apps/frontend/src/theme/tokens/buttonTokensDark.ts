@@ -1,0 +1,117 @@
+import { colorsDark, greyDark } from './paletteDark';
+
+const white = '#ffffff';
+
+export const buttonTokensDark = {
+  contained: {
+    borderRadius: 20,
+    paddingX: 16,
+    paddingY: 6,
+    iconSpacing: 8,
+    sizes: {
+      small: { paddingX: 10, paddingY: 4 },
+      medium: { paddingX: 16, paddingY: 6 },
+      large: { paddingX: 22, paddingY: 8 },
+    },
+    bg: colorsDark.primary.main, // Soft blue
+    hoverBg: colorsDark.primary.dark,
+    pressedBg: '#3670c2',
+    text: white,
+    disabledBg: greyDark[300],
+    disabledText: greyDark[600],
+  },
+  outlined: {
+    borderRadius: 20,
+    paddingX: 15,
+    paddingY: 5,
+    iconSpacing: 8,
+    sizes: {
+      small: { paddingX: 9, paddingY: 3 },
+      medium: { paddingX: 15, paddingY: 5 },
+      large: { paddingX: 21, paddingY: 7 },
+    },
+    border: greyDark[500],
+    bg: 'transparent',
+    hoverBg: 'rgba(90, 155, 245, 0.08)', // Soft blue tint
+    pressedBg: 'rgba(90, 155, 245, 0.16)',
+    text: greyDark[900],
+    disabledBorder: greyDark[400],
+    disabledText: greyDark[600],
+  },
+  text: {
+    borderRadius: 20,
+    paddingX: 8,
+    paddingY: 6,
+    iconSpacing: 8,
+    sizes: {
+      small: { paddingX: 5, paddingY: 4 },
+      medium: { paddingX: 8, paddingY: 6 },
+      large: { paddingX: 11, paddingY: 8 },
+    },
+    text: colorsDark.primary.light, // Lighter blue for text buttons
+    hoverBg: 'rgba(90, 155, 245, 0.08)',
+    pressedBg: 'rgba(90, 155, 245, 0.16)',
+    disabledText: greyDark[600],
+  },
+  elevated: {
+    borderRadius: 6,
+    paddingX: 16,
+    paddingY: 6,
+    iconSpacing: 8,
+    sizes: {
+      small: { paddingX: 10, paddingY: 4 },
+      medium: { paddingX: 16, paddingY: 6 },
+      large: { paddingX: 22, paddingY: 8 },
+    },
+    bg: `linear-gradient(180deg, ${colorsDark.primary.light} 0%, ${colorsDark.primary.dark} 100%)`,
+    hoverBg: colorsDark.primary.main,
+    pressedBg: colorsDark.primary.dark,
+    text: white,
+    disabledBg: greyDark[300],
+    disabledText: greyDark[600],
+    boxShadow:
+      '0 2px 3px 0 rgba(255, 255, 255, 0.05) inset, 0 10px 20px 0 rgba(90, 155, 245, 0.15)',
+  },
+  tagContained: {
+    borderRadius: 20,
+    height: 28,
+    paddingX: 12,
+    paddingY: 4,
+    iconSpacing: 6,
+    bg: greyDark[200],
+    hoverBg: greyDark[300],
+    pressedBg: greyDark[400],
+    text: greyDark[800],
+    disabledBg: greyDark[200],
+    disabledText: greyDark[600],
+  },
+  tagText: {
+    borderRadius: 20,
+    height: 28,
+    paddingX: 12,
+    paddingY: 4,
+    iconSpacing: 6,
+    text: colorsDark.primary.light,
+    hoverBg: 'rgba(90, 155, 245, 0.08)',
+    pressedBg: 'rgba(90, 155, 245, 0.16)',
+    disabledText: greyDark[600],
+  },
+  iconGradient: {
+    borderRadius: '50px',
+    paddingX: 16,
+    paddingY: 6,
+    iconSpacing: 8,
+    sizes: {
+      small: { paddingX: 10, paddingY: 4 },
+      medium: { paddingX: 16, paddingY: 6 },
+      large: { paddingX: 22, paddingY: 8 },
+    },
+    bg: `linear-gradient(180deg, ${greyDark[300]} 0%, ${greyDark[200]} 100%)`,
+    boxShadow: `0 2px 1px 0 ${greyDark[400]}`,
+    hoverBg: greyDark[300],
+    pressedBg: greyDark[400],
+    disabledBg: `linear-gradient(180deg, ${greyDark[200]} 0%, ${greyDark[100]} 100%)`,
+    disableBoxShadow: `0 2px 1px 0 ${greyDark[300]}`,
+    iconColor: colorsDark.primary.light,
+  },
+} as const;

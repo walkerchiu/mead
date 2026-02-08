@@ -1,4 +1,4 @@
-# @wind/typescript-config
+# @npt/typescript-config
 
 共享 TypeScript 編譯器設定預設檔。
 
@@ -17,6 +17,6 @@
 
 ```json
 {
-  "extends": "@wind/typescript-config/nextjs.json"
+  "extends": "@npt/typescript-config/nextjs.json"
 }
 ```

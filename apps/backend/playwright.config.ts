@@ -1,7 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e-tests',
+  testDir: './',
+  testMatch: '**/*.spec.ts',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
@@ -13,9 +14,11 @@ export default defineConfig({
   ],
   use: {
     baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: 'on',
+    screenshot: 'on',
+    video: 'on',
+    headless: false, // Run in headed mode for debugging
+    viewport: { width: 1920, height: 1080 },
   },
   projects: [
     {
@@ -24,4 +27,7 @@ export default defineConfig({
     },
   ],
   timeout: 60000,
+  expect: {
+    timeout: 10000,
+  },
 });

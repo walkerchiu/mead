@@ -56,7 +56,7 @@
 
 ## 📖 概述
 
-Wind 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `BaseResponse<T>`，確保所有 API 回應結構一致。
+NPT 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `BaseResponse<T>`，確保所有 API 回應結構一致。
 
 ### 核心原則
 
@@ -206,11 +206,11 @@ export class ErrorDetail {
 ```json
 {
   "success": false,
-  "message": "使用者不存在",
+  "message": "用戶不存在",
   "errors": [
     {
       "code": "NOT_FOUND",
-      "message": "找不到指定的使用者"
+      "message": "找不到指定的用戶"
     }
   ],
   "requestId": "req-1234567890"
@@ -245,7 +245,7 @@ export class ErrorDetail {
 {
   "errors": [
     {
-      "message": "使用者不存在",
+      "message": "用戶不存在",
       "extensions": {
         "code": "NOT_FOUND",
         "requestId": "req-1234567890",
@@ -376,7 +376,7 @@ query {
   "timestamp": "2026-01-30T00:00:00.000Z",
   "path": "/api/users/123",
   "requestId": "req-1234567890",
-  "message": "使用者不存在"
+  "message": "用戶不存在"
 }
 ```
 
@@ -386,7 +386,7 @@ query {
 {
   "errors": [
     {
-      "message": "使用者不存在",
+      "message": "用戶不存在",
       "extensions": {
         "code": "NOT_FOUND",
         "requestId": "req-1234567890",
@@ -466,7 +466,7 @@ const response = await fetch('/api/graphql', {
 #### 後端記錄日誌
 
 ```typescript
-logger.error(`[${requestId}] 使用者不存在`, { userId: '123' });
+logger.error(`[${requestId}] 用戶不存在`, { userId: '123' });
 ```
 
 #### 審計日誌整合
@@ -488,7 +488,7 @@ SELECT * FROM audit_logs WHERE request_id = 'req-1234567890';
 ```typescript
 return {
   success: true,
-  message: '使用者建立成功',
+  message: '用戶建立成功',
   data: user,
 };
 ```
@@ -514,7 +514,7 @@ export class CreateUserResponse extends BaseResponse(UserType) {}
 #### 4. 記錄 Request ID
 
 ```typescript
-logger.info(`[${requestId}] 使用者登入成功`, { userId: user.id });
+logger.info(`[${requestId}] 用戶登入成功`, { userId: user.id });
 ```
 
 ### ❌ DON'T - 不要這樣做
@@ -564,6 +564,6 @@ throw new BadRequestException({
 ## 📚 相關文檔
 
 - [PAGINATION_GUIDE.md](./PAGINATION_GUIDE.md) - 分頁實現指南
-- [AUDIT_LOG_SYSTEM.md](../infrastructure/AUDIT_LOG_SYSTEM.md) - 審計日誌系統
+- [AUDIT_LOG_SYSTEM.md](./AUDIT_LOG_SYSTEM.md) - 審計日誌系統
 - [FIELD_AUTHORIZATION.md](../authentication/FIELD_AUTHORIZATION.md) - GraphQL 欄位權限
 - [RBAC_ARCHITECTURE.md](../authentication/RBAC_ARCHITECTURE.md) - 角色權限架構

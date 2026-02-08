@@ -1,0 +1,1 @@
+export { RevokeSessionModal } from './RevokeSessionModal';

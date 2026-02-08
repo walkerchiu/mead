@@ -1,6 +1,8 @@
 # 組件設計指南
 
-面向設計師的完整組件設計規範與協作指南
+面向設計師的完整組件設計規範與協作指南。
+
+---
 
 ## 📋 目錄
 
@@ -23,6 +25,16 @@
       - [Neutral Colors（中性色）](#neutral-colors中性色)
       - [Light Theme Guidance](#light-theme-guidance)
       - [Icon / Surface / Text / Outline](#icon--surface--text--outline)
+    - [暗色模式設計系統 (Dark Mode)](#暗色模式設計系統-dark-mode)
+      - [暗色模式設計原則](#暗色模式設計原則)
+      - [暗色模式中性色 (Grey Scale Dark)](#暗色模式中性色-grey-scale-dark)
+      - [暗色模式主題色](#暗色模式主題色)
+      - [暗色模式語意色 (Semantic Colors)](#暗色模式語意色-semantic-colors)
+      - [暗色模式文字系統](#暗色模式文字系統)
+      - [暗色模式互動狀態](#暗色模式互動狀態)
+      - [暗色模式按鈕系統](#暗色模式按鈕系統)
+      - [暗色模式表格與列表](#暗色模式表格與列表)
+      - [暗色模式實作建議](#暗色模式實作建議)
     - [字體系統](#字體系統)
     - [響應式斷點](#響應式斷點)
     - [Guide（版型尺寸）](#guide版型尺寸)
@@ -32,17 +44,17 @@
   - [📐 組件規範](#-組件規範)
     - [🔹 Atoms（原子組件）](#-atoms原子組件)
       - [Button（按鈕）](#button按鈕)
-      - [Switch（開關）](#switch開關)
-      - [Radio（單選）](#radio單選)
-      - [TextField（輸入框）](#textfield輸入框)
       - [CodeInput（驗證碼輸入）](#codeinput驗證碼輸入)
+      - [Radio（單選）](#radio單選)
+      - [Switch（開關）](#switch開關)
+      - [TextField（輸入框）](#textfield輸入框)
     - [🟢 Molecules（分子組件）](#-molecules分子組件)
+      - [AlertMessage（提示訊息）](#alertmessage提示訊息)
+      - [DataList（數據列表）](#datalist數據列表)
+      - [DataTable（數據表格）](#datatable數據表格)
       - [FormField（表單欄位）](#formfield表單欄位)
       - [PasswordField（密碼欄位）](#passwordfield密碼欄位)
-      - [AlertMessage（提示訊息）](#alertmessage提示訊息)
       - [SelectField（下拉選單）](#selectfield下拉選單)
-      - [DataTable（數據表格）](#datatable數據表格)
-      - [DataList（數據列表）](#datalist數據列表)
     - [🟠 Organisms（有機體組件）](#-organisms有機體組件)
       - [LoginForm（登入表單）](#loginform登入表單)
       - [TwoFactorForm（2FA 表單）](#twofactorform2fa-表單)
@@ -75,7 +87,7 @@
 
 ### 這份文件的用途
 
-這份文件是 **Wind 專案的組件設計規範**，幫助你：
+這份文件是 **NPT 專案的組件設計規範**，幫助你：
 
 - ✅ 了解專案已有哪些組件
 - ✅ 知道設計新組件時需要提供什麼
@@ -144,17 +156,17 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 用途：主要按鈕、連結、強調元素
 色階：
 ├── 0: #FFFFFF
-├── 50: #FFF4ED
-├── 100: #FFE6D5
-├── 200: #FECAAA
-├── 300: #FDA474
-├── 400: #FB743C
-├── 500: #F94F16
-├── 600: #E0320B
-├── 700: #C2240C
-├── 800: #9A1E12
-├── 900: #7C1C12
-└── 950: #430A07
+├── 50: #F0F4F9
+├── 100: #D9E2EF
+├── 200: #B2C5DF
+├── 300: #8CA8CF
+├── 400: #658BBF
+├── 500: #3E6FAF
+├── 600: #0c3467
+├── 700: #0a2a54
+├── 800: #00194e
+├── 900: #001239
+└── 950: #000820
 ```
 
 #### Secondary（次要色）
@@ -294,10 +306,10 @@ Text / Background 建議：
 #### Light Theme Guidance
 
 ```text
-Primary: E0320B
+Primary: 0c3467
 On Primary: FFFFFF
-Primary Container: FFE6D5
-On Primary Container: C2240C
+Primary Container: D9E2EF
+On Primary Container: 0a2a54
 
 Secondary: C55731
 On Secondary: FFFFFF
@@ -340,12 +352,12 @@ Icon
 └── Invert: N-0 (#FFFFFF)
 
 Surface
-├── Default: P-50 (#FFF4ED)
+├── Default: P-50 (#F0F4F9)
 ├── Dark: N-100 (#ECEFF2)
 └── White: N-0 (#FFFFFF)
 
 Surface Container
-├── P-50 (#FFF4ED)
+├── P-50 (#F0F4F9)
 ├── N-100 (#ECEFF2)
 └── N-0 (#FFFFFF)
 
@@ -358,6 +370,354 @@ Outline
 ├── Default: N-200 (#D4DAE3)
 └── Variant: #ECECEC
 ```
+
+---
+
+### 暗色模式設計系統 (Dark Mode)
+
+> 💡 **給設計師的提示**：暗色模式已完全實作,並支援 Light/Dark/System 三種模式自動切換。
+
+#### 暗色模式設計原則
+
+```text
+設計理念：
+✅ 保留品牌識別 - Primary 使用品牌深藍的提亮版本（非換色相）
+✅ 降低對比度 - 減少長時間使用的眼睛疲勞
+✅ 中性深灰背景 - 營造專業、沉穩的氛圍
+✅ 統一的色彩系統 - 確保跨組件一致性
+
+注意事項：
+- 避免純黑 (#000000) 背景,使用純深灰黑 (#0D0D0D)
+- 避免純白 (#ffffff) 文字,使用柔和白色 (rgba(255,255,255,0.92))
+- 避免高對比度強烈色彩,使用降低飽和度的版本
+- 確保對比度仍符合 WCAG AA 標準 (4.5:1)
+```
+
+#### 暗色模式中性色 (Grey Scale Dark)
+
+```text
+Grey Dark Scale:
+├── 50: #0D0D0D   - 最深（主背景）
+├── 100: #1A1A1A  - 非常深（卡片/Paper）
+├── 200: #262626  - 深色（Hover 狀態）
+├── 300: #2E2E2E  - 中深（邊框）
+├── 400: #404040  - 中等（禁用元素）
+├── 500: #595757  - 中淺（PANTONE Cool Gray 11C）
+├── 600: #797878  - 淺色（Placeholder 文字）
+├── 700: #999999  - 較淺（次要文字）
+├── 800: #b5b5b6  - 很淺（PANTONE 429C）
+├── 900: #dcdddd  - 接近白（PANTONE 428C，主要文字）
+└── 950: #F5F5F5  - 幾乎白（強調文字）
+
+用途對應：
+├── Background Default: Grey Dark 50  (#0D0D0D)
+├── Background Paper: Grey Dark 100   (#1A1A1A)
+├── Border Default: Grey Dark 300     (#2E2E2E)
+├── Border Hover: Grey Dark 500       (#595757)
+├── Text Primary: rgba(255,255,255,0.92)
+├── Text Secondary: rgba(255,255,255,0.65)
+├── Text Disabled: rgba(255,255,255,0.38)
+└── Divider: rgba(255,255,255,0.12)
+```
+
+#### 暗色模式主題色
+
+**Primary（主色 - 品牌深藍提亮版）**
+
+```text
+用途：主要按鈕、連結、強調元素
+色階：
+├── Light: #8CA8CF   - 淺藍（Hover 文字）
+├── Main: #658BBF    - 提亮深藍（主色）
+├── Dark: #0c3467    - 品牌深藍（Pressed 狀態，PANTONE 294C）
+└── Contrast Text: #FFFFFF
+
+設計原則：
+- 保留 Light mode 的品牌識別
+- 提亮至 400 階，在深色背景下仍具可讀性
+- 與深色背景形成舒適對比
+```
+
+**Secondary（次要色 - 品牌亮藍提亮版）**
+
+```text
+用途：次要操作、輔助元素
+色階：
+├── Light: #8EC7DE   - 淺亮藍
+├── Main: #5FB0CF    - 提亮亮藍
+├── Dark: #008ec3    - 品牌亮藍（PANTONE 2184C）
+└── Contrast Text: #FFFFFF
+```
+
+**Accent（輔助強調 - 琥珀）**
+
+```text
+用途：標記強調、輔助視覺焦點
+色階：
+├── Light: #FDE68A   - 淺琥珀
+├── Main: #FBBF24    - 琥珀
+├── Dark: #D97706    - 深琥珀
+└── Contrast Text: #FFFFFF
+```
+
+#### 暗色模式語意色 (Semantic Colors)
+
+**Error（錯誤 - 柔和紅）**
+
+```text
+├── Light: #FCA5A5   - 淺紅
+├── Main: #F87171    - 柔和紅
+├── Dark: #DC2626    - 深紅
+└── Contrast Text: #FFFFFF
+
+使用場景：
+- 錯誤訊息背景：rgba(220, 38, 38, 0.22)
+- 錯誤訊息邊框：rgba(220, 38, 38, 0.5)
+- 錯誤訊息文字：#FCA5A5
+```
+
+**Warning（警告 - 溫暖琥珀）**
+
+```text
+├── Light: #FCD34D   - 淺琥珀
+├── Main: #FBBF24    - 溫暖琥珀
+├── Dark: #D97706    - 深琥珀
+└── Contrast Text: #FFFFFF
+
+使用場景：
+- 警告訊息背景：rgba(251, 191, 36, 0.22)
+- 警告訊息邊框：rgba(251, 191, 36, 0.5)
+- 警告訊息文字：#FCD34D
+```
+
+**Info（資訊 - 品牌亮藍提亮版）**
+
+```text
+├── Light: #8EC7DE   - 淺亮藍
+├── Main: #5FB0CF    - 提亮亮藍
+├── Dark: #008ec3    - 品牌亮藍
+└── Contrast Text: #FFFFFF
+
+使用場景：
+- 資訊訊息背景：rgba(0, 142, 195, 0.22)
+- 資訊訊息邊框：rgba(0, 142, 195, 0.5)
+- 資訊訊息文字：#8EC7DE
+```
+
+**Success（成功 - 祖母綠）**
+
+```text
+├── Light: #6EE7B7   - 淺綠
+├── Main: #34D399    - 提亮綠
+├── Dark: #059669    - 祖母綠
+└── Contrast Text: #FFFFFF
+
+使用場景：
+- 成功訊息背景：rgba(5, 150, 105, 0.22)
+- 成功訊息邊框：rgba(5, 150, 105, 0.5)
+- 成功訊息文字：#6EE7B7
+```
+
+#### 暗色模式文字系統
+
+```text
+Text Colors:
+├── Primary: rgba(255, 255, 255, 0.92)   - 主要文字（高對比）
+├── Secondary: rgba(255, 255, 255, 0.65) - 次要文字（中對比）
+└── Disabled: rgba(255, 255, 255, 0.38)  - 禁用文字（低對比）
+
+對應關係：
+- 主標題、重要內容 → Text Primary
+- 輔助說明、標籤 → Text Secondary
+- 禁用狀態 → Text Disabled
+```
+
+#### 暗色模式互動狀態
+
+```text
+Action States:
+├── Active: rgba(255, 255, 255, 0.92)    - 啟用狀態
+├── Hover: rgba(255, 255, 255, 0.04)     - 懸停背景
+├── Selected: rgba(255, 255, 255, 0.08)  - 選中背景
+├── Focus: rgba(255, 255, 255, 0.12)     - 聚焦背景
+├── Disabled: rgba(255, 255, 255, 0.26)  - 禁用前景
+└── Disabled BG: rgba(255, 255, 255, 0.08) - 禁用背景
+
+設計建議：
+- Hover 效果要細微,避免過於明顯
+- 聚焦狀態必須清晰可見（無障礙要求）
+- 禁用狀態要明顯區分,但不刺眼
+```
+
+#### 暗色模式按鈕系統
+
+**Contained Button（填充按鈕）**
+
+```text
+尺寸規格：
+├── Small: paddingX 10px, paddingY 4px
+├── Medium: paddingX 16px, paddingY 6px
+└── Large: paddingX 22px, paddingY 8px
+
+顏色系統：
+├── Background: #658BBF (Primary Main，提亮深藍)
+├── Hover BG: #0c3467 (Primary Dark，品牌深藍)
+├── Pressed BG: #00194e (品牌深色)
+├── Text: #FFFFFF
+├── Disabled BG: #2E2E2E (Grey Dark 300)
+└── Disabled Text: #797878 (Grey Dark 600)
+
+圓角：20px
+圖示間距：8px
+```
+
+**Outlined Button（邊框按鈕）**
+
+```text
+顏色系統：
+├── Border: #595757 (Grey Dark 500)
+├── Background: transparent
+├── Hover BG: rgba(101, 139, 191, 0.08) (Primary with opacity)
+├── Pressed BG: rgba(101, 139, 191, 0.16)
+├── Text: rgba(255,255,255,0.92)
+├── Disabled Border: #404040 (Grey Dark 400)
+└── Disabled Text: #797878 (Grey Dark 600)
+
+圓角：20px
+邊框寬度：1px
+```
+
+**Text Button（文字按鈕）**
+
+```text
+顏色系統：
+├── Text: #8CA8CF (Primary Light)
+├── Hover BG: rgba(101, 139, 191, 0.08)
+├── Pressed BG: rgba(101, 139, 191, 0.16)
+└── Disabled Text: #797878 (Grey Dark 600)
+
+無邊框、無背景（預設）
+圓角：20px
+```
+
+#### 暗色模式表格與列表
+
+**DataTable 暗色模式配色**
+
+```text
+表格結構：
+├── Container BG: #1A1A1A (Grey Dark 100, Paper)
+├── Header BG: #262626 (Grey Dark 200)
+├── Header Text: rgba(255,255,255,0.92)
+├── Row BG: transparent
+├── Row Hover BG: rgba(255, 255, 255, 0.04)
+├── Row Selected BG: rgba(101, 139, 191, 0.08)
+└── Divider: rgba(255, 255, 255, 0.12)
+
+狀態標籤配色（Chip）：
+├── ACTIVE（啟用）
+│   ├── Background: rgba(5, 150, 105, 0.25)
+│   ├── Border: rgba(5, 150, 105, 0.5)
+│   └── Text: #6EE7B7
+│
+├── REVOKED（撤銷）
+│   ├── Background: rgba(220, 38, 38, 0.25)
+│   ├── Border: rgba(220, 38, 38, 0.5)
+│   └── Text: #FCA5A5
+│
+├── EXPIRED（過期）
+│   ├── Background: rgba(251, 191, 36, 0.25)
+│   ├── Border: rgba(251, 191, 36, 0.5)
+│   └── Text: #FCD34D
+│
+└── 設計原則：
+    - 使用半透明背景創造層次感
+    - 邊框顏色比背景更飽和
+    - 文字顏色比邊框更亮,確保可讀性
+```
+
+**Audit Log Action Colors（審計日誌動作顏色）**
+
+```text
+Create（創建）：
+├── Background: rgba(5, 150, 105, 0.25)
+├── Border: rgba(5, 150, 105, 0.5)
+└── Text: #6EE7B7
+
+Update/Modify（更新）：
+├── Background: rgba(0, 142, 195, 0.25)
+├── Border: rgba(0, 142, 195, 0.5)
+└── Text: #8EC7DE
+
+Delete/Remove（刪除）：
+├── Background: rgba(220, 38, 38, 0.25)
+├── Border: rgba(220, 38, 38, 0.5)
+└── Text: #FCA5A5
+
+Login/Auth（登入/認證）：
+├── Background: rgba(101, 139, 191, 0.25)
+├── Border: rgba(101, 139, 191, 0.5)
+└── Text: #8CA8CF
+
+Default（預設）：
+├── Background: rgba(255, 255, 255, 0.08)
+├── Border: rgba(255, 255, 255, 0.15)
+└── Text: #b5b5b6
+```
+
+#### 暗色模式實作建議
+
+**給設計師的檢查清單**：
+
+- [ ] 確認所有背景使用 Grey Dark 50/100,避免純黑
+- [ ] 確認所有文字使用 rgba(255,255,255,0.87/0.60),避免純白
+- [ ] 確認語意色使用柔和版本 (降低飽和度)
+- [ ] 確認對比度符合 WCAG AA 標準 (4.5:1)
+- [ ] 測試長時間閱讀的舒適度
+- [ ] 確認與淺色模式的視覺一致性
+- [ ] 提供主題切換預覽（Figma Variants）
+
+**Figma 設定建議**：
+
+```text
+使用 Variables 管理暗色模式：
+
+創建 Mode:
+├── Light Mode (預設)
+└── Dark Mode
+
+Variable Collections:
+├── color/background/default
+│   ├── Light: #F5F7FA
+│   └── Dark: #0D0D0D
+│
+├── color/background/paper
+│   ├── Light: #FFFFFF
+│   └── Dark: #1A1A1A
+│
+├── color/text/primary
+│   ├── Light: #001239
+│   └── Dark: rgba(255,255,255,0.92)
+│
+└── color/primary/main
+    ├── Light: #0c3467 (品牌深藍 PANTONE 294C)
+    └── Dark: #658BBF (提亮深藍)
+
+這樣可以一鍵切換模式查看效果！
+```
+
+**無障礙考量**：
+
+```text
+暗色模式特殊注意：
+✅ 對比度檢查更重要 - 深色背景下對比度容易不足
+✅ 聚焦狀態必須明顯 - 使用亮色邊框或背景高亮
+✅ 避免純紅/純綠 - 對色盲用戶不友善,使用柔和版本
+✅ 測試不同亮度環境 - 暗處和亮處觀看效果不同
+✅ 提供切換選項 - 讓用戶自由選擇 Light/Dark/System
+```
+
+---
 
 ### 字體系統
 
@@ -587,121 +947,6 @@ Loading 狀態特性：
 
 ---
 
-#### Switch（開關）
-
-**Design Tokens**：
-
-```text
-Sizes
-- Medium: width 44, height 24, padding 2, thumb 20, track radius 12
-- Small: width 36, height 20, padding 2, thumb 16, track radius 10
-
-Colors
-- Track Off: #D4DAE3
-- Track On: #F94F16
-- Track Disabled: #ECEFF2
-- Thumb: #FFFFFF
-- Thumb Disabled: #D4DAE3
-```
-
-**狀態**：
-
-```text
-- Default（未啟用）
-- Checked（啟用）
-- Disabled（禁用）
-```
-
----
-
-#### Radio（單選）
-
-**Design Tokens**：
-
-```text
-Sizes
-- Large: size 24, dot 14, border 1
-- Medium: size 20, dot 12, border 1
-- Small: size 16, dot 10, border 1
-
-Colors (Unchecked)
-- Border: #D4DAE3
-- Background: #FFFFFF
-- Hover Border: #AFBACA
-- Hover Background: #F6F7F9
-- Pressed Border: #8396AD
-- Pressed Background: #ECEFF2
-- Disabled Border: #ECEFF2
-- Disabled Background: #FFFFFF
-
-Colors (Checked)
-- Border/Dot: #F94F16
-- Background: #FFF4ED
-- Hover Border/Dot: #E0320B
-- Hover Background: #FFE6D5
-- Pressed Border/Dot: #C2240C
-- Pressed Background: #FECAAA
-- Disabled Border: #D4DAE3
-- Disabled Background: #FFFFFF
-- Disabled Dot: #AFBACA
-```
-
-**狀態**：
-
-```text
-- Default（未選）
-- Checked（已選）
-- Disabled（禁用）
-```
-
----
-
-#### TextField（輸入框）
-
-**Design Tokens**：
-
-```text
-Sizes
-- Large: height 48, paddingX 16, radius 20, font 14, label 12
-- Medium: height 40, paddingX 14, radius 20, font 14, label 12
-- Small: height 32, paddingX 12, radius 16, font 13, label 12
-
-Colors
-- Border: #D4DAE3
-- Hover Border: #4F617A
-- Focus Border: #F94F16
-- Disabled Border: #D4DAE3
-- Background: #FFFFFF
-- Disabled Background: #F6F7F9
-- Text: #2A313C
-- Placeholder: #AFBACA
-- Label: #4F617A
-- Focus Label: #F94F16
-- Error Border: #FA3949
-- Error Background: #FFF1F2
-- Error Text/Label: #E61728
-```
-
-**狀態**：
-
-```text
-- Enable
-- Hover
-- Focus
-- Disabled
-- Error
-```
-
-**設計檢查清單**：
-
-- [ ] 提供所有狀態的設計
-- [ ] 標註 Label、Input、Helper Text 的間距
-- [ ] 提供圖示位置和尺寸
-- [ ] 提供錯誤狀態的視覺
-- [ ] 考慮長文字溢出處理
-
----
-
 #### CodeInput（驗證碼輸入）
 
 **設計規範**：
@@ -739,46 +984,122 @@ Colors
 
 ---
 
+#### Radio（單選）
+
+**Design Tokens**：
+
+```text
+Sizes
+- Large: size 24, dot 14, border 1
+- Medium: size 20, dot 12, border 1
+- Small: size 16, dot 10, border 1
+
+Colors (Unchecked)
+- Border: #D4DAE3
+- Background: #FFFFFF
+- Hover Border: #AFBACA
+- Hover Background: #F6F7F9
+- Pressed Border: #8396AD
+- Pressed Background: #ECEFF2
+- Disabled Border: #ECEFF2
+- Disabled Background: #FFFFFF
+
+Colors (Checked)
+- Border/Dot: #3E6FAF
+- Background: #F0F4F9
+- Hover Border/Dot: #0c3467
+- Hover Background: #D9E2EF
+- Pressed Border/Dot: #0a2a54
+- Pressed Background: #B2C5DF
+- Disabled Border: #dcdddd
+- Disabled Background: #FFFFFF
+- Disabled Dot: #AFBACA
+```
+
+**狀態**：
+
+```text
+- Default（未選）
+- Checked（已選）
+- Disabled（禁用）
+```
+
+---
+
+#### Switch（開關）
+
+**Design Tokens**：
+
+```text
+Sizes
+- Medium: width 44, height 24, padding 2, thumb 20, track radius 12
+- Small: width 36, height 20, padding 2, thumb 16, track radius 10
+
+Colors
+- Track Off: #D4DAE3
+- Track On: #3E6FAF
+- Track Disabled: #ECEFF2
+- Thumb: #FFFFFF
+- Thumb Disabled: #D4DAE3
+```
+
+**狀態**：
+
+```text
+- Default（未啟用）
+- Checked（啟用）
+- Disabled（禁用）
+```
+
+---
+
+#### TextField（輸入框）
+
+**Design Tokens**：
+
+```text
+Sizes
+- Large: height 48, paddingX 16, radius 20, font 14, label 12
+- Medium: height 40, paddingX 14, radius 20, font 14, label 12
+- Small: height 32, paddingX 12, radius 16, font 13, label 12
+
+Colors
+- Border: #D4DAE3
+- Hover Border: #4F617A
+- Focus Border: #3E6FAF
+- Disabled Border: #D4DAE3
+- Background: #FFFFFF
+- Disabled Background: #F6F7F9
+- Text: #2A313C
+- Placeholder: #AFBACA
+- Label: #4F617A
+- Focus Label: #3E6FAF
+- Error Border: #FA3949
+- Error Background: #FFF1F2
+- Error Text/Label: #E61728
+```
+
+**狀態**：
+
+```text
+- Enable
+- Hover
+- Focus
+- Disabled
+- Error
+```
+
+**設計檢查清單**：
+
+- [ ] 提供所有狀態的設計
+- [ ] 標註 Label、Input、Helper Text 的間距
+- [ ] 提供圖示位置和尺寸
+- [ ] 提供錯誤狀態的視覺
+- [ ] 考慮長文字溢出處理
+
+---
+
 ### 🟢 Molecules（分子組件）
-
-#### FormField（表單欄位）
-
-**設計規範**：
-
-```text
-組成：
-├── Label（上方，8px 間距）
-├── TextField
-└── Error Message（下方，4px 間距）
-
-整體高度：約 80-90px（含錯誤訊息）
-
-必填標記：
-- 位置：Label 右側
-- 符號：*
-- 顏色：Error 紅色
-```
-
----
-
-#### PasswordField（密碼欄位）
-
-**設計規範**：
-
-```text
-特殊元素：
-- 眼睛圖示按鈕（右側）
-  ├── 尺寸：24x24px
-  ├── 顏色：Text Secondary
-  ├── Hover：變深
-  └── 圖示：visibility / visibility_off
-
-行為：
-- 點擊切換顯示/隱藏
-- 預設隱藏
-```
-
----
 
 #### AlertMessage（提示訊息）
 
@@ -810,8 +1131,8 @@ Colors
 │
 ├── Warning
 │   ├── 背景：#fff3e0（淺橙）
-│   ├── 邊框：#ff9800（橙色）
-│   ├── 圖示：⚠（橙色）
+│   ├── 邊框：#ff9800（琥珀）
+│   ├── 圖示：⚠（琥珀）
 │   └── 文字：#e65100（深橙）
 │
 └── Info
@@ -830,98 +1151,151 @@ Colors
 
 ---
 
-#### SelectField（下拉選單）
+#### DataList（數據列表）
 
 **設計規範**：
 
 ```text
-基本結構：
-├── Label（標籤，上方）
-├── Select Container（選單容器）
-│   ├── 高度：56px
-│   ├── 內邊距：16px
-│   ├── 邊框：1px solid rgba(0,0,0,0.23)
+列表結構：
+├── Paper 容器
+│   ├── 陰影：Elevation 1
 │   └── 圓角：4px
-├── Helper Text（輔助文字，下方）
-└── Error Message（錯誤訊息）
-
-選項顯示：
-├── 單選
-│   └── 顯示選中項目的文字
 │
-└── 多選
-    ├── renderChips=true：顯示為 Chips
-    │   ├── Chip 高度：24px
-    │   ├── Chip 間距：4px
-    │   └── Chip 可刪除
-    └── renderChips=false：顯示為文字列表
-
-選項分組：
-├── 分組標題
-│   ├── 字重：Bold
-│   ├── 不可選擇
-│   └── 透明度：60%
+├── Toolbar（工具列，可選）
+│   ├── 位置：列表頂部
+│   ├── 內邊距：16px
+│   ├── 背景色：白色
+│   ├── 邊框：底部分隔線
+│   └── 包含：
+│       ├── 全選 Checkbox（可選）
+│       ├── 篩選輸入框（可選）
+│       └── 排序下拉選單（可選）
 │
-└── 分組項目
-    └── 左邊距：32px（縮排）
+├── List Items（列表項目）
+│   ├── 項目高度：最小 64px
+│   ├── 內邊距：16px
+│   └── Hover 效果：背景色變淺
+│
+└── Pagination（分頁，可選）
+    ├── 位置：列表底部
+    ├── 對齊：右對齊
+    └── 邊框：頂部分隔線
 
-選項圖示：
-├── 位置：選項文字左側
-├── 尺寸：24x24px
-├── 間距：與文字間隔 8-12px
-└── 支援類型：
-    ├── MUI Icons
-    ├── Emoji（Icon 組件）
-    └── 自訂 ReactNode
-
-多選模式：
-├── Checkbox（可選）
-│   ├── 位置：選項最左側
+列表項目結構：
+├── Checkbox（可選，左側）
 │   ├── 尺寸：18x18px
-│   └── showCheckbox 控制顯示
+│   └── 間距：margin-left 8px
 │
-└── 選中狀態
-    ├── 背景高亮
-    └── Checkbox 勾選
+├── Icon（可選，左側）
+│   ├── 尺寸：24x24px
+│   ├── 圓形容器：40x40px
+│   └── 背景色：淺灰色
+│
+├── Content（內容區，填充）
+│   ├── Primary Text（主標題）
+│   │   ├── 字體：Body1 (16px)
+│   │   └── 字重：Regular / 高亮時 SemiBold (600)
+│   └── Secondary Text（副標題）
+│       ├── 字體：Body2 (14px)
+│       └── 顏色：Text Secondary
+│
+└── Actions（右側操作區）
+    ├── Badge（徽章，可選）
+    │   ├── 尺寸：Small
+    │   ├── 圓角：12px
+    │   └── 顏色：可自訂
+    ├── 自訂操作按鈕
+    └── 展開圖示（可選）
 
-搜尋模式（searchable=true）：
-├── 切換為 Autocomplete 組件
-├── 輸入框：可輸入篩選
-├── noOptionsText：無結果提示
-├── 支援所有功能：
-│   ├── 分組
-│   ├── 圖示
-│   ├── 多選
-│   └── Checkbox
-└── 篩選行為：即時搜尋
+篩選和排序：
+├── 篩選輸入框
+│   ├── 位置：Toolbar
+│   ├── 尺寸：Small
+│   ├── 佔位符：可自訂
+│   └── flexGrow: 1（填充寬度）
+│
+└── 排序選單
+    ├── 位置：Toolbar 右側
+    ├── FormControl + Select
+    ├── 最小寬度：150px
+    └── 選項：自訂排序選項
 
-下拉選單面板：
-├── 最大高度：300px（可滾動）
-├── 陰影：Elevation 8
-├── 圓角：4px
-└── 項目高度：48px
+高亮項目：
+├── 條件高亮
+│   ├── highlightItem 函數判斷
+│   └── 自訂背景色（預設淺藍）
+│
+└── 文字字重
+    └── 高亮時：SemiBold (600)
 
-狀態：
-├── Default：邊框 #ccc
-├── Hover：邊框變深
-├── Focus：邊框 2px，主色
-├── Error：邊框紅色，顯示錯誤訊息
-├── Disabled：背景色 #f5f5f5，禁用
-└── Open：面板展開
+展開/收合：
+├── 展開圖示
+│   ├── 位置：Actions 區域最右側
+│   ├── expandIconPosition='right'：
+│   │   ├── 收合：▶（向右箭頭）
+│   │   └── 展開：▼（向下箭頭）
+│   └── expandIconPosition='down'（預設）：
+│       ├── 收合：▼（向下箭頭）
+│       └── 展開：▲（向上箭頭）
+│
+└── 展開內容
+    ├── 位置：項目下方
+    ├── 背景色：#f5f5f5
+    ├── 內邊距：16px 24px
+    └── 動畫：Collapse 展開/收合
+
+Badge（徽章）顯示：
+├── 位置：Actions 區域
+├── 樣式：MUI Badge 組件
+├── 顏色選項：
+│   ├── default（灰色）
+│   ├── primary（主色）
+│   ├── secondary（次要色）
+│   ├── error（紅色）
+│   ├── warning（琥珀色）
+│   ├── info（藍色）
+│   └── success（綠色）
+└── 尺寸：Small
+
+多選功能：
+├── 全選 Checkbox
+│   ├── 位置：Toolbar 最左側
+│   └── 狀態：未選 / 全選 / 部分選
+│
+└── 項目 Checkbox
+    ├── 位置：每項最左側
+    └── 選中狀態：項目無特殊高亮
+
+分隔線：
+├── divider 控制顯示
+├── 位置：項目之間
+└── 最後一項無分隔線
+
+載入狀態：
+├── 顯示：Circular Progress（居中）
+└── 位置：列表中央
+
+空狀態：
+├── 顯示：自訂文字
+├── 顏色：Text Secondary
+└── 位置：居中顯示
 ```
 
 **設計檢查清單**：
 
-- [ ] 單選和多選的視覺設計
-- [ ] 分組選項的層級表現
-- [ ] 圖示與文字的對齊和間距
-- [ ] Chip 顯示樣式（多選）
-- [ ] Checkbox 樣式（多選）
-- [ ] 搜尋模式的輸入框設計
-- [ ] 下拉面板的樣式和陰影
-- [ ] 空狀態提示（無選項）
-- [ ] 所有互動狀態
-- [ ] 長選項文字的處理（截斷、換行）
+- [ ] 列表項目的結構和間距
+- [ ] Icon 和 Badge 的樣式
+- [ ] 兩種展開圖示方向的設計
+- [ ] 展開內容的樣式和背景色
+- [ ] Toolbar 的佈局和功能
+- [ ] 篩選和排序控制的樣式
+- [ ] Checkbox 的樣式和位置
+- [ ] 高亮項目的視覺效果
+- [ ] Hover 和 Selected 狀態
+- [ ] 分隔線的顯示
+- [ ] 載入和空狀態的設計
+- [ ] 分頁組件的樣式
+- [ ] 響應式設計（手機版）
 
 ---
 
@@ -1051,151 +1425,137 @@ Colors
 
 ---
 
-#### DataList（數據列表）
+#### FormField（表單欄位）
 
 **設計規範**：
 
 ```text
-列表結構：
-├── Paper 容器
-│   ├── 陰影：Elevation 1
+組成：
+├── Label（上方，8px 間距）
+├── TextField
+└── Error Message（下方，4px 間距）
+
+整體高度：約 80-90px（含錯誤訊息）
+
+必填標記：
+- 位置：Label 右側
+- 符號：*
+- 顏色：Error 紅色
+```
+
+---
+
+#### PasswordField（密碼欄位）
+
+**設計規範**：
+
+```text
+特殊元素：
+- 眼睛圖示按鈕（右側）
+  ├── 尺寸：24x24px
+  ├── 顏色：Text Secondary
+  ├── Hover：變深
+  └── 圖示：visibility / visibility_off
+
+行為：
+- 點擊切換顯示/隱藏
+- 預設隱藏
+```
+
+---
+
+#### SelectField（下拉選單）
+
+**設計規範**：
+
+```text
+基本結構：
+├── Label（標籤，上方）
+├── Select Container（選單容器）
+│   ├── 高度：56px
+│   ├── 內邊距：16px
+│   ├── 邊框：1px solid rgba(0,0,0,0.23)
 │   └── 圓角：4px
-│
-├── Toolbar（工具列，可選）
-│   ├── 位置：列表頂部
-│   ├── 內邊距：16px
-│   ├── 背景色：白色
-│   ├── 邊框：底部分隔線
-│   └── 包含：
-│       ├── 全選 Checkbox（可選）
-│       ├── 篩選輸入框（可選）
-│       └── 排序下拉選單（可選）
-│
-├── List Items（列表項目）
-│   ├── 項目高度：最小 64px
-│   ├── 內邊距：16px
-│   └── Hover 效果：背景色變淺
-│
-└── Pagination（分頁，可選）
-    ├── 位置：列表底部
-    ├── 對齊：右對齊
-    └── 邊框：頂部分隔線
+├── Helper Text（輔助文字，下方）
+└── Error Message（錯誤訊息）
 
-列表項目結構：
-├── Checkbox（可選，左側）
+選項顯示：
+├── 單選
+│   └── 顯示選中項目的文字
+│
+└── 多選
+    ├── renderChips=true：顯示為 Chips
+    │   ├── Chip 高度：24px
+    │   ├── Chip 間距：4px
+    │   └── Chip 可刪除
+    └── renderChips=false：顯示為文字列表
+
+選項分組：
+├── 分組標題
+│   ├── 字重：Bold
+│   ├── 不可選擇
+│   └── 透明度：60%
+│
+└── 分組項目
+    └── 左邊距：32px（縮排）
+
+選項圖示：
+├── 位置：選項文字左側
+├── 尺寸：24x24px
+├── 間距：與文字間隔 8-12px
+└── 支援類型：
+    ├── MUI Icons
+    ├── Emoji（Icon 組件）
+    └── 自訂 ReactNode
+
+多選模式：
+├── Checkbox（可選）
+│   ├── 位置：選項最左側
 │   ├── 尺寸：18x18px
-│   └── 間距：margin-left 8px
+│   └── showCheckbox 控制顯示
 │
-├── Icon（可選，左側）
-│   ├── 尺寸：24x24px
-│   ├── 圓形容器：40x40px
-│   └── 背景色：淺灰色
-│
-├── Content（內容區，填充）
-│   ├── Primary Text（主標題）
-│   │   ├── 字體：Body1 (16px)
-│   │   └── 字重：Regular / 高亮時 SemiBold (600)
-│   └── Secondary Text（副標題）
-│       ├── 字體：Body2 (14px)
-│       └── 顏色：Text Secondary
-│
-└── Actions（右側操作區）
-    ├── Badge（徽章，可選）
-    │   ├── 尺寸：Small
-    │   ├── 圓角：12px
-    │   └── 顏色：可自訂
-    ├── 自訂操作按鈕
-    └── 展開圖示（可選）
+└── 選中狀態
+    ├── 背景高亮
+    └── Checkbox 勾選
 
-篩選和排序：
-├── 篩選輸入框
-│   ├── 位置：Toolbar
-│   ├── 尺寸：Small
-│   ├── 佔位符：可自訂
-│   └── flexGrow: 1（填充寬度）
-│
-└── 排序選單
-    ├── 位置：Toolbar 右側
-    ├── FormControl + Select
-    ├── 最小寬度：150px
-    └── 選項：自訂排序選項
+搜尋模式（searchable=true）：
+├── 切換為 Autocomplete 組件
+├── 輸入框：可輸入篩選
+├── noOptionsText：無結果提示
+├── 支援所有功能：
+│   ├── 分組
+│   ├── 圖示
+│   ├── 多選
+│   └── Checkbox
+└── 篩選行為：即時搜尋
 
-高亮項目：
-├── 條件高亮
-│   ├── highlightItem 函數判斷
-│   └── 自訂背景色（預設淺藍）
-│
-└── 文字字重
-    └── 高亮時：SemiBold (600)
+下拉選單面板：
+├── 最大高度：300px（可滾動）
+├── 陰影：Elevation 8
+├── 圓角：4px
+└── 項目高度：48px
 
-展開/收合：
-├── 展開圖示
-│   ├── 位置：Actions 區域最右側
-│   ├── expandIconPosition='right'：
-│   │   ├── 收合：▶（向右箭頭）
-│   │   └── 展開：▼（向下箭頭）
-│   └── expandIconPosition='down'（預設）：
-│       ├── 收合：▼（向下箭頭）
-│       └── 展開：▲（向上箭頭）
-│
-└── 展開內容
-    ├── 位置：項目下方
-    ├── 背景色：#f5f5f5
-    ├── 內邊距：16px 24px
-    └── 動畫：Collapse 展開/收合
-
-Badge（徽章）顯示：
-├── 位置：Actions 區域
-├── 樣式：MUI Badge 組件
-├── 顏色選項：
-│   ├── default（灰色）
-│   ├── primary（主色）
-│   ├── secondary（次要色）
-│   ├── error（紅色）
-│   ├── warning（橙色）
-│   ├── info（藍色）
-│   └── success（綠色）
-└── 尺寸：Small
-
-多選功能：
-├── 全選 Checkbox
-│   ├── 位置：Toolbar 最左側
-│   └── 狀態：未選 / 全選 / 部分選
-│
-└── 項目 Checkbox
-    ├── 位置：每項最左側
-    └── 選中狀態：項目無特殊高亮
-
-分隔線：
-├── divider 控制顯示
-├── 位置：項目之間
-└── 最後一項無分隔線
-
-載入狀態：
-├── 顯示：Circular Progress（居中）
-└── 位置：列表中央
-
-空狀態：
-├── 顯示：自訂文字
-├── 顏色：Text Secondary
-└── 位置：居中顯示
+狀態：
+├── Default：邊框 #ccc
+├── Hover：邊框變深
+├── Focus：邊框 2px，主色
+├── Error：邊框紅色，顯示錯誤訊息
+├── Disabled：背景色 #f5f5f5，禁用
+└── Open：面板展開
 ```
 
 **設計檢查清單**：
 
-- [ ] 列表項目的結構和間距
-- [ ] Icon 和 Badge 的樣式
-- [ ] 兩種展開圖示方向的設計
-- [ ] 展開內容的樣式和背景色
-- [ ] Toolbar 的佈局和功能
-- [ ] 篩選和排序控制的樣式
-- [ ] Checkbox 的樣式和位置
-- [ ] 高亮項目的視覺效果
-- [ ] Hover 和 Selected 狀態
-- [ ] 分隔線的顯示
-- [ ] 載入和空狀態的設計
-- [ ] 分頁組件的樣式
-- [ ] 響應式設計（手機版）
+- [ ] 單選和多選的視覺設計
+- [ ] 分組選項的層級表現
+- [ ] 圖示與文字的對齊和間距
+- [ ] Chip 顯示樣式（多選）
+- [ ] Checkbox 樣式（多選）
+- [ ] 搜尋模式的輸入框設計
+- [ ] 下拉面板的樣式和陰影
+- [ ] 空狀態提示（無選項）
+- [ ] 所有互動狀態
+- [ ] 長選項文字的處理（截斷、換行）
 
 ---
 
@@ -1288,7 +1648,7 @@ Badge（徽章）顯示：
 #### 推薦的 Page 結構（含說明）
 
 ```text
-📁 Wind Design System
+📁 NPT Design System
 │
 ├── 📄 🏠 Cover（封面頁）
 │   說明：專案介紹、團隊成員、版本資訊、導航索引
@@ -1330,32 +1690,53 @@ Badge（徽章）顯示：
 │   │   │   - 圖示按鈕（startIcon、endIcon、iconOnly）
 │   │   │   - Loading 狀態下的 Spinner 替換
 │   │   │
+│   │   ├── IconButton（圖示按鈕）
+│   │   │   說明：純圖示的可點擊按鈕
+│   │   │
 │   │   ├── Switch（開關）
 │   │   │   說明：基本狀態切換元件，支援大小與狀態
 │   │   │   包含：Small/Medium、Default/Checked/Disabled
 │   │   │
 │   │   ├── TextField（輸入框）
-│   │   │   說明：基礎文字輸入組件，用於表單中收集使用者輸入
+│   │   │   說明：基礎文字輸入組件，用於表單中收集用戶輸入
 │   │   │   包含：不同類型（Text/Email/Password）、所有狀態、圖示變體
+│   │   │
+│   │   ├── TextArea（多行輸入框）
+│   │   │   說明：多行文字輸入組件
+│   │   │
+│   │   ├── Radio（單選按鈕）
+│   │   │   說明：基礎單選按鈕，支援各種尺寸與狀態
+│   │   │
+│   │   ├── DatePicker（日期選擇器）
+│   │   │   說明：日期輸入與選擇組件
+│   │   │
+│   │   ├── TimePicker（時間選擇器）
+│   │   │   說明：時間輸入與選擇組件
+│   │   │
+│   │   ├── Search（搜尋輸入框）
+│   │   │   說明：帶搜尋圖示的輸入框
 │   │   │
 │   │   ├── CodeInput（驗證碼輸入）
 │   │   │   說明：6 位數字驗證碼專用輸入，用於 2FA 驗證
 │   │   │   包含：單格設計、間距定義、各種狀態
 │   │   │
-│   │   ├── Switch（開關）
-│   │   │   說明：開關切換組件
-│   │   │
 │   │   ├── Slider（滑桿）
 │   │   │   說明：數值範圍選擇滑桿
 │   │   │
 │   │   ├── Avatar（頭像）
-│   │   │   說明：使用者頭像，支援圖片、文字、圖示
+│   │   │   說明：用戶頭像，支援圖片、文字、圖示
 │   │   │
 │   │   ├── Badge（徽章）
 │   │   │   說明：狀態或數量徽章
 │   │   │
+│   │   ├── Chip（標籤片）
+│   │   │   說明：可選取或可刪除的標籤元件
+│   │   │
 │   │   ├── Icon（圖示）
 │   │   │   說明：圖示組件，支援 MUI Icons 和 Emoji
+│   │   │
+│   │   ├── Link（連結）
+│   │   │   說明：文字連結組件
 │   │   │
 │   │   ├── Progress（進度）
 │   │   │   說明：載入進度指示器（圓形/線性）
@@ -1364,19 +1745,37 @@ Badge（徽章）顯示：
 │   │   │   說明：視覺分隔元素
 │   │   │
 │   │   ├── Skeleton（骨架屏）
-│   │   │   說明：載入佔位符（Form/Dashboard）
+│   │   │   說明：載入佔位符（Form/Dashboard/NotificationList/Filters）
 │   │   │
-│   │   ├── LanguageSwitcher（語言切換器）
-│   │   │   說明：多語系切換組件
+│   │   ├── NotificationBadge（通知徽章）
+│   │   │   說明：帶數字的通知圖示徽章
 │   │   │
-│   │   ├── SettingsMenu（設定選單）
-│   │   │   說明：使用者設定下拉選單
+│   │   ├── NotificationItem（通知項目）
+│   │   │   說明：單一通知列表項目
 │   │   │
-│   │   ├── SnackbarWithProgress（通知提示）
-│   │   │   說明：帶進度條的通知提示
+│   │   ├── PasswordStrengthIndicator（密碼強度指示）
+│   │   │   說明：顯示密碼強度的視覺指示器
 │   │   │
-│   │   └── Drawer（抽屜）
-│   │       說明：抽屜式側邊欄
+│   │   ├── ScrollButton（捲動按鈕）
+│   │   │   說明：觸發頁面捲動的按鈕
+│   │   │
+│   │   ├── SettingsButton（設定按鈕）
+│   │   │   說明：開啟設定選單的觸發按鈕
+│   │   │
+│   │   ├── SettingsMenuItem（設定選單項目）
+│   │   │   說明：設定選單的單一選項行
+│   │   │
+│   │   ├── ThemeToggleButton（主題切換按鈕）
+│   │   │   說明：深色/淺色模式切換按鈕
+│   │   │
+│   │   ├── Typography（文字排版）
+│   │   │   說明：統一的文字樣式組件
+│   │   │
+│   │   ├── UserButton（用戶按鈕）
+│   │   │   說明：顯示用戶頭像與名稱的觸發按鈕
+│   │   │
+│   │   └── UserMenuItem（用戶選單項目）
+│   │       說明：用戶選單的單一選項行
 │   │
 │   ├── 🟢 Molecules（分子組件）
 │   │   說明：由 2-3 個原子組合而成，具有簡單功能
@@ -1384,6 +1783,9 @@ Badge（徽章）顯示：
 │   │   ├── FormField（表單欄位）
 │   │   │   說明：完整的表單輸入單元（Label + Input + Error）
 │   │   │   包含：標籤、輸入框、錯誤訊息的組合
+│   │   │
+│   │   ├── EmailField（Email 欄位）
+│   │   │   說明：帶格式驗證的 Email 輸入欄位
 │   │   │
 │   │   ├── PasswordField（密碼欄位）
 │   │   │   說明：帶顯示/隱藏切換的密碼輸入欄位
@@ -1404,12 +1806,21 @@ Badge（徽章）顯示：
 │   │   ├── RadioGroup（單選按鈕群組）
 │   │   │   說明：單選按鈕群組組件
 │   │   │
+│   │   ├── FileUploader（檔案上傳）
+│   │   │   說明：拖放或點擊上傳檔案的組件
+│   │   │
 │   │   ├── ErrorDisplay（錯誤展示）
 │   │   │   說明：錯誤訊息展示組件
 │   │   │
 │   │   ├── AlertMessage（提示訊息）
 │   │   │   說明：用於顯示成功、錯誤、警告等反饋訊息
 │   │   │   包含：圖示 + 文字 + 關閉按鈕（可選）、4 種類型
+│   │   │
+│   │   ├── Toast（快閃通知）
+│   │   │   說明：短暫顯示的操作反饋通知
+│   │   │
+│   │   ├── SnackbarWithProgress（帶進度條的通知）
+│   │   │   說明：帶倒數進度條的通知提示
 │   │   │
 │   │   ├── Tabs（頁籤）
 │   │   │   說明：頁籤切換組件
@@ -1444,44 +1855,138 @@ Badge（徽章）顯示：
 │   │   │   - Badge 顯示
 │   │   │   - 自訂操作
 │   │   │
+│   │   ├── DetailRow（詳情列）
+│   │   │   說明：標籤與內容並排的詳情展示行
+│   │   │
 │   │   ├── Accordion（手風琴）
 │   │   │   說明：可折疊面板組件
 │   │   │
-│   │   ├── Sidebar（側邊欄）
-│   │   │   說明：側邊欄導航組件
+│   │   ├── PageHeader（頁面標題）
+│   │   │   說明：頁面頂部的標題與副標題區塊
 │   │   │
-│   │   └── Modal（模態框）
-│   │       說明：模態對話框組件
+│   │   ├── LanguageSwitcher（語言切換器）
+│   │   │   說明：多語系切換組件
+│   │   │
+│   │   ├── ThemeSelector（主題選擇器）
+│   │   │   說明：提供主題樣式選項的選單組件
+│   │   │
+│   │   ├── ScrollControl（捲動控制器）
+│   │   │   說明：控制列表捲動位置的操作組件
+│   │   │
+│   │   ├── NotificationFilters（通知篩選器）
+│   │   │   說明：通知列表的篩選條件組件
+│   │   │
+│   │   ├── NotificationList（通知列表）
+│   │   │   說明：通知項目的靜態列表
+│   │   │
+│   │   ├── NotificationMenuList（通知選單列表）
+│   │   │   說明：下拉選單中的通知列表
+│   │   │
+│   │   ├── InfiniteNotificationList（無限捲動通知列表）
+│   │   │   說明：支援無限捲動載入的通知列表
+│   │   │
+│   │   ├── SettingsMenuList（設定選單列表）
+│   │   │   說明：設定選單的選項列表
+│   │   │
+│   │   ├── UserMenuHeader（用戶選單標頭）
+│   │   │   說明：用戶下拉選單頂部的用戶資訊區塊
+│   │   │
+│   │   ├── UserMenuList（用戶選單列表）
+│   │   │   說明：用戶下拉選單的操作選項列表
+│   │   │
+│   │   ├── AboutContent（關於頁內容）
+│   │   │   說明：關於頁面的靜態說明內容
+│   │   │
+│   │   └── HelpContent（說明頁內容）
+│   │       說明：說明頁面的靜態說明內容
 │   │
 │   ├── 🟠 Organisms（有機體組件）
 │   │   說明：完整功能單元，可獨立完成一個任務
 │   │   │
-│   │   ├── MainAppBar（主應用程式列）
-│   │   │   說明：頂部導航列
-│   │   │   包含：Logo、導航、使用者選單
+│   │   ├── 🔐 認證相關
+│   │   │   ├── LoginForm（登入表單）
+│   │   │   │   說明：完整的用戶登入功能區塊
+│   │   │   │   包含：Email、Password、Remember Me、Submit、Forgot Link
+│   │   │   │
+│   │   │   ├── TwoFactorForm（雙因素驗證表單）
+│   │   │   │   說明：2FA 驗證碼輸入和驗證功能
+│   │   │   │   包含：CodeInput、倒數計時、重新發送、Submit
+│   │   │   │
+│   │   │   ├── TwoFactorSettings（雙因素驗證設定）
+│   │   │   │   說明：啟用/停用 2FA 的設定區塊
+│   │   │   │
+│   │   │   ├── ForgotPasswordForm（忘記密碼表單）
+│   │   │   │   說明：請求密碼重設連結的表單
+│   │   │   │   包含：Email 輸入、Submit、返回登入連結
+│   │   │   │
+│   │   │   ├── ResetPasswordForm（重設密碼表單）
+│   │   │   │   說明：設定新密碼的表單
+│   │   │   │   包含：新密碼、確認密碼、密碼強度指示、Submit
+│   │   │   │
+│   │   │   └── ChangePasswordForm（修改密碼表單）
+│   │   │       說明：已登入用戶修改密碼的表單
+│   │   │       包含：舊密碼、新密碼、確認密碼、Submit
 │   │   │
-│   │   ├── LoginForm（登入表單）
-│   │   │   說明：完整的使用者登入功能區塊
-│   │   │   包含：Email、Password、Remember Me、Submit、Forgot Link
+│   │   ├── 🧭 導航相關
+│   │   │   ├── Sidebar（側邊欄）
+│   │   │   │   說明：主要導航側邊欄，包含選單項目與折疊功能
+│   │   │   │
+│   │   │   ├── Drawer（抽屜面板）
+│   │   │   │   說明：從側邊滑入的抽屜式面板
+│   │   │   │
+│   │   │   ├── NotificationCenter（通知中心）
+│   │   │   │   說明：完整的通知管理介面（含篩選、無限捲動）
+│   │   │   │
+│   │   │   ├── NotificationMenu（通知選單）
+│   │   │   │   說明：頂部導航列的通知下拉選單
+│   │   │   │
+│   │   │   ├── UserMenu（用戶選單）
+│   │   │   │   說明：頂部導航列的用戶帳號下拉選單
+│   │   │   │
+│   │   │   └── SettingsMenu（設定選單）
+│   │   │       說明：用戶設定下拉選單（主題/語言等）
 │   │   │
-│   │   ├── TwoFactorForm（雙因素驗證表單）
-│   │   │   說明：2FA 驗證碼輸入和驗證功能
-│   │   │   包含：CodeInput、倒數計時、重新發送、Submit
+│   │   ├── 💬 對話框 / Modal
+│   │   │   └── Modal（通用 Modal）
+│   │   │       說明：通用的模態對話框基礎組件
 │   │   │
-│   │   ├── ForgotPasswordForm（忘記密碼表單）
-│   │   │   說明：請求密碼重設連結的表單
-│   │   │   包含：Email 輸入、Submit、返回登入連結
-│   │   │
-│   │   └── ResetPasswordForm（重設密碼表單）
-│   │       說明：設定新密碼的表單
-│   │       包含：新密碼、確認密碼、密碼強度指示、Submit
+│   │   └── 🛡️ HQ 後台管理
+│   │       ├── AuditLogFilters（稽核日誌篩選器）
+│   │       ├── AuditLogTable（稽核日誌表格）
+│   │       ├── AuditLogStats（稽核日誌統計）
+│   │       ├── AuditLogDetailsModal（稽核日誌詳情 Modal）
+│   │       ├── SessionFilters（Session 篩選器）
+│   │       ├── SessionTable（Session 表格）
+│   │       ├── SessionStats（Session 統計）
+│   │       ├── SessionDetailsModal（Session 詳情 Modal）
+│   │       ├── BatchRevokeModal（批次撤銷 Modal）
+│   │       ├── RevokeSessionModal（撤銷 Session Modal）
+│   │       ├── RevokeOtherDevicesModal（撤銷其他裝置 Modal）
+│   │       ├── UserFilters（用戶篩選器）
+│   │       ├── UserTable（用戶表格）
+│   │       ├── CreateUserDialog（新增用戶對話框）
+│   │       ├── EditUserDialog（編輯用戶對話框）
+│   │       ├── DeleteUserModal（刪除用戶 Modal）
+│   │       ├── ResetPasswordDialog（重設密碼對話框）
+│   │       ├── CronJobFilters（排程任務篩選器）
+│   │       ├── CronJobListFilters（排程任務列表篩選器）
+│   │       ├── CronJobTable（排程任務表格）
+│   │       ├── CronJobStats（排程任務統計）
+│   │       ├── CronJobExecutionHistory（排程任務執行歷史）
+│   │       ├── CronJobConfigDetailsModal（排程設定詳情 Modal）
+│   │       ├── CronJobExecutionDetailsModal（排程執行詳情 Modal）
+│   │       └── CronJobTriggerDialog（觸發排程任務對話框）
 │   │
 │   └── 🔵 Templates（模板）
 │       說明：頁面級別的佈局結構，定義內容擺放位置
 │       │
-│       └── AuthLayout（認證頁面佈局）
-│           說明：所有認證相關頁面的統一外框
-│           包含：背景、卡片容器、Logo 位置、響應式規則
+│       ├── AuthLayout（認證頁面佈局）
+│       │   說明：所有認證相關頁面的統一外框
+│       │   包含：背景、卡片容器、Logo 位置、響應式規則
+│       │
+│       └── DashboardLayout（儀表板佈局）
+│           說明：主應用程式頁面的佈局框架
+│           包含：頂部導航列、側邊欄、主內容區域、響應式規則
 │
 ├── 📄 📱 Responsive Examples（響應式範例）
 │   說明：展示組件在不同螢幕尺寸下的呈現效果
@@ -1542,7 +2047,7 @@ Badge（徽章）顯示：
 
 **🎭 States & Interactions（狀態與互動）**
 
-- **用途**：展示使用者操作時的視覺反饋
+- **用途**：展示用戶操作時的視覺反饋
 - **為什麼重要**：開發者需要知道每個狀態該長什麼樣
 - **必須包含**：所有可互動組件的所有可能狀態
 
@@ -1805,7 +2310,7 @@ Button States Frame:
 
 ```text
 格式：[專案名稱] - [類型] - [版本]
-範例：Wind - Design System - v1.0
+範例：NPT - Design System - v1.0
 ```
 
 **Page 命名**：

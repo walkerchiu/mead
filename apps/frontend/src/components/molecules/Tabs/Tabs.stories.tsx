@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Tabs } from './Tabs';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
@@ -51,6 +51,26 @@ export const Default: Story = {
   },
 };
 
+export const WithDisabled: Story = {
+  args: {
+    tabs: [
+      {
+        label: 'Enabled',
+        content: <Typography>This tab is enabled</Typography>,
+      },
+      {
+        label: 'Disabled',
+        content: <Typography>This tab is disabled</Typography>,
+        disabled: true,
+      },
+      {
+        label: 'Enabled',
+        content: <Typography>This tab is also enabled</Typography>,
+      },
+    ],
+  },
+};
+
 export const FullWidth: Story = {
   args: {
     tabs: sampleTabs,
@@ -81,24 +101,52 @@ export const Scrollable: Story = {
   },
 };
 
-export const WithDisabled: Story = {
-  args: {
-    tabs: [
-      {
-        label: 'Enabled',
-        content: <Typography>This tab is enabled</Typography>,
-      },
-      {
-        label: 'Disabled',
-        content: <Typography>This tab is disabled</Typography>,
-        disabled: true,
-      },
-      {
-        label: 'Enabled',
-        content: <Typography>This tab is also enabled</Typography>,
-      },
-    ],
-  },
+export const Vertical: Story = {
+  render: () => (
+    <Box sx={{ width: '600px', height: '400px' }}>
+      <Tabs
+        orientation="vertical"
+        tabs={[
+          {
+            label: 'Overview',
+            content: (
+              <Box>
+                <Typography variant="h6">Overview</Typography>
+                <Typography>View system overview and statistics</Typography>
+              </Box>
+            ),
+          },
+          {
+            label: 'User Management',
+            content: (
+              <Box>
+                <Typography variant="h6">User Management</Typography>
+                <Typography>Manage system users and permissions</Typography>
+              </Box>
+            ),
+          },
+          {
+            label: 'System Settings',
+            content: (
+              <Box>
+                <Typography variant="h6">System Settings</Typography>
+                <Typography>Configure system parameters and options</Typography>
+              </Box>
+            ),
+          },
+          {
+            label: 'Logs',
+            content: (
+              <Box>
+                <Typography variant="h6">Logs</Typography>
+                <Typography>View system activity logs</Typography>
+              </Box>
+            ),
+          },
+        ]}
+      />
+    </Box>
+  ),
 };
 
 export const SecondaryColor: Story = {
@@ -178,52 +226,4 @@ export const SettingsTabs: Story = {
       },
     ],
   },
-};
-
-export const Vertical: Story = {
-  render: () => (
-    <Box sx={{ width: '600px', height: '400px' }}>
-      <Tabs
-        orientation="vertical"
-        tabs={[
-          {
-            label: 'Overview',
-            content: (
-              <Box>
-                <Typography variant="h6">Overview</Typography>
-                <Typography>View system overview and statistics</Typography>
-              </Box>
-            ),
-          },
-          {
-            label: 'User Management',
-            content: (
-              <Box>
-                <Typography variant="h6">User Management</Typography>
-                <Typography>Manage system users and permissions</Typography>
-              </Box>
-            ),
-          },
-          {
-            label: 'System Settings',
-            content: (
-              <Box>
-                <Typography variant="h6">System Settings</Typography>
-                <Typography>Configure system parameters and options</Typography>
-              </Box>
-            ),
-          },
-          {
-            label: 'Logs',
-            content: (
-              <Box>
-                <Typography variant="h6">Logs</Typography>
-                <Typography>View system activity logs</Typography>
-              </Box>
-            ),
-          },
-        ]}
-      />
-    </Box>
-  ),
 };

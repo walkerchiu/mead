@@ -6,14 +6,14 @@ import { AccessScope } from '../enums/access-scope.enum';
  * 使用 Symbol 以獲得更好的效能和避免衝突
  */
 export const FIELD_SENSITIVE = Symbol('field:sensitive');
-export const FIELD_ADMIN_ONLY = Symbol('field:adminOnly');
+export const FIELD_HQ_ONLY = Symbol('field:hqOnly');
 export const FIELD_REQUIRES_SCOPE = Symbol('field:requiresScope');
 export const FIELD_REQUIRES_PERMISSION = Symbol('field:requiresPermission');
 export const FIELD_SELF_ACCESSIBLE = Symbol('field:selfAccessible');
 
 /**
  * 標記欄位為敏感欄位
- * 只有具備對應權限的使用者才能看到
+ * 只有具備對應權限的用戶才能看到
  *
  * @param permission - 需要的權限，如 'users:read-sensitive'
  *
@@ -39,21 +39,21 @@ export function SensitiveField(permission?: string): PropertyDecorator {
 }
 
 /**
- * 標記欄位僅 Admin 可見
+ * 標記欄位僅 HQ 可見
  *
  * @example
  * ```typescript
  * @ObjectType()
  * export class UserType {
  *   @Field({ nullable: true })
- *   @AdminOnly()
+ *   @HQOnly()
  *   deletedAt?: Date;
  * }
  * ```
  */
-export function AdminOnly(): PropertyDecorator {
+export function HQOnly(): PropertyDecorator {
   return (target: object, propertyKey: string | symbol) => {
-    Reflect.defineMetadata(FIELD_ADMIN_ONLY, true, target, propertyKey);
+    Reflect.defineMetadata(FIELD_HQ_ONLY, true, target, propertyKey);
   };
 }
 
@@ -65,11 +65,11 @@ export function AdminOnly(): PropertyDecorator {
  * @example
  * ```typescript
  * @Field()
- * @FieldRequiresScope(AccessScope.ADMIN_SCOPE)
- * adminNotes: string;
+ * @FieldRequiresScope(AccessScope.HQ_SCOPE)
+ * hqNotes: string;
  *
  * @Field()
- * @FieldRequiresScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+ * @FieldRequiresScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
  * sharedData: string;
  * ```
  */

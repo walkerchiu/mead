@@ -8,16 +8,16 @@ import { ConfigService } from '@nestjs/config';
 import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
 import { TwoFactorAuthService } from '../two-factor-auth/two-factor-auth.service';
+import { AccountLockoutService } from './account-lockout.service';
 import { SessionManagementService } from './session-management.service';
 import * as bcrypt from 'bcrypt';
-import * as crypto from 'crypto';
 import { AccessScope } from '../common/enums/access-scope.enum';
 import {
   JwtPayload,
   AuthTokenResult,
   TwoFactorLoginResponse,
 } from './auth.types';
-import { RevokedMethod } from './admin-session.types';
+import { RevokedMethod } from './hq-session.types';
 import { assertPasswordStrength } from '../common/utils/password-validator';
 import {
   assertValidEmail,
@@ -36,6 +36,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private twoFactorAuthService: TwoFactorAuthService,
+    private accountLockoutService: AccountLockoutService,
     private sessionManagementService: SessionManagementService,
     private i18n: I18nService,
     private configService: ConfigService,
@@ -54,7 +55,7 @@ export class AuthService {
 
   /**
    * 註冊客戶用戶
-   * 只有 CUSTOMER_SCOPE 或 ADMIN_SCOPE 的用戶可以調用
+   * 只有 CUSTOMER_SCOPE 或 HQ_SCOPE 的用戶可以調用
    */
   async registerCustomer(
     email: string,
@@ -95,7 +96,15 @@ export class AuthService {
       include: {
         userRoles: {
           include: {
-            role: true,
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -107,9 +116,9 @@ export class AuthService {
 
   /**
    * 註冊管理員用戶
-   * 只有 ADMIN_SCOPE 的用戶可以調用
+   * 只有 HQ_SCOPE 的用戶可以調用
    */
-  async registerAdmin(
+  async registerHQ(
     email: string,
     password: string,
     name?: string,
@@ -143,12 +152,20 @@ export class AuthService {
         email,
         password: hashedPassword,
         name,
-        accessScopes: [AccessScope.ADMIN_SCOPE],
+        accessScopes: [AccessScope.HQ_SCOPE],
       },
       include: {
         userRoles: {
           include: {
-            role: true,
+            role: {
+              include: {
+                rolePermissions: {
+                  include: {
+                    permission: true,
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -166,7 +183,10 @@ export class AuthService {
     lang?: string,
   ): Promise<AuthTokenResult | TwoFactorLoginResponse> {
     logger.info('[AuthService] Login started', { email });
+    logger.info('[AuthService] Asserting valid email', { email });
     assertValidEmail(email, lang, this.i18n);
+
+    logger.info('[AuthService] Fetching user from database', { email });
 
     const user = await this.prisma.user.findUnique({
       where: { email },
@@ -179,21 +199,64 @@ export class AuthService {
       },
     });
 
+    logger.info('[AuthService] User fetched from database', {
+      email,
+      userFound: !!user,
+      userDeleted: user?.deletedAt ? true : false,
+      userRolesCount: user?.userRoles?.length || 0,
+    });
+
     if (!user || user.deletedAt) {
       throw new UnauthorizedException(
         this.i18n.translate('auth.invalidCredentials', { lang }),
       );
     }
 
+    // 檢查帳號是否被鎖定（委託給 AccountLockoutService）
+    const lockInfo = await this.accountLockoutService.isAccountLocked(user.id);
+    if (lockInfo.isLocked) {
+      throw new UnauthorizedException(
+        this.i18n.translate('auth.accountLocked', {
+          lang,
+          args: { minutes: lockInfo.remainingMinutes },
+        }),
+      );
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      // 密碼錯誤：委託給 AccountLockoutService（含重設視窗、鎖定通知信）
+      const result = await this.accountLockoutService.recordFailedLogin(
+        user.id,
+        user.email,
+        ipAddress,
+      );
+
+      if (result.isLocked) {
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.accountLockedDueToFailedAttempts', {
+            lang,
+          }),
+        );
+      }
+
       throw new UnauthorizedException(
         this.i18n.translate('auth.invalidCredentials', { lang }),
       );
     }
 
+    // 密碼正確：重設失敗次數
+    if (
+      user.failedLoginAttempts > 0 ||
+      user.lockedUntil ||
+      user.lastFailedLoginAt
+    ) {
+      await this.accountLockoutService.resetFailedAttempts(user.id);
+    }
+
     // 檢查是否啟用 2FA
     const is2FAEnabled = await this.twoFactorAuthService.isEnabled(user.id);
+    logger.info('[AuthService] 2FA check complete', { email, is2FAEnabled });
 
     if (is2FAEnabled) {
       // 發送 2FA 驗證碼
@@ -219,12 +282,29 @@ export class AuthService {
     }
 
     // 沒有啟用 2FA，直接登入
+    logger.info('[AuthService] 2FA not enabled, proceeding with direct login', {
+      userId: user.id,
+    });
+
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
 
+    logger.info('[AuthService] lastLoginAt updated, calling generateTokens', {
+      userId: user.id,
+      hasUserRoles: !!user.userRoles,
+      userRolesCount: user.userRoles?.length || 0,
+    });
+
     const result = await this.generateTokens(user, userAgent, ipAddress, true);
+
+    logger.info('[AuthService] generateTokens completed', {
+      userId: user.id,
+      hasAccessToken: !!result?.accessToken,
+      hasRefreshToken: !!result?.refreshToken,
+    });
+
     return result;
   }
 
@@ -258,7 +338,15 @@ export class AuthService {
         include: {
           userRoles: {
             include: {
-              role: true,
+              role: {
+                include: {
+                  rolePermissions: {
+                    include: {
+                      permission: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -314,13 +402,21 @@ export class AuthService {
         include: {
           userRoles: {
             include: {
-              role: true,
+              role: {
+                include: {
+                  rolePermissions: {
+                    include: {
+                      permission: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
       });
 
-      if (!user || user.deletedAt || !user.refreshToken) {
+      if (!user || user.deletedAt) {
         logger.warn('[AuthService] Invalid user state', {
           userId: payload.sub,
           exists: !!user,
@@ -329,24 +425,26 @@ export class AuthService {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      // 比對 refresh token 雜湊值
-      const tokenHash = crypto
-        .createHash('sha256')
-        .update(refreshToken)
-        .digest('hex');
+      // ✅ 使用 Session 表驗證 refresh token（改用 hash 比對）
+      const isValidSession = await this.sessionManagementService.isSessionValid(
+        refreshToken,
+        user.id,
+      );
 
-      if (user.refreshToken !== tokenHash) {
-        logger.warn('[AuthService] Token hash mismatch', { userId: user.id });
+      if (!isValidSession) {
+        logger.warn('[AuthService] Invalid session', { userId: user.id });
         throw new UnauthorizedException('Invalid refresh token');
       }
 
       logger.debug('[AuthService] Generating new tokens', { userId: user.id });
       // Refresh token 時不創建新會話，而是更新現有會話
+      // 傳入舊的 refreshToken 以便更新 session 的 refreshTokenHash
       const result = await this.generateTokens(
         user,
         undefined,
         undefined,
         false,
+        refreshToken, // 傳入舊的 refreshToken
       );
       return result;
     } catch (error) {
@@ -394,11 +492,7 @@ export class AuthService {
         logger.warn('[Auth] No refresh token provided for logout', { userId });
       }
 
-      // 清除用戶的 Refresh Token
-      await this.prisma.user.update({
-        where: { id: userId },
-        data: { refreshToken: null },
-      });
+      // ✅ Refresh token 現在只存在 Session 表，不需要清除 User 表
 
       logger.info('[Auth] User logged out successfully', { userId });
       return true;
@@ -428,6 +522,13 @@ export class AuthService {
     }
 
     const rolesByScope = this.groupRolesByScope(user.userRoles);
+    // 使用高效查詢獲取 permissions
+    const roleIds = user.userRoles.map((ur) => ur.role.id);
+    const permissions = await this.getPermissionsByRoleIds(roleIds);
+    const isSuperHQ =
+      (user.accessScopes?.includes('HQ_SCOPE') &&
+        user.userRoles?.some((ur: any) => ur.role?.name === 'SUPER_HQ')) ||
+      false;
 
     return {
       sub: user.id, // JWT 標準使用 sub 表示 subject (user ID)
@@ -435,6 +536,8 @@ export class AuthService {
       email: user.email,
       accessScopes: user.accessScopes,
       roles: rolesByScope,
+      permissions,
+      isSuperHQ, // 只有 SUPER_HQ 角色才有完整繞過權限
     };
   }
 
@@ -443,15 +546,26 @@ export class AuthService {
     userAgent?: string,
     ipAddress?: string,
     createNewSession: boolean = false,
+    oldRefreshToken?: string,
   ): Promise<AuthTokenResult> {
+    logger.info('[AuthService] generateTokens called', {
+      userId: user.id,
+      email: user.email,
+      createNewSession,
+    });
+
     const rolesByScope = this.groupRolesByScope(user.userRoles || []);
     const accessScopes = user.accessScopes || [];
 
-    logger.debug('[AuthService] Generating tokens', {
+    // 獲取 permissions（透過單獨查詢，避免深層 include）
+    const roleIds = (user.userRoles || []).map((ur: any) => ur.role.id);
+    const permissions = await this.getPermissionsByRoleIds(roleIds);
+
+    logger.info('[AuthService] Roles and permissions extracted', {
       userId: user.id,
-      email: user.email,
       accessScopes,
-      createNewSession,
+      rolesCount: rolesByScope.length,
+      permissionsCount: permissions.length,
     });
 
     const payload: JwtPayload = {
@@ -459,14 +573,23 @@ export class AuthService {
       email: user.email,
       accessScopes,
       roles: rolesByScope,
+      permissions,
     };
 
+    logger.info('[AuthService] Signing access token', { userId: user.id });
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: this.ACCESS_TOKEN_EXPIRES_IN as any,
     });
 
+    logger.info('[AuthService] Signing refresh token', { userId: user.id });
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: this.REFRESH_TOKEN_EXPIRES_IN as any,
+    });
+
+    logger.info('[AuthService] Tokens signed successfully', {
+      userId: user.id,
+      accessTokenLength: accessToken?.length,
+      refreshTokenLength: refreshToken?.length,
     });
 
     logger.info('[AuthService] Tokens generated', {
@@ -489,16 +612,7 @@ export class AuthService {
       throw new Error('Token generation failed');
     }
 
-    // 儲存 refresh token 的 SHA-256 雜湊值
-    const refreshTokenHash = crypto
-      .createHash('sha256')
-      .update(refreshToken)
-      .digest('hex');
-
-    await this.prisma.user.update({
-      where: { id: user.id },
-      data: { refreshToken: refreshTokenHash },
-    });
+    // ✅ Refresh token 現在只存儲在 Session 表（as hash），不再存儲在 User 表
 
     // 根據情況創建新會話或更新現有會話
     if (createNewSession) {
@@ -512,10 +626,28 @@ export class AuthService {
       logger.info('[AuthService] New session created', { userId: user.id });
     } else {
       // Refresh token 時更新現有會話
-      await this.sessionManagementService.updateSessionActivity(refreshToken);
-      logger.info('[AuthService] Session activity updated', {
-        userId: user.id,
-      });
+      if (oldRefreshToken) {
+        // 傳入舊的和新的 refresh token，以便更新 session 的 refreshTokenHash
+        await this.sessionManagementService.updateSessionActivity(
+          oldRefreshToken,
+          refreshToken,
+        );
+        logger.info(
+          '[AuthService] Session activity updated with new token hash',
+          {
+            userId: user.id,
+          },
+        );
+      } else {
+        // 如果沒有舊 token（不應該發生），只更新 lastUsedAt
+        await this.sessionManagementService.updateSessionActivity(refreshToken);
+        logger.warn(
+          '[AuthService] Session activity updated without old token',
+          {
+            userId: user.id,
+          },
+        );
+      }
     }
 
     const result = {
@@ -557,5 +689,55 @@ export class AuthService {
       scope,
       roleNames,
     }));
+  }
+
+  /**
+   * 從 userRoles 中提取所有權限名稱（扁平化）
+   */
+  private extractPermissions(userRoles: any[]): string[] {
+    const permissionsSet = new Set<string>();
+
+    for (const userRole of userRoles) {
+      if (userRole.role?.rolePermissions) {
+        for (const rolePermission of userRole.role.rolePermissions) {
+          if (rolePermission.permission?.name) {
+            permissionsSet.add(rolePermission.permission.name);
+          }
+        }
+      }
+    }
+
+    return Array.from(permissionsSet);
+  }
+
+  /**
+   * 透過 role IDs 獲取 permissions（單獨查詢，避免深層 include）
+   */
+  private async getPermissionsByRoleIds(roleIds: string[]): Promise<string[]> {
+    if (!roleIds || roleIds.length === 0) {
+      return [];
+    }
+
+    const rolePermissions = await this.prisma.rolePermission.findMany({
+      where: {
+        roleId: { in: roleIds },
+      },
+      select: {
+        permission: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    const permissionsSet = new Set<string>();
+    for (const rp of rolePermissions) {
+      if (rp.permission?.name) {
+        permissionsSet.add(rp.permission.name);
+      }
+    }
+
+    return Array.from(permissionsSet);
   }
 }

@@ -23,7 +23,17 @@ export class AllExceptionsFilter
   catch(exception: unknown, host: ArgumentsHost) {
     const gqlHost = GqlArgumentsHost.create(host);
     const ctx = gqlHost.getContext();
-    const requestId = ctx?.requestId || ctx?.req?.requestId || 'unknown';
+    let httpReq: { requestId?: string } | undefined;
+    try {
+      httpReq =
+        host.getType<'graphql' | 'http'>() === 'http'
+          ? host.switchToHttp().getRequest()
+          : undefined;
+    } catch {
+      /* ignore */
+    }
+    const requestId =
+      ctx?.requestId || ctx?.req?.requestId || httpReq?.requestId || 'unknown';
 
     if (host.getType<'graphql' | 'http'>() === 'graphql') {
       // GraphQL exception
@@ -45,7 +55,17 @@ export class AllExceptionsFilter
         ? exception.getResponse()
         : 'Internal server error';
 
-    logger.error(`[${requestId}] Exception`, { error: exception });
+    // 更詳細的錯誤日誌
+    if (exception instanceof Error) {
+      logger.error(`[${requestId}] Exception`, {
+        name: exception.name,
+        message: exception.message,
+        stack: exception.stack,
+        error: exception,
+      });
+    } else {
+      logger.error(`[${requestId}] Exception`, { error: exception });
+    }
 
     response.status(status).json({
       statusCode: status,

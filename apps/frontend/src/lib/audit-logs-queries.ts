@@ -4,14 +4,14 @@ import { gql } from '@apollo/client';
 export const AUDIT_LOGS_PAGINATED_QUERY = gql`
   query AuditLogsPaginated(
     $pagination: PaginationInput!
-    $userId: String
+    $userSearch: String
     $action: String
     $entity: String
     $status: String
   ) {
     auditLogsPaginated(
       pagination: $pagination
-      userId: $userId
+      userSearch: $userSearch
       action: $action
       entity: $entity
       status: $status
@@ -20,6 +20,8 @@ export const AUDIT_LOGS_PAGINATED_QUERY = gql`
         id
         requestId
         userId
+        userName
+        userEmail
         action
         entity
         entityId
@@ -50,6 +52,8 @@ export const AUDIT_LOG_CREATED_SUBSCRIPTION = gql`
       id
       requestId
       userId
+      userName
+      userEmail
       action
       entity
       entityId
@@ -57,6 +61,7 @@ export const AUDIT_LOG_CREATED_SUBSCRIPTION = gql`
       method
       path
       ipAddress
+      userAgent
       timestamp
       duration
     }
@@ -79,6 +84,30 @@ export const AUDIT_LOG_STATISTICS_QUERY = gql`
         entity
         count
       }
+    }
+  }
+`;
+
+// 查詢單一稽核日誌詳細資料
+export const AUDIT_LOG_BY_ID_QUERY = gql`
+  query AuditLogById($id: String!) {
+    auditLogById(id: $id) {
+      id
+      requestId
+      userId
+      userName
+      userEmail
+      action
+      entity
+      entityId
+      status
+      method
+      path
+      ipAddress
+      userAgent
+      timestamp
+      duration
+      details
     }
   }
 `;

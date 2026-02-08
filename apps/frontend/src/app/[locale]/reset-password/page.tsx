@@ -13,7 +13,7 @@ import {
   RESET_PASSWORD_MUTATION,
   VERIFY_PASSWORD_RESET_TOKEN_QUERY,
 } from '@/lib/graphql';
-import { useRouter } from '@/i18n/routing';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
 import { getErrorMessage } from '@/lib/error-utils';
 
 function ResetPasswordContent() {

@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AccessScope } from '../enums/access-scope.enum';
 import {
   FIELD_SENSITIVE,
-  FIELD_ADMIN_ONLY,
+  FIELD_HQ_ONLY,
   FIELD_REQUIRES_SCOPE,
   FIELD_REQUIRES_PERMISSION,
 } from '../decorators/field-auth.decorator';
@@ -13,7 +13,7 @@ import {
 export interface FieldRule {
   fieldName: string;
   isSensitive: boolean;
-  isAdminOnly: boolean;
+  isHQOnly: boolean;
   requiredScopes?: AccessScope[];
   requiredPermission?: string;
   sensitivePermission?: string;
@@ -76,8 +76,8 @@ export class FieldMetadataCache {
       target.prototype,
       fieldName,
     );
-    const isAdminOnly = Reflect.getMetadata(
-      FIELD_ADMIN_ONLY,
+    const isHQOnly = Reflect.getMetadata(
+      FIELD_HQ_ONLY,
       target.prototype,
       fieldName,
     );
@@ -93,19 +93,14 @@ export class FieldMetadataCache {
     );
 
     // 如果沒有任何限制，返回 null
-    if (
-      !isSensitive &&
-      !isAdminOnly &&
-      !requiredScopes &&
-      !requiredPermission
-    ) {
+    if (!isSensitive && !isHQOnly && !requiredScopes && !requiredPermission) {
       return null;
     }
 
     const rule: FieldRule = {
       fieldName,
       isSensitive: !!isSensitive,
-      isAdminOnly: !!isAdminOnly,
+      isHQOnly: !!isHQOnly,
     };
 
     if (requiredScopes) {

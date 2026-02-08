@@ -22,8 +22,8 @@ import type { TextFieldOwnerState } from '@mui/material/TextField';
  * // With units
  * <FormField
  *   label="Price"
- *   startAdornment="$"
- *   endAdornment="USD"
+ *   startAdornment="NT$"
+ *   endAdornment="TWD"
  *   {...register('price')}
  * />
  *

@@ -1,6 +1,6 @@
 # Row-Level Security (RLS) - 行級別安全控制
 
-基於訪問範圍的資料行級別過濾，確保使用者只能查看其有權限存取的資料。
+基於訪問範圍的資料行級別過濾，確保用戶只能查看其有權限存取的資料。
 
 ---
 
@@ -17,16 +17,16 @@
     - [2. Resolver 層應用](#2-resolver-層應用)
     - [3. Prisma 查詢過濾](#3-prisma-查詢過濾)
   - [📝 實際應用範例](#-實際應用範例)
-    - [範例 1: Admin 查詢所有使用者](#範例-1-admin-查詢所有使用者)
-    - [範例 2: Customer 查詢使用者](#範例-2-customer-查詢使用者)
-    - [範例 3: Public 查詢使用者](#範例-3-public-查詢使用者)
+    - [範例 1: HQ 查詢所有用戶](#範例-1-hq-查詢所有用戶)
+    - [範例 2: Customer 查詢用戶](#範例-2-customer-查詢用戶)
+    - [範例 3: Public 查詢用戶](#範例-3-public-查詢用戶)
   - [🔗 關聯查詢處理](#-關聯查詢處理)
   - [🔧 配置選項](#-配置選項)
     - [UserQueryContext 介面](#userquerycontext-介面)
     - [擴展 RLS 規則](#擴展-rls-規則)
   - [🧪 測試](#-測試)
     - [測試不同權限的查詢](#測試不同權限的查詢)
-      - [1. 使用 Admin Token 測試](#1-使用-admin-token-測試)
+      - [1. 使用 HQ Token 測試](#1-使用-hq-token-測試)
       - [2. 使用 Customer Token 測試](#2-使用-customer-token-測試)
   - [🔒 安全性考量](#-安全性考量)
     - [✅ 已實現的保護](#-已實現的保護)
@@ -39,7 +39,7 @@
 
 ## 📖 概述
 
-Row-Level Security (RLS) 是一種資料庫級別的安全機制，根據使用者的身份和權限自動過濾查詢結果。本系統在應用層實現了 RLS，確保使用者只能查看其有權限存取的資料。
+Row-Level Security (RLS) 是一種資料庫級別的安全機制，根據用戶的身份和權限自動過濾查詢結果。本系統在應用層實現了 RLS，確保用戶只能查看其有權限存取的資料。
 
 > **🔗 相關文檔**
 >
@@ -54,18 +54,18 @@ Row-Level Security (RLS) 是一種資料庫級別的安全機制，根據使用�
 
 ### AccessScope 訪問矩陣
 
-| AccessScope        | 可查看的帳號 AccessScope      | 說明                                      |
-| ------------------ | ----------------------------- | ----------------------------------------- |
-| **ADMIN_SCOPE**    | ALL (ADMIN, CUSTOMER, PUBLIC) | 管理員可以查看所有帳號                    |
-| **CUSTOMER_SCOPE** | CUSTOMER, PUBLIC              | Customer 可以查看 Customer 和 Public 帳號 |
-| **PUBLIC_SCOPE**   | PUBLIC only                   | Public 使用者只能查看 Public 帳號         |
-| **未認證**         | PUBLIC only                   | 未登入使用者只能查看 Public 帳號          |
+| AccessScope        | 可查看的帳號 AccessScope   | 說明                                      |
+| ------------------ | -------------------------- | ----------------------------------------- |
+| **HQ_SCOPE**       | ALL (HQ, CUSTOMER, PUBLIC) | 管理員可以查看所有帳號                    |
+| **CUSTOMER_SCOPE** | CUSTOMER, PUBLIC           | Customer 可以查看 Customer 和 Public 帳號 |
+| **PUBLIC_SCOPE**   | PUBLIC only                | Public 用戶只能查看 Public 帳號           |
+| **未認證**         | PUBLIC only                | 未登入用戶只能查看 Public 帳號            |
 
 ### 視覺化權限樹
 
 ```text
-ADMIN_SCOPE (最高權限)
-    ├── 可查看 ADMIN_SCOPE 帳號
+HQ_SCOPE (最高權限)
+    ├── 可查看 HQ_SCOPE 帳號
     ├── 可查看 CUSTOMER_SCOPE 帳號
     └── 可查看 PUBLIC_SCOPE 帳號
 
@@ -90,11 +90,11 @@ PUBLIC_SCOPE (基本權限)
 
 ```typescript
 /**
- * 根據使用者的 accessScopes 建立資料過濾條件
+ * 根據用戶的 accessScopes 建立資料過濾條件
  */
 private buildAccessScopeFilter(context?: UserQueryContext) {
   if (!context || !context.accessScopes || context.accessScopes.length === 0) {
-    // 未認證的使用者，只能查詢 PUBLIC_SCOPE
+    // 未認證的用戶，只能查詢 PUBLIC_SCOPE
     return {
       accessScopes: {
         hasSome: [AccessScope.PUBLIC_SCOPE],
@@ -104,8 +104,8 @@ private buildAccessScopeFilter(context?: UserQueryContext) {
 
   const accessScopes = context.accessScopes;
 
-  // ADMIN 可以查詢所有帳號
-  if (accessScopes.includes(AccessScope.ADMIN_SCOPE)) {
+  // HQ 可以查詢所有帳號
+  if (accessScopes.includes(AccessScope.HQ_SCOPE)) {
     return {}; // 無過濾條件
   }
 
@@ -136,18 +136,18 @@ private buildAccessScopeFilter(context?: UserQueryContext) {
 
 ### 2. Resolver 層應用
 
-在 `UserResolver` 中傳遞使用者上下文：
+在 `UserResolver` 中傳遞用戶上下文：
 
 ```typescript
 @Query(() => PaginatedUsers)
 @UseGuards(PermissionGuard)
-@RequiresAnyScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+@RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
 @RequiresPermission('users:list')
 async usersPaginated(
   @Args('pagination') pagination: PaginationInput,
   @Context() context: any,
 ): Promise<PaginatedUsers> {
-  // 提取使用者權限上下文
+  // 提取用戶權限上下文
   const userContext = {
     accessScopes: context.req?.user?.accessScopes || [],
     userId: context.req?.user?.userId,
@@ -184,10 +184,10 @@ const users = await this.prisma.user.findMany({
 
 ## 📝 實際應用範例
 
-### 範例 1: Admin 查詢所有使用者
+### 範例 1: HQ 查詢所有用戶
 
 ```graphql
-# Admin Token (accessScopes: [ADMIN_SCOPE])
+# HQ Token (accessScopes: [HQ_SCOPE])
 query {
   usersPaginated(pagination: { page: 1, limit: 10 }) {
     data {
@@ -202,14 +202,14 @@ query {
 }
 ```
 
-**結果**: 返回所有使用者，包括 ADMIN、CUSTOMER、PUBLIC
+**結果**: 返回所有用戶，包括 HQ、CUSTOMER、PUBLIC
 
 ```json
 {
   "data": {
     "usersPaginated": {
       "data": [
-        { "email": "admin@example.com", "accessScopes": ["ADMIN_SCOPE"] },
+        { "email": "hq@example.com", "accessScopes": ["HQ_SCOPE"] },
         { "email": "customer@example.com", "accessScopes": ["CUSTOMER_SCOPE"] },
         { "email": "public@example.com", "accessScopes": ["PUBLIC_SCOPE"] }
       ],
@@ -219,7 +219,7 @@ query {
 }
 ```
 
-### 範例 2: Customer 查詢使用者
+### 範例 2: Customer 查詢用戶
 
 ```graphql
 # Customer Token (accessScopes: [CUSTOMER_SCOPE])
@@ -234,7 +234,7 @@ query {
 }
 ```
 
-**結果**: 只返回 CUSTOMER 和 PUBLIC 使用者
+**結果**: 只返回 CUSTOMER 和 PUBLIC 用戶
 
 ```json
 {
@@ -249,7 +249,7 @@ query {
 }
 ```
 
-### 範例 3: Public 查詢使用者
+### 範例 3: Public 查詢用戶
 
 ```graphql
 # Public Token (accessScopes: [PUBLIC_SCOPE])
@@ -264,7 +264,7 @@ query {
 }
 ```
 
-**結果**: 只返回 PUBLIC 使用者
+**結果**: 只返回 PUBLIC 用戶
 
 ```json
 {
@@ -313,8 +313,8 @@ query {
 
 ```typescript
 export interface UserQueryContext {
-  accessScopes?: AccessScope[]; // 使用者的訪問範圍
-  userId?: string; // 使用者 ID（用於未來擴展）
+  accessScopes?: AccessScope[]; // 用戶的訪問範圍
+  userId?: string; // 用戶 ID（用於未來擴展）
 }
 ```
 
@@ -350,20 +350,20 @@ private buildAccessScopeFilter(context?: UserQueryContext) {
 
 ### 測試不同權限的查詢
 
-#### 1. 使用 Admin Token 測試
+#### 1. 使用 HQ Token 測試
 
 ```bash
-# 登入獲取 Admin Token
+# 登入獲取 HQ Token
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { login(email: \"admin@example.com\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
+    "query": "mutation { login(email: \"hq@example.com\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
   }'
 
 # 使用 Token 查詢
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <ADMIN_TOKEN>" \
+  -H "Authorization: Bearer <HQ_TOKEN>" \
   -d '{
     "query": "query { usersPaginated { data { email accessScopes } } }"
   }'
@@ -372,17 +372,17 @@ curl -X POST http://localhost:4000/graphql \
 #### 2. 使用 Customer Token 測試
 
 ```bash
-# 登入獲取 Customer Token
+# 登入獲取 HQ Token
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { login(email: \"customer@example.com\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
+    "query": "mutation { login(email: \"hq@example.com\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
   }'
 
-# 查詢（應該只看到 CUSTOMER 和 PUBLIC）
+# 查詢（應該只看到 HQ 和 PUBLIC）
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <CUSTOMER_TOKEN>" \
+  -H "Authorization: Bearer <HQ_TOKEN>" \
   -d '{
     "query": "query { usersPaginated { data { email accessScopes } } }"
   }'
@@ -421,7 +421,7 @@ curl -X POST http://localhost:4000/graphql \
 請求流程：
 1. JwtAuthGuard        - 驗證 JWT Token
 2. PermissionGuard     - 檢查 Scope/Permission（Endpoint 級別）
-3. Resolver            - 提取使用者上下文
+3. Resolver            - 提取用戶上下文
 4. Service (RLS)       - 過濾查詢結果（Row 級別）
 5. FieldAuthPlugin     - 過濾敏感欄位（Field 級別）
 ```

@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
  * Profile 片段
  */
 export const PROFILE_FRAGMENT = gql`
-  fragment ProfileFields on ProfileType {
+  fragment ProfileFields on Profile {
     id
     userId
     bio
@@ -19,10 +19,10 @@ export const PROFILE_FRAGMENT = gql`
 `;
 
 /**
- * 使用者片段
+ * 用戶片段
  */
 export const USER_FRAGMENT = gql`
-  fragment UserFields on UserType {
+  fragment UserFields on User {
     id
     email
     name
@@ -32,11 +32,11 @@ export const USER_FRAGMENT = gql`
 `;
 
 /**
- * 使用者完整片段（包含 Profile）
+ * 用戶完整片段（包含 Profile）
  */
 export const USER_WITH_PROFILE_FRAGMENT = gql`
   ${PROFILE_FRAGMENT}
-  fragment UserWithProfileFields on UserType {
+  fragment UserWithProfileFields on User {
     id
     email
     name
@@ -121,7 +121,7 @@ export const RESET_PASSWORD_MUTATION = gql`
 `;
 
 /**
- * 查詢當前使用者
+ * 查詢當前用戶
  */
 export const ME_QUERY = gql`
   ${USER_WITH_PROFILE_FRAGMENT}
@@ -193,7 +193,7 @@ export const CONFIRM_DISABLE_2FA_MUTATION = gql`
 `;
 
 /**
- * 刷新 Access Token（Refresh Token 透過 HttpOnly Cookie 自動帶入）
+ * 重新整理 Access Token（Refresh Token 透過 HttpOnly Cookie 自動帶入）
  */
 export const REFRESH_TOKEN_MUTATION = gql`
   ${USER_FRAGMENT}
@@ -217,7 +217,7 @@ export const LOGOUT_MUTATION = gql`
 `;
 
 /**
- * 更新當前使用者的基本資料
+ * 更新當前用戶的基本資料
  */
 export const UPDATE_MY_PROFILE_MUTATION = gql`
   ${USER_WITH_PROFILE_FRAGMENT}
@@ -229,7 +229,7 @@ export const UPDATE_MY_PROFILE_MUTATION = gql`
 `;
 
 /**
- * 更新當前使用者的詳細資料（Profile）
+ * 更新當前用戶的詳細資料（Profile）
  */
 export const UPDATE_MY_PROFILE_DETAILS_MUTATION = gql`
   ${PROFILE_FRAGMENT}

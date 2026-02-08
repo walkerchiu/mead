@@ -49,7 +49,7 @@ User 和 Profile 資料表已實作軟刪除功能。資料不會被實際刪除
 
 - `id`: UUID v7 主鍵
 - `email`: 唯一電子郵件
-- `name`: 使用者名稱
+- `name`: 用戶名稱
 - `createdAt`: 建立時間
 - `updatedAt`: 更新時間
 - `deletedAt`: **軟刪除時間戳**（null = 未刪除）

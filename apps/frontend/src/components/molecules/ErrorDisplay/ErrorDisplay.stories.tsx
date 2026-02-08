@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import React from 'react';
 import { ErrorDisplay } from './ErrorDisplay';
 import Stack from '@mui/material/Stack';
@@ -75,6 +75,34 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
+ * All Severity Levels
+ */
+export const AllSeverities: Story = {
+  render: () => (
+    <Stack spacing={0}>
+      <ErrorDisplay
+        title="Error Severity"
+        message="This is an error message with high severity."
+        severity="error"
+        minHeight="33vh"
+      />
+      <ErrorDisplay
+        title="Warning Severity"
+        message="This is a warning message with medium severity."
+        severity="warning"
+        minHeight="33vh"
+      />
+      <ErrorDisplay
+        title="Info Severity"
+        message="This is an informational message with low severity."
+        severity="info"
+        minHeight="34vh"
+      />
+    </Stack>
+  ),
+};
+
+/**
  * 404 Page Not Found
  */
 export const PageNotFound: Story = {
@@ -95,7 +123,7 @@ export const AccessDenied: Story = {
   args: {
     title: 'Access Denied',
     message:
-      'You do not have permission to access this page. Please contact your administrator.',
+      'You do not have permission to access this page. Please contact your hq.',
     severity: 'warning',
     showRetry: true,
     retryText: 'Go Back',
@@ -227,34 +255,6 @@ export const CustomHeight: Story = {
 };
 
 /**
- * All Severity Levels
- */
-export const AllSeverities: Story = {
-  render: () => (
-    <Stack spacing={0}>
-      <ErrorDisplay
-        title="Error Severity"
-        message="This is an error message with high severity."
-        severity="error"
-        minHeight="33vh"
-      />
-      <ErrorDisplay
-        title="Warning Severity"
-        message="This is a warning message with medium severity."
-        severity="warning"
-        minHeight="33vh"
-      />
-      <ErrorDisplay
-        title="Info Severity"
-        message="This is an informational message with low severity."
-        severity="info"
-        minHeight="34vh"
-      />
-    </Stack>
-  ),
-};
-
-/**
  * Real World Example: 404 Page
  */
 export const RealWorld404: Story = {
@@ -285,7 +285,7 @@ export const RealWorldAccessDenied: Story = {
   render: () => (
     <ErrorDisplay
       title="Access Denied"
-      message="You do not have permission to access this page. To request access, please contact your administrator."
+      message="You do not have permission to access this page. To request access, please contact your hq."
       severity="warning"
       action={
         <Stack direction="row" spacing={2}>

@@ -5,7 +5,7 @@ import { SESSION_STATISTICS_QUERY } from '@/lib/session-management-queries';
 
 interface UseSessionStatisticsOptions {
   authReady?: boolean;
-  pollInterval?: number; // 自動刷新間隔（毫秒）
+  pollInterval?: number; // 自動重新整理間隔（毫秒）
 }
 
 interface SessionStatistics {
@@ -47,7 +47,7 @@ interface SessionStatisticsQueryResponse {
 
 export const useSessionStatistics = ({
   authReady = true,
-  pollInterval = 30000, // 預設 30 秒刷新一次
+  pollInterval = 30000, // 預設 30 秒重新整理一次
 }: UseSessionStatisticsOptions = {}) => {
   const { data, loading, error, refetch } =
     useQuery<SessionStatisticsQueryResponse>(SESSION_STATISTICS_QUERY, {

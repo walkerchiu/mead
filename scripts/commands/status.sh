@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - status 命令
+# NPT CLI - status 命令
 # 查看所有服務狀態
 # ==========================================
 
@@ -106,11 +106,19 @@ check_service() {
 check_docker_service() {
   local name="$1"
   local container="$2"
+  local is_storage="${3:-false}"
 
   if docker ps --format '{{.Names}}' | grep -q "^${container}$"; then
     # 獲取容器狀態
     STATUS=$(docker inspect --format='{{.State.Status}}' "$container")
-    HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "$container" 2>/dev/null || echo "none")
+
+    # 先檢查是否有健康檢查配置
+    HAS_HEALTHCHECK=$(docker inspect --format='{{if .State.Health}}true{{else}}false{{end}}' "$container")
+    HEALTH="none"
+
+    if [[ "$HAS_HEALTHCHECK" == "true" ]]; then
+      HEALTH=$(docker inspect --format='{{.State.Health.Status}}' "$container")
+    fi
 
     # 獲取資源使用
     STATS=$(docker stats --no-stream --format "{{.CPUPerc}},{{.MemUsage}}" "$container" 2>/dev/null || echo "0%,0B / 0B")
@@ -131,7 +139,11 @@ check_docker_service() {
     fi
   else
     echo -e "  ${RED}✗${NC} ${name} ${DIM}(容器: $container)${NC} ${RED}未運行${NC}"
-    echo -e "      ${DIM}啟動: ${CYAN}docker-compose up -d${NC}"
+    if [[ "$is_storage" == "true" ]]; then
+      echo -e "      ${DIM}啟動: ${CYAN}./scripts/cli.sh storage start${NC}"
+    else
+      echo -e "      ${DIM}啟動: ${CYAN}docker-compose up -d${NC}"
+    fi
     return 1
   fi
 }
@@ -198,7 +210,7 @@ if [[ "$WATCH_MODE" == "true" ]]; then
 
   while true; do
     clear
-    echo -e "${GREEN}Wind 服務狀態監控${NC} - $(date '+%Y-%m-%d %H:%M:%S')"
+    echo -e "${GREEN}NPT 服務狀態監控${NC} - $(date '+%Y-%m-%d %H:%M:%S')"
     echo ""
 
     # 執行檢查（不使用 print_header 避免清屏）
@@ -224,6 +236,14 @@ if [[ "$WATCH_MODE" == "true" ]]; then
     check_docker_service "Dragonfly" "$(get_container_name dragonfly)" && ((RUNNING++)) || true
     ((TOTAL++))
     check_docker_service "Mailpit" "$(get_container_name mailpit)" && ((RUNNING++)) || true
+    ((TOTAL++))
+    check_docker_service "SeaweedFS Master" "$(get_container_name seaweedfs-master)" true && ((RUNNING++)) || true
+    ((TOTAL++))
+    check_docker_service "SeaweedFS Volume" "$(get_container_name seaweedfs-volume)" true && ((RUNNING++)) || true
+    ((TOTAL++))
+    check_docker_service "SeaweedFS Filer" "$(get_container_name seaweedfs-filer)" true && ((RUNNING++)) || true
+    ((TOTAL++))
+    check_docker_service "SeaweedFS S3" "$(get_container_name seaweedfs-s3)" true && ((RUNNING++)) || true
     ((TOTAL++))
 
     show_summary $TOTAL $RUNNING
@@ -265,8 +285,33 @@ check_docker_service "Dragonfly" "$(get_container_name dragonfly)" && ((RUNNING+
 ((TOTAL++))
 check_docker_service "Mailpit" "$(get_container_name mailpit)" && ((RUNNING++)) || true
 ((TOTAL++))
+check_docker_service "SeaweedFS Master" "$(get_container_name seaweedfs-master)" true && ((RUNNING++)) || true
+((TOTAL++))
+check_docker_service "SeaweedFS Volume" "$(get_container_name seaweedfs-volume)" true && ((RUNNING++)) || true
+((TOTAL++))
+check_docker_service "SeaweedFS Filer" "$(get_container_name seaweedfs-filer)" true && ((RUNNING++)) || true
+((TOTAL++))
+check_docker_service "SeaweedFS S3" "$(get_container_name seaweedfs-s3)" true && ((RUNNING++)) || true
+((TOTAL++))
 
 show_summary $TOTAL $RUNNING
+
+# 顯示 SeaweedFS 連接資訊（如果有運行）
+if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
+  echo ""
+  echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "${YELLOW}🔌 SeaweedFS 連接資訊${NC}"
+  echo ""
+  echo -e "  ${CYAN}S3 端點:${NC}      http://localhost:${SEAWEEDFS_S3_PORT:-8333}"
+  echo -e "  ${CYAN}Access Key:${NC}   ${SEAWEEDFS_S3_USER:-admin}"
+  echo -e "  ${CYAN}Secret Key:${NC}   ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+  echo ""
+  echo -e "  ${CYAN}Master UI:${NC}    http://localhost:${SEAWEEDFS_MASTER_PORT:-9333}"
+  echo -e "  ${CYAN}Filer UI:${NC}     http://localhost:${SEAWEEDFS_FILER_PORT:-8888}"
+  echo ""
+  echo -e "  ${DIM}詳細資訊: ${CYAN}./scripts/cli.sh storage info${NC}"
+  echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+fi
 
 # JSON 輸出模式
 if [[ "$JSON_OUTPUT" == "true" ]]; then

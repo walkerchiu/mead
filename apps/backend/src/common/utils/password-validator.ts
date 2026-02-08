@@ -1,5 +1,11 @@
 import { BadRequestException } from '@nestjs/common';
 import { I18nService } from 'nestjs-i18n';
+import {
+  extractEmailTokens,
+  extractNameTokens,
+  extractTokens,
+  containsAnyToken,
+} from './password-similarity';
 
 export interface PasswordValidationResult {
   isValid: boolean;
@@ -10,6 +16,21 @@ export interface PasswordSimilarityCheck {
   email?: string;
   name?: string;
   username?: string;
+  /**
+   * 是否檢查 email 網域部分
+   * @default false
+   *
+   * @remarks
+   * 預設為 false，因為大多數情況下網域是通用的（gmail.com, outlook.com）
+   * 僅在以下情況建議設為 true：
+   * - 企業內部系統，統一使用公司網域
+   * - 公司名稱獨特且有意義
+   */
+  checkEmailDomain?: boolean;
+}
+
+export interface PasswordHistoryCheck {
+  passwordHashes: string[];
 }
 
 /**
@@ -48,7 +69,7 @@ const COMMON_PASSWORDS = new Set([
   'mustang',
   'password1',
   '123456789',
-  'admin',
+  'hq',
   'root',
   'user',
   'test',
@@ -59,13 +80,15 @@ const COMMON_PASSWORDS = new Set([
 /**
  * 驗證密碼強度（增強版 - 符合 NIST 最低標準）
  * 規則：
- * - 至少 8 個字元（NIST 最低要求）
- * - 至少一個大寫英文字母
- * - 至少一個小寫英文字母
- * - 至少一個數字
- * - 至少一個特殊符號
+ * - 長度至少 8 個字元
+ * - 至少包含 1 個大寫字母
+ * - 至少包含 1 個小寫字母
+ * - 至少包含 1 個數字
+ * - 至少包含 1 個特殊符號
  * - 不在常見密碼黑名單中（NIST 建議）
- * - 與用戶資訊不相似（防止社交工程攻擊）
+ * - 不得包含使用者名稱或 Email 的任何部分（防止社交工程攻擊）
+ *
+ * 注意：密碼歷史檢查需使用 validatePasswordStrengthAsync
  */
 export function validatePasswordStrength(
   password: string,
@@ -109,30 +132,39 @@ export function validatePasswordStrength(
     errors.push(t('validation.password.tooCommon'));
   }
 
-  // 檢查與用戶資訊的相似度
+  // 檢查與用戶資訊的相似度（基於 Token-based 方法）
   if (similarityCheck) {
-    const { email, name, username } = similarityCheck;
+    const { email, name, username, checkEmailDomain = false } = similarityCheck;
 
-    // 檢查是否包含 email 的 username 部分
+    // 檢查是否包含 email 的任何有意義的部分
+    // 例如：john.smith@example.com → 檢查 "john" 和 "smith"
+    // 如果 checkEmailDomain=true，也會檢查 "example"
+    // 會檢測到：Smith123, J0hn@2024, htimS!99（反轉）等變體
     if (email) {
-      const emailUsername = email.split('@')[0].toLowerCase();
-      if (emailUsername.length >= 4 && passwordLower.includes(emailUsername)) {
+      const emailTokens = extractEmailTokens(email, checkEmailDomain);
+      if (emailTokens.length > 0 && containsAnyToken(password, emailTokens)) {
         errors.push(t('validation.password.similarToEmail'));
       }
     }
 
-    // 檢查是否包含名字
-    if (name && name.length >= 3) {
-      const nameLower = name.toLowerCase();
-      if (passwordLower.includes(nameLower)) {
+    // 檢查是否包含姓名的任何有意義的部分
+    // 例如：John Smith → 檢查 "john" 和 "smith"
+    // 會檢測到：John123, Sm1th!99, nhoJ@2024（反轉）等變體
+    if (name) {
+      const nameTokens = extractNameTokens(name);
+      if (nameTokens.length > 0 && containsAnyToken(password, nameTokens)) {
         errors.push(t('validation.password.similarToName'));
       }
     }
 
-    // 檢查是否包含用戶名
-    if (username && username.length >= 3) {
-      const usernameLower = username.toLowerCase();
-      if (passwordLower.includes(usernameLower)) {
+    // 檢查是否包含用戶名的任何有意義的部分
+    // 例如：alice_wonder → 檢查 "alice" 和 "wonder"
+    if (username) {
+      const usernameTokens = extractTokens(username);
+      if (
+        usernameTokens.length > 0 &&
+        containsAnyToken(password, usernameTokens)
+      ) {
         errors.push(t('validation.password.similarToUsername'));
       }
     }
@@ -158,6 +190,81 @@ export function assertPasswordStrength(
     lang,
     i18n,
     similarityCheck,
+  );
+
+  if (!result.isValid) {
+    const message = i18n
+      ? i18n.translate('validation.password.strengthFailed', { lang })
+      : '密碼強度不符合要求';
+
+    throw new BadRequestException({
+      message,
+      errors: result.errors,
+    });
+  }
+}
+
+/**
+ * 異步驗證密碼強度（包含密碼歷史檢查）
+ * 規則：
+ * - 所有 validatePasswordStrength 的規則
+ * - 不得為最近使用過的 3 組密碼
+ */
+export async function validatePasswordStrengthAsync(
+  password: string,
+  lang?: string,
+  i18n?: I18nService,
+  similarityCheck?: PasswordSimilarityCheck,
+  historyCheck?: PasswordHistoryCheck,
+): Promise<PasswordValidationResult> {
+  const errors: string[] = [];
+
+  // 執行同步驗證
+  const syncResult = validatePasswordStrength(
+    password,
+    lang,
+    i18n,
+    similarityCheck,
+  );
+  errors.push(...syncResult.errors);
+
+  // 檢查密碼歷史（需要 bcrypt 異步比對）
+  if (historyCheck && historyCheck.passwordHashes.length > 0) {
+    const bcrypt = await import('bcrypt');
+    const t = (key: string): string =>
+      i18n ? String(i18n.translate(key, { lang })) : key;
+
+    for (const hash of historyCheck.passwordHashes) {
+      const isMatch = await bcrypt.compare(password, hash);
+      if (isMatch) {
+        errors.push(t('validation.password.recentlyUsed'));
+        break; // 只需要報告一次錯誤
+      }
+    }
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * 異步驗證密碼並在不符合時拋出錯誤
+ */
+export async function assertPasswordStrengthAsync(
+  password: string,
+  lang?: string,
+  i18n?: I18nService,
+  similarityCheck?: PasswordSimilarityCheck,
+  historyCheck?: PasswordHistoryCheck,
+): Promise<void> {
+  const result = await validatePasswordStrengthAsync(
+    password,
+    lang,
+    i18n,
+    similarityCheck,
+    historyCheck,
   );
 
   if (!result.isValid) {

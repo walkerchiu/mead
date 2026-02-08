@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { AuthLayout } from '@/components/templates';
 import { LoginForm } from '@/components/organisms';
@@ -89,12 +89,9 @@ export const FullFlow: Story = {
       // Simulate API request
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
-      // Test account: admin@example.com / password123 (requires 2FA)
+      // Test account: hq@example.com / password123 (requires 2FA)
       // Test account: user@example.com / password123 (direct login)
-      if (
-        data.email === 'admin@example.com' &&
-        data.password === 'password123'
-      ) {
+      if (data.email === 'hq@example.com' && data.password === 'password123') {
         // Requires 2FA
         setTemporaryToken('temp_token_12345');
         setStep('2fa');
@@ -177,7 +174,7 @@ export const FullFlow: Story = {
               sx={{ fontSize: '0.75rem', m: 0, whiteSpace: 'pre-wrap' }}
             >
               Test account (requires 2FA):{'\n'}
-              Email: admin@example.com{'\n'}
+              Email: hq@example.com{'\n'}
               Password: password123{'\n'}
               {'\n'}
               Test account (direct login):{'\n'}

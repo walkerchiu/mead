@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import { DatePicker } from './DatePicker';
 
 const meta = {
-  title: 'Atoms/DatePicker',
+  title: 'Atoms/Fields/DatePicker',
   component: DatePicker,
   parameters: {
     layout: 'centered',

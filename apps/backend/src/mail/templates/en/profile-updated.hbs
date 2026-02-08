@@ -4,111 +4,72 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>Profile Updated</title>
     <style>
-      body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-          'Helvetica Neue', Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-      }
-      .container {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 30px;
-      }
-      h1 {
-        color: #2c3e50;
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-      p {
-        margin-bottom: 15px;
-      }
-      .success {
-        background-color: #d4edda;
-        border-left: 4px solid #28a745;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 4px;
-      }
-      .info {
-        background-color: #e7f3ff;
-        border-left: 4px solid #2196f3;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 4px;
-        font-size: 14px;
-      }
-      .changes {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 4px;
-      }
-      .warning {
-        background-color: #fff3cd;
-        border-left: 4px solid #ffc107;
-        padding: 15px;
-        margin: 20px 0;
-        border-radius: 4px;
-      }
-      .footer {
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 1px solid #ddd;
-        font-size: 12px;
-        color: #666;
-      }
+      body { font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f6f9; }
+      .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+      .header { background-color: #1a365d; color: white; padding: 28px 24px; text-align: center; }
+      .header h2 { margin: 0; font-size: 22px; font-weight: 600; }
+      .content { padding: 32px 24px; }
+      .content p { margin: 0 0 16px; }
+      .success { background-color: #f0fff4; border-left: 4px solid #38a169; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
+      .changes { background-color: #f7f8fa; border: 1px solid #e2e8f0; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
+      .changes ul { margin: 8px 0 0; padding-left: 20px; }
+      .changes li { margin: 4px 0; }
+      .info { background-color: #ebf4ff; border-left: 4px solid #2b6cb0; padding: 14px 16px; margin: 20px 0; border-radius: 4px; font-size: 14px; }
+      .warning { background-color: #fffbeb; border-left: 4px solid #d69e2e; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
+      .warning ol { margin: 8px 0 0; padding-left: 20px; }
+      .warning li { margin: 4px 0; }
+      .footer { background-color: #f7f8fa; padding: 20px 24px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #e8ecf1; }
     </style>
   </head>
   <body>
     <div class='container'>
-      <h1>✅ Profile Updated Successfully</h1>
-
-      <p>Hello, {{name}}!</p>
-
-      <div class='success'>
-        <strong>Your profile has been successfully updated</strong><br />
-        Your account information has been changed.
+      <div class='header'>
+        <h2>✅ Profile Updated Successfully</h2>
       </div>
 
-      {{#if changes}}
-        <div class='changes'>
-          <strong>Changes made:</strong>
-          <ul>
-            {{#each changes}}
-              <li>{{this}}</li>
-            {{/each}}
-          </ul>
+      <div class='content'>
+        <p>Hello, {{name}}!</p>
+
+        <div class='success'>
+          <strong>Your profile has been updated successfully.</strong><br />
+          Your account information has been changed.
         </div>
-      {{/if}}
 
-      <div class='info'>
-        <strong>🛡️ Security Information:</strong><br />
-        Request IP:
-        {{ipAddress}}<br />
-        Updated at:
-        {{timestamp}}
-      </div>
+        {{#if changes}}
+          <div class='changes'>
+            <strong>Changes Made:</strong>
+            <ul>
+              {{#each changes}}
+                <li>{{this}}</li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
 
-      <div class='warning'>
-        <strong>⚠️ If this was not you:</strong>
-        <p>If you did not make these changes, your account may have been
-          compromised. Please immediately:</p>
-        <ol>
-          <li>Contact our support team</li>
-          <li>Review your account activity</li>
-          <li>Change your password</li>
-        </ol>
+        <div class='info'>
+          <strong>🛡️ Security Information:</strong><br />
+          Request IP: {{ipAddress}}<br />
+          Updated at: {{timestamp}}
+        </div>
+
+        <div class='warning'>
+          <strong>⚠️ If this wasn't you:</strong>
+          <p style='margin: 8px 0 0;'>If you did not make these changes, your account may have been compromised. Please immediately:</p>
+          <ol>
+            <li>Contact our support team</li>
+            <li>Review your account activity</li>
+            <li>Change your password</li>
+          </ol>
+        </div>
+        <p style='text-align: center; margin-top: 24px;'>
+          <a href='{{dashboardUrl}}' style='display: inline-block; padding: 12px 32px; background-color: #2b6cb0; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;'>Go to Dashboard</a>
+        </p>
       </div>
 
       <div class='footer'>
-        <p>For your account security, please review your profile regularly.</p>
+        <p>For your security, please review your profile regularly.</p>
         <p>This email was sent automatically. Please do not reply directly.</p>
+        <p>&copy; 2026 Intelligent Cloud Plus, Inc. All rights reserved.</p>
       </div>
     </div>
   </body>

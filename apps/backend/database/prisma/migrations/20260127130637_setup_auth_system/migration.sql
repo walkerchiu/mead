@@ -14,7 +14,7 @@ $$ LANGUAGE plpgsql;
 
 -- CreateEnum for UserRole (check existence first)
 DO $$ BEGIN
-  CREATE TYPE "UserRole" AS ENUM ('PUBLIC', 'DASHBOARD', 'ADMIN');
+  CREATE TYPE "UserRole" AS ENUM ('PUBLIC', 'DASHBOARD', 'HQ');
 EXCEPTION
   WHEN duplicate_object THEN null;
 END $$;

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Icon } from './Icon';
 import { Box, Typography } from '@mui/material';
 

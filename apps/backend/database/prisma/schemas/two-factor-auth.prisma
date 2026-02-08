@@ -3,34 +3,34 @@
 model TwoFactorAuth {
   /// 2FA 記錄唯一識別碼（UUID v7）
   id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  
-  /// 關聯的使用者 ID
+
+  /// 關聯的用戶 ID
   userId    String   @unique @map("user_id") @db.Uuid
-  
+
   /// 2FA 類型（EMAIL: 郵件驗證碼, TOTP: 時間型一次性密碼, SMS: 簡訊驗證碼）
   type      String   @default("EMAIL") // EMAIL, TOTP, SMS
-  
+
   /// 是否已啟用 2FA
   enabled   Boolean  @default(false)
-  
+
   /// TOTP 密鑰（僅用於 TOTP 類型，加密儲存）
   secret    String?  @db.Text
-  
+
   /// 備用驗證碼（JSON 陣列，已使用的會被標記）
   /// 格式：[{"code": "ABC123", "used": false, "usedAt": null}, ...]
   backupCodes Json?
-  
+
   /// 最後驗證成功時間
   lastVerifiedAt DateTime? @map("last_verified_at")
-  
+
   /// 記錄建立時間
   createdAt DateTime  @default(now()) @map("created_at")
-  
+
   /// 記錄最後更新時間
   updatedAt DateTime  @updatedAt @map("updated_at")
 
   // === 關聯 ===
-  /// 關聯的使用者（Cascade 刪除：刪除使用者時自動刪除 2FA 設定）
+  /// 關聯的用戶（Cascade 刪除：刪除用戶時自動刪除 2FA 設定）
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // === 索引 ===
@@ -43,33 +43,33 @@ model TwoFactorAuth {
 model TwoFactorVerification {
   /// 驗證記錄唯一識別碼（UUID v7）
   id        String    @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  
-  /// 關聯的使用者 ID
+
+  /// 關聯的用戶 ID
   userId    String    @map("user_id") @db.Uuid
-  
+
   /// 驗證類型（LOGIN: 登入驗證, ENABLE: 啟用 2FA, DISABLE: 停用 2FA）
   purpose   String    // LOGIN, ENABLE, DISABLE
-  
+
   /// 驗證碼（已加密）
   code      String
-  
+
   /// 過期時間（預設 10 分鐘）
   expiresAt DateTime  @map("expires_at")
-  
+
   /// 驗證成功時間（null 表示未驗證）
   verifiedAt DateTime? @map("verified_at")
-  
+
   /// 嘗試次數（防止暴力破解）
   attempts  Int       @default(0)
-  
+
   /// 請求來源 IP 位址
   ipAddress String?   @map("ip_address")
-  
+
   /// 記錄建立時間
   createdAt DateTime  @default(now()) @map("created_at")
 
   // === 關聯 ===
-  /// 關聯的使用者（Cascade 刪除）
+  /// 關聯的用戶（Cascade 刪除）
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // === 索引 ===

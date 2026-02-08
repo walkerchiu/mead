@@ -12,19 +12,19 @@ import {
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import Link from 'next/link';
-import { useRouter } from '@/i18n/routing';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
 import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/molecules';
 import {
   NotificationMenu,
-  LanguageSwitcher,
   UserMenu,
   SettingsMenu,
   createUserMenuItems,
   createSettingsMenuItems,
-  type Notification,
   type UserMenuItem,
   type SettingsMenuItem,
-} from '@/components/atoms';
+} from '@/components/organisms';
+import type { UnifiedNotification } from '@/types/notification';
 
 export interface MainAppBarProps {
   /**
@@ -64,7 +64,7 @@ export interface MainAppBarProps {
   /**
    * Notification list
    */
-  notifications?: Notification[];
+  notifications?: UnifiedNotification[];
   /**
    * Unread notification count
    */
@@ -72,7 +72,7 @@ export interface MainAppBarProps {
   /**
    * Callback when notification is clicked
    */
-  onNotificationClick?: (notification: Notification) => void;
+  onNotificationClick?: (notification: UnifiedNotification) => void;
   /**
    * Callback for mark all as read
    */
@@ -85,6 +85,10 @@ export interface MainAppBarProps {
    * Callback for clear all notifications
    */
   onClearAllNotifications?: () => void;
+  /**
+   * Callback when notification settings is clicked
+   */
+  onNotificationSettingsClick?: () => void;
 
   // Settings related
   /**
@@ -118,6 +122,10 @@ export interface MainAppBarProps {
    */
   onSecurityClick?: () => void;
   /**
+   * Callback when access tokens is clicked
+   */
+  onTokensClick?: () => void;
+  /**
    * Callback when logout is clicked
    */
   onLogout?: () => void;
@@ -133,6 +141,10 @@ export interface MainAppBarProps {
    * Security settings URL (default: /settings/security)
    */
   securityUrl?: string;
+  /**
+   * Access tokens URL (default: /settings/tokens)
+   */
+  tokensUrl?: string;
 
   // Display control
   /**
@@ -195,6 +207,7 @@ export function MainAppBar({
   onMarkAllNotificationsRead,
   onViewAllNotifications,
   onClearAllNotifications,
+  onNotificationSettingsClick,
   currentTheme = 'system',
   onThemeChange,
   onHelpClick,
@@ -202,10 +215,12 @@ export function MainAppBar({
   onAccountClick,
   onProfileClick,
   onSecurityClick,
+  onTokensClick,
   onLogout,
   accountUrl,
   profileUrl,
   securityUrl,
+  tokensUrl,
   showNotifications = true,
   showUserMenu = true,
   showSettings = true,
@@ -230,13 +245,16 @@ export function MainAppBar({
     onAccountClick,
     onProfileClick,
     onSecurityClick,
+    onTokensClick,
     onLogout,
     accountUrl,
     profileUrl,
     securityUrl,
+    tokensUrl,
     accountLabel: tUser('account'),
     profileLabel: tUser('profile'),
     securityLabel: tUser('security'),
+    tokensLabel: tUser('tokens'),
     logoutLabel: tUser('logout'),
   });
 
@@ -286,7 +304,14 @@ export function MainAppBar({
   };
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="static"
+      sx={{
+        zIndex: 1,
+        bgcolor: (theme) =>
+          theme.palette.mode === 'dark' ? '#1a1f25' : undefined,
+      }}
+    >
       <Toolbar>
         {/* Left: Back button + Logo + Title */}
         {showBackButton && (
@@ -333,17 +358,19 @@ export function MainAppBar({
             alignItems: 'center',
           }}
         >
-          {/* Group 1: Notifications */}
+          {/* Group 1: UnifiedNotifications */}
           {showNotifications && (
             <NotificationMenu
               color="inherit"
               size="medium"
               unreadCount={unreadNotificationCount}
               notifications={notifications}
+              showSettings={!!onNotificationSettingsClick}
               onNotificationClick={onNotificationClick}
               onMarkAllAsRead={onMarkAllNotificationsRead}
               onViewAll={onViewAllNotifications}
               onClearAll={onClearAllNotifications}
+              onSettingsClick={onNotificationSettingsClick}
             />
           )}
 

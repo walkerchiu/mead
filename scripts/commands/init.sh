@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - init 命令
+# NPT CLI - init 命令
 # 新開發者專案初始化
 # ==========================================
 
@@ -15,7 +15,7 @@ source "$SCRIPT_DIR/../utils/common.sh"
 
 # 顯示幫助
 show_command_help() {
-  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 Wind 專案\n"
+  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 NPT 專案\n"
   echo -e "${YELLOW}描述:${NC}"
   echo "  為新開發者設置完整的開發環境，包括："
   echo "  - 檢查系統需求 (Node.js, pnpm, Docker)"
@@ -75,7 +75,7 @@ done
 # 切換到專案根目錄
 cd "$PROJECT_ROOT"
 
-print_header "Wind 專案初始化"
+print_header "NPT 專案初始化"
 
 # ==========================================
 # Step 1: 檢查系統需求
@@ -180,13 +180,31 @@ fi
 if [ "$SKIP_DOCKER" = false ]; then
   log_step "4/6 啟動 Docker 服務"
 
-  log_info "啟動 TimescaleDB, RabbitMQ, Dragonfly, Mailpit..."
+  # 從 .env.docker 載入變數（供 envsubst 使用）
+  if [[ -f "$PROJECT_ROOT/.env.docker" ]]; then
+    set -a
+    source "$PROJECT_ROOT/.env.docker"
+    set +a
+  fi
+
+  # 生成 SeaweedFS S3 設定（從 template 替換環境變數）
+  S3_TEMPLATE="$PROJECT_ROOT/infra/seaweedfs/s3.json.template"
+  S3_CONFIG="$PROJECT_ROOT/infra/seaweedfs/s3.json"
+  if [[ -f "$S3_TEMPLATE" ]]; then
+    envsubst '${SEAWEEDFS_S3_USER} ${SEAWEEDFS_S3_PASSWORD}' < "$S3_TEMPLATE" > "$S3_CONFIG"
+    log_success "SeaweedFS S3 設定已生成"
+  else
+    log_warning "找不到 SeaweedFS S3 設定範本，跳過"
+  fi
+
+  # 啟動核心服務
+  log_info "啟動核心服務 (TimescaleDB, RabbitMQ, Dragonfly, Mailpit)..."
 
   if docker-compose --env-file .env.docker up -d; then
-    log_success "Docker 服務已啟動"
+    log_success "核心服務已啟動"
 
-    # 等待服務就緒
-    log_info "等待服務就緒..."
+    # 等待核心服務就緒
+    log_info "等待核心服務就緒..."
     sleep 5
 
     # 檢查 PostgreSQL（透過 Docker 容器內的 pg_isready）
@@ -203,8 +221,29 @@ if [ "$SKIP_DOCKER" = false ]; then
     # 檢查 Mailpit
     wait_for_service "curl -s http://localhost:8025/api/v1/info > /dev/null" "Mailpit" 30 2
 
+    # 啟動儲存服務
+    echo ""
+    log_info "啟動儲存服務 (SeaweedFS)..."
+    if docker-compose --env-file .env.docker --profile storage up -d seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3; then
+      log_success "SeaweedFS 容器已啟動"
+      log_info "等待 SeaweedFS 就緒..."
+      sleep 5
+
+      # 檢查 SeaweedFS Master
+      if curl -sf http://localhost:9333/cluster/status > /dev/null 2>&1; then
+        log_success "SeaweedFS Master 就緒"
+      else
+        log_warning "SeaweedFS Master 尚未完全就緒，請稍後檢查"
+      fi
+    else
+      log_warning "SeaweedFS 啟動失敗（非關鍵性錯誤，可繼續）"
+    fi
+
+    echo ""
+    log_success "所有 Docker 服務已啟動"
+
   else
-    log_error "Docker 服務啟動失敗"
+    log_error "核心服務啟動失敗"
     exit 1
   fi
 else
@@ -231,7 +270,7 @@ if [ "$SKIP_DB" = false ]; then
   ENABLE_UUID_SQL="apps/backend/database/prisma/migrations/enable_uuid_v7.sql"
   if [ -f "$ENABLE_UUID_SQL" ]; then
     PG_CONTAINER=$(get_container_name timescaledb)
-    docker exec -i "$PG_CONTAINER" psql -U postgres -d wind_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
+    docker exec -i "$PG_CONTAINER" psql -U postgres -d npt_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
     log_success "資料庫函式已初始化"
   else
     log_warning "找不到 enable_uuid_v7.sql，跳過"
@@ -246,21 +285,21 @@ if [ "$SKIP_DB" = false ]; then
     exit 1
   fi
 
-  # 讀取當前環境並設定 WIND_ENV
+  # 讀取當前環境並設定 NPT_ENV
   CURRENT_ENV="local"
   if [[ -f "$PROJECT_ROOT/.current-env" ]]; then
     CURRENT_ENV=$(cat "$PROJECT_ROOT/.current-env")
   fi
 
   case "$CURRENT_ENV" in
-    local|dev) WIND_ENV="development" ;;
-    uat)       WIND_ENV="uat" ;;
-    prod)      WIND_ENV="production" ;;
-    *)         WIND_ENV="development" ;;
+    local|dev) NPT_ENV="development" ;;
+    uat)       NPT_ENV="uat" ;;
+    prod)      NPT_ENV="production" ;;
+    *)         NPT_ENV="development" ;;
   esac
 
-  export WIND_ENV
-  log_info "Seed 環境: $WIND_ENV"
+  export NPT_ENV
+  log_info "Seed 環境: $NPT_ENV"
 
   # 執行 seed
   log_info "載入初始資料..."
@@ -279,11 +318,61 @@ fi
 # ==========================================
 log_step "6/6 驗證安裝"
 
+# 檢查所有 Docker 服務狀態（含核心服務與儲存服務）
+check_all_services() {
+  local all_healthy=true
+
+  # 核心服務
+  if docker ps --format '{{.Names}}' | grep -q "timescaledb"; then
+    log_success "✓ PostgreSQL 運行中"
+  else
+    log_error "✗ PostgreSQL 未運行"
+    all_healthy=false
+  fi
+
+  if docker ps --format '{{.Names}}' | grep -q "rabbitmq"; then
+    log_success "✓ RabbitMQ 運行中"
+  else
+    log_error "✗ RabbitMQ 未運行"
+    all_healthy=false
+  fi
+
+  if docker ps --format '{{.Names}}' | grep -q "dragonfly"; then
+    log_success "✓ Dragonfly (Redis) 運行中"
+  else
+    log_error "✗ Dragonfly 未運行"
+    all_healthy=false
+  fi
+
+  if docker ps --format '{{.Names}}' | grep -q "mailpit"; then
+    log_success "✓ Mailpit 運行中"
+  else
+    log_error "✗ Mailpit 未運行"
+    all_healthy=false
+  fi
+
+  # 儲存服務（SeaweedFS）
+  if docker ps --format '{{.Names}}' | grep -q "seaweedfs"; then
+    log_success "✓ SeaweedFS 運行中"
+  else
+    log_warning "△ SeaweedFS 未運行（非關鍵性，可執行 ./scripts/cli.sh storage start 啟動）"
+  fi
+
+  if [ "$all_healthy" = true ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 log_info "執行服務健康檢查..."
-if bash "$SCRIPT_DIR/test-services-safe.sh"; then
-  log_success "所有服務運行正常"
+echo ""
+if check_all_services; then
+  echo ""
+  log_success "所有核心服務運行正常"
 else
-  log_warning "部分服務可能未正常運行，請檢查"
+  echo ""
+  log_warning "部分核心服務未正常運行，請檢查"
 fi
 
 # ==========================================
@@ -294,13 +383,13 @@ print_header "🎉 初始化完成！"
 
 echo -e "${GREEN}✓${NC} 專案已成功初始化！\n"
 echo -e "${YELLOW}測試帳號：${NC}"
-echo "  Admin:    admin@example.com    / Password123!"
-echo "  Customer: customer@example.com / Password123!"
+echo "  HQ:     hq@example.com    / Password123!"
+echo "  Public: public@example.com / Password123!"
 echo ""
 echo -e "${YELLOW}服務端點：${NC}"
 echo "  Frontend:       http://localhost:3000"
 echo "  Backend API:    http://localhost:4000/graphql"
-echo "  RabbitMQ UI:    http://localhost:15672 (admin/[.env.docker password])"
+echo "  RabbitMQ UI:    http://localhost:15672 (hq/[.env.docker password])"
 echo "  Prisma Studio:  pnpm db:studio"
 echo ""
 echo -e "${YELLOW}下一步：${NC}"
@@ -308,14 +397,20 @@ echo "  1. 啟動開發環境:"
 echo -e "     ${CYAN}./scripts/cli.sh dev${NC}"
 echo "     "
 echo "     或分別啟動:"
-echo -e "     ${CYAN}pnpm --filter @wind/frontend dev${NC}  # 終端 1"
-echo -e "     ${CYAN}pnpm --filter @wind/backend dev${NC}   # 終端 2"
+echo -e "     ${CYAN}pnpm --filter @npt/frontend dev${NC}  # 終端 1"
+echo -e "     ${CYAN}pnpm --filter @npt/backend dev${NC}   # 終端 2"
 echo ""
 echo "  2. 查看 Storybook:"
 echo -e "     ${CYAN}pnpm storybook${NC}"
 echo ""
 echo "  3. 執行測試:"
 echo -e "     ${CYAN}./scripts/cli.sh test${NC}"
+echo ""
+echo -e "${YELLOW}其他指令：${NC}"
+echo "  SeaweedFS 管理 (本地 S3 儲存):"
+echo -e "     ${CYAN}./scripts/cli.sh storage info${NC}     # 查看連接資訊"
+echo -e "     ${CYAN}./scripts/cli.sh storage status${NC}   # 查看狀態"
+echo -e "     ${CYAN}./scripts/cli.sh storage stop${NC}     # 如不需要可停止"
 echo ""
 echo -e "${YELLOW}有問題？${NC}"
 echo -e "  執行診斷工具: ${CYAN}./scripts/cli.sh doctor${NC}"

@@ -1,6 +1,8 @@
 # MSW (Mock Service Worker) 設置指南
 
-Storybook 與開發環境的 API Mock 完整設置指南
+Storybook 與開發環境的 API Mock 完整設置指南。
+
+---
 
 ## 📋 目錄
 
@@ -116,10 +118,10 @@ pnpm storybook
 
 1. 導航到：`Example > Apollo + MSW Test`
 2. 輸入：
-   - Email: `customer@example.com`
+   - Email: `public@example.com`
    - Password: `Password123!`
 3. 點擊「登入」
-4. 應該看到：「✅ 登入成功！用戶: customer@example.com」
+4. 應該看到：「✅ 登入成功！用戶: public@example.com」
 
 **如果看到錯誤**:
 

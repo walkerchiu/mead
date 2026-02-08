@@ -15,3 +15,6 @@ pnpm-lock.yaml
 
 # Auto-generated files
 next-env.d.ts
+apps/backend/schema.gql
+apps/backend/schema-public.gql
+

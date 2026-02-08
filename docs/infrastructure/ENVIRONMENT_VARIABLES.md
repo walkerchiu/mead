@@ -1,6 +1,6 @@
 # 環境變數配置指南
 
-本指南說明如何正確配置 Wind 專案的環境變數。
+本指南說明如何正確配置 NPT 專案的環境變數。
 
 ---
 
@@ -63,7 +63,7 @@
 
 ## 📖 概述
 
-Wind 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
+NPT 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
 
 **核心概念**：
 
@@ -76,10 +76,10 @@ Wind 專案使用三層環境變數架構，分別管理 Docker 服務、Backend
 
 ## 📋 專案結構
 
-Wind 專案有三個層級的環境變數：
+NPT 專案有三個層級的環境變數：
 
 ```text
-wind/
+npt/
 ├── .env.docker              # Docker 服務（PostgreSQL, RabbitMQ, Redis）
 ├── .env.docker.example      # Docker 範本 ✅
 ├── apps/
@@ -155,65 +155,141 @@ pnpm dev
 
 ### Docker (.env.docker)
 
-| 變數                    | 說明              | 範例                | 必填 |
-| ----------------------- | ----------------- | ------------------- | ---- |
-| `POSTGRES_PASSWORD`     | PostgreSQL 密碼   | `dev_postgres_2024` | ✅   |
-| `RABBITMQ_DEFAULT_PASS` | RabbitMQ 密碼     | `dev_rabbitmq_2024` | ✅   |
-| `POSTGRES_USER`         | PostgreSQL 使用者 | `postgres`          | ❌   |
-| `POSTGRES_DB`           | 資料庫名稱        | `wind_db`           | ❌   |
+| 變數                    | 說明            | 範例                | 必填 |
+| ----------------------- | --------------- | ------------------- | ---- |
+| `POSTGRES_PASSWORD`     | PostgreSQL 密碼 | `dev_postgres_2024` | ✅   |
+| `RABBITMQ_DEFAULT_PASS` | RabbitMQ 密碼   | `dev_rabbitmq_2024` | ✅   |
+| `POSTGRES_USER`         | PostgreSQL 用戶 | `postgres`          | ❌   |
+| `POSTGRES_DB`           | 資料庫名稱      | `npt_db`            | ❌   |
 
 ### Backend (.env)
 
 #### 核心配置
 
-| 變數                     | 說明                                    | 範例                        | 必填 |
-| ------------------------ | --------------------------------------- | --------------------------- | ---- |
-| `PORT`                   | 後端服務端口                            | `4000`                      | ✅   |
-| `NODE_ENV`               | 運行環境                                | `development/production`    | ✅   |
-| `DATABASE_URL`           | PostgreSQL 連線字串                     | `postgresql://...`          | ✅   |
-| `JWT_SECRET`             | JWT 密鑰（至少 64 字元）                | 使用 `openssl rand -hex 64` | ✅   |
-| `JWT_REFRESH_SECRET`     | Refresh Token 密鑰（不同於 JWT_SECRET） | 使用 `openssl rand -hex 64` | ✅   |
-| `JWT_EXPIRES_IN`         | Access Token 過期時間                   | `15m`                       | ✅   |
-| `JWT_REFRESH_EXPIRES_IN` | Refresh Token 過期時間                  | `7d` (生產) / `30d` (開發)  | ✅   |
-| `ENCRYPTION_KEY`         | 資料加密密鑰（64 字元 hex）             | 使用 `openssl rand -hex 32` | ✅   |
-| `CORS_ORIGIN`            | CORS 允許的來源                         | `http://localhost:3000`     | ✅   |
+| 變數                     | 說明                                      | 範例                        | 必填 |
+| ------------------------ | ----------------------------------------- | --------------------------- | ---- |
+| `PORT`                   | 後端服務端口                              | `4000`                      | ✅   |
+| `NODE_ENV`               | 運行環境                                  | `development/production`    | ✅   |
+| `DATABASE_URL`           | PostgreSQL 連線字串（含連線池參數）       | 見下方詳細說明              | ✅   |
+| `JWT_SECRET`             | JWT 密鑰（至少 64 字元）                  | 使用 `openssl rand -hex 64` | ✅   |
+| `JWT_REFRESH_SECRET`     | Refresh Token 密鑰（不同於 JWT_SECRET）   | 使用 `openssl rand -hex 64` | ✅   |
+| `JWT_EXPIRES_IN`         | Access Token 過期時間                     | `15m`                       | ✅   |
+| `JWT_REFRESH_EXPIRES_IN` | Refresh Token 過期時間                    | `7d` (生產) / `30d` (開發)  | ✅   |
+| `ENCRYPTION_KEY`         | 資料加密密鑰（64 字元 hex）               | 使用 `openssl rand -hex 32` | ✅   |
+| `CORS_ORIGIN`            | CORS 允許的來源（未設定時使用 `APP_URL`） | `http://localhost:3000`     | ❌   |
 
 > **⚠️ 注意**：`ACCESS_TOKEN_EXPIRES_IN` 已從環境變數改為硬編碼（固定 30 分鐘），無需配置。
 
+**DATABASE_URL 連線池參數說明**：
+
+`DATABASE_URL` 支援以下連線池參數來優化資料庫連線效能：
+
+```
+postgresql://user:password@host:5432/database?schema=public&connection_limit=10&pool_timeout=10
+```
+
+| 參數               | 說明                            | 建議值                     |
+| ------------------ | ------------------------------- | -------------------------- |
+| `connection_limit` | 最大連線數（Prisma 連線池大小） | 開發: 10, 生產: 20         |
+| `pool_timeout`     | 等待可用連線的超時時間（秒）    | 10                         |
+| `sslmode`          | SSL 連線模式                    | 生產環境必須使用 `require` |
+
+**範例配置**：
+
+```bash
+# 開發環境
+DATABASE_URL="postgresql://postgres:password@localhost:5432/npt_db?schema=public&connection_limit=10&pool_timeout=10"
+
+# UAT 環境
+DATABASE_URL="postgresql://npt_uat:password@uat-db:5432/npt_db_uat?schema=public&sslmode=require&connection_limit=10&pool_timeout=10"
+
+# 生產環境
+DATABASE_URL="postgresql://npt_prod:password@prod-db:5432/npt_db_prod?schema=public&sslmode=require&connection_limit=20&pool_timeout=10"
+```
+
+> **💡 提示**：`connection_limit` 應根據應用程式規模和資料庫負載調整。過高會消耗資料庫資源，過低會導致連線等待。
+
 #### 快取與訊息佇列
 
-| 變數           | 說明                 | 範例                                   | 必填 |
-| -------------- | -------------------- | -------------------------------------- | ---- |
-| `REDIS_HOST`   | Redis/Dragonfly 主機 | `localhost`                            | ✅   |
-| `REDIS_PORT`   | Redis/Dragonfly 端口 | `6379`                                 | ✅   |
-| `RABBITMQ_URL` | RabbitMQ 連線字串    | `amqp://admin:password@localhost:5672` | ✅   |
+| 變數           | 說明                 | 範例                                | 必填 |
+| -------------- | -------------------- | ----------------------------------- | ---- |
+| `REDIS_HOST`   | Redis/Dragonfly 主機 | `localhost`                         | ✅   |
+| `REDIS_PORT`   | Redis/Dragonfly 端口 | `6379`                              | ✅   |
+| `RABBITMQ_URL` | RabbitMQ 連線字串    | `amqp://hq:password@localhost:5672` | ✅   |
 
 > **📌 說明**：專案使用 Dragonfly（Redis 協議相容）作為快取和 PubSub。開發環境使用 Memory PubSub，生產環境自動切換為 Distributed PubSub。
 
+#### 前端 URL
+
+| 變數      | 說明                            | 範例                    | 必填 |
+| --------- | ------------------------------- | ----------------------- | ---- |
+| `APP_URL` | 前端網域（用於 Email 中的連結） | `http://localhost:3000` | ❌   |
+
+> `APP_URL` 是系統的統一前端網域設定。Email 中的「前往系統」按鈕、通知連結、密碼重設 URL、CORS 允許來源都會使用此值。未設定時預設為 `http://localhost:3000`。
+
 #### Email 配置
 
-| 變數             | 說明            | 範例                           | 必填 |
-| ---------------- | --------------- | ------------------------------ | ---- |
-| `MAIL_HOST`      | SMTP 主機       | `smtp.ethereal.email`          | ✅   |
-| `MAIL_PORT`      | SMTP 端口       | `587`                          | ✅   |
-| `MAIL_USER`      | SMTP 使用者名稱 | `your-email@ethereal.email`    | ✅   |
-| `MAIL_PASSWORD`  | SMTP 密碼       | `your-password`                | ✅   |
-| `MAIL_FROM`      | 寄件者郵箱      | `noreply@localhost`            | ✅   |
-| `MAIL_FROM_NAME` | 寄件者名稱      | `Wind (Local)`                 | ❌   |
-| `MAIL_SECURE`    | 啟用 TLS/SSL    | `false` (開發) / `true` (生產) | ❌   |
+| 變數                  | 說明                 | 範例                           | 必填  |
+| --------------------- | -------------------- | ------------------------------ | ----- |
+| `MAIL_PROVIDER`       | 郵件發送方式         | `graph` 或 `smtp`              | ❌    |
+| `MAIL_HOST`           | SMTP 主機            | `smtp.ethereal.email`          | SMTP  |
+| `MAIL_PORT`           | SMTP 端口            | `587`                          | SMTP  |
+| `MAIL_USER`           | SMTP 用戶名稱        | `your-email@ethereal.email`    | SMTP  |
+| `MAIL_PASSWORD`       | SMTP 密碼            | `your-password`                | SMTP  |
+| `MAIL_FROM`           | 寄件者郵箱           | `noreply@localhost`            | ✅    |
+| `MAIL_FROM_NAME`      | 寄件者名稱           | `NPT (Local)`                  | ❌    |
+| `MAIL_SECURE`         | 啟用 TLS/SSL         | `false` (開發) / `true` (生產) | ❌    |
+| `GRAPH_TENANT_ID`     | Azure AD 租用戶 ID   | `40d12886-...`                 | Graph |
+| `GRAPH_CLIENT_ID`     | Azure AD 應用程式 ID | `ceb51399-...`                 | Graph |
+| `GRAPH_CLIENT_SECRET` | Azure AD 用戶端密碼  | `cLs8Q~...`                    | Graph |
+| `GRAPH_MAIL_FROM`     | Graph API 寄件者郵箱 | `noreply@your-domain.com`      | Graph |
+
+#### 通知開關
+
+| 變數                                 | 說明             | 預設值  | 必填 |
+| ------------------------------------ | ---------------- | ------- | ---- |
+| `MAIL_NOTIFY_PASSWORD_CHANGED`       | 密碼變更通知     | `true`  | ❌   |
+| `MAIL_NOTIFY_PROFILE_UPDATED`        | 個人資料更新通知 | `false` | ❌   |
+| `MAIL_NOTIFY_ACCOUNT_LOCKED`         | 帳號鎖定通知     | `true`  | ❌   |
+| `MAIL_NOTIFY_SESSION_REVOKED`        | 會話撤銷通知     | `false` | ❌   |
+| `MAIL_NOTIFY_BATCH_SESSIONS_REVOKED` | 批量會話撤銷通知 | `false` | ❌   |
+| `MAIL_NOTIFY_PAT`                    | 個人存取權杖通知 | `true`  | ❌   |
+
+> 密碼重設連結與 2FA 驗證碼為核心功能，無法關閉。設為 `false` 時該類信件不會發送。
+
+#### 系統通知開關（鈴鐺 + 通知中心）
+
+| 變數                                 | 說明             | 預設值 | 必填 |
+| ------------------------------------ | ---------------- | ------ | ---- |
+| `PUSH_NOTIFY_PASSWORD_CHANGED`       | 密碼變更通知     | `true` | ❌   |
+| `PUSH_NOTIFY_ACCOUNT_LOCKED`         | 帳號鎖定通知     | `true` | ❌   |
+| `PUSH_NOTIFY_SESSION_REVOKED`        | 會話撤銷通知     | `true` | ❌   |
+| `PUSH_NOTIFY_BATCH_SESSIONS_REVOKED` | 批量會話撤銷通知 | `true` | ❌   |
+| `PUSH_NOTIFY_PAT`                    | 個人存取權杖通知 | `true` | ❌   |
+
+> 設為 `false` 時該事件不會出現在鈴鐺下拉選單和通知中心。Email 和系統通知的開關互相獨立。
 
 #### 其他配置
 
-| 變數                               | 說明                   | 預設值                                 | 必填 |
-| ---------------------------------- | ---------------------- | -------------------------------------- | ---- |
-| `PASSWORD_RESET_EXPIRE_MINUTES`    | 密碼重設連結有效時間   | `60`                                   | ❌   |
-| `PASSWORD_RESET_URL`               | 密碼重設頁面 URL       | `http://localhost:3000/reset-password` | ❌   |
-| `GRAPHQL_MAX_COMPLEXITY`           | GraphQL 查詢複雜度上限 | `1000`                                 | ❌   |
-| `GRAPHQL_COMPLEXITY_LOG_THRESHOLD` | 記錄高複雜度查詢閾值   | `500`                                  | ❌   |
-| `ENABLE_FILE_LOGGING`              | 啟用檔案日誌           | `false` (開發) / `true` (生產)         | ❌   |
-| `LOG_DIR`                          | 日誌目錄               | `./logs`                               | ❌   |
-| `LOG_MAX_SIZE`                     | 單個日誌檔案最大大小   | `20m`                                  | ❌   |
-| `LOG_MAX_FILES`                    | 日誌保留天數           | `14d`                                  | ❌   |
+| 變數                               | 說明                                                      | 預設值                            | 必填 |
+| ---------------------------------- | --------------------------------------------------------- | --------------------------------- | ---- |
+| `PASSWORD_RESET_EXPIRE_MINUTES`    | 密碼重設連結有效時間                                      | `60`                              | ❌   |
+| `PASSWORD_RESET_URL`               | 密碼重設頁面 URL（未設定時使用 `APP_URL/reset-password`） | —                                 | ❌   |
+| `GRAPHQL_MAX_COMPLEXITY`           | GraphQL 查詢複雜度上限                                    | `1000`                            | ❌   |
+| `GRAPHQL_COMPLEXITY_LOG_THRESHOLD` | 記錄高複雜度查詢閾值                                      | `500`                             | ❌   |
+| `PRISMA_SLOW_QUERY_THRESHOLD`      | Prisma 慢查詢閾值（毫秒）                                 | `1000` (開發) / `500` (生產)      | ❌   |
+| `ENABLE_FILE_LOGGING`              | 啟用檔案日誌                                              | `false` (開發) / `true` (生產)    | ❌   |
+| `LOG_DIR`                          | 日誌目錄                                                  | `./logs`                          | ❌   |
+| `LOG_MAX_SIZE`                     | 單個日誌檔案最大大小                                      | `20m`                             | ❌   |
+| `LOG_MAX_FILES`                    | 日誌保留天數                                              | `14d`                             | ❌   |
+| `GEOIP_DB_PATH`                    | GeoLite2 資料庫路徑（會話地理位置）                       | `./data/geoip/GeoLite2-City.mmdb` | ❌   |
+
+**效能監控說明**：
+
+- **PRISMA_SLOW_QUERY_THRESHOLD**: 超過此閾值的查詢會被記錄到日誌中，幫助識別效能瓶頸
+  - 開發環境建議 `1000ms`（1 秒）
+  - 生產環境建議 `500ms`（0.5 秒）
+  - UAT 環境建議 `700ms`
 
 ### Frontend (.env)
 
@@ -247,7 +323,7 @@ Frontend 使用 Next.js 框架,所有環境變數都使用 `NEXT_PUBLIC_` 前綴
 
 | 變數                   | 說明             | 範例                    | 必填 |
 | ---------------------- | ---------------- | ----------------------- | ---- |
-| `NEXT_PUBLIC_APP_NAME` | 應用程式顯示名稱 | `Wind` / `Wind (Dev)`   | ❌   |
+| `NEXT_PUBLIC_APP_NAME` | 應用程式顯示名稱 | `NPT` / `NPT (Dev)`     | ❌   |
 | `NEXT_PUBLIC_APP_URL`  | 應用程式基礎 URL | `http://localhost:3000` | ❌   |
 
 #### 功能開關
@@ -256,6 +332,18 @@ Frontend 使用 Next.js 框架,所有環境變數都使用 `NEXT_PUBLIC_` 前綴
 | ------------------------------ | ----------------------- | ------- | ---- |
 | `NEXT_PUBLIC_ENABLE_2FA`       | 啟用/停用雙因素認證功能 | `true`  | ❌   |
 | `NEXT_PUBLIC_ENABLE_ANALYTICS` | 啟用/停用分析追蹤功能   | `false` | ❌   |
+
+#### 開發工具配置
+
+| 變數                    | 說明                                         | 預設值 | 必填 |
+| ----------------------- | -------------------------------------------- | ------ | ---- |
+| `NEXT_DISABLE_DEVTOOLS` | 禁用 Next.js DevTools 按鈕（僅開發環境有效） | 未設定 | ❌   |
+
+**說明**：
+
+- 設定為 `1` 則隱藏開發環境左上角的 DevTools 按鈕
+- 生產環境會自動禁用開發工具，無需設定此變數
+- 建議本地開發時設為 `1` 以獲得更乾淨的界面
 
 #### 錯誤追蹤配置 (Sentry)
 
@@ -308,7 +396,7 @@ NEXT_PUBLIC_APOLLO_MAX_RETRIES=100  # 太高,自動調整為 10
 POSTGRES_PASSWORD=dev_postgres_2024
 
 # apps/backend/.env
-DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/wind_db"
+DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/npt_db"
                                     ^^^^^^^^^^^^^^^^^^
 ```
 
@@ -319,7 +407,7 @@ DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/wind_db"
 RABBITMQ_DEFAULT_PASS=dev_rabbitmq_2024
 
 # apps/backend/.env
-RABBITMQ_URL=amqp://admin:dev_rabbitmq_2024@localhost:5672
+RABBITMQ_URL=amqp://hq:dev_rabbitmq_2024@localhost:5672
                           ^^^^^^^^^^^^^^^^^^^
 ```
 
@@ -351,7 +439,7 @@ NEXT_PUBLIC_APOLLO_TIMEOUT=30000
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=3
 NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
 NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=10000
-NEXT_PUBLIC_APP_NAME=Wind (Local)
+NEXT_PUBLIC_APP_NAME=NPT (Local)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_ENABLE_2FA=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=false
@@ -359,6 +447,7 @@ NEXT_PUBLIC_SENTRY_DSN=
 NEXT_PUBLIC_APP_VERSION=0.1.0
 NEXT_PUBLIC_BUILD_ID=
 NEXT_PUBLIC_COMMIT_SHA=
+NEXT_DISABLE_DEVTOOLS=1
 
 pnpm dev
 ```
@@ -394,7 +483,7 @@ NEXT_PUBLIC_APOLLO_TIMEOUT=60000           # 生產環境使用較長超時
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=5           # 更多重試次數
 NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
 NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=15000   # 允許更長延遲
-NEXT_PUBLIC_APP_NAME=Wind
+NEXT_PUBLIC_APP_NAME=NPT
 NEXT_PUBLIC_APP_URL=https://yourapp.com
 NEXT_PUBLIC_ENABLE_2FA=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=true          # 生產必須啟用
@@ -402,6 +491,7 @@ NEXT_PUBLIC_SENTRY_DSN=your-prod-dsn       # 生產必須啟用
 NEXT_PUBLIC_APP_VERSION=1.2.3
 NEXT_PUBLIC_BUILD_ID=$(date +%Y%m%d%H%M%S)
 NEXT_PUBLIC_COMMIT_SHA=$(git rev-parse --short HEAD)
+# 注意：生產環境不需要 NEXT_DISABLE_DEVTOOLS（會自動禁用）
 
 pnpm build
 pnpm start
@@ -448,7 +538,7 @@ e5df40356b0d79d63104836480a465b411207d95e966a429558c9f28d807b74e
 - ❌ 將包含實際密碼的 `.env` 檔案提交到 Git
 - ❌ 在 Slack/Email/文件中分享密碼
 - ❌ 所有環境使用相同的密碼
-- ❌ 使用 "password", "admin" 等弱密碼
+- ❌ 使用 "password", "hq" 等弱密碼
 - ❌ 在 `NEXT_PUBLIC_` 變數中放敏感資訊
 
 ### 4. 應該做的事 ✅
@@ -549,7 +639,7 @@ Error: Invalid token
 
 1. 確認 JWT_SECRET 已設置且夠長（至少 64 字元）
 2. 重新生成 JWT_SECRET
-3. 清除舊的 token（需要使用者重新登入）
+3. 清除舊的 token（需要用戶重新登入）
 
 ### 問題 3: CORS 錯誤
 
@@ -662,9 +752,8 @@ curl http://localhost:4000/graphql
 
 - [Docker Setup](../getting-started/DOCKER_SETUP.md) - Docker 配置與安全指南
 - [CLI Guide](../getting-started/CLI_GUIDE.md) - CLI 使用完整說明
-- [Error Handling Guide](../frontend/ERROR_HANDLING_GUIDE.md) - 完整錯誤處理指南
-- [Apollo Configuration](../frontend/APOLLO_CONFIGURATION.md) - Apollo Client 配置
-- [Apollo Configuration Examples](../frontend/APOLLO_CONFIGURATION_EXAMPLES.md) - 代碼範例
+- [前端錯誤處理指南](../frontend/FRONTEND_ERROR_HANDLING_GUIDE.md) - Error Boundaries 與錯誤追蹤
+- [前端認證整合](../frontend/FRONTEND_INTEGRATION.md) - Apollo Client 配置與認證系統
 
 **外部文檔**：
 

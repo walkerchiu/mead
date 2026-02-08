@@ -1,5 +1,8 @@
 # RBAC 架構設計文件
 
+> **最新的角色定義、權限清單及對照表請參考 [權限系統 (PERMISSION_SYSTEM.md)](./PERMISSION_SYSTEM.md)**。
+> 本文件說明多層式權限控制的架構設計（AccessScope / RLS / RBAC / Field-Level）。
+
 多層式權限控制架構，提供從介面層級到欄位層級的完整權限管理。
 
 ---
@@ -23,8 +26,8 @@
     - [Action 類別](#action-類別)
     - [範例](#範例)
   - [🎯 預設角色與權限](#-預設角色與權限)
-    - [Admin Portal (ADMIN_SCOPE)](#admin-portal-admin_scope)
-      - [SUPER_ADMIN](#super_admin)
+    - [HQ Portal (HQ_SCOPE)](#hq-portal-hq_scope)
+      - [SUPER_HQ](#super_hq)
       - [CONTENT_EDITOR](#content_editor)
       - [VIEWER](#viewer)
     - [Customer Dashboard (CUSTOMER_SCOPE)](#customer-dashboard-customer_scope)
@@ -54,7 +57,7 @@
 
 本系統採用多層式權限控制架構：
 
-1. **AccessScope（訪問範圍）** - 決定使用者可以訪問哪個介面
+1. **AccessScope（訪問範圍）** - 決定用戶可以訪問哪個介面
 2. **Row-Level Security** - 基於 AccessScope 過濾可見資料行
 3. **RBAC（角色權限）** - 在每個介面內進行細粒度權限控制
 4. **Field-Level Authorization** - 精確控制欄位可見性
@@ -75,35 +78,43 @@ JWT Token
 │ Layer 1: AccessScope Check                  │
 │ - PUBLIC_SCOPE                               │
 │ - CUSTOMER_SCOPE                             │
-│ - ADMIN_SCOPE                                │
+│ - HQ_SCOPE                                │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
 │ Layer 2: Row-Level Security (RLS)           │
-│ - ADMIN_SCOPE → 查看所有資料                │
+│ - HQ_SCOPE → 查看所有資料                   │
 │ - CUSTOMER_SCOPE → 過濾僅 CUSTOMER+PUBLIC   │
 │ - PUBLIC_SCOPE → 只能查看 PUBLIC            │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
 │ Layer 3: RBAC Check (within scope)          │
-│                                              │
-│ Admin Portal (ADMIN_SCOPE)                   │
-│ ├─ Roles: SUPER_ADMIN, CONTENT_EDITOR, ...  │
-│ └─ Permissions: users:create, users:delete   │
-│                                              │
-│ Customer Dashboard (CUSTOMER_SCOPE)          │
-│ ├─ Roles: OWNER, MEMBER, GUEST              │
-│ └─ Permissions: project:view, project:edit   │
-│                                              │
-│ Public Pages (PUBLIC_SCOPE)                  │
-│ └─ No RBAC (open access)                    │
+│                                             │
+│ ★ SUPER_HQ 自動繞過所有權限檢查            │
+│                                             │
+│ HQ Portal (HQ_SCOPE)                       │
+│ ├─ SUPER_HQ: 所有權限（auto-bypass）       │
+│ ├─ CONTENT_EDITOR: 客戶端資料管理+用戶管理 │
+│ └─ VIEWER: 唯讀存取                        │
+│                                             │
+│ Customer Dashboard (CUSTOMER_SCOPE)         │
+│ ├─ OWNER: 所有 CUSTOMER 權限+用戶管理      │
+│ ├─ MANAGER: 用戶管理                       │
+│ ├─ MEMBER: 查詢用戶                        │
+│ └─ GUEST: 無權限                           │
+│                                             │
+│ ★ HQ 角色可持有跨 Scope 權限               │
+│   （檢查 CUSTOMER 權限時也查 HQ 角色）     │
+│                                             │
+│ Public Pages (PUBLIC_SCOPE)                 │
+│ └─ No RBAC (open access)                   │
 └─────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────┐
 │ Layer 4: Field-Level Authorization          │
 │ - 根據 AccessScope/Permissions 過濾欄位     │
-│ - @SensitiveField, @AdminOnly 等裝飾器      │
+│ - @SensitiveField, @HQOnly 等裝飾器      │
 └─────────────────────────────────────────────┘
 ```
 
@@ -117,7 +128,7 @@ JWT Token
 enum AccessScope {
   PUBLIC_SCOPE = 'PUBLIC_SCOPE', // 公開頁面訪問
   CUSTOMER_SCOPE = 'CUSTOMER_SCOPE', // 客戶儀表板訪問
-  ADMIN_SCOPE = 'ADMIN_SCOPE', // 管理後台訪問
+  HQ_SCOPE = 'HQ_SCOPE', // 管理後台訪問
 }
 ```
 
@@ -129,7 +140,7 @@ model User {
   email         String        @unique
   name          String?
   password      String
-  accessScopes  AccessScope[] // 使用者可以訪問的範圍（複數）
+  accessScopes  AccessScope[] // 用戶可以訪問的範圍（複數）
   refreshToken  String?
   lastLoginAt   DateTime?
   createdAt     DateTime      @default(now())
@@ -138,7 +149,7 @@ model User {
 
   // 關聯
   profile       Profile?
-  userRoles     UserRole[]    // 使用者擁有的角色（多對多）
+  userRoles     UserRole[]    // 用戶擁有的角色（多對多）
 }
 ```
 
@@ -147,7 +158,7 @@ model User {
 ```prisma
 model Role {
   id          String   @id @default(dbgenerated("uuid_generate_v7()"))
-  name        String   // SUPER_ADMIN, OWNER, MEMBER, etc.
+  name        String   // SUPER_HQ, OWNER, MEMBER, etc.
   displayName String   // "超級管理員", "專案擁有者"
   scope       AccessScope // 此角色屬於哪個範圍
   description String?
@@ -168,8 +179,8 @@ model Role {
 ```prisma
 model Permission {
   id          String      @id @default(dbgenerated("uuid_generate_v7()"))
-  name        String      @unique // "users:create", "projects:edit"
-  resource    String      // "users", "projects", "billing"
+  name        String      @unique // "users:create", "audit-logs:export"
+  resource    String      // "users", "audit-logs", "sessions"
   action      String      // "create", "read", "update", "delete", "list"
   scope       AccessScope // 此權限屬於哪個範圍
   description String?
@@ -234,14 +245,13 @@ model RolePermission {
 
 ### Resource 類別
 
-- `users` - 使用者管理
+模板僅內建身份/系統管理相關資源，業務模組請依需求擴充：
+
+- `users` - 用戶管理
 - `roles` - 角色管理
-- `permissions` - 權限管理
-- `posts` - 內容管理
-- `projects` - 專案管理
-- `billing` - 帳務管理
 - `audit-logs` - 審計日誌
-- `settings` - 系統設定
+- `sessions` - 會話管理
+- `cron_jobs` - 排程任務
 
 ### Action 類別
 
@@ -256,75 +266,38 @@ model RolePermission {
 ### 範例
 
 ```text
-users:create          // 創建使用者
-users:list            // 查詢使用者列表
-users:update          // 更新使用者
-users:delete          // 刪除使用者
-projects:read         // 查看專案詳情
-projects:manage       // 完整專案管理
-billing:read          // 查看帳單
-settings:update       // 更新設定
-audit-logs:list       // 查詢審計日誌
+users:create            // 創建用戶
+users:list              // 查詢用戶列表
+users:update            // 更新用戶
+users:delete            // 刪除用戶
+roles:manage            // 管理角色
+audit-logs:read         // 查詢審計日誌
+sessions:revoke_all     // 撤銷所有會話
+cron_jobs:write         // 修改排程任務
 ```
 
 ---
 
 ## 🎯 預設角色與權限
 
-### Admin Portal (ADMIN_SCOPE)
+> 完整的角色權限對照表請參考 [PERMISSION_SYSTEM.md](./PERMISSION_SYSTEM.md#角色權限對照表)。
 
-#### SUPER_ADMIN
+### HQ Scope 角色
 
-- 所有權限：`*:*`
+| 角色             | 說明       | 權限範圍                                              |
+| ---------------- | ---------- | ----------------------------------------------------- |
+| `SUPER_HQ`       | 超級管理員 | 自動繞過所有權限檢查                                  |
+| `CONTENT_EDITOR` | 內容編輯   | HQ: users 完整管理；CUSTOMER: 用戶管理 + roles:manage |
+| `VIEWER`         | 檢視者     | HQ: users:read/list + audit-logs:read + roles:read    |
 
-#### CONTENT_EDITOR
+### Customer Scope 角色
 
-```text
-posts:create
-posts:read
-posts:list
-posts:update
-posts:delete
-users:read
-users:list
-```
-
-#### VIEWER
-
-```text
-posts:read
-posts:list
-users:read
-users:list
-audit-logs:list
-```
-
-### Customer Dashboard (CUSTOMER_SCOPE)
-
-#### OWNER
-
-```text
-projects:*          // 所有專案權限
-billing:*           // 所有帳務權限
-members:manage      // 成員管理
-settings:update     // 設定更新
-```
-
-#### MEMBER
-
-```text
-projects:read
-projects:list
-projects:update
-billing:read
-```
-
-#### GUEST
-
-```text
-projects:read
-projects:list
-```
+| 角色      | 說明   | 權限範圍                        |
+| --------- | ------ | ------------------------------- |
+| `OWNER`   | 擁有者 | 所有 CUSTOMER_SCOPE 權限        |
+| `MANAGER` | 管理者 | 用戶管理（CUSTOMER_SCOPE 用戶） |
+| `MEMBER`  | 成員   | users:read/list                 |
+| `GUEST`   | 訪客   | **無任何權限**                  |
 
 ---
 
@@ -334,11 +307,13 @@ projects:list
 interface JwtPayload {
   sub: string; // userId
   email: string;
-  accessScopes: AccessScope[]; // ["CUSTOMER_SCOPE", "ADMIN_SCOPE"]
+  accessScopes: AccessScope[]; // ["CUSTOMER_SCOPE", "HQ_SCOPE"]
+  isSuperHQ: boolean; // 是否為 SUPER_HQ（自動繞過所有權限）
   roles: {
     scope: AccessScope;
-    roleNames: string[]; // ["OWNER", "SUPER_ADMIN"]
+    roleNames: string[]; // ["OWNER", "SUPER_HQ"]
   }[];
+  permissions: string[]; // ["users:create", "audit-logs:read", ...]
 }
 ```
 
@@ -347,14 +322,14 @@ interface JwtPayload {
 ```json
 {
   "sub": "019c1234-5678-...",
-  "email": "admin@example.com",
-  "accessScopes": ["ADMIN_SCOPE"],
+  "email": "hq@example.com",
+  "accessScopes": ["HQ_SCOPE", "CUSTOMER_SCOPE"],
+  "isSuperHQ": true,
   "roles": [
-    {
-      "scope": "ADMIN_SCOPE",
-      "roleNames": ["SUPER_ADMIN"]
-    }
+    { "scope": "HQ_SCOPE", "roleNames": ["SUPER_HQ"] },
+    { "scope": "CUSTOMER_SCOPE", "roleNames": ["OWNER"] }
   ],
+  "permissions": ["users:create", "users:read", "audit-logs:read", "..."],
   "iat": 1706342400,
   "exp": 1706343300
 }
@@ -373,12 +348,28 @@ if (!user.accessScopes.includes(requiredScope)) {
   throw new ForbiddenException('沒有訪問此介面的權限');
 }
 
-// Step 3: 檢查 Permission
-const hasPermission = await permissionService.checkPermission(
+// Step 3: SUPER_HQ 自動繞過（僅限 SUPER_HQ 角色，非所有 HQ 用戶）
+if (user.isSuperHQ) {
+  return true; // 直接通過，不檢查具體權限
+}
+
+// Step 4: 檢查 Permission（含跨 Scope 檢查）
+// 先在請求的 Scope 中檢查
+let hasPermission = await permissionService.checkPermission(
   user.id,
   requiredScope,
   'users:create',
 );
+
+// 若未找到，且請求的不是 HQ_SCOPE，則也檢查 HQ_SCOPE 角色的權限
+// （支援 CONTENT_EDITOR/VIEWER 跨 Scope 存取客戶端資料）
+if (!hasPermission && requiredScope !== 'HQ_SCOPE') {
+  hasPermission = await permissionService.checkPermission(
+    user.id,
+    'HQ_SCOPE',
+    'users:create',
+  );
+}
 
 if (!hasPermission) {
   throw new ForbiddenException('沒有執行此操作的權限');
@@ -392,8 +383,8 @@ if (!hasPermission) {
 ```typescript
 // 檢查 AccessScope
 @UseGuards(JwtAuthGuard)
-@RequiresScope(AccessScope.ADMIN_SCOPE)
-async adminOnlyOperation() { }
+@RequiresScope(AccessScope.HQ_SCOPE)
+async hqOnlyOperation() { }
 
 // 檢查 Permission
 @UseGuards(JwtAuthGuard, PermissionGuard)
@@ -403,8 +394,8 @@ async createUser() { }
 // 同時檢查 Scope + Permission
 @UseGuards(JwtAuthGuard, PermissionGuard)
 @RequiresScope(AccessScope.CUSTOMER_SCOPE)
-@RequiresPermission('projects:update')
-async updateProject() { }
+@RequiresPermission('users:update')
+async updateUser() { }
 ```
 
 ---
@@ -417,7 +408,7 @@ async updateProject() { }
 2. 資料遷移：
    - `UserRole.PUBLIC` → `accessScopes: [PUBLIC_SCOPE]`, roles: []
    - `UserRole.DASHBOARD` → `accessScopes: [CUSTOMER_SCOPE]`, roles: [MEMBER]
-   - `UserRole.ADMIN` → `accessScopes: [ADMIN_SCOPE]`, roles: [SUPER_ADMIN]
+   - `UserRole.HQ` → `accessScopes: [HQ_SCOPE]`, roles: [SUPER_HQ]
 3. 更新程式碼引用
 4. 刪除舊的 `role` enum 欄位
 
@@ -428,18 +419,20 @@ async updateProject() { }
 ### 1. 角色繼承
 
 ```text
-SUPER_ADMIN
-  ↓ inherits
-CONTENT_EDITOR
-  ↓ inherits
-VIEWER
+HQ Scope:
+  SUPER_HQ → CONTENT_EDITOR → VIEWER
+
+Customer Scope:
+  OWNER → MANAGER → MEMBER → GUEST
 ```
+
+> 目前系統不支援自動角色繼承，每個角色的權限需個別分配。
 
 ### 2. 條件權限
 
 ```typescript
 {
-  permission: 'projects:update',
+  permission: 'records:update',
   condition: {
     field: 'ownerId',
     operator: 'equals',
@@ -452,7 +445,7 @@ VIEWER
 
 ```typescript
 {
-  permission: 'billing:read',
+  permission: 'reports:read_all',
   validFrom: '2026-01-01',
   validUntil: '2026-12-31'
 }
@@ -473,11 +466,11 @@ Client → JWT Auth → AccessScope Check → Permission Check → Resolver → 
 
 ### 三層權限控制
 
-| 層級        | 檢查階段 | 控制範圍   | 實作方式                            |
-| ----------- | -------- | ---------- | ----------------------------------- |
-| **Layer 1** | Request  | 介面訪問   | `@RequiresScope()`                  |
-| **Layer 2** | Request  | 操作權限   | `@RequiresPermission()`             |
-| **Layer 3** | Response | 欄位可見性 | `@SensitiveField()`, `@AdminOnly()` |
+| 層級        | 檢查階段 | 控制範圍   | 實作方式                         |
+| ----------- | -------- | ---------- | -------------------------------- |
+| **Layer 1** | Request  | 介面訪問   | `@RequiresScope()`               |
+| **Layer 2** | Request  | 操作權限   | `@RequiresPermission()`          |
+| **Layer 3** | Response | 欄位可見性 | `@SensitiveField()`, `@HQOnly()` |
 
 ### 欄位裝飾器
 
@@ -488,23 +481,23 @@ export class UserType {
   id: string; // 所有人可見
 
   @Field()
-  @SensitiveField() // Customer 和 Admin 可見
+  @SensitiveField() // Customer 和 HQ 可見
   email: string;
 
   @Field({ nullable: true })
-  @AdminOnly() // 只有 Admin 可見
+  @HQOnly() // 只有 HQ 可見
   deletedAt?: Date;
 }
 ```
 
 ### 權限矩陣（含欄位級別）
 
-| 欄位         | PUBLIC | CUSTOMER | ADMIN |
-| ------------ | ------ | -------- | ----- |
-| id, name     | ✅     | ✅       | ✅    |
-| email, phone | ❌     | ✅       | ✅    |
-| deletedAt    | ❌     | ❌       | ✅    |
-| password     | ❌     | ❌       | ❌    |
+| 欄位         | PUBLIC | CUSTOMER | HQ  |
+| ------------ | ------ | -------- | --- |
+| id, name     | ✅     | ✅       | ✅  |
+| email, phone | ❌     | ✅       | ✅  |
+| deletedAt    | ❌     | ❌       | ✅  |
+| password     | ❌     | ❌       | ❌  |
 
 ### 效能優化
 
@@ -518,7 +511,9 @@ export class UserType {
 
 ## 📖 相關文檔
 
+- [權限系統](./PERMISSION_SYSTEM.md) - 完整的角色定義、權限清單及對照表（**主要參考**）
 - [Row-Level Security](./ROW_LEVEL_SECURITY.md) - AccessScope 資料行過濾
 - [Field-Level Authorization](./FIELD_AUTHORIZATION.md) - GraphQL 欄位權限
+- [角色管理](../backend/ROLE_MANAGEMENT.md) - 角色分配/撤銷 API 與前端操作
 - [Registration](./REGISTRATION.md) - 用戶註冊與權限分配
 - [Token Configuration](./TOKEN-CONFIGURATION.md) - JWT Token 配置

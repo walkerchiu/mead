@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - restart 命令
+# NPT CLI - restart 命令
 # 快速重啟服務
 # ==========================================
 
@@ -111,8 +111,15 @@ kill_process() {
 restart_docker() {
   print_header "重啟 Docker 服務"
 
-  log_info "停止 Docker 容器..."
-  docker-compose --env-file .env.docker down
+  # 檢查 SeaweedFS 是否在運行
+  local seaweedfs_was_running=false
+  if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
+    seaweedfs_was_running=true
+  fi
+
+  # 停止所有 Docker 容器
+  log_info "停止所有 Docker 容器..."
+  docker-compose --env-file .env.docker --profile storage down
 
   log_info "啟動 Docker 容器..."
   if docker-compose --env-file .env.docker up -d; then
@@ -129,6 +136,21 @@ restart_docker() {
     wait_for_service "docker exec $REDIS_CONTAINER redis-cli ping" "Dragonfly" 30 2
     wait_for_service "curl -s http://localhost:15672 > /dev/null" "RabbitMQ" 30 2
     wait_for_service "curl -s http://localhost:8025/api/v1/info > /dev/null" "Mailpit" 30 2
+
+    # 如果之前 SeaweedFS 在運行，重新啟動
+    if [ "$seaweedfs_was_running" = true ]; then
+      echo ""
+      if confirm "是否也要重啟 SeaweedFS?" "y"; then
+        log_info "啟動 SeaweedFS 服務..."
+        if docker-compose --env-file .env.docker --profile storage up -d seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3; then
+          log_success "SeaweedFS 服務已啟動"
+        else
+          log_error "SeaweedFS 啟動失敗"
+        fi
+      else
+        log_info "SeaweedFS 服務未啟動"
+      fi
+    fi
   else
     log_error "Docker 服務重啟失敗"
     exit 1
@@ -191,7 +213,7 @@ restart_prisma_studio() {
 restart_all() {
   print_header "重啟所有服務"
 
-  log_warning "這將重啟前端、後端、Storybook、Prisma Studio 和 Docker 服務"
+  log_warning "這將重啟前端、後端、Storybook、Prisma Studio 和所有 Docker 服務"
   if ! confirm "確定要繼續嗎?" "n"; then
     log_info "已取消"
     exit 0
@@ -203,7 +225,7 @@ restart_all() {
   kill_process 6006 "Storybook"
   kill_process 5555 "Prisma Studio"
 
-  # 重啟 Docker
+  # 重啟 Docker（會自動處理 SeaweedFS）
   restart_docker
 
   echo ""

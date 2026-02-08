@@ -1,4 +1,4 @@
-// UserRole - 使用者角色關聯表（多對多）
+// UserRole - 用戶角色關聯表（多對多）
 model UserRole {
   id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid

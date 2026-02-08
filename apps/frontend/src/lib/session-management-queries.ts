@@ -33,6 +33,7 @@ export const SESSIONS_QUERY = gql`
         revokedByName
         revokedReason
         revokedMethod
+        isCurrent
       }
       pageInfo {
         hasNextPage
@@ -149,6 +150,7 @@ export const SESSION_DETAILS_QUERY = gql`
       revokedByName
       revokedReason
       revokedMethod
+      isCurrent
     }
   }
 `;

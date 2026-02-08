@@ -11,16 +11,23 @@ import { REFRESH_TOKEN_MUTATION } from './graphql';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ApolloClientType = any;
 
+/**
+ * Token 更新事件常量
+ * 當 access token 被更新時觸發此事件
+ */
+export const TOKEN_UPDATED_EVENT = 'auth:token-updated';
+export const AUTH_INIT_COMPLETE_EVENT = 'auth:init-complete';
+
 // 記憶體儲存（不暴露給 XSS）
 let accessToken: string | null = null;
 
 // Apollo Client 實例引用（由 apollo-client.ts 設定）
 let apolloClientRef: ApolloClientType | null = null;
 
-// 自動刷新計時器
+// 自動重新整理計時器
 let refreshTimer: NodeJS.Timeout | null = null;
 
-// ✅ 防止並發刷新的 Promise
+// ✅ 防止並發重新整理的 Promise
 let refreshPromise: Promise<boolean> | null = null;
 
 // ✅ 防止重複初始化的標誌（存儲在 window 上以避免模塊重新載入時丟失）
@@ -28,6 +35,7 @@ let refreshPromise: Promise<boolean> | null = null;
 declare global {
   interface Window {
     __authInitialized?: boolean;
+    __authInitComplete?: boolean;
   }
 }
 
@@ -50,14 +58,21 @@ export const setApolloClientRef = (client: ApolloClientType): void => {
 };
 
 /**
- * 儲存 access token（內部使用，不設置自動刷新）
+ * 儲存 access token（內部使用，不設置自動重新整理）
  */
 const setAccessToken = (token: string): void => {
   accessToken = token;
+
+  // 觸發 token 更新事件
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(
+      new CustomEvent(TOKEN_UPDATED_EVENT, { detail: { token } }),
+    );
+  }
 };
 
 /**
- * 儲存 access token 並啟動自動刷新
+ * 儲存 access token 並啟動自動重新整理
  */
 export const setAuthTokens = (tokens: { accessToken: string }): void => {
   setAccessToken(tokens.accessToken);
@@ -76,13 +91,16 @@ export const getAccessToken = (): string | null => {
  */
 export const clearAuthTokens = (): void => {
   accessToken = null;
-  refreshPromise = null; // ✅ 清除刷新 Promise
+  refreshPromise = null; // ✅ 清除重新整理 Promise
   setIsInitialized(false); // ✅ 重置初始化標誌，允許重新初始化
+  if (typeof window !== 'undefined') {
+    window.__authInitComplete = false;
+  }
   cancelTokenRefresh();
 };
 
 /**
- * 檢查使用者是否已登入
+ * 檢查用戶是否已登入
  */
 export const isAuthenticated = (): boolean => {
   return !!getAccessToken();
@@ -90,16 +108,16 @@ export const isAuthenticated = (): boolean => {
 
 /**
  * 透過 HttpOnly Cookie 中的 refresh token 重新取得 access token
- * 返回是否刷新成功
+ * 返回是否重新整理成功
  *
- * ✅ 防止並發刷新：如果已有刷新正在進行，返回現有的 Promise
+ * ✅ 防止並發重新整理：如果已有重新整理正在進行，返回現有的 Promise
  *
  * @param source - 調用來源（用於調試追蹤）
  */
 export const refreshAccessToken = async (
   source: string = 'unknown',
 ): Promise<boolean> => {
-  // ✅ 如果已有刷新正在進行，返回現有的 Promise
+  // ✅ 如果已有重新整理正在進行，返回現有的 Promise
   if (refreshPromise) {
     console.log(
       `[Auth] Token refresh already in progress, waiting... (source: ${source})`,
@@ -112,7 +130,7 @@ export const refreshAccessToken = async (
     return false;
   }
 
-  // ✅ 創建新的刷新 Promise
+  // ✅ 創建新的重新整理 Promise
   refreshPromise = (async () => {
     try {
       console.log(`[Auth] 🔄 Starting token refresh (source: ${source})...`);
@@ -145,7 +163,7 @@ export const refreshAccessToken = async (
       }
       return false;
     } finally {
-      // ✅ 清除 Promise，允許下次刷新
+      // ✅ 清除 Promise，允許下次重新整理
       refreshPromise = null;
     }
   })();
@@ -187,7 +205,7 @@ export const logout = async (): Promise<void> => {
   // 清除前端 tokens（必須在後端調用之後）
   clearAuthTokens();
 
-  // 清除錯誤追蹤的使用者資訊
+  // 清除錯誤追蹤的用戶資訊
   if (typeof window !== 'undefined') {
     try {
       const { clearErrorTrackingUser } = await import('./error-user-tracking');
@@ -247,7 +265,7 @@ export const getTokenRemainingTime = (token: string): number => {
 };
 
 /**
- * 取消自動刷新計時器
+ * 取消自動重新整理計時器
  */
 const cancelTokenRefresh = (): void => {
   if (refreshTimer) {
@@ -257,8 +275,8 @@ const cancelTokenRefresh = (): void => {
 };
 
 /**
- * 排程 Token 自動刷新
- * 策略：Token 有效期 15 分鐘，在到期前 5 分鐘刷新（即 10 分鐘後）
+ * 排程 Token 自動重新整理
+ * 策略：Token 有效期 15 分鐘，在到期前 5 分鐘重新整理（即 10 分鐘後）
  */
 const scheduleTokenRefresh = (token: string): void => {
   cancelTokenRefresh(); // 取消舊的計時器
@@ -269,7 +287,7 @@ const scheduleTokenRefresh = (token: string): void => {
     return;
   }
 
-  // 在 Token 到期前 5 分鐘刷新
+  // 在 Token 到期前 5 分鐘重新整理
   const REFRESH_BEFORE_EXPIRY = 5 * 60 * 1000; // 5 分鐘
   const refreshIn = remainingTime - REFRESH_BEFORE_EXPIRY;
 
@@ -278,8 +296,8 @@ const scheduleTokenRefresh = (token: string): void => {
   );
 
   if (refreshIn <= 0) {
-    // Token 剩餘時間不到 5 分鐘，但不立即刷新
-    // 等待 1 分鐘後再刷新，避免頻繁刷新
+    // Token 剩餘時間不到 5 分鐘，但不立即重新整理
+    // 等待 1 分鐘後再重新整理，避免頻繁重新整理
     console.log(
       '[Auth] Token expires soon (< 5 min), scheduling refresh in 1 minute',
     );
@@ -291,7 +309,7 @@ const scheduleTokenRefresh = (token: string): void => {
           scheduleTokenRefresh(newToken);
         }
       }
-    }, 60 * 1000); // 1 分鐘後刷新
+    }, 60 * 1000); // 1 分鐘後重新整理
     return;
   }
 
@@ -300,7 +318,7 @@ const scheduleTokenRefresh = (token: string): void => {
     const success = await refreshAccessToken('scheduled');
 
     if (success) {
-      // 刷新成功後，重新排程下一次刷新
+      // 重新整理成功後，重新排程下一次重新整理
       const newToken = getAccessToken();
       if (newToken) {
         scheduleTokenRefresh(newToken);
@@ -310,39 +328,76 @@ const scheduleTokenRefresh = (token: string): void => {
 };
 
 /**
- * 啟動時初始化 Token 刷新（由 App 啟動時調用）
+ * 通知 ProtectedRoute 等元件：認證初始化已完成
+ */
+const dispatchInitComplete = (success: boolean): void => {
+  if (typeof window !== 'undefined') {
+    window.__authInitComplete = true;
+    window.dispatchEvent(
+      new CustomEvent(AUTH_INIT_COMPLETE_EVENT, { detail: { success } }),
+    );
+  }
+};
+
+/**
+ * 檢查認證初始化是否已完成（供 ProtectedRoute 避免競態條件）
+ */
+export const isAuthInitComplete = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return !!window.__authInitComplete;
+};
+
+/**
+ * 啟動時初始化 Token 重新整理（由 App 啟動時調用）
  *
  * ✅ 冪等設計：多次調用不會重複初始化，只會在首次調用時執行
  */
 export const initializeAuth = async (): Promise<boolean> => {
-  // ✅ 如果已經初始化過，直接返回當前認證狀態
+  // ✅ 檢查是否已經初始化
   const alreadyInitialized = getIsInitialized();
   console.log(
     `[Auth] 🔍 Checking initialization status: ${alreadyInitialized}`,
   );
 
-  if (alreadyInitialized) {
-    console.log('[Auth] ✅ Already initialized, skipping...');
-    const token = getAccessToken();
-    return !!(token && !isTokenExpired(token));
+  // 檢查當前是否有有效 token
+  const token = getAccessToken();
+  const hasValidToken = !!(token && !isTokenExpired(token));
+
+  if (alreadyInitialized && hasValidToken) {
+    // 已經初始化且有有效 token，直接返回
+    console.log('[Auth] ✅ Already initialized with valid token');
+    dispatchInitComplete(true);
+    return true;
   }
 
-  console.log('[Auth] 🔵 Initializing authentication...');
+  if (alreadyInitialized && !hasValidToken) {
+    // 已經初始化但沒有有效 token（可能是頁面重新整理後 token 丟失）
+    // 嘗試使用 refresh token 恢復 session
+    console.log(
+      '[Auth] 🔄 Initialized but no valid token, attempting refresh...',
+    );
+    const success = await refreshAccessToken('re-initialization');
+    dispatchInitComplete(success);
+    return success;
+  }
+
+  // 首次初始化
+  console.log('[Auth] 🔵 Initializing authentication for the first time...');
   setIsInitialized(true);
   console.log(
     `[Auth] 🔍 Set initialization flag to true, current value: ${getIsInitialized()}`,
   );
 
-  // 如果已有 access token 且未過期，排程刷新
-  const token = getAccessToken();
-  if (token && !isTokenExpired(token)) {
-    // ✅ 只在首次初始化時排程刷新
-    // 後續的刷新會由 refreshAccessToken 中的 scheduleTokenRefresh 處理
+  // 如果已有 access token 且未過期，排程重新整理
+  if (hasValidToken) {
+    // ✅ 只在首次初始化時排程重新整理
+    // 後續的重新整理會由 refreshAccessToken 中的 scheduleTokenRefresh 處理
     if (refreshTimer === null) {
-      scheduleTokenRefresh(token);
+      scheduleTokenRefresh(token!);
     } else {
       console.log('[Auth] Token refresh already scheduled, skipping schedule');
     }
+    dispatchInitComplete(true);
     return true;
   }
 
@@ -351,5 +406,6 @@ export const initializeAuth = async (): Promise<boolean> => {
 
   // refreshAccessToken 已經會調用 scheduleTokenRefresh，這裡不需要再調用
 
+  dispatchInitComplete(success);
   return success;
 };

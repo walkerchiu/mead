@@ -5,6 +5,14 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 @Injectable()
 export class GqlThrottlerGuard extends ThrottlerGuard {
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // ✅ 檢查是否為 HTTP 請求（非 GraphQL）
+    const contextType = context.getType<'http' | 'graphql'>();
+    if (contextType === 'http') {
+      // 對於 HTTP 請求，直接使用父類的 throttling
+      return super.canActivate(context);
+    }
+
+    // 對於 GraphQL 請求
     const gqlCtx = GqlExecutionContext.create(context);
     const info = gqlCtx.getInfo();
 
@@ -19,10 +27,18 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
   }
 
   getRequestResponse(context: ExecutionContext) {
+    // ✅ 檢查是否為 HTTP 請求
+    const contextType = context.getType<'http' | 'graphql'>();
+    if (contextType === 'http') {
+      // 對於 HTTP 請求，直接從 context 取得
+      const req = context.switchToHttp().getRequest();
+      const res = context.switchToHttp().getResponse();
+      return { req, res };
+    }
+
+    // 對於 GraphQL 請求，從 GraphQL context 取得
     const gqlCtx = GqlExecutionContext.create(context);
     const ctx = gqlCtx.getContext();
-
-    // 對於 GraphQL，從 context 取得 req 和 res
     return { req: ctx.req, res: ctx.res };
   }
 }

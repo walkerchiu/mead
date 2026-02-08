@@ -9,6 +9,7 @@ import {
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
+import { uuidv7 } from 'uuidv7';
 import { AuditLogService } from './audit-log.service';
 import { AuditLogPubSubService } from './audit-log-pubsub.service';
 import { logger } from '../common/services/logger.service';
@@ -46,6 +47,7 @@ export class AuditLogInterceptor implements NestInterceptor {
     let requestInput: any; // 請求輸入參數
     let req: any;
     let gqlContext: any;
+    let isNotificationRead = false; // 標記是否為通知讀取操作
 
     if (contextType === 'graphql') {
       // GraphQL 請求
@@ -75,6 +77,16 @@ export class AuditLogInterceptor implements NestInterceptor {
         return next.handle();
       }
 
+      // ✅ 通知查詢：分層審計策略
+      // 根據 NIST/SOC2 最佳實踐：用戶查看自己資料的成功操作不需審計
+      // 但失敗操作應該記錄（可能表示攻擊或系統問題）
+      const notificationReadOperations = [
+        'notifications',
+        'unreadNotificationCount',
+        'myNotificationPreferences',
+      ];
+      isNotificationRead = notificationReadOperations.includes(operationName);
+
       gqlContext = gqlCtx.getContext();
       req = gqlContext.req;
 
@@ -87,12 +99,30 @@ export class AuditLogInterceptor implements NestInterceptor {
 
       // 提取 GraphQL 輸入參數（args）
       const args = gqlCtx.getArgs();
+
+      // 🔍 調試:記錄原始 args
+      if (operationName === 'login') {
+        logger.debug('[AuditLog] 原始 args:', JSON.stringify(args));
+        logger.debug(
+          '[AuditLog] 原始 variables:',
+          JSON.stringify(info.variableValues),
+        );
+      }
+
       requestInput = {
         args: this.sanitizeData(args),
         variables: this.sanitizeData(info.variableValues),
       };
 
-      // 嘗試從 context 中取得當前使用者 ID
+      // 🔍 調試:記錄清理後的 requestInput
+      if (operationName === 'login') {
+        logger.debug(
+          '[AuditLog] 清理後 requestInput:',
+          JSON.stringify(requestInput),
+        );
+      }
+
+      // 嘗試從 context 中取得當前用戶 ID
       contextUserId = this.extractUserIdFromContext(gqlContext);
 
       // 推斷實體和操作類型
@@ -120,7 +150,7 @@ export class AuditLogInterceptor implements NestInterceptor {
         params: this.sanitizeData(req.params),
       };
 
-      // 嘗試從 request 中取得當前使用者 ID
+      // 嘗試從 request 中取得當前用戶 ID
       contextUserId = this.extractUserIdFromContext(req);
 
       // 推斷實體和操作類型
@@ -129,17 +159,29 @@ export class AuditLogInterceptor implements NestInterceptor {
       action = parsedAction.action;
     }
 
-    // 確保 requestId 有效 (如果還是沒有，記錄警告但繼續)
+    // 確保 requestId 有效。沒有的話 fallback 自生 UUID 並標記，
+    // 避免漏記 audit log（合規/安全角度，漏記比記錯更嚴重）
+    let requestIdMissing = false;
     if (!requestId) {
-      logger.warn(`[AuditLog] requestId 不存在於 ${contextType} 請求: ${path}`);
+      requestId = uuidv7();
+      requestIdMissing = true;
+      logger.warn(
+        `[AuditLog] requestId 不存在於 ${contextType} 請求: ${path}，已 fallback 為 ${requestId}`,
+      );
       logger.warn('[AuditLog] 檢查 RequestIdInterceptor 是否正確設定');
-      // 不記錄無效的審計日誌
-      return next.handle();
     }
 
     // 執行請求並記錄
     return next.handle().pipe(
-      tap(async (response) => {
+      tap((response) => {
+        // ✅ 跳過成功的通知讀取操作（減少審計噪音）
+        if (contextType === 'graphql' && isNotificationRead) {
+          logger.debug(
+            `[AuditLog] Skipping successful notification read: ${operationName}`,
+          );
+          return;
+        }
+
         const duration = Date.now() - startTime;
 
         logger.debug('[AuditLog] Processing response', {
@@ -170,16 +212,31 @@ export class AuditLogInterceptor implements NestInterceptor {
           details: {
             request: requestInput,
             response: this.sanitizeResponse(response, action),
+            ...(requestIdMissing && { requestIdMissing: true }),
           },
           duration,
         };
 
-        // 成功記錄（發送到 RabbitMQ 隊列）
+        // 成功記錄（發送到 RabbitMQ 隊列，fire-and-forget）
         // ⚠️ 注意：訂閱事件會在 Consumer 寫入資料庫後發送
-        await this.auditLogService.create(auditLogData);
+        void this.auditLogService.create(auditLogData).catch((err) => {
+          logger.error('[AuditLog] Failed to create audit log:', err);
+        });
       }),
-      catchError(async (error) => {
+      catchError((error) => {
         const duration = Date.now() - startTime;
+
+        // ✅ 失敗的通知讀取操作仍然記錄（安全監控）
+        // 失敗可能表示：認證問題、權限問題、系統錯誤或攻擊嘗試
+        if (contextType === 'graphql' && isNotificationRead && operationName) {
+          logger.warn(
+            `[AuditLog] Recording failed notification read: ${operationName}`,
+            {
+              error: error.message,
+              userId: contextUserId,
+            },
+          );
+        }
 
         // 建立失敗記錄
         const auditLogData = {
@@ -202,13 +259,16 @@ export class AuditLogInterceptor implements NestInterceptor {
                   ? error.stack
                   : undefined,
             },
+            ...(requestIdMissing && { requestIdMissing: true }),
           },
           duration,
         };
 
-        // 失敗記錄（發送到 RabbitMQ 隊列）
+        // 失敗記錄（發送到 RabbitMQ 隊列，fire-and-forget）
         // ⚠️ 注意：訂閱事件會在 Consumer 寫入資料庫後發送
-        await this.auditLogService.create(auditLogData);
+        void this.auditLogService.create(auditLogData).catch((err) => {
+          logger.error('[AuditLog] Failed to create audit log:', err);
+        });
 
         return throwError(() => error);
       }),
@@ -216,7 +276,7 @@ export class AuditLogInterceptor implements NestInterceptor {
   }
 
   /**
-   * 從 context 中提取當前使用者 ID
+   * 從 context 中提取當前用戶 ID
    */
   private extractUserIdFromContext(context: any): string | undefined {
     // 嘗試多種常見的 user 屬性位置
@@ -448,18 +508,6 @@ export class AuditLogInterceptor implements NestInterceptor {
   private sanitizeData(data: any): any {
     if (!data) return data;
 
-    // 複製物件避免修改原始資料
-    let sanitized: any;
-    try {
-      sanitized = JSON.parse(JSON.stringify(data));
-    } catch (error) {
-      // 如果序列化失敗，返回簡化版本
-      logger.error('[AuditLog] Failed to sanitize data', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return { serialization_error: 'Unable to serialize response' };
-    }
-
     // 移除敏感欄位（更全面的列表）
     const sensitiveFields = [
       // 密碼相關
@@ -511,21 +559,71 @@ export class AuditLogInterceptor implements NestInterceptor {
       'cookie',
     ];
 
-    const removeSensitive = (obj: any) => {
+    // ✅ 第一步:遍歷原始資料,記錄所有敏感欄位的位置
+    const sensitiveFieldPaths: string[] = [];
+
+    const recordSensitiveFields = (obj: any, path = '') => {
       if (typeof obj !== 'object' || obj === null) return;
 
       for (const key in obj) {
+        const currentPath = path ? `${path}.${key}` : key;
+
         if (
           sensitiveFields.some((field) => key.toLowerCase().includes(field))
         ) {
-          obj[key] = '[REDACTED]';
-        } else if (typeof obj[key] === 'object') {
-          removeSensitive(obj[key]);
+          // 記錄敏感欄位的完整路徑
+          sensitiveFieldPaths.push(currentPath);
+        }
+
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          recordSensitiveFields(obj[key], currentPath);
         }
       }
     };
 
-    removeSensitive(sanitized);
+    recordSensitiveFields(data);
+
+    // ✅ 第二步:複製物件
+    let sanitized: any;
+    try {
+      sanitized = JSON.parse(JSON.stringify(data));
+    } catch (error) {
+      // 如果序列化失敗，返回簡化版本
+      logger.error('[AuditLog] Failed to sanitize data', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return { serialization_error: 'Unable to serialize response' };
+    }
+
+    // ✅ 第三步:確保所有敏感欄位都存在且值為 [REDACTED]
+    // 按路徑長度排序（短路徑先處理），避免父層被 REDACTED 後子路徑失敗
+    const sortedPaths = [...sensitiveFieldPaths].sort(
+      (a, b) => a.split('.').length - b.split('.').length,
+    );
+    for (const fieldPath of sortedPaths) {
+      const keys = fieldPath.split('.');
+      let current = sanitized;
+
+      // 導航到目標欄位的父對象
+      let pathValid = true;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (current == null || typeof current !== 'object') {
+          pathValid = false;
+          break;
+        }
+        if (!current[keys[i]]) {
+          current[keys[i]] = {};
+        }
+        current = current[keys[i]];
+      }
+
+      // 設置敏感欄位為 [REDACTED]（僅在路徑有效時）
+      if (pathValid && current != null && typeof current === 'object') {
+        const lastKey = keys[keys.length - 1];
+        current[lastKey] = '[REDACTED]';
+      }
+    }
+
     return sanitized;
   }
 }

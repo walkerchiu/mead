@@ -25,7 +25,7 @@
   - [📝 使用方式](#-使用方式)
     - [標記敏感欄位](#標記敏感欄位)
     - [測試結果示例](#測試結果示例)
-      - [Admin 查詢 (ADMIN_SCOPE)](#admin-查詢-admin_scope)
+      - [HQ 查詢 (HQ_SCOPE)](#hq-查詢-hq_scope)
       - [Customer 查詢 (CUSTOMER_SCOPE)](#customer-查詢-customer_scope)
       - [Public 查詢 (無 Token)](#public-查詢-無-token)
   - [📊 權限矩陣](#-權限矩陣)
@@ -53,7 +53,7 @@
 
 ## 📖 概述
 
-Field-Level Authorization 是基於 RBAC 系統的擴展，提供**細粒度的欄位級別訪問控制**。它允許根據使用者的 AccessScope 和 Permissions 動態控制 GraphQL 響應中的欄位可見性。
+Field-Level Authorization 是基於 RBAC 系統的擴展，提供**細粒度的欄位級別訪問控制**。它允許根據用戶的 AccessScope 和 Permissions 動態控制 GraphQL 響應中的欄位可見性。
 
 ### 核心特性
 
@@ -84,7 +84,7 @@ Field-Level Authorization 是基於 RBAC 系統的擴展，提供**細粒度的�
 import { ObjectType, Field } from '@nestjs/graphql';
 import {
   SensitiveField,
-  AdminOnly,
+  HQOnly,
 } from '../common/decorators/field-auth.decorator';
 
 @ObjectType()
@@ -96,24 +96,24 @@ export class UserType {
   name: string;
 
   @Field()
-  @SensitiveField() // 敏感欄位：需要 CUSTOMER_SCOPE 或 ADMIN_SCOPE
+  @SensitiveField() // 敏感欄位：需要 CUSTOMER_SCOPE 或 HQ_SCOPE
   email: string;
 
   @Field({ nullable: true })
-  @AdminOnly() // 只有 Admin 可見
+  @HQOnly() // 只有 HQ 可見
   deletedAt?: Date;
 }
 ```
 
 **可用裝飾器**：
 
-| 裝飾器                       | 用途                | 效果                                  |
-| ---------------------------- | ------------------- | ------------------------------------- |
-| `@SensitiveField()`          | 標記敏感欄位        | Customer 和 Admin 可見，Public 不可見 |
-| `@AdminOnly()`               | 標記 Admin 專屬欄位 | 只有 ADMIN_SCOPE 可見                 |
-| `@SelfAccessible()`          | 允許查看自己的資料  | 用戶只能看到自己的敏感欄位            |
-| `@FieldRequiresScope()`      | 需要特定 Scope      | 需要指定的 AccessScope                |
-| `@FieldRequiresPermission()` | 需要特定 Permission | 需要特定權限字串                      |
+| 裝飾器                       | 用途                | 效果                               |
+| ---------------------------- | ------------------- | ---------------------------------- |
+| `@SensitiveField()`          | 標記敏感欄位        | Customer 和 HQ 可見，Public 不可見 |
+| `@HQOnly()`                  | 標記 HQ 專屬欄位    | 只有 HQ_SCOPE 可見                 |
+| `@SelfAccessible()`          | 允許查看自己的資料  | 用戶只能看到自己的敏感欄位         |
+| `@FieldRequiresScope()`      | 需要特定 Scope      | 需要指定的 AccessScope             |
+| `@FieldRequiresPermission()` | 需要特定 Permission | 需要特定權限字串                   |
 
 ### 2. Plugin 層 (Plugin Layer)
 
@@ -127,7 +127,7 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
     const plugin = this;
     return {
       async willSendResponse({ response, contextValue }) {
-        // 從 JWT context 取得使用者權限
+        // 從 JWT context 取得用戶權限
         const user = contextValue.req?.user;
 
         // 根據權限過濾響應數據
@@ -207,14 +207,14 @@ export class UserType {
   phone: string;
 
   @Field({ nullable: true })
-  @AdminOnly() // ❌ 只有 Admin 可見
+  @HQOnly() // ❌ 只有 HQ 可見
   deletedAt?: Date;
 }
 ```
 
 ### 測試結果示例
 
-#### Admin 查詢 (ADMIN_SCOPE)
+#### HQ 查詢 (HQ_SCOPE)
 
 ```graphql
 query {
@@ -278,17 +278,17 @@ query {
 
 ## 📊 權限矩陣
 
-| 欄位         | PUBLIC | CUSTOMER (他人) | CUSTOMER (自己) | ADMIN | 裝飾器                                |
-| ------------ | ------ | --------------- | --------------- | ----- | ------------------------------------- |
-| id           | ✅     | ✅              | ✅              | ✅    | -                                     |
-| name         | ✅     | ✅              | ✅              | ✅    | -                                     |
-| email        | ❌     | ❌              | ✅              | ✅    | @SensitiveField() + @SelfAccessible() |
-| phone        | ❌     | ❌              | ✅              | ✅    | @SensitiveField() + @SelfAccessible() |
-| address      | ❌     | ❌              | ✅              | ✅    | @SensitiveField() + @SelfAccessible() |
-| lastLoginAt  | ❌     | ❌              | ✅              | ✅    | @SensitiveField() + @SelfAccessible() |
-| deletedAt    | ❌     | ❌              | ❌              | ✅    | @AdminOnly()                          |
-| password     | ❌     | ❌              | ❌              | ❌    | 永不暴露                              |
-| refreshToken | ❌     | ❌              | ❌              | ❌    | 永不暴露                              |
+| 欄位         | PUBLIC | CUSTOMER (他人) | CUSTOMER (自己) | HQ  | 裝飾器                                |
+| ------------ | ------ | --------------- | --------------- | --- | ------------------------------------- |
+| id           | ✅     | ✅              | ✅              | ✅  | -                                     |
+| name         | ✅     | ✅              | ✅              | ✅  | -                                     |
+| email        | ❌     | ❌              | ✅              | ✅  | @SensitiveField() + @SelfAccessible() |
+| phone        | ❌     | ❌              | ✅              | ✅  | @SensitiveField() + @SelfAccessible() |
+| address      | ❌     | ❌              | ✅              | ✅  | @SensitiveField() + @SelfAccessible() |
+| lastLoginAt  | ❌     | ❌              | ✅              | ✅  | @SensitiveField() + @SelfAccessible() |
+| deletedAt    | ❌     | ❌              | ❌              | ✅  | @HQOnly()                             |
+| password     | ❌     | ❌              | ❌              | ❌  | 永不暴露                              |
+| refreshToken | ❌     | ❌              | ❌              | ❌  | 永不暴露                              |
 
 ---
 
@@ -471,10 +471,10 @@ pnpm --filter backend test -- field-auth.plugin.spec.ts
 **測試場景**：
 
 - ✅ 永不暴露欄位（password, refreshToken）
-- ✅ Admin 權限（可見所有欄位）
+- ✅ HQ 權限（可見所有欄位）
 - ✅ Customer 自己的敏感欄位（@SelfAccessible）
 - ✅ Customer 不能看到別人的敏感欄位
-- ✅ Customer 不能看到 Admin-only 欄位
+- ✅ Customer 不能看到 HQ-only 欄位
 - ✅ Public 用戶權限
 - ✅ 嵌套物件過濾
 - ✅ 陣列中的多個物件

@@ -3,22 +3,22 @@
 model Permission {
   /// 權限唯一識別碼（UUID v7）
   id          String      @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
-  
-  /// 權限名稱（格式：resource:action，例如：users:create, projects:edit）
+
+  /// 權限名稱（格式：resource:action，例如：users:create, proposals:update）
   name        String
-  
-  /// 資源名稱（例如：users, projects, billing, audit-logs）
+
+  /// 資源名稱（例如：users, proposals, departments, audit-logs）
   resource    String
-  
+
   /// 動作名稱（例如：create, read, update, delete, list, manage, export）
   action      String
-  
-  /// 此權限所屬的訪問範圍（ADMIN_SCOPE, CUSTOMER_SCOPE, PUBLIC_SCOPE）
+
+  /// 此權限所屬的訪問範圍（HQ_SCOPE, CUSTOMER_SCOPE, PUBLIC_SCOPE）
   scope       AccessScope
-  
+
   /// 權限說明描述
   description String?     @db.Text
-  
+
   /// 記錄建立時間
   createdAt   DateTime    @default(now()) @map("created_at")
 
@@ -27,7 +27,7 @@ model Permission {
   rolePermissions RolePermission[]
 
   // === 索引和約束 ===
-  /// 同一個權限名稱可在不同 scope 存在（例如：ADMIN_SCOPE 的 users:read 和 CUSTOMER_SCOPE 的 users:read）
+  /// 同一個權限名稱可在不同 scope 存在（例如：HQ_SCOPE 的 users:read 和 CUSTOMER_SCOPE 的 users:read）
   @@unique([name, scope], name: "name_scope")
   @@index([resource, action])
   @@index([scope])

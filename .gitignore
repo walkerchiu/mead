@@ -24,6 +24,9 @@ storybook-static/
 .env.docker
 !.env.docker.example
 
+# SeaweedFS generated config (generated from infra/seaweedfs/s3.json.template)
+infra/seaweedfs/s3.json
+
 # IDE
 .idea/
 .vscode/
@@ -40,7 +43,7 @@ Thumbs.db
 
 # Logs
 logs/
-!**/admin/logs/
+!**/hq/logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -57,3 +60,12 @@ temp/
 
 # Database backups
 backups/
+
+# Uploaded files (應使用外部儲存如 S3/SeaweedFS)
+apps/backend/uploads/*
+!apps/backend/uploads/README.md
+
+# Python（scripts/check-drift.py 執行產物）
+__pycache__/
+*.pyc
+*.pyo

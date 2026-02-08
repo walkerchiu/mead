@@ -9,8 +9,10 @@ import { ConfigService } from '@nestjs/config';
 import { I18nService } from 'nestjs-i18n';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
-import { assertPasswordStrength } from '../common/utils/password-validator';
+import { assertPasswordStrengthAsync } from '../common/utils/password-validator';
 import { logger } from '../common/services/logger.service';
+import { NotificationService } from '../notification/notification.service';
+import { RevokedMethod } from './hq-session.types';
 
 @Injectable()
 export class PasswordResetService {
@@ -22,6 +24,7 @@ export class PasswordResetService {
   constructor(
     private prisma: PrismaService,
     private mailService: MailService,
+    private notificationService: NotificationService,
     private config: ConfigService,
     private i18n: I18nService,
   ) {
@@ -29,10 +32,10 @@ export class PasswordResetService {
     this.EXPIRE_MINUTES = parseInt(
       this.config.get('PASSWORD_RESET_EXPIRE_MINUTES', '15'),
     );
-    this.RESET_URL = this.config.get(
-      'PASSWORD_RESET_URL',
-      'http://localhost:3000/reset-password',
-    );
+    // PASSWORD_RESET_URL 優先，否則從 APP_URL 推導
+    this.RESET_URL =
+      this.config.get('PASSWORD_RESET_URL') ||
+      `${this.config.get('APP_URL', 'http://localhost:3000')}/reset-password`;
   }
 
   /**
@@ -143,13 +146,29 @@ export class PasswordResetService {
       );
     }
 
-    // 驗證新密碼強度（包含相似度檢查）
-    assertPasswordStrength(newPassword, lang, this.i18n, {
-      email: user.email,
-      name: user.name || undefined,
+    // 查詢最近 3 組密碼歷史記錄（用於檢查密碼重複使用）
+    const passwordHistories = await this.prisma.passwordHistory.findMany({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      select: { passwordHash: true },
     });
 
-    // 檢查新密碼是否與舊密碼相同
+    // 驗證新密碼強度（包含相似度檢查和密碼歷史檢查）
+    await assertPasswordStrengthAsync(
+      newPassword,
+      lang,
+      this.i18n,
+      {
+        email: user.email,
+        name: user.name || undefined,
+      },
+      {
+        passwordHashes: passwordHistories.map((h) => h.passwordHash),
+      },
+    );
+
+    // 檢查新密碼是否與當前密碼相同
     const isSamePassword = await bcrypt.compare(newPassword, user.password);
     if (isSamePassword) {
       throw new BadRequestException(
@@ -162,24 +181,63 @@ export class PasswordResetService {
 
     // 開始事務
     await this.prisma.$transaction(async (tx) => {
-      // 更新密碼
+      // 1. 將當前密碼儲存到歷史記錄
+      await tx.passwordHistory.create({
+        data: {
+          userId: user.id,
+          passwordHash: user.password,
+        },
+      });
+
+      // 2. 更新密碼
       await tx.user.update({
         where: { id: user.id },
         data: {
           password: hashedPassword,
-          refreshToken: null, // 清除 refresh token，強制重新登入
           updatedAt: new Date(),
         },
       });
 
-      // 標記 token 為已使用
+      // 3. 只保留最近 3 組密碼歷史記錄（刪除更舊的記錄）
+      const allHistories = await tx.passwordHistory.findMany({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+
+      if (allHistories.length > 3) {
+        const idsToKeep = allHistories.slice(0, 3).map((h) => h.id);
+        await tx.passwordHistory.deleteMany({
+          where: {
+            userId: user.id,
+            id: {
+              notIn: idsToKeep,
+            },
+          },
+        });
+      }
+
+      // 4. 標記 token 為已使用
       await tx.passwordReset.update({
         where: { id: resetRequest.id },
         data: { usedAt: new Date() },
       });
+
+      // 5. 撤銷所有 sessions，強制重新登入（改用 Session 表）
+      await tx.session.updateMany({
+        where: {
+          userId: user.id,
+          revokedAt: null,
+        },
+        data: {
+          revokedAt: new Date(),
+          revokedMethod: RevokedMethod.SECURITY_MEASURE,
+          revokedReason: 'Password reset - all sessions revoked for security',
+        },
+      });
     });
 
-    // 發送密碼變更通知
+    // 發送密碼變更通知（email + 系統通知）
     try {
       await this.mailService.sendPasswordChangedEmail(
         user.email,
@@ -188,7 +246,27 @@ export class PasswordResetService {
         lang,
       );
     } catch (error) {
-      logger.error('[PasswordReset] Failed to send notification:', error);
+      logger.error('[PasswordReset] Failed to send email notification:', error);
+    }
+
+    if (
+      this.config.get<string>('PUSH_NOTIFY_PASSWORD_CHANGED', 'true') !==
+      'false'
+    ) {
+      try {
+        await this.notificationService.createLocalizedNotification(
+          user.id,
+          'INFO',
+          'PASSWORD_CHANGED_RESET',
+          [],
+          { event: 'PASSWORD_CHANGED', source: 'password_reset', ipAddress },
+        );
+      } catch (error) {
+        logger.error(
+          '[PasswordReset] Failed to create system notification:',
+          error,
+        );
+      }
     }
 
     return true;

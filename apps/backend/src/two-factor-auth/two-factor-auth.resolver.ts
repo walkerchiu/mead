@@ -24,11 +24,11 @@ export class TwoFactorAuthResolver {
   ) {}
 
   /**
-   * 查詢當前使用者的 2FA 設定
+   * 查詢當前用戶的 2FA 設定
    */
   @Query(() => TwoFactorAuthType, {
     nullable: true,
-    description: '查詢當前使用者的雙因素認證設定',
+    description: '查詢當前用戶的雙因素認證設定',
   })
   @UseGuards(JwtAuthGuard)
   async my2FASettings(

@@ -8,6 +8,19 @@
   "profileUpdated": {
     "subject": "Your profile has been updated"
   },
+  "accountLocked": {
+    "subject": "Account temporarily locked"
+  },
+  "sessionRevoked": {
+    "subject": "Your session has been terminated"
+  },
+  "batchSessionsRevoked": {
+    "subject": "{count} of your sessions have been terminated"
+  },
+  "pat": {
+    "created": "A new personal access token has been created",
+    "revoked": "Your personal access token has been revoked"
+  },
   "twoFactorCode": {
     "login": "Login verification code",
     "enable": "Enable two-factor authentication verification code",

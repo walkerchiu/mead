@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { DataTable, type DataTableColumn } from './DataTable';
 import { Badge } from '@/components/atoms';
@@ -20,7 +20,7 @@ import Chip from '@mui/material/Chip';
  *
  * ## Use Cases
  * - Data list display
- * - Admin backend tables
+ * - HQ backend tables
  * - Complex data query interfaces
  */
 const meta = {
@@ -126,6 +126,30 @@ export const Basic: Story = {
 };
 
 /**
+ * loadingStatus
+ * Display loading indicator
+ */
+export const Loading: Story = {
+  args: {
+    columns: basicColumns,
+    data: sampleUsers,
+    loading: true,
+  },
+};
+
+/**
+ * empty dataStatus
+ * Display when no data
+ */
+export const Empty: Story = {
+  args: {
+    columns: basicColumns,
+    data: [],
+    emptyText: 'No user data available',
+  },
+};
+
+/**
  * Sortable table
  * Click column header to sort
  */
@@ -161,6 +185,117 @@ export const Filterable: Story = {
       },
     ],
     data: sampleUsers,
+  },
+};
+
+/**
+ * Selectable table
+ * Supports multi-select rows
+ */
+export const Selectable: Story = {
+  render: function SelectableTable() {
+    const [selected, setSelected] = useState<string[]>([]);
+
+    return (
+      <Box>
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          Selected: {selected.length} rows
+        </Typography>
+        <DataTable
+          columns={[
+            { id: 'name', label: 'Name', sortable: true },
+            { id: 'email', label: 'Email' },
+            { id: 'age', label: 'Age', align: 'center', sortable: true },
+            { id: 'role', label: 'Role' },
+            { id: 'department', label: 'Department' },
+          ]}
+          data={sampleUsers}
+          selectable
+          selectedRows={selected}
+          onSelectionChange={setSelected}
+        />
+      </Box>
+    );
+  },
+};
+
+/**
+ * Expandable table
+ * Click expand button to show details
+ */
+export const Expandable: Story = {
+  args: {
+    columns: [
+      { id: 'name', label: 'Name', sortable: true },
+      { id: 'email', label: 'Email' },
+      { id: 'role', label: 'Role' },
+      {
+        id: 'status',
+        label: 'Status',
+        render: (value: 'active' | 'inactive' | 'pending') => {
+          const colorMap = {
+            active: 'success' as const,
+            inactive: 'default' as const,
+            pending: 'warning' as const,
+          };
+          const labelMap = {
+            active: 'Active',
+            inactive: 'Inactive',
+            pending: 'Pending',
+          };
+          return (
+            <Badge color={colorMap[value]} size="small">
+              {labelMap[value]}
+            </Badge>
+          );
+        },
+      },
+    ],
+    data: sampleUsers,
+    expandable: true,
+    renderExpandedRow: (row: User) => (
+      <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+        <Typography variant="h6" gutterBottom>
+          Details
+        </Typography>
+        <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 1 }}>
+          <Typography color="text.secondary">Department：</Typography>
+          <Typography>{row.department}</Typography>
+          <Typography color="text.secondary">Hire Date：</Typography>
+          <Typography>{row.joinDate}</Typography>
+          <Typography color="text.secondary">Age：</Typography>
+          <Typography>{row.age} years old</Typography>
+          <Typography color="text.secondary">Email：</Typography>
+          <Typography>{row.email}</Typography>
+        </Box>
+      </Box>
+    ),
+  },
+};
+
+/**
+ * Paginated table
+ * Display pagination controls
+ */
+export const WithPagination: Story = {
+  render: function PaginatedTable() {
+    const [page, setPage] = useState(1);
+
+    return (
+      <DataTable
+        columns={[
+          { id: 'name', label: 'Name', sortable: true },
+          { id: 'email', label: 'Email' },
+          { id: 'role', label: 'Role' },
+          { id: 'department', label: 'Department' },
+        ]}
+        data={sampleUsers}
+        pagination
+        page={page}
+        totalPages={3}
+        onPageChange={setPage}
+      />
+    );
   },
 };
 
@@ -247,141 +382,6 @@ export const HighlightRows: Story = {
 };
 
 /**
- * Expandable table
- * Click expand button to show details
- */
-export const Expandable: Story = {
-  args: {
-    columns: [
-      { id: 'name', label: 'Name', sortable: true },
-      { id: 'email', label: 'Email' },
-      { id: 'role', label: 'Role' },
-      {
-        id: 'status',
-        label: 'Status',
-        render: (value: 'active' | 'inactive' | 'pending') => {
-          const colorMap = {
-            active: 'success' as const,
-            inactive: 'default' as const,
-            pending: 'warning' as const,
-          };
-          const labelMap = {
-            active: 'Active',
-            inactive: 'Inactive',
-            pending: 'Pending',
-          };
-          return (
-            <Badge color={colorMap[value]} size="small">
-              {labelMap[value]}
-            </Badge>
-          );
-        },
-      },
-    ],
-    data: sampleUsers,
-    expandable: true,
-    renderExpandedRow: (row: User) => (
-      <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-        <Typography variant="h6" gutterBottom>
-          Details
-        </Typography>
-        <Box sx={{ display: 'grid', gridTemplateColumns: '150px 1fr', gap: 1 }}>
-          <Typography color="text.secondary">Department：</Typography>
-          <Typography>{row.department}</Typography>
-          <Typography color="text.secondary">Hire Date：</Typography>
-          <Typography>{row.joinDate}</Typography>
-          <Typography color="text.secondary">Age：</Typography>
-          <Typography>{row.age} years old</Typography>
-          <Typography color="text.secondary">Email：</Typography>
-          <Typography>{row.email}</Typography>
-        </Box>
-      </Box>
-    ),
-  },
-};
-
-/**
- * Selectable table
- * Supports multi-select rows
- */
-export const Selectable: Story = {
-  render: function SelectableTable() {
-    const [selected, setSelected] = useState<string[]>([]);
-
-    return (
-      <Box>
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          Selected: {selected.length} rows
-        </Typography>
-        <DataTable
-          columns={[
-            { id: 'name', label: 'Name', sortable: true },
-            { id: 'email', label: 'Email' },
-            { id: 'age', label: 'Age', align: 'center', sortable: true },
-            { id: 'role', label: 'Role' },
-            { id: 'department', label: 'Department' },
-          ]}
-          data={sampleUsers}
-          selectable
-          selectedRows={selected}
-          onSelectionChange={setSelected}
-        />
-      </Box>
-    );
-  },
-};
-
-/**
- * Paginated table
- * Display pagination controls
- */
-export const WithPagination: Story = {
-  render: function PaginatedTable() {
-    const [page, setPage] = useState(1);
-
-    return (
-      <DataTable
-        columns={[
-          { id: 'name', label: 'Name', sortable: true },
-          { id: 'email', label: 'Email' },
-          { id: 'role', label: 'Role' },
-          { id: 'department', label: 'Department' },
-        ]}
-        data={sampleUsers}
-        pagination
-        page={page}
-        totalPages={3}
-        onPageChange={setPage}
-      />
-    );
-  },
-};
-
-/**
- * loadingStatus
- * Display loading indicator
- */
-export const Loading: Story = {
-  args: {
-    columns: basicColumns,
-    data: sampleUsers,
-    loading: true,
-  },
-};
-
-/**
- * empty dataStatus
- * Display when no data
- */
-export const Empty: Story = {
-  args: {
-    columns: basicColumns,
-    data: [],
-    emptyText: 'No user data available',
-  },
-};
-
-/**
  * Fixed header
  * Header fixed at top when scrolling
  */
@@ -423,95 +423,111 @@ export const ExpandIconDown: Story = {
 };
 
 /**
- * Full feature showcase
- * Showcase all features simultaneously
+ * WithNewRowAnimation - Demonstrates animated highlighting for newly inserted rows
+ * Simulates real-time data updates (like WebSocket subscriptions)
  */
-export const FullFeatures: Story = {
-  render: function FullFeaturesTable() {
-    const [selected, setSelected] = useState<string[]>([]);
-    const [page, setPage] = useState(1);
+export const WithNewRowAnimation: Story = {
+  render: () => {
+    const [data, setData] = useState(sampleUsers.slice(0, 5));
+    const [highlightedIds, setHighlightedIds] = useState<Set<string>>(
+      new Set(),
+    );
+    const [nextId, setNextId] = useState(6);
+
+    const handleAddNewRow = () => {
+      const newUser: User = {
+        id: String(nextId),
+        name: `New User ${nextId}`,
+        email: `user${nextId}@example.com`,
+        age: 25 + (nextId % 10),
+        role: 'Engineer',
+        status: 'active',
+        department: 'Engineering',
+        joinDate: new Date().toISOString().split('T')[0],
+      };
+
+      // Insert new row at the top
+      setData((prev) => [newUser, ...prev]);
+
+      // Highlight the new row
+      setHighlightedIds(new Set([newUser.id]));
+
+      // Clear highlight after 5 seconds
+      setTimeout(() => {
+        setHighlightedIds(new Set());
+      }, 5000);
+
+      setNextId(nextId + 1);
+    };
+
+    const columns: DataTableColumn<User>[] = [
+      {
+        id: 'name',
+        label: 'Name',
+        sortable: true,
+      },
+      {
+        id: 'email',
+        label: 'Email',
+        sortable: true,
+      },
+      {
+        id: 'role',
+        label: 'Role',
+        sortable: true,
+      },
+      {
+        id: 'status',
+        label: 'Status',
+        render: (_, row) => {
+          const colorMap = {
+            active: 'success' as const,
+            inactive: 'error' as const,
+            pending: 'warning' as const,
+          };
+          const labelMap = {
+            active: 'Active',
+            inactive: 'Inactive',
+            pending: 'Pending',
+          };
+          return (
+            <Badge color={colorMap[row.status]} variant="filled">
+              {labelMap[row.status]}
+            </Badge>
+          );
+        },
+      },
+    ];
 
     return (
-      <Box>
-        <Typography variant="body2" sx={{ mb: 2 }}>
-          Selected: {selected.length} rows | Current page：{page}
-        </Typography>
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ mb: 2 }}>
+          <button
+            onClick={handleAddNewRow}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#1976d2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: 500,
+            }}
+          >
+            Simulate New Row (WebSocket)
+          </button>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Click to simulate real-time data insertion with slide-in and pulse
+            animation (5s duration)
+          </Typography>
+        </Box>
         <DataTable
-          columns={[
-            { id: 'name', label: 'Name', sortable: true, filterable: true },
-            {
-              id: 'email',
-              label: 'Email',
-              sortable: true,
-              filterable: true,
-            },
-            {
-              id: 'age',
-              label: 'Age',
-              align: 'center',
-              sortable: true,
-              render: (value) => (
-                <Chip label={`${value} years old`} size="small" />
-              ),
-            },
-            { id: 'role', label: 'Role', sortable: true, filterable: true },
-            {
-              id: 'status',
-              label: 'Status',
-              render: (value: 'active' | 'inactive' | 'pending') => {
-                const colorMap = {
-                  active: 'success' as const,
-                  inactive: 'default' as const,
-                  pending: 'warning' as const,
-                };
-                const labelMap = {
-                  active: 'Active',
-                  inactive: 'Inactive',
-                  pending: 'Pending',
-                };
-                return (
-                  <Badge color={colorMap[value]} size="small">
-                    {labelMap[value]}
-                  </Badge>
-                );
-              },
-            },
-          ]}
-          data={sampleUsers}
-          selectable
-          selectedRows={selected}
-          onSelectionChange={setSelected}
-          expandable
-          renderExpandedRow={(row: User) => (
-            <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Details
-              </Typography>
-              <Box
-                sx={{
-                  display: 'grid',
-                  gridTemplateColumns: '120px 1fr',
-                  gap: 1,
-                }}
-              >
-                <Typography variant="body2" color="text.secondary">
-                  Department：
-                </Typography>
-                <Typography variant="body2">{row.department}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Hire Date：
-                </Typography>
-                <Typography variant="body2">{row.joinDate}</Typography>
-              </Box>
-            </Box>
-          )}
-          highlightRow={(row) => row.status === 'pending'}
-          highlightColor="rgba(255, 152, 0, 0.08)"
-          pagination
-          page={page}
-          totalPages={2}
-          onPageChange={setPage}
-          maxHeight={500}
+          columns={columns}
+          data={data}
+          highlightRow={(row) => highlightedIds.has(row.id)}
+          highlightColor="rgba(76, 175, 80, 0.1)"
+          animateHighlight={true}
         />
       </Box>
     );

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - port 命令
+# NPT CLI - port 命令
 # Port 管理工具
 # ==========================================
 
@@ -15,8 +15,8 @@ source "$SCRIPT_DIR/../utils/common.sh"
 
 # 服務使用的 Port（平行陣列，相容 bash 3.x）
 # 按 Port 號碼由小到大排序
-PROJECT_PORTS=(1025 3000 4000 5432 5555 5672 6006 6379 8025 15672)
-PORT_NAMES=("Mailpit (SMTP)" "Frontend (Next.js)" "Backend (NestJS)" "PostgreSQL/TimescaleDB" "Prisma Studio" "RabbitMQ (AMQP)" "Storybook" "Dragonfly (Redis)" "Mailpit (Web UI)" "RabbitMQ Management")
+PROJECT_PORTS=(1025 3000 4000 5432 5555 5672 6006 6379 8025 8080 8333 8888 9333 15672 18080 18888 19333)
+PORT_NAMES=("Mailpit (SMTP)" "Frontend (Next.js)" "Backend (NestJS)" "PostgreSQL/TimescaleDB" "Prisma Studio" "RabbitMQ (AMQP)" "Storybook" "Dragonfly (Redis)" "Mailpit (Web UI)" "SeaweedFS Volume" "SeaweedFS S3" "SeaweedFS Filer" "SeaweedFS Master" "RabbitMQ Management" "SeaweedFS Volume gRPC" "SeaweedFS Filer gRPC" "SeaweedFS Master gRPC")
 
 # 根據索引取得服務名稱
 get_service_name() {

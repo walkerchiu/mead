@@ -21,7 +21,12 @@ import {
   TwoFactorLoginResponse,
   VerifyTwoFactorInput,
 } from './auth.types';
-import { setRefreshTokenCookie, clearRefreshTokenCookie } from './cookie.utils';
+import {
+  setAccessTokenCookie,
+  setRefreshTokenCookie,
+  clearAccessTokenCookie,
+  clearRefreshTokenCookie,
+} from './cookie.utils';
 import {
   PasswordResetResponse,
   VerifyTokenResponse,
@@ -57,14 +62,14 @@ export class AuthResolver {
 
   /**
    * 註冊客戶用戶
-   * 需要 CUSTOMER_SCOPE 或 ADMIN_SCOPE
+   * 需要 CUSTOMER_SCOPE 或 HQ_SCOPE
    */
   @Mutation(() => AuthResponse, {
     description:
-      '註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 ADMIN_SCOPE 權限，用於邀請制註冊）',
+      '註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 HQ_SCOPE 權限，用於邀請制註冊）',
   })
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @RequiresAnyScope([AccessScope.CUSTOMER_SCOPE, AccessScope.ADMIN_SCOPE])
+  @RequiresAnyScope([AccessScope.CUSTOMER_SCOPE, AccessScope.HQ_SCOPE])
   async registerCustomer(
     @Args('email', { description: '電子郵件地址（必須唯一）' })
     email: string,
@@ -72,7 +77,7 @@ export class AuthResolver {
       description: '密碼（至少 8 字符，包含大小寫字母和數字）',
     })
     password: string,
-    @Args('name', { nullable: true, description: '使用者顯示名稱（選填）' })
+    @Args('name', { nullable: true, description: '用戶顯示名稱（選填）' })
     name: string | undefined,
     @I18nLang() lang: string,
     @Context() context: GraphQLContextWithExpress,
@@ -101,46 +106,46 @@ export class AuthResolver {
       );
     }
 
+    // 設置 access token 和 refresh token cookies
+    setAccessTokenCookie(context.res, authResponse.accessToken);
     setRefreshTokenCookie(context.res, refreshToken);
     return authResponse;
   }
 
   /**
    * 註冊管理員用戶
-   * 只有 ADMIN_SCOPE 可以調用
+   * 只有 HQ_SCOPE 可以調用
    */
   @Mutation(() => AuthResponse, {
-    description:
-      '註冊新的管理員用戶（僅限 ADMIN_SCOPE 權限，用於建立管理團隊）',
+    description: '註冊新的管理員用戶（僅限 HQ_SCOPE 權限，用於建立管理團隊）',
   })
   @UseGuards(JwtAuthGuard, PermissionGuard)
-  @RequiresAnyScope([AccessScope.ADMIN_SCOPE])
-  async registerAdmin(
+  @RequiresAnyScope([AccessScope.HQ_SCOPE])
+  async registerHQ(
     @Args('email', { description: '電子郵件地址（必須唯一）' })
     email: string,
     @Args('password', {
       description: '密碼（至少 8 字符，包含大小寫字母和數字）',
     })
     password: string,
-    @Args('name', { nullable: true, description: '使用者顯示名稱（選填）' })
+    @Args('name', { nullable: true, description: '用戶顯示名稱（選填）' })
     name: string | undefined,
     @I18nLang() lang: string,
     @Context() context: GraphQLContextWithExpress,
   ): Promise<AuthResponse> {
-    const { refreshToken, ...authResponse } =
-      await this.authService.registerAdmin(
-        email,
-        password,
-        name,
-        context.req.headers['user-agent'],
-        context.req.ip,
-        lang,
-      );
+    const { refreshToken, ...authResponse } = await this.authService.registerHQ(
+      email,
+      password,
+      name,
+      context.req.headers['user-agent'],
+      context.req.ip,
+      lang,
+    );
 
     // 驗證 accessToken 是否存在
     if (!authResponse.accessToken) {
       logger.error(
-        '[AuthResolver] Register admin failed: accessToken is missing',
+        '[AuthResolver] Register hq failed: accessToken is missing',
         {
           email,
           hasUser: !!authResponse.user,
@@ -151,22 +156,24 @@ export class AuthResolver {
       );
     }
 
+    // 設置 access token 和 refresh token cookies
+    setAccessTokenCookie(context.res, authResponse.accessToken);
     setRefreshTokenCookie(context.res, refreshToken);
     return authResponse;
   }
 
   /**
-   * 使用者登入（可能需要 2FA）
+   * 用戶登入（可能需要 2FA）
    */
   @Mutation(() => LoginResult, {
     description:
-      '使用者登入（使用 email 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼',
+      '用戶登入（使用 email 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼',
   })
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   async login(
     @Args('email', { description: '註冊的電子郵件地址' })
     email: string,
-    @Args('password', { description: '使用者密碼' })
+    @Args('password', { description: '用戶密碼' })
     password: string,
     @Context() context: GraphQLContextWithExpress,
     @I18nLang() lang: string,
@@ -194,7 +201,8 @@ export class AuthResolver {
         );
       }
 
-      // 設置 refresh token cookie
+      // 設置 access token 和 refresh token cookies
+      setAccessTokenCookie(context.res, authResponse.accessToken);
       setRefreshTokenCookie(context.res, refreshToken);
       return authResponse;
     }
@@ -235,12 +243,14 @@ export class AuthResolver {
       );
     }
 
+    // 設置 access token 和 refresh token cookies
+    setAccessTokenCookie(context.res, authResponse.accessToken);
     setRefreshTokenCookie(context.res, refreshToken);
     return authResponse;
   }
 
   /**
-   * 刷新 Token
+   * 重新整理 Token
    */
   @Mutation(() => AuthResponse, {
     description:
@@ -266,8 +276,24 @@ export class AuthResolver {
 
     try {
       logger.debug('[AuthResolver] Calling authService.refresh');
-      const { refreshToken, ...authResponse } =
-        await this.authService.refresh(token);
+      const result = await this.authService.refresh(token);
+
+      logger.debug('[AuthResolver] Received result from authService.refresh', {
+        hasResult: !!result,
+        resultKeys: result ? Object.keys(result) : [],
+        hasAccessToken: !!(result as any)?.accessToken,
+        hasRefreshToken: !!(result as any)?.refreshToken,
+        hasUser: !!(result as any)?.user,
+      });
+
+      const { refreshToken, ...authResponse } = result;
+
+      logger.debug('[AuthResolver] After destructuring', {
+        authResponseKeys: Object.keys(authResponse),
+        hasAccessToken: !!authResponse.accessToken,
+        hasUser: !!authResponse.user,
+        accessTokenLength: authResponse.accessToken?.length,
+      });
 
       // ✅ 验证返回值
       if (!authResponse.accessToken) {
@@ -280,15 +306,26 @@ export class AuthResolver {
         );
       }
 
-      logger.debug('[AuthResolver] Setting new refresh token cookie', {
-        userId: authResponse.user?.id,
-        hasAccessToken: !!authResponse.accessToken,
-      });
+      logger.debug(
+        '[AuthResolver] Setting new access and refresh token cookies',
+        {
+          userId: authResponse.user?.id,
+          hasAccessToken: !!authResponse.accessToken,
+        },
+      );
+      setAccessTokenCookie(context.res, authResponse.accessToken);
       setRefreshTokenCookie(context.res, refreshToken);
+
+      logger.debug('[AuthResolver] Returning authResponse', {
+        authResponseKeys: Object.keys(authResponse),
+        hasAccessToken: !!authResponse.accessToken,
+        hasUser: !!authResponse.user,
+      });
 
       return authResponse;
     } catch (error) {
-      // 清除無效的 refresh token cookie
+      // 清除無效的 access 和 refresh token cookies
+      clearAccessTokenCookie(context.res);
       clearRefreshTokenCookie(context.res);
 
       logger.warn('[AuthResolver] Token refresh failed, cookie cleared', {
@@ -327,6 +364,7 @@ export class AuthResolver {
     const success = await this.authService.logout(userId, refreshToken);
 
     if (success) {
+      clearAccessTokenCookie(context.res);
       clearRefreshTokenCookie(context.res);
     }
 

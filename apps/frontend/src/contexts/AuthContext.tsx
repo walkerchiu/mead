@@ -12,7 +12,7 @@ import { setErrorTrackingUser } from '@/lib/error-user-tracking';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  isAdmin: boolean;
+  isSuperHQ: boolean;
   accessScopes: string[];
   loading: boolean;
   refreshAuth: () => Promise<void>;
@@ -22,7 +22,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperHQ, setIsSuperHQ] = useState(false);
   const [accessScopes, setAccessScopes] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       let token = getAccessToken();
 
-      // 如果没有 token，尝试刷新
+      // 如果没有 token，嘗試重新整理
       if (!token) {
         console.log('[AuthProvider] No token found, attempting refresh...');
         const refreshed = await refreshAccessToken('auth-context');
@@ -45,16 +45,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (token) {
         const payload = parseJwt(token);
         const scopes = (payload?.accessScopes as string[]) || [];
+        const roles =
+          (payload?.roles as Array<{ scope: string; roleNames: string[] }>) ||
+          [];
+        const superHQ =
+          scopes.includes('HQ_SCOPE') &&
+          roles.some((r) => r.roleNames?.includes('SUPER_HQ'));
 
         console.log('[AuthProvider] Auth check complete:', {
           isAuthenticated: true,
           scopes,
-          isAdmin: scopes.includes('ADMIN_SCOPE'),
+          isSuperHQ: superHQ,
         });
 
         setIsAuthenticated(true);
         setAccessScopes(scopes);
-        setIsAdmin(scopes.includes('ADMIN_SCOPE'));
+        setIsSuperHQ(superHQ);
 
         // Set user information for error tracking
         if (payload?.sub && payload?.email) {
@@ -68,13 +74,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('[AuthProvider] No token available');
         setIsAuthenticated(false);
         setAccessScopes([]);
-        setIsAdmin(false);
+        setIsSuperHQ(false);
       }
     } catch (error) {
       console.error('[AuthProvider] Auth check failed:', error);
       setIsAuthenticated(false);
       setAccessScopes([]);
-      setIsAdmin(false);
+      setIsSuperHQ(false);
     } finally {
       setLoading(false);
     }
@@ -88,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        isAdmin,
+        isSuperHQ,
         accessScopes,
         loading,
         refreshAuth: checkAuth,

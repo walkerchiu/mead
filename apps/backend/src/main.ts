@@ -115,7 +115,8 @@ async function bootstrap() {
   });
 
   // CORS 設定與驗證
-  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOrigin =
+    process.env.CORS_ORIGIN || process.env.APP_URL || 'http://localhost:3000';
 
   // 生產環境 CORS 安全檢查
   if (isProduction) {

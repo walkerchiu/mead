@@ -1,215 +1,365 @@
 'use client';
 
+import { useMemo, useState, useEffect } from 'react';
 import {
   Container,
-  Box,
   Typography,
+  Box,
+  Grid,
+  Stack,
   Button,
   Paper,
-  Card,
-  CardContent,
-  CardActions,
-  Grid,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Chip,
+  Skeleton,
 } from '@mui/material';
-import { useSnackbar } from 'notistack';
-import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import ProtectedRoute, { useAuthReady } from '@/components/auth/ProtectedRoute';
-import { getAccessToken, parseJwt, logout } from '@/lib/auth';
-import { useRouter } from '@/i18n/routing';
-import { MainAppBar } from '@/components/layout';
-import { AccessScope } from '@/types/auth';
+import {
+  ArrowForward as ArrowForwardIcon,
+  CheckCircleOutline as CheckCircleIcon,
+  Info as InfoIcon,
+  Warning as WarningIcon,
+  Error as ErrorIcon,
+  Devices as SessionIcon,
+  Schedule as CronIcon,
+  AdminPanelSettings as AdminIcon,
+} from '@mui/icons-material';
+import { useTranslations, useLocale } from 'next-intl';
+import { useQuery } from '@apollo/client/react';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { AppShell } from '@/components/layout';
+import { KPICard } from '@/components/molecules';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
+import { ACTIVE_SESSION_COUNT_QUERY } from '@/graphql/sessions';
+import { GET_CRON_JOB_STATISTICS } from '@/graphql/cron-jobs';
+import { GET_NOTIFICATIONS } from '@/graphql/notification';
+import { getAccessToken, parseJwt } from '@/lib/auth';
+import { AccessScope } from '@/types/auth';
 
 function DashboardContent() {
-  const router = useRouter();
-  const { enqueueSnackbar } = useSnackbar();
   const t = useTranslations('pages.dashboard');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [userFromToken, setUserFromToken] = useState<{
-    name: string;
-    email: string;
-  } | null>(null);
-  const authReady = useAuthReady();
+  const locale = useLocale();
+  const router = useRouter();
+  const { user } = useCurrentUser();
 
-  // 取得當前使用者資訊
-  const {
-    user: currentUser,
-    loading: userLoading,
-    error: userError,
-  } = useCurrentUser({ skip: !authReady });
+  const [roles, setRoles] = useState<{ isHQ: boolean }>({ isHQ: false });
 
   useEffect(() => {
-    if (!authReady) {
-      return;
-    }
-
     const token = getAccessToken();
-    if (token) {
-      const payload = parseJwt(token);
-      const scopes = payload?.accessScopes as string[] | undefined;
-      const hasAdminScope = scopes?.includes(AccessScope.ADMIN_SCOPE) || false;
-      setIsAdmin(hasAdminScope);
+    if (!token) return;
+    const payload = parseJwt(token);
+    const scopes = (payload?.accessScopes as string[]) || [];
+    const perms = (payload?.permissions as string[]) || [];
+    const hasHQScope = scopes.includes(AccessScope.HQ_SCOPE);
+    setRoles({
+      isHQ: hasHQScope && perms.includes('sessions:read_all'),
+    });
+  }, []);
 
-      // 從 token 取得基本使用者資訊作為 fallback
-      if (payload?.email) {
-        setUserFromToken({
-          name: (payload.email as string).split('@')[0], // 使用 email 前綴作為名稱
-          email: payload.email as string,
-        });
-      }
-    } else {
-      setIsAdmin(false);
-      setUserFromToken(null);
-    }
-  }, [authReady]);
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('greeting.morning');
+    if (hour < 18) return t('greeting.afternoon');
+    return t('greeting.evening');
+  }, [t]);
 
-  // 調試：顯示使用者載入狀態
-  useEffect(() => {
-    console.log('[Dashboard] authReady:', authReady);
-    console.log('[Dashboard] currentUser:', currentUser);
-    console.log('[Dashboard] userFromToken:', userFromToken);
-    console.log('[Dashboard] userLoading:', userLoading);
-    console.log('[Dashboard] userError:', userError);
-  }, [authReady, currentUser, userFromToken, userLoading, userError]);
+  const todayLabel = useMemo(() => {
+    return new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long',
+    }).format(new Date());
+  }, [locale]);
 
-  // 使用 GraphQL 查詢結果，如果失敗則使用 token 中的資訊
-  const displayUser = currentUser || userFromToken;
+  // HQ：活躍會話數
+  const { data: activeSessionData, loading: activeSessionLoading } = useQuery<{
+    activeSessionCount: number;
+  }>(ACTIVE_SESSION_COUNT_QUERY, {
+    skip: !roles.isHQ,
+    fetchPolicy: 'cache-and-network',
+  });
 
-  const handleLogout = async () => {
-    await logout();
-    enqueueSnackbar(t('loggedOut'), { variant: 'info' });
+  // HQ：Cron 統計（過去 7 天）
+  const cronStartDate = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return d.toISOString();
+  }, []);
+  const { data: cronStatsData, loading: cronStatsLoading } = useQuery<{
+    cronJobStatistics: {
+      totalExecutions: number;
+      successfulExecutions: number;
+      failedExecutions: number;
+      successRate: number;
+    };
+  }>(GET_CRON_JOB_STATISTICS, {
+    variables: { startDate: cronStartDate },
+    skip: !roles.isHQ,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  interface NotificationItem {
+    id: string;
+    type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+    title: string;
+    message: string;
+    isRead: boolean;
+    createdAt: string;
+    data?: { actionUrl?: string } | null;
+  }
+  const { data: notificationsData, loading: notificationsLoading } = useQuery<{
+    notifications: { notifications: NotificationItem[] };
+  }>(GET_NOTIFICATIONS, {
+    variables: { filter: { limit: 5, offset: 0 } },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const activeSessionCount = activeSessionData?.activeSessionCount ?? 0;
+  const cronSuccessRate = cronStatsData?.cronJobStatistics?.successRate;
+  const cronFailed = cronStatsData?.cronJobStatistics?.failedExecutions ?? 0;
+  const cronHealthy = cronFailed === 0;
+
+  return (
+    <AppShell title={t('title')}>
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Greeting */}
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ fontWeight: 700, mb: 0.5 }}
+          >
+            {greeting}
+            {user?.name ? `，${user.name}` : ''}！
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {t('greeting.today', { date: todayLabel })}
+          </Typography>
+        </Box>
+
+        {/* 近期動態 */}
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2.5,
+            border: '1px solid',
+            borderColor: 'divider',
+            borderRadius: 2,
+            mb: 2,
+          }}
+        >
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            sx={{ mb: 1.5 }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 600 }}>
+              {t('activityFeed.title')}
+            </Typography>
+            <Button
+              size="small"
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => router.push('/notifications')}
+            >
+              {t('activityFeed.viewAll')}
+            </Button>
+          </Stack>
+          <Divider sx={{ mb: 1 }} />
+          <ActivityFeedList
+            items={notificationsData?.notifications?.notifications ?? []}
+            loading={notificationsLoading}
+            locale={locale}
+            onItemClick={(item) => {
+              const url = item.data?.actionUrl || '/notifications';
+              router.push(url as never);
+            }}
+          />
+        </Paper>
+
+        {/* HQ 系統健康度（僅 HQ）*/}
+        {roles.isHQ && (
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 2,
+              p: 2.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+            }}
+          >
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ mb: 1.5 }}
+            >
+              <Stack direction="row" spacing={1} alignItems="center">
+                <AdminIcon fontSize="small" sx={{ color: 'primary.main' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  {t('systemHealth.title')}
+                </Typography>
+                <Chip
+                  label={t('systemHealth.subtitle')}
+                  size="small"
+                  variant="outlined"
+                  sx={{ height: 20, fontSize: '0.7rem' }}
+                />
+              </Stack>
+            </Stack>
+            <Divider sx={{ mb: 2 }} />
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <KPICard
+                  title={t('systemHealth.activeSessions')}
+                  value={activeSessionCount}
+                  icon={<SessionIcon />}
+                  href="/hq/sessions"
+                  loading={activeSessionLoading}
+                  accentColor="info.main"
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <KPICard
+                  title={t('systemHealth.cronHealth')}
+                  value={
+                    cronSuccessRate !== undefined
+                      ? `${Math.round(cronSuccessRate * 100) / 100}%`
+                      : '—'
+                  }
+                  icon={<CronIcon />}
+                  href="/hq/cron-jobs"
+                  loading={cronStatsLoading}
+                  accentColor={cronHealthy ? 'success.main' : 'error.main'}
+                  hint={
+                    cronHealthy
+                      ? t('systemHealth.cronHealthy')
+                      : t('systemHealth.cronHasFailures')
+                  }
+                  hintColor={cronHealthy ? 'success' : 'error'}
+                />
+              </Grid>
+            </Grid>
+          </Paper>
+        )}
+      </Container>
+    </AppShell>
+  );
+}
+
+function ActivityFeedList({
+  items,
+  loading,
+  locale,
+  onItemClick,
+}: {
+  items: Array<{
+    id: string;
+    type: 'INFO' | 'SUCCESS' | 'WARNING' | 'ERROR';
+    title: string;
+    message: string;
+    isRead: boolean;
+    createdAt: string;
+    data?: { actionUrl?: string } | null;
+  }>;
+  loading: boolean;
+  locale: string;
+  onItemClick: (item: { data?: { actionUrl?: string } | null }) => void;
+}) {
+  const t = useTranslations('pages.dashboard.activityFeed');
+
+  if (loading) {
+    return (
+      <Stack spacing={1} sx={{ py: 1 }}>
+        {[0, 1, 2, 3].map((i) => (
+          <Skeleton key={i} variant="rounded" height={48} />
+        ))}
+      </Stack>
+    );
+  }
+
+  if (items.length === 0) {
+    return (
+      <Box sx={{ py: 4, textAlign: 'center', color: 'text.secondary' }}>
+        <Typography variant="body2">{t('empty')}</Typography>
+      </Box>
+    );
+  }
+
+  const typeIconMap = {
+    SUCCESS: (
+      <CheckCircleIcon fontSize="small" sx={{ color: 'success.main' }} />
+    ),
+    WARNING: <WarningIcon fontSize="small" sx={{ color: 'warning.main' }} />,
+    ERROR: <ErrorIcon fontSize="small" sx={{ color: 'error.main' }} />,
+    INFO: <InfoIcon fontSize="small" sx={{ color: 'info.main' }} />,
   };
 
-  const handleAccountClick = () => {
-    router.push('/settings/account');
-  };
-
-  const handleProfileClick = () => {
-    router.push('/settings/profile');
-  };
-
-  const handleSecurityClick = () => {
-    router.push('/settings/security');
-  };
-
-  const handleHelpClick = () => {
-    // TODO: Navigate to help page or open help dialog
-    console.log('Help clicked');
-  };
-
-  const handleAboutClick = () => {
-    // TODO: Navigate to about page or open about dialog
-    console.log('About clicked');
+  const formatRelativeTime = (iso: string) => {
+    const diff = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d`;
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(iso));
   };
 
   return (
-    <>
-      <MainAppBar
-        logo={
-          <Box
-            sx={{
-              fontSize: '1.75rem',
-              fontWeight: 'bold',
-              color: 'white',
+    <List disablePadding>
+      {items.map((item) => (
+        <ListItemButton
+          key={item.id}
+          onClick={() => onItemClick(item)}
+          sx={{
+            borderRadius: 1,
+            px: 1.5,
+            bgcolor: item.isRead ? 'transparent' : 'action.hover',
+          }}
+        >
+          <ListItemIcon sx={{ minWidth: 36 }}>
+            {typeIconMap[item.type] || typeIconMap.INFO}
+          </ListItemIcon>
+          <ListItemText
+            primary={
+              <Stack direction="row" spacing={1} alignItems="baseline">
+                <Typography
+                  variant="body2"
+                  component="span"
+                  sx={{ fontWeight: item.isRead ? 500 : 600, flex: 1 }}
+                  noWrap
+                >
+                  {item.title}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  component="span"
+                  sx={{ color: 'text.secondary', flexShrink: 0 }}
+                >
+                  {formatRelativeTime(item.createdAt)}
+                </Typography>
+              </Stack>
+            }
+            secondary={item.message}
+            secondaryTypographyProps={{
+              variant: 'caption',
+              noWrap: true,
             }}
-          >
-            📊
-          </Box>
-        }
-        title={t('title')}
-        titleLink="/dashboard"
-        user={
-          displayUser
-            ? {
-                name: displayUser.name,
-                email: displayUser.email,
-                avatar: currentUser?.avatar, // 只有 GraphQL 查詢成功才有 avatar
-                role: isAdmin ? 'Admin' : 'User',
-                status: 'online',
-              }
-            : undefined
-        }
-        accountUrl="/settings/account"
-        profileUrl="/settings/profile"
-        securityUrl="/settings/security"
-        onAccountClick={handleAccountClick}
-        onProfileClick={handleProfileClick}
-        onSecurityClick={handleSecurityClick}
-        onLogout={handleLogout}
-        onHelpClick={handleHelpClick}
-        onAboutClick={handleAboutClick}
-        userIconMode={true}
-      />
-
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-        <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" gutterBottom>
-            {t('welcome')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary" paragraph>
-            {t('description')}
-          </Typography>
-
-          {/* 僅管理員顯示管理功能卡片 */}
-          {isAdmin && (
-            <Grid container spacing={3} sx={{ mt: 2 }}>
-              {/* Admin Audit Logs 卡片 */}
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      📊 {t('cards.auditLogs.title')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('cards.auditLogs.description')}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      color="primary"
-                      onClick={() => router.push('/admin/audit-logs')}
-                    >
-                      {t('cards.auditLogs.action')}
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-
-              {/* Admin Sessions 卡片 */}
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      🖥️ {t('cards.sessions.title')}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('cards.sessions.description')}
-                    </Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      color="primary"
-                      onClick={() => router.push('/admin/sessions')}
-                    >
-                      {t('cards.sessions.action')}
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            </Grid>
-          )}
-
-          <Box sx={{ mt: 4 }}>
-            <Button variant="outlined" onClick={() => router.push('/')}>
-              {t('backToHome')}
-            </Button>
-          </Box>
-        </Paper>
-      </Container>
-    </>
+          />
+        </ListItemButton>
+      ))}
+    </List>
   );
 }
 

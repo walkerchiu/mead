@@ -8,8 +8,8 @@ import { AccessScope } from '../enums/access-scope.enum';
  * @example
  * @Query(() => UserType)
  * @UseGuards(JwtAuthGuard)
- * @RequiresScope(AccessScope.ADMIN_SCOPE)
- * async adminUsers() { }
+ * @RequiresScope(AccessScope.HQ_SCOPE)
+ * async hqUsers() { }
  */
 export const REQUIRES_SCOPE_KEY = 'requiresScope';
 export const RequiresScope = (scope: AccessScope) =>

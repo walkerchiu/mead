@@ -1,17 +1,23 @@
 import { tones } from './tones';
 
+/**
+ * 灰階 — 基於加雲聯網企業識別灰階
+ * 100: PANTONE 428C (#dcdddd) 品牌淺灰
+ * 300: PANTONE 429C (#b5b5b6) 品牌中灰
+ * 600: PANTONE Cool Gray 11C (#595757) 品牌深灰
+ */
 export const grey = {
-  50: '#F6F7F9',
-  100: '#ECEFF2',
-  200: '#D4DAE3',
-  300: '#AFBACA',
-  400: '#8396AD',
-  500: '#637994',
-  600: '#4F617A',
-  700: '#414F63',
-  800: '#384354',
-  900: '#2A313C',
-  950: '#212630',
+  50: '#F5F5F5',
+  100: '#dcdddd', // ← PANTONE 428C
+  200: '#C4C5C5',
+  300: '#b5b5b6', // ← PANTONE 429C
+  400: '#999999',
+  500: '#797878',
+  600: '#595757', // ← PANTONE Cool Gray 11C
+  700: '#404040',
+  800: '#2A2A2A',
+  900: '#1A1A1A',
+  950: '#0D0D0D',
 } as const;
 
 const white = tones.primary[0];
@@ -19,13 +25,13 @@ const white = tones.primary[0];
 export const paletteBase = {
   primary: {
     light: tones.primary[100],
-    main: tones.primary[600],
-    dark: tones.primary[700],
+    main: tones.primary[600], // #0c3467 品牌深藍
+    dark: tones.primary[800], // #00194e 品牌深色
     contrastText: white,
   },
   secondary: {
-    light: tones.secondary[100],
-    main: tones.secondary[600],
+    light: tones.secondary[50],
+    main: tones.secondary[600], // #008ec3 品牌亮藍
     dark: tones.secondary[700],
     contrastText: white,
   },
@@ -61,18 +67,18 @@ export const paletteBase = {
   },
   grey,
   background: {
-    default: tones.primary[50],
+    default: '#F5F7FA', // 極淺冷灰白
     paper: white,
   },
-  divider: grey[200],
+  divider: grey[100], // #dcdddd 品牌淺灰
   action: {
-    active: grey[950],
+    active: tones.primary[900],
     disabled: grey[400],
-    disabledBackground: grey[100],
+    disabledBackground: grey[50],
   },
   text: {
-    primary: grey[900],
-    secondary: grey[800],
+    primary: tones.primary[900], // #001239 近黑深藍，強化品牌感
+    secondary: grey[600], // #595757 品牌深灰
     disabled: grey[400],
   },
 } as const;

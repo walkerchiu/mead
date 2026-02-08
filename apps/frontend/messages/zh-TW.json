@@ -1,30 +1,104 @@
 {
   "common": {
+    "none": "無",
     "loading": "載入中...",
     "submit": "提交",
     "cancel": "取消",
     "back": "返回",
+    "home": "首頁",
     "logout": "登出",
     "save": "儲存",
-    "confirm": "確認",
+    "saving": "儲存中",
+    "deleteSuccess": "刪除成功",
+    "confirm": {},
     "done": "完成",
     "download": "下載",
     "unknown": "未知",
+    "never": "從未",
     "all": "全部",
     "locale": "zh-TW",
-    "refresh": "刷新",
+    "refresh": "重新整理",
+    "refreshed": "已重新整理",
     "clear": "清除",
+    "clearAll": "清除全部",
+    "showingResults": "顯示 {count} 筆結果",
+    "totalResults": "共 {count} 筆",
     "close": "關閉",
     "settings": "設定",
     "processing": "處理中...",
     "previous": "上一頁",
     "next": "下一頁",
+    "copy": "複製",
+    "copied": "已複製",
+    "yes": "是",
+    "no": "否",
+    "update": "更新",
+    "reset": "重設",
+    "creating": "建立中...",
+    "updating": "更新中...",
+    "resetting": "重設中...",
+    "rowsPerPage": "每頁筆數",
     "error": {
       "loadFailed": "載入失敗",
       "permissionDenied": "權限不足",
       "permissionDeniedMessage": "抱歉，您沒有權限訪問此頁面。",
       "permissionDeniedDescription": "此頁面僅限管理員訪問。如需協助，請聯繫系統管理員。",
-      "backToHome": "返回首頁"
+      "backToHome": "返回首頁",
+      "failed": "操作失敗",
+      "createFailed": "建立失敗",
+      "updateFailed": "更新失敗",
+      "deleteFailed": "刪除失敗",
+      "restoreFailed": "恢復失敗",
+      "resetPasswordFailed": "重設密碼失敗"
+    },
+    "scrollControl": {
+      "scrollUp": "向上捲動",
+      "scrollDown": "向下捲動",
+      "scrollToTop": "回到頂部",
+      "scrollToBottom": "捲到底部"
+    },
+    "active": "啟用",
+    "inactive": "停用",
+    "edit": "編輯",
+    "delete": "刪除",
+    "create": "建立",
+    "days": "天",
+    "comingSoon": "即將推出",
+    "viewDetails": "查看詳情",
+    "success": {},
+    "passwordStrength": {
+      "label": "密碼強度",
+      "veryWeak": "非常弱",
+      "weak": "弱",
+      "medium": "中等",
+      "strong": "強",
+      "veryStrong": "非常強",
+      "requirements": "密碼必須包含",
+      "minLength": "至少 8 個字符",
+      "uppercase": "至少一個大寫字母 (A-Z)",
+      "lowercase": "至少一個小寫字母 (a-z)",
+      "number": "至少一個數字 (0-9)",
+      "specialChar": "至少一個特殊符號 (!@#$%^&* 等)"
+    },
+    "columnManager": {
+      "title": "欄位管理",
+      "reset": "重置"
+    },
+    "breadcrumb": {
+      "home": "首頁",
+      "dashboard": "Dashboard",
+      "hq": "總部管理",
+      "auditLogs": "審計日誌",
+      "users": "用戶管理",
+      "sessions": "會話管理",
+      "cronJobs": "排程任務",
+      "settings": "設定",
+      "account": "帳號設定",
+      "profile": "個人檔案",
+      "security": "安全設定",
+      "tokens": "存取權杖",
+      "notificationSettings": "通知設定",
+      "notifications": "通知中心"
     }
   },
   "nav": {
@@ -32,6 +106,14 @@
     "dashboard": "儀表板",
     "settings": "設定",
     "securitySettings": "安全設定"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "administration": "系統管理",
+    "users": "用戶管理",
+    "auditLogs": "審計日誌",
+    "sessions": "會話管理",
+    "cronJobs": "排程任務"
   },
   "auth": {
     "login": {
@@ -163,38 +245,73 @@
   },
   "pages": {
     "home": {
-      "title": "歡迎使用 Wind",
-      "subtitle": "Next.js 16 + NestJS 11 + GraphQL + MUI 7",
-      "description": "完整的認證系統：登入、密碼重設、雙因素認證",
-      "login": "登入",
-      "dashboard": "Dashboard"
+      "title": "NPT",
+      "subtitle": "New Project Template",
+      "goToDashboard": "前往 Dashboard"
     },
     "dashboard": {
-      "title": "Wind Dashboard",
+      "title": "NPT Dashboard",
       "welcome": "歡迎回來！",
       "description": "您已成功登入系統。",
       "securitySettings": "安全設定",
       "backToHome": "返回首頁",
       "loggedOut": "已登出",
+      "greeting": {
+        "morning": "早安",
+        "afternoon": "午安",
+        "evening": "晚安",
+        "today": "今天是 {date}"
+      },
+      "activityFeed": {
+        "title": "近期動態",
+        "empty": "暫無動態",
+        "viewAll": "查看全部通知"
+      },
+      "systemHealth": {
+        "title": "系統健康度",
+        "subtitle": "系統管理員專屬",
+        "activeSessions": "活躍會話",
+        "cronHealth": "Cron 健康度",
+        "cronHealthy": "全部正常",
+        "cronHasFailures": "有異常",
+        "viewDetails": "查看詳情"
+      },
       "cards": {
         "auditLogs": {
           "title": "審計日誌",
-          "description": "查看系統操作記錄、使用者活動和安全事件（需要管理員權限）",
+          "description": "查看系統操作記錄、用戶活動和安全事件（需要管理員權限）",
           "action": "查看日誌"
         },
         "sessions": {
           "title": "會話管理",
-          "description": "管理使用者登入狀態、撤銷會話和監控裝置活動（需要管理員權限）",
+          "description": "管理用戶登入狀態、撤銷會話和監控裝置活動（需要管理員權限）",
           "action": "管理會話"
+        },
+        "cronJobs": {
+          "title": "Cron Jobs 監控",
+          "description": "管理和監控系統定時任務的執行狀態、統計資料和歷史記錄（需要管理員權限）",
+          "action": "監控任務"
+        },
+        "users": {
+          "title": "用戶管理",
+          "description": "管理系統用戶帳號、權限和資料（需要管理員權限）",
+          "action": "管理用戶"
         }
       }
     },
+    "notificationCenter": {
+      "messages": {
+        "markAsReadSuccess": "已標記為已讀",
+        "markAsReadError": "無法標記通知為已讀",
+        "markAllAsReadSuccess": "所有通知已標記為已讀",
+        "markAllAsReadError": "無法標記所有通知為已讀",
+        "deleteSuccess": "已刪除通知",
+        "deleteError": "無法刪除通知",
+        "deleteReadSuccess": "已刪除所有已讀通知",
+        "deleteReadError": "無法刪除已讀通知"
+      }
+    },
     "settings": {
-      "navigation": {
-        "account": "帳號設定",
-        "profile": "個人資料",
-        "security": "安全設定"
-      },
       "account": {
         "title": "帳號設定",
         "description": "管理您的帳號基本資訊",
@@ -206,7 +323,7 @@
         "updateError": "更新帳號資訊失敗"
       },
       "profile": {
-        "title": "個人資料",
+        "title": "個人資料設定",
         "description": "管理您的個人詳細資訊和偏好設定",
         "bio": "個人簡介",
         "bioHelper": "向其他人介紹您自己（最多 500 字元）",
@@ -234,12 +351,197 @@
         "revokeOtherDevices": "登出其他設備",
         "revokeOtherDevicesHelper": "修改密碼後將其他所有設備登出",
         "passwordChanged": "密碼修改成功"
+      },
+      "tokens": {
+        "title": "存取權杖",
+        "description": "管理您的個人存取權杖，用於透過 API 存取系統",
+        "listTitle": "權杖列表",
+        "createButton": "建立權杖",
+        "emptyState": "尚未建立任何存取權杖",
+        "neverUsed": "從未使用",
+        "revokeButton": "撤銷",
+        "apiUsageHint": "使用存取權杖透過 API 呼叫服務。建立權杖後，使用 Authorization: Bearer YOUR_TOKEN。",
+        "createSuccess": "權杖建立成功",
+        "createError": "建立權杖失敗",
+        "revokeSuccess": "權杖已撤銷",
+        "revokeError": "撤銷權杖失敗",
+        "status": {
+          "active": "有效",
+          "expired": "已到期",
+          "revoked": "已撤銷"
+        },
+        "scopes": {},
+        "expires": {
+          "30days": "30 天",
+          "60days": "60 天",
+          "90days": "90 天",
+          "180days": "180 天",
+          "365days": "365 天"
+        },
+        "table": {
+          "name": "名稱",
+          "token": "權杖",
+          "scopes": "授權範圍",
+          "lastUsed": "最後使用",
+          "expires": "到期時間",
+          "status": "狀態",
+          "actions": "操作"
+        },
+        "createDialog": {
+          "title": "建立個人存取權杖",
+          "nameLabel": "權杖名稱",
+          "namePlaceholder": "例如：日誌同步腳本",
+          "nameHelper": "用於識別此權杖的用途（3-100 個字元）",
+          "nameMinLength": "權杖名稱至少需要 3 個字元",
+          "nameMaxLength": "權杖名稱不能超過 100 個字元",
+          "scopesLabel": "授權範圍",
+          "scopesHelper": "選擇此權杖可存取的功能範圍",
+          "scopesRequired": "請至少選擇一個授權範圍",
+          "expiresLabel": "到期時間",
+          "submitButton": "建立"
+        },
+        "tokenDialog": {
+          "title": "權杖已建立",
+          "warning": "請立即複製此權杖！關閉此視窗後將無法再次查看。",
+          "copy": "複製",
+          "copied": "已複製！",
+          "usageExample": "使用範例：",
+          "closeButton": "我已複製，關閉"
+        },
+        "revokeDialog": {
+          "title": "撤銷權杖",
+          "message": "確定要撤銷權杖「{name}」嗎？撤銷後使用此權杖的所有 API 呼叫將立即失效。",
+          "confirmButton": "撤銷"
+        }
+      },
+      "sessions": {
+        "title": "我的會話",
+        "description": "管理您的登入會話和裝置安全",
+        "refresh": "重新整理",
+        "info": "這裡顯示您所有的登入會話。您可以撤銷其他裝置的會話以確保帳號安全。",
+        "totalSessions": "總會話數",
+        "activeSessions": "活躍會話",
+        "loadError": "載入失敗"
+      },
+      "notifications": {
+        "title": "通知設定",
+        "description": "管理您的通知偏好和接收方式",
+        "applyToAllDevices": "這些設定將套用到您的所有裝置",
+        "types": {
+          "title": "通知類型",
+          "description": "選擇您想接收的通知類型",
+          "info": {
+            "label": "一般資訊",
+            "helper": "系統公告和一般資訊通知"
+          },
+          "success": {
+            "label": "成功訊息",
+            "helper": "操作成功的確認通知"
+          },
+          "warning": {
+            "label": "警告訊息",
+            "helper": "需要注意的警告通知"
+          },
+          "error": {
+            "label": "錯誤訊息",
+            "helper": "系統錯誤和問題通知"
+          }
+        },
+        "channels": {
+          "title": "通知渠道",
+          "description": "選擇接收通知的方式",
+          "browser": {
+            "label": "瀏覽器通知",
+            "helper": "在應用程式內顯示通知"
+          },
+          "email": {
+            "label": "電子郵件",
+            "helper": "透過電子郵件接收通知"
+          },
+          "push": {
+            "label": "推送通知",
+            "helper": "在行動裝置上接收推送通知（即將推出）"
+          }
+        },
+        "advanced": {
+          "title": "進階設定",
+          "description": "更多通知選項",
+          "sound": {
+            "label": "通知音效",
+            "helper": "接收通知時播放音效"
+          },
+          "desktop": {
+            "label": "桌面通知",
+            "helper": "在桌面環境顯示通知"
+          },
+          "mobile": {
+            "label": "行動裝置通知",
+            "helper": "在行動裝置上顯示通知"
+          }
+        },
+        "saveSettings": "儲存設定",
+        "warning": "修改設定後，請記得點擊「儲存設定」按鈕以套用變更。",
+        "saveSuccess": "通知設定已成功儲存",
+        "saveErrorAbnormal": "儲存通知設定失敗：未收到正確的回應",
+        "saveErrorBackend": "儲存通知設定失敗：後端錯誤",
+        "noChanges": "沒有任何變更需要儲存",
+        "changesCancelled": "已取消變更",
+        "unauthorized": "未授權：請重新登入",
+        "loadError": "載入通知設定失敗，將使用預設值"
+      },
+      "notificationCenter": {
+        "title": "通知中心",
+        "description": "查看和管理所有通知",
+        "notificationList": "通知列表",
+        "loading": "載入通知中...",
+        "error": "載入通知失敗",
+        "retry": "重試",
+        "endOfList": "已經到底了",
+        "totalRecords": "共 {total} 筆記錄",
+        "loadedOfTotal": "已載入 {loaded} / {total} 筆",
+        "empty": {
+          "title": "沒有通知",
+          "description": "目前沒有新通知，稍後再回來查看。"
+        },
+        "actions": {
+          "markAsRead": "標記為已讀",
+          "markAllAsRead": "全部標記為已讀",
+          "clearAll": "清除所有",
+          "viewAll": "查看所有通知",
+          "refresh": "重新整理"
+        },
+        "filters": {
+          "title": "篩選條件",
+          "search": "搜尋通知",
+          "searchPlaceholder": "輸入關鍵字搜尋...",
+          "type": "類型",
+          "dateRange": "日期範圍",
+          "all": "全部",
+          "read": "已讀",
+          "unread": "未讀"
+        },
+        "types": {
+          "info": "資訊",
+          "success": "成功",
+          "warning": "警告",
+          "error": "錯誤"
+        },
+        "messages": {
+          "markAsReadSuccess": "已標記為已讀",
+          "markAsReadError": "無法標記通知為已讀",
+          "markAllAsReadSuccess": "所有通知已標記為已讀",
+          "markAllAsReadError": "無法標記所有通知為已讀",
+          "deleteSuccess": "已刪除通知",
+          "deleteError": "無法刪除通知",
+          "deleteReadSuccess": "已刪除所有已讀通知",
+          "deleteReadError": "無法刪除已讀通知"
+        }
       }
     },
-    "admin": {
+    "hq": {
       "auditLogs": {
         "title": "審計日誌",
-        "description": "查看系統操作記錄、使用者活動和安全事件",
+        "description": "查看系統操作記錄、用戶活動和安全事件",
         "refresh": "重新整理",
         "newLogs": "有 {count} 筆新日誌，點擊重新整理",
         "newLogsOnOtherPage": "第 1 頁有 {count} 筆新日誌，點擊查看",
@@ -249,8 +551,8 @@
         "loading": "載入中...",
         "filters": {
           "title": "篩選條件",
-          "userId": "使用者 ID",
-          "userIdPlaceholder": "輸入使用者 ID",
+          "userSearch": "用戶搜尋",
+          "userSearchPlaceholder": "搜尋 email、名稱或 ID...",
           "action": "操作",
           "actionPlaceholder": "輸入操作名稱（如：QUERY_SESSIONSTATISTICS）",
           "actionHelper": "支援模糊搜尋，輸入關鍵字即可",
@@ -274,14 +576,16 @@
         },
         "table": {
           "title": "稽核日誌列表",
+          "logsTable": "稽核日誌列表",
           "timestamp": "時間",
-          "user": "使用者",
+          "user": "用戶",
           "action": "操作",
           "entity": "實體",
           "status": "狀態",
           "method": "方法",
           "path": "路徑",
           "ip": "IP",
+          "ipAddress": "IP 地址",
           "duration": "執行時間",
           "success": "成功",
           "failure": "失敗",
@@ -290,14 +594,55 @@
           "page": "第 {current} 頁，共 {total} 頁",
           "firstPage": "第一頁",
           "lastPage": "最後一頁",
-          "totalRecords": "共 {count} 筆"
+          "totalRecords": "共 {total} 筆記錄",
+          "showingRecordsWithPage": "顯示 {start}-{end} / {total} 筆（第 {page} / {totalPages} 頁）",
+          "actions": "操作",
+          "viewDetails": "查看詳情"
+        },
+        "details": {
+          "title": "審計日誌詳情",
+          "loadError": "無法載入審計日誌詳情",
+          "basicInfoTab": "基本資訊",
+          "requestTab": "Request",
+          "responseTab": "Response",
+          "basicInfo": "基本資訊",
+          "techInfo": "技術資訊",
+          "errorInfo": "錯誤資訊",
+          "timestamp": "時間",
+          "user": "用戶",
+          "userId": "用戶 ID",
+          "unknown": "未知",
+          "action": "操作",
+          "entity": "實體",
+          "entityId": "實體 ID",
+          "status": "狀態",
+          "success": "成功",
+          "failure": "失敗",
+          "requestId": "Request ID",
+          "method": "HTTP 方法",
+          "path": "路徑",
+          "ipAddress": "IP 地址",
+          "userAgent": "User Agent",
+          "duration": "執行時間",
+          "copy": "複製",
+          "copied": "已複製",
+          "requestData": "Request 資料",
+          "responseData": "Response 資料",
+          "errorResponse": "錯誤回應",
+          "errorDetails": "錯誤詳情",
+          "noRequestData": "無 Request 資料",
+          "noResponseData": "無 Response 資料",
+          "exportJSON": "匯出 JSON",
+          "exportCSV": "匯出 CSV"
         }
       },
       "sessions": {
         "title": "會話管理",
-        "description": "管理使用者登入狀態、撤銷會話和監控裝置活動",
+        "description": "管理用戶登入狀態、撤銷會話和監控裝置活動",
         "sessionList": "會話列表",
         "batchRevoke": "批量撤銷會話",
+        "batchRevokeSuccess": "已成功撤銷 {count} 個會話",
+        "batchRevokeNoMatch": "沒有符合條件的會話需要撤銷",
         "stats": {
           "activeCount": "活躍會話",
           "revokedCount": "已撤銷會話",
@@ -310,6 +655,8 @@
           "title": "篩選條件",
           "userId": "用戶 ID",
           "userIdPlaceholder": "輸入用戶 ID",
+          "userSearch": "用戶搜尋",
+          "userSearchPlaceholder": "搜尋 email、名稱或 ID...",
           "status": "狀態",
           "ipAddress": "IP 地址",
           "ipAddressPlaceholder": "例如：192.168.1.1",
@@ -317,6 +664,15 @@
           "deviceInfoPlaceholder": "例如：Chrome、iPhone",
           "location": "地理位置",
           "locationPlaceholder": "例如：台灣",
+          "revokedMethod": "撤銷方式",
+          "revokedMethodHint": "已撤銷的細節",
+          "revokedMethods": {
+            "user_logout": "自己登出",
+            "hq_force": "管理員撤銷",
+            "batch_revoke": "批量撤銷",
+            "auto_expire": "自動過期",
+            "security_measure": "安全措施"
+          },
           "statuses": {
             "active": "活躍",
             "expired": "過期",
@@ -324,6 +680,7 @@
           }
         },
         "table": {
+          "sessionsTable": "會話列表",
           "user": "用戶",
           "status": "狀態",
           "device": "設備",
@@ -335,6 +692,8 @@
           "viewDetails": "查看詳情",
           "revokeSession": "撤銷會話",
           "totalCount": "共 {count} 個會話",
+          "totalRecords": "共 {total} 筆記錄",
+          "showingRecordsWithPage": "顯示 {start}-{end} / {total} 筆（第 {page} / {totalPages} 頁）",
           "noSessions": "未找到會話",
           "noSessionsDescription": "沒有符合篩選條件的會話。",
           "revokeSuccess": "會話已成功撤銷",
@@ -342,10 +701,21 @@
             "active": "活躍",
             "expired": "過期",
             "revoked": "已撤銷"
+          },
+          "revokedMethod": "撤銷方式",
+          "revokedMethods": {
+            "user_logout": "自己登出",
+            "hq_force": "管理員撤銷",
+            "hq_force_with_name": "管理員撤銷 ({name})",
+            "batch_revoke": "批量撤銷",
+            "batch_revoke_with_name": "批量撤銷 ({name})",
+            "auto_expire": "自動過期",
+            "security_measure": "安全措施"
           }
         },
         "details": {
           "title": "會話詳情",
+          "currentSession": "當前會話",
           "userInfo": "用戶資訊",
           "userName": "姓名",
           "userEmail": "電子郵件",
@@ -369,6 +739,9 @@
           "revokedMethod": "撤銷方式",
           "sessionId": "會話 ID",
           "revokeSession": "撤銷此會話",
+          "systemAutomatic": "系統（自動）",
+          "exportJSON": "匯出 JSON",
+          "exportCSV": "匯出 CSV",
           "statuses": {
             "active": "活躍",
             "expired": "過期",
@@ -392,7 +765,7 @@
           "errors": {
             "sessionNotFound": "找不到該會話，可能已被刪除",
             "sessionAlreadyRevoked": "該會話已被撤銷",
-            "cannotRevokeAdmin": "無法撤銷其他管理員的會話",
+            "cannotRevokeHQ": "無法撤銷其他管理員的會話",
             "cannotRevokeCurrent": "無法撤銷當前會話，請使用登出功能",
             "notAuthenticated": "用戶未登入",
             "ownSessionsOnly": "您只能操作自己的會話",
@@ -444,22 +817,372 @@
           "defaultReason": "用戶撤銷其他設備",
           "error": "撤銷其他設備失敗"
         }
+      },
+      "cronJobs": {
+        "title": "Cron Jobs 監控",
+        "description": "管理和監控系統定時任務的執行狀態、統計資料和歷史記錄",
+        "refresh": "重新整理",
+        "viewNewExecutions": "查看新記錄",
+        "newExecutionsAlert": "有 {count} 條新的執行記錄，點擊查看",
+        "loadError": "載入失敗",
+        "triggerSuccess": "Job 已成功觸發",
+        "triggerError": "觸發 Job 失敗",
+        "toggleSuccess": "Job 狀態已更新",
+        "toggleError": "更新 Job 狀態失敗",
+        "stats": {
+          "totalExecutions": "總執行次數",
+          "successRate": "成功率",
+          "failedExecutions": "失敗次數",
+          "averageDuration": "平均執行時長"
+        },
+        "listFilters": {
+          "title": "Job 列表篩選",
+          "category": "類別",
+          "type": "類型",
+          "all": "全部"
+        },
+        "executionFilters": {
+          "title": "執行歷史篩選",
+          "job": "Job",
+          "status": "狀態",
+          "all": "全部",
+          "statuses": {
+            "success": "成功",
+            "failed": "失敗",
+            "timeout": "超時",
+            "running": "執行中",
+            "skipped": "跳過"
+          }
+        },
+        "table": {
+          "title": "Cron Jobs 列表",
+          "jobName": "Job 名稱",
+          "category": "類別",
+          "type": "類型",
+          "schedule": "排程",
+          "lastExecution": "最後執行",
+          "status": "狀態",
+          "successRate": "成功率",
+          "consecutiveFailures": "連續失敗",
+          "enabled": "啟用",
+          "actions": "操作",
+          "viewDetails": "查看詳情",
+          "trigger": "立即執行",
+          "noJobs": "目前沒有 Cron Jobs",
+          "triggerDialog": {
+            "title": "執行 CronJob",
+            "jobName": "Job 名稱",
+            "description": "請選擇執行模式：",
+            "jobDisabledWarning": "此 Job 目前已停用，無法使用正常模式執行",
+            "normalMode": {
+              "title": "正常執行",
+              "description": "安全模式執行，會進行必要的檢查",
+              "check1": "✓ 檢查 Job 是否已啟用",
+              "check2": "✓ 檢查是否有實例正在執行"
+            },
+            "forceMode": {
+              "title": "強制執行",
+              "description": "跳過所有安全檢查，強制執行 Job",
+              "skip1": "✗ 跳過啟用狀態檢查",
+              "skip2": "✗ 跳過執行狀態檢查",
+              "warning": "⚠️ 強制執行可能導致並發執行或執行未啟用的 Job，請謹慎使用"
+            },
+            "auditLogNote": "所有執行操作都會記錄在審計日誌中，包括執行模式（force=true/false）",
+            "cancel": "取消",
+            "normalExecute": "正常執行",
+            "forceExecute": "強制執行"
+          },
+          "statuses": {
+            "success": "成功",
+            "failed": "失敗",
+            "timeout": "超時",
+            "running": "執行中",
+            "skipped": "跳過",
+            "enabled": "已啟用",
+            "disabled": "已停用"
+          }
+        },
+        "executionHistory": {
+          "title": "執行歷史",
+          "job": "Job 名稱",
+          "startTime": "開始時間",
+          "endTime": "完成時間",
+          "duration": "時長",
+          "status": "狀態",
+          "processedSuccessFailed": "處理/成功/失敗",
+          "instance": "實例",
+          "actions": "操作",
+          "viewDetails": "查看詳情",
+          "noExecutions": "沒有執行記錄",
+          "totalRecords": "共 {total} 筆記錄",
+          "showingRecordsWithPage": "顯示 {start}-{end} / {total} 筆（第 {page} / {totalPages} 頁）",
+          "showingRecords": "顯示 {showing} / {total} 筆記錄（第 {page} / {totalPages} 頁）"
+        },
+        "executionDetails": {
+          "title": "執行詳情",
+          "basicInfoTab": "基本資訊",
+          "errorDetailsTab": "錯誤詳情",
+          "executionDetailsTab": "執行詳情",
+          "basicInfo": "基本資訊",
+          "jobName": "Job 名稱",
+          "jobType": "Job 類型",
+          "duration": "執行時長",
+          "instanceId": "實例 ID",
+          "lockId": "鎖 ID",
+          "executionData": "執行數據",
+          "processedCount": "處理數量",
+          "successCount": "成功數量",
+          "errorCount": "錯誤數量",
+          "timeline": "時間軸",
+          "startedAt": "開始時間",
+          "completedAt": "完成時間",
+          "nextRunAt": "下次執行時間",
+          "errorDetails": "錯誤詳情",
+          "errorStack": "錯誤堆疊",
+          "executionDetails": "執行詳情",
+          "exportJSON": "匯出 JSON",
+          "exportCSV": "匯出 CSV"
+        },
+        "configDetails": {
+          "basicInfoTab": "基本資訊",
+          "configImpactTab": "配置與影響",
+          "statisticsTab": "執行統計",
+          "basicInfo": "基本資訊",
+          "jobName": "Job 名稱",
+          "type": "類型",
+          "category": "類別",
+          "description": "說明",
+          "schedule": "排程資訊",
+          "cronExpression": "Cron 表達式",
+          "timeZone": "時區",
+          "nextRun": "下次執行",
+          "lastExecution": "最後執行",
+          "configuration": "配置資訊",
+          "status": "狀態",
+          "enabled": "已啟用",
+          "disabled": "已停用",
+          "timeout": "超時時間",
+          "alertOnFailure": "失敗告警",
+          "failureThreshold": "失敗門檻",
+          "times": "次",
+          "statistics": "執行統計",
+          "totalExecutions": "總執行次數",
+          "successRate": "成功率",
+          "consecutiveFailures": "連續失敗次數",
+          "lastStatus": "最後狀態",
+          "lastDuration": "最後執行時長",
+          "dataRetention": "資料保留期限",
+          "deletionType": "刪除方式",
+          "exportJSON": "匯出 JSON",
+          "exportCSV": "匯出 CSV",
+          "impacts": {
+            "title": "影響範圍",
+            "softDelete": "軟刪除（標記）",
+            "hardDelete": "硬刪除（永久）",
+            "session": {
+              "title": "會話清理影響",
+              "description": "此任務會掃描並標記所有過期的用戶會話，不會實際刪除資料。",
+              "impact1": "✅ 標記過期會話為已撤銷狀態",
+              "impact2": "✅ 記錄詳細的審計日誌",
+              "impact3": "✅ 保留所有歷史記錄供追溯",
+              "retention": "永久保留（僅標記）"
+            },
+            "auditLog": {
+              "title": "審計日誌清理影響",
+              "description": "此任務會永久刪除超過 180 天的舊審計日誌，無法恢復。",
+              "impact1": "⚠️ 永久刪除 180 天以上的日誌",
+              "impact2": "⚠️ 刪除後無法恢復",
+              "impact3": "✅ 有效控制資料庫大小",
+              "retention": "180 天（6 個月）"
+            },
+            "notification": {
+              "title": "通知清理影響",
+              "description": "此任務會永久刪除已讀且超過 30 天的舊通知，未讀通知不受影響。",
+              "impact1": "⚠️ 永久刪除已讀且超過 30 天的通知",
+              "impact2": "✅ 未讀通知不會被刪除",
+              "impact3": "✅ 減少儲存空間使用",
+              "retention": "30 天（僅已讀）"
+            },
+            "default": {
+              "title": "任務影響",
+              "description": "此任務的詳細影響說明尚未配置。"
+            }
+          }
+        }
+      },
+      "users": {
+        "title": "用戶管理",
+        "description": "管理系統用戶帳號、權限和資料",
+        "createUser": "建立用戶",
+        "editUser": "編輯用戶",
+        "resetPassword": "重設密碼",
+        "createSuccess": "用戶建立成功",
+        "updateSuccess": "用戶資訊更新成功",
+        "deleteSuccess": "用戶已刪除",
+        "restoreSuccess": "用戶已恢復",
+        "resetPasswordSuccess": "密碼重設成功",
+        "noUsers": "暫無用戶",
+        "noChanges": "沒有任何變更",
+        "active": "啟用",
+        "locked": "已鎖定",
+        "permanentLock": "永久鎖定",
+        "deleted": "已刪除",
+        "lockSuccess": "用戶已鎖定",
+        "unlockSuccess": "用戶已解鎖",
+        "createUserHint": "建立新用戶帳號,預設密碼至少需要 8 個字元",
+        "editUserHint": "只需填寫要更新的欄位",
+        "resetPasswordWarning": "此操作將重設用戶密碼,建議同時撤銷所有會話以確保安全",
+        "resetPasswordFor": "重設密碼對象",
+        "table": {
+          "name": "名稱",
+          "email": "電子郵件",
+          "accessScopes": "存取範圍",
+          "lastLoginAt": "最近登入時間",
+          "roles": "角色",
+          "status": "狀態",
+          "actions": "操作"
+        },
+        "menu": {
+          "edit": "編輯",
+          "resetPassword": "重設密碼",
+          "manageRoles": "管理角色",
+          "lock": "鎖定",
+          "unlock": "解鎖",
+          "delete": "刪除",
+          "restore": "恢復"
+        },
+        "form": {
+          "email": "電子郵件",
+          "name": "名稱",
+          "password": "密碼",
+          "newPassword": "新密碼",
+          "confirmPassword": "確認密碼",
+          "passwordHint": "至少 8 個字元",
+          "revokeAllSessions": "撤銷所有會話",
+          "revokeAllSessionsHint": "重設密碼後,該用戶的所有會話將被撤銷,需要重新登入"
+        },
+        "filters": {
+          "title": "篩選條件",
+          "search": "搜尋",
+          "searchPlaceholder": "搜尋名稱或電子郵件",
+          "accessScope": "存取範圍",
+          "status": "狀態",
+          "role": "角色",
+          "accessScopes": {
+            "hq_scope": "管理員",
+            "customer_scope": "客戶",
+            "public_scope": "公開"
+          },
+          "statuses": {
+            "active": "啟用",
+            "locked": "已鎖定",
+            "deleted": "已刪除"
+          }
+        },
+        "validation": {
+          "emailRequired": "電子郵件不可為空",
+          "emailInvalid": "電子郵件格式不正確",
+          "nameRequired": "名稱不可為空",
+          "nameTooLong": "名稱長度不可超過 100 字元",
+          "passwordRequired": "密碼不可為空",
+          "passwordTooShort": "密碼長度至少需要 8 字元",
+          "confirmPasswordRequired": "請確認密碼",
+          "passwordMismatch": "密碼不一致"
+        },
+        "deleteUserTitle": "刪除用戶",
+        "deleteWarning": "此操作將軟刪除用戶帳號,可以稍後恢復。所有相關資料將保留。",
+        "targetUser": "目標用戶",
+        "unnamed": "未命名",
+        "deleteInfo": "刪除後該用戶將無法登入系統,但資料會保留並可恢復。",
+        "deleteConfirm": "確認刪除",
+        "deleteError": "刪除用戶失敗",
+        "deleteReason": "刪除原因 (選填)",
+        "deleteReasonPlaceholder": "請輸入刪除原因...",
+        "deleteReasonHelp": "記錄刪除原因有助於日後審查",
+        "manageRoles": "管理角色",
+        "currentRoles": "目前角色",
+        "noRoles": "尚未分配角色",
+        "assignRole": "分配角色",
+        "selectRole": "選擇角色",
+        "assignSuccess": "角色分配成功",
+        "revokeSuccess": "角色已撤銷",
+        "confirmRevoke": "確定要撤銷此角色嗎？",
+        "manageRolesFor": "管理角色："
       }
     }
   },
   "components": {
+    "activityDiffModal": {
+      "title": "{field} 的變更",
+      "before": "變更前",
+      "after": "變更後",
+      "empty": "（空）",
+      "fields": {
+        "title": "標題",
+        "description": "描述",
+        "content": "內容",
+        "code": "代碼",
+        "status": "狀態",
+        "type": "類型",
+        "score": "分數",
+        "name": "名稱",
+        "note": "備註"
+      }
+    },
+    "statusTransition": {
+      "confirmTitle": "確認狀態變更",
+      "feedbackLabel": "備註（選填）",
+      "cancel": "取消",
+      "confirm": "確認"
+    },
+    "fileUploader": {
+      "dragDrop": "拖放檔案到這裡，或點擊選擇檔案（最多 {max} 個）",
+      "dropHere": "放開以上傳檔案",
+      "browse": "瀏覽檔案",
+      "maxSize": "最大檔案大小：{size}",
+      "uploaded": "已上傳",
+      "filesCount": "{count} / {max} 個檔案",
+      "maxFilesError": "最多只能上傳 {max} 個檔案",
+      "fileTooLargeError": "檔案過大，最大允許 {max}",
+      "fileTypeError": "不支援的檔案類型"
+    },
+    "notification": {
+      "new": "新",
+      "justNow": "剛剛",
+      "clickToView": "點擊查看詳情",
+      "markAsRead": "標記為已讀",
+      "markedAsRead": "已標記為已讀",
+      "delete": "刪除",
+      "clearAll": "清除全部",
+      "confirmDeleteTitle": "刪除通知",
+      "confirmDelete": "確定要刪除此通知嗎？此操作無法復原。",
+      "deleteSuccess": "通知已成功刪除",
+      "deleteFailed": "刪除通知失敗",
+      "confirmMarkAllReadTitle": "全部標記為已讀",
+      "confirmMarkAllRead": "確定要將所有通知標記為已讀嗎？",
+      "confirmClearReadTitle": "清除已讀通知",
+      "confirmClearRead": "確定要刪除所有已讀通知嗎？此操作無法復原。",
+      "clearReadSuccess": "所有已讀通知已成功刪除",
+      "clearReadFailed": "刪除已讀通知失敗"
+    },
     "notificationMenu": {
       "title": "通知",
       "markAllAsRead": "全部標記為已讀",
       "viewAll": "查看全部通知",
       "clearAll": "清除",
-      "noNotifications": "暫無通知"
+      "noNotifications": "暫無通知",
+      "settings": "設定"
     },
     "userMenu": {
+      "tooltip": "用戶選單",
       "account": "帳號設定",
-      "profile": "個人資料",
+      "profile": "個人資料設定",
       "security": "安全設定",
+      "tokens": "存取權杖",
       "logout": "登出"
+    },
+    "languageSwitcher": {
+      "tooltip": "切換語言"
     },
     "settingsMenu": {
       "title": "設定",
@@ -471,6 +1194,33 @@
       },
       "help": "說明文件",
       "about": "關於"
+    },
+    "helpModal": {
+      "title": "幫助中心",
+      "quickStart": "快速開始",
+      "quickStartDescription": "歡迎使用 NPT 專案！按照以下步驟快速上手：",
+      "faq": "常見問題",
+      "commonFeatures": "常用功能",
+      "needMoreHelp": "需要更多幫助？",
+      "needMoreHelpDescription": "如果您還有其他問題或需要技術支援，歡迎聯絡我們：",
+      "email": "電子郵件",
+      "documentation": "文檔"
+    },
+    "aboutModal": {
+      "title": "關於 NPT",
+      "projectName": "NPT 專案",
+      "version": "版本",
+      "buildDate": "建置日期",
+      "projectDescription": "專案簡介",
+      "description1": "NPT 是一個現代化的全端應用程式框架，專注於提供安全、可擴展且易於維護的企業級解決方案。",
+      "description2": "本專案採用 Monorepo 架構，整合了前端、後端和資料庫層，提供完整的開發體驗。",
+      "mainFeatures": "主要功能",
+      "techStack": "技術堆疊",
+      "license": "授權資訊",
+      "licenseText": "本專案採用 MIT 授權條款發布。",
+      "copyright": "Copyright © 2024 NPT Project Contributors",
+      "contact": "聯絡資訊",
+      "author": "專案作者"
     }
   }
 }

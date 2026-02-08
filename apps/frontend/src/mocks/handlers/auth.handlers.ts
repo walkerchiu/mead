@@ -34,7 +34,7 @@ export const authHandlers = [
     // Check if user has 2FA enabled
     const user2FA =
       email === mockUsers.customerWith2FA.email ||
-      email === mockUsers.adminWith2FA.email;
+      email === mockUsers.hqWith2FA.email;
 
     if (user2FA) {
       // Return temporary token for 2FA
@@ -51,7 +51,7 @@ export const authHandlers = [
 
     // Return regular auth response
     const user =
-      email === mockUsers.admin.email ? mockUsers.admin : mockUsers.customer;
+      email === mockUsers.hq.email ? mockUsers.hq : mockUsers.customer;
 
     return HttpResponse.json({
       data: {

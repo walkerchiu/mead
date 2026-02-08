@@ -1,12 +1,28 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Card } from './Card';
 import { Box, Avatar, IconButton, Typography, Chip } from '@mui/material';
 
+/**
+ * Card 是通用卡片容器，用於展示結構化內容（title、subheader、image、content、actions）。
+ *
+ * **使用時機**：
+ * - 文章列表、產品卡、通知卡
+ * - 需要圖片 + 標題 + 內文 + 多個 action 按鈕的情境
+ *
+ * **相關元件**：
+ * - 若要展示**單一關鍵數值**（KPI、統計指標），請改用 [`<KPICard>`](/docs/molecules-kpicard--docs) — 它有專為數字設計的排版（icon 方框 + 大字號 + hint 提示），視覺重心不同。
+ */
 const meta = {
   title: 'Molecules/Card',
   component: Card,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component:
+          '通用卡片容器。若要展示單一關鍵數值（KPI），請改用 KPICard。',
+      },
+    },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof Card>;
@@ -19,6 +35,25 @@ export const Default: Story = {
     title: 'Card Title',
     content:
       'This is the content area of the card. You can place any text or components here.',
+  },
+};
+
+export const Outlined: Story = {
+  args: {
+    title: 'Outlined Card',
+    content: 'This card uses the outlined variant with no shadow effect.',
+    variant: 'outlined',
+  },
+};
+
+export const Clickable: Story = {
+  args: {
+    image: 'https://picsum.photos/400/200',
+    title: 'Clickable Card',
+    content:
+      'Hover over the card for elevation effect, click the entire card to trigger an action.',
+    clickable: true,
+    onClick: () => alert('Card clicked!'),
   },
 };
 
@@ -65,25 +100,6 @@ export const Complete: Story = {
       { label: 'Share' },
     ],
     headerAction: <IconButton aria-label="settings">⚙️</IconButton>,
-  },
-};
-
-export const Outlined: Story = {
-  args: {
-    title: 'Outlined Card',
-    content: 'This card uses the outlined variant with no shadow effect.',
-    variant: 'outlined',
-  },
-};
-
-export const Clickable: Story = {
-  args: {
-    image: 'https://picsum.photos/400/200',
-    title: 'Clickable Card',
-    content:
-      'Hover over the card for elevation effect, click the entire card to trigger an action.',
-    clickable: true,
-    onClick: () => alert('Card clicked!'),
   },
 };
 
@@ -208,29 +224,6 @@ export const UserProfileCard: Story = {
   ),
 };
 
-export const Grid: Story = {
-  render: () => (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: 2,
-        maxWidth: 1000,
-      }}
-    >
-      {[1, 2, 3, 4, 5, 6].map((i) => (
-        <Card
-          key={i}
-          image={`https://picsum.photos/400/300?random=${i}`}
-          title={`Card ${i}`}
-          content="This is the card content description..."
-          actions={[{ label: 'View', variant: 'text' }]}
-        />
-      ))}
-    </Box>
-  ),
-};
-
 export const NotificationCard: Story = {
   render: () => (
     <Box sx={{ width: 400 }}>
@@ -271,6 +264,29 @@ export const MediaCard: Story = {
           { label: 'Share', variant: 'text' },
         ]}
       />
+    </Box>
+  ),
+};
+
+export const Grid: Story = {
+  render: () => (
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: 2,
+        maxWidth: 1000,
+      }}
+    >
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <Card
+          key={i}
+          image={`https://picsum.photos/400/300?random=${i}`}
+          title={`Card ${i}`}
+          content="This is the card content description..."
+          actions={[{ label: 'View', variant: 'text' }]}
+        />
+      ))}
     </Box>
   ),
 };

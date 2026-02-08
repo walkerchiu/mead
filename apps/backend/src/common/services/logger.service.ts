@@ -1,6 +1,7 @@
 import { createLogger, format, transports } from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import * as path from 'path';
+import { sanitizeLog } from '../utils/log-sanitizer';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -8,10 +9,38 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // 日誌目錄
 const LOG_DIR = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
 
+// ✅ 敏感資訊過濾格式
+const sanitizeFormat = format((info) => {
+  // 過濾 message
+  if (typeof info.message === 'object') {
+    info.message = sanitizeLog(info.message);
+  }
+
+  // 過濾 metadata
+  if (info.metadata && typeof info.metadata === 'object') {
+    info.metadata = sanitizeLog(info.metadata);
+  }
+
+  // 過濾其他自定義欄位
+  const keysToSanitize = Object.keys(info).filter(
+    (key) =>
+      !['level', 'timestamp', 'message', 'service', 'label'].includes(key),
+  );
+
+  keysToSanitize.forEach((key) => {
+    if (typeof info[key] === 'object') {
+      info[key] = sanitizeLog(info[key]);
+    }
+  });
+
+  return info;
+});
+
 // 日誌格式
 const logFormat = format.combine(
   format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   format.errors({ stack: true }),
+  sanitizeFormat(), // ✅ 敏感資訊過濾（在格式化之前）
   format.metadata(),
   isProduction
     ? format.json()
@@ -32,13 +61,23 @@ const createRotateTransport = (filename: string, level: string) => {
   });
 };
 
+// 靜音情境：
+//   CLI_MODE=1（one-shot 腳本如 seed / migration）
+//   NODE_ENV=test（jest / e2e CI 下不該被 rate-limiter / SystemMonitor 等 info log 淹沒）
+// 皆升到 warn；`CLI_VERBOSE=1` 解開 CLI 情境。
+const isTest = process.env.NODE_ENV === 'test';
+const isCli = process.env.CLI_MODE === '1' && !process.env.CLI_VERBOSE;
+const isQuiet = isTest || isCli;
+
+const consoleLevel = isQuiet ? 'warn' : isDevelopment ? 'debug' : 'info';
+
 // 配置 transports
 const logTransports: (transports.ConsoleTransportInstance | DailyRotateFile)[] =
   [
     // Console output (所有環境)
     new transports.Console({
       format: logFormat,
-      level: isDevelopment ? 'debug' : 'info',
+      level: consoleLevel,
     }),
   ];
 
@@ -60,7 +99,7 @@ if (isProduction || process.env.ENABLE_FILE_LOGGING === 'true') {
 export const logger = createLogger({
   level: isProduction ? 'warn' : 'debug',
   format: logFormat,
-  defaultMeta: { service: 'wind-backend' },
+  defaultMeta: { service: 'npt-backend' },
   transports: logTransports,
   // 防止未處理的錯誤導致程序崩潰
   exitOnError: false,

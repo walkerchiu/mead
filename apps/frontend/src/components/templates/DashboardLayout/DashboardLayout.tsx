@@ -3,9 +3,10 @@
 import { ReactNode, useState } from 'react';
 import { Box, useMediaQuery, useTheme } from '@mui/material';
 import { MainAppBar } from '@/components/layout/MainAppBar';
-import { Sidebar, SidebarMenuItem } from '@/components/molecules/Sidebar';
-import { DrawerState } from '@/components/atoms/Drawer';
-import type { Notification } from '@/components/atoms';
+import { Sidebar, SidebarMenuItem } from '@/components/organisms';
+import { DrawerState } from '@/components/organisms';
+import { ScrollControl } from '@/components/molecules';
+import type { UnifiedNotification } from '@/types/notification';
 
 export interface DashboardLayoutProps {
   /**
@@ -61,7 +62,7 @@ export interface DashboardLayoutProps {
   /**
    * notification list
    */
-  notifications?: Notification[];
+  notifications?: UnifiedNotification[];
   /**
    * unread notifications count
    */
@@ -113,7 +114,7 @@ export interface DashboardLayoutProps {
   /**
    * NotificationsClick callback
    */
-  onNotificationClick?: (notification: Notification) => void;
+  onNotificationClick?: (notification: UnifiedNotification) => void;
   /**
    * mark all notifications as read
    */
@@ -126,6 +127,10 @@ export interface DashboardLayoutProps {
    * clear all notifications
    */
   onClearAllNotifications?: () => void;
+  /**
+   * notification settings callback
+   */
+  onNotificationSettingsClick?: () => void;
   /**
    * sidebar background color
    */
@@ -202,6 +207,7 @@ export function DashboardLayout({
   onMarkAllNotificationsRead,
   onViewAllNotifications,
   onClearAllNotifications,
+  onNotificationSettingsClick,
   sidebarBgColor,
   sidebarColor,
   sidebarActiveBackgroundColor,
@@ -300,6 +306,7 @@ export function DashboardLayout({
             onMarkAllNotificationsRead={onMarkAllNotificationsRead}
             onViewAllNotifications={onViewAllNotifications}
             onClearAllNotifications={onClearAllNotifications}
+            onNotificationSettingsClick={onNotificationSettingsClick}
           />
         </Box>
 
@@ -317,6 +324,17 @@ export function DashboardLayout({
           {children}
         </Box>
       </Box>
+
+      {/* Scroll Control - Fixed position scroll buttons */}
+      <ScrollControl
+        position="right-bottom"
+        showScrollUp={true}
+        showScrollDown={true}
+        showScrollToTop={true}
+        showScrollToBottom={true}
+        offset={500}
+        visibilityThreshold={300}
+      />
     </Box>
   );
 }

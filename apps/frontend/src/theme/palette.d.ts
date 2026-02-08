@@ -227,6 +227,124 @@ declare module '@mui/material/styles' {
     };
   };
 
+  type NumberFieldTokens = {
+    sizes: {
+      medium: {
+        height: number;
+        borderRadius: number;
+        paddingX: number;
+        fontSize: number;
+        unitWidth: number;
+        stepperWidth: number;
+        iconSize: number;
+      };
+      small: {
+        height: number;
+        borderRadius: number;
+        paddingX: number;
+        fontSize: number;
+        unitWidth: number;
+        stepperWidth: number;
+        iconSize: number;
+      };
+    };
+    colors: {
+      bg: string;
+      border: string;
+      hoverBorder: string;
+      focusBorder: string;
+      text: string;
+      placeholder: string;
+      unitText: string;
+      unitBg: string;
+      stepper: string;
+      disabledBg: string;
+      disabledBorder: string;
+      disabledText: string;
+      disabledStepper: string;
+    };
+  };
+
+  type SelectTokens = {
+    sizes: {
+      large: TextFieldSizeTokens;
+      medium: TextFieldSizeTokens;
+      small: TextFieldSizeTokens;
+    };
+    colors: {
+      bg: string;
+      hoverBg: string;
+      focusBg: string;
+      border: string;
+      hoverBorder: string;
+      focusBorder: string;
+      pressedBorder: string;
+      text: string;
+      placeholder: string;
+      label: string;
+      focusLabel: string;
+      icon: string;
+      disabledBg: string;
+      disabledBorder: string;
+      disabledText: string;
+      disabledIcon: string;
+      errorBorder: string;
+      errorLabel: string;
+      errorText: string;
+      helper: string;
+      menuBg: string;
+      menuBorder: string;
+      menuShadow: string;
+      optionText: string;
+      optionHoverBg: string;
+      optionSelectedBg: string;
+      checkColor: string;
+      checkboxBorder: string;
+      checkboxBg: string;
+      checkboxIndeterminate: string;
+    };
+  };
+
+  type SegmentedControlTokens = {
+    sizes: {
+      medium: {
+        height: number;
+        borderRadius: number;
+        paddingX: number;
+        minItemWidth: number;
+        iconSize: number;
+        iconGap: number;
+        fontSize: number;
+        fontWeight: number;
+      };
+      small: {
+        height: number;
+        borderRadius: number;
+        paddingX: number;
+        minItemWidth: number;
+        iconSize: number;
+        iconGap: number;
+        fontSize: number;
+        fontWeight: number;
+      };
+    };
+    colors: {
+      bg: string;
+      border: string;
+      text: string;
+      icon: string;
+      hoverBg: string;
+      activeBg: string;
+      activeBorder: string;
+      activeText: string;
+      activeIcon: string;
+      disabledBg: string;
+      disabledBorder: string;
+      disabledText: string;
+      disabledIcon: string;
+    };
+  };
+
   type ChipSizeTokens = {
     height: number;
     paddingX: number;
@@ -441,6 +559,7 @@ declare module '@mui/material/styles' {
     radioTokens: RadioTokens;
     textFieldTokens: TextFieldTokens;
     searchTokens: SearchTokens;
+    selectTokens: SelectTokens;
     chipTokens: ChipTokens;
   }
 
@@ -622,6 +741,7 @@ declare module '@mui/material/styles' {
     radioTokens?: RadioTokens;
     textFieldTokens?: TextFieldTokens;
     searchTokens?: SearchTokens;
+    selectTokens?: SelectTokens;
     chipTokens?: ChipTokens;
   }
 }

@@ -1,12 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 import { seedBase } from './seeds/base';
 import { seedDevelopment } from './seeds/development';
-import { seedUat } from './seeds/uat';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const env = process.env.WIND_ENV || process.env.NODE_ENV || 'development';
+  const env = process.env.NPT_ENV || process.env.NODE_ENV || 'development';
 
   console.log(`🌱 開始 Seed 資料...（環境: ${env}）`);
 
@@ -15,10 +14,8 @@ async function main() {
 
   if (env === 'production') {
     console.log('\n⚠️  Production 環境：僅載入結構性資料，跳過測試帳號');
-  } else if (env === 'uat') {
-    await seedUat(prisma);
   } else {
-    // local / development
+    // local / development / uat 共用同一組測試帳號
     await seedDevelopment(prisma);
   }
 

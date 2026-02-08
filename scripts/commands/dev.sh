@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - dev 命令
+# NPT CLI - dev 命令
 # 啟動開發環境
 # ==========================================
 
@@ -91,20 +91,20 @@ print_header "啟動開發環境"
 
 if [ "$ALL" = true ]; then
   log_info "啟動全部服務（Frontend + Backend + Storybook）..."
-  pnpm --filter @wind/frontend dev & pnpm --filter @wind/backend dev & pnpm storybook & wait
+  pnpm --filter @npt/frontend dev & pnpm --filter @npt/backend dev & pnpm storybook & wait
 elif [ "$STORYBOOK_ONLY" = true ]; then
   log_info "啟動 Storybook..."
   pnpm storybook
 elif [ "$FRONTEND_STORYBOOK" = true ]; then
   log_info "啟動前端 + Storybook..."
-  pnpm --filter @wind/frontend dev & pnpm storybook & wait
+  pnpm --filter @npt/frontend dev & pnpm storybook & wait
 elif [ "$FRONTEND_ONLY" = true ]; then
   log_info "啟動前端..."
-  pnpm --filter @wind/frontend dev
+  pnpm --filter @npt/frontend dev
 elif [ "$BACKEND_ONLY" = true ]; then
   log_info "啟動後端..."
-  pnpm --filter @wind/backend dev
+  pnpm --filter @npt/backend dev
 else
   log_info "啟動前端 + 後端..."
-  pnpm --filter @wind/frontend dev & pnpm --filter @wind/backend dev & wait
+  pnpm --filter @npt/frontend dev & pnpm --filter @npt/backend dev & wait
 fi

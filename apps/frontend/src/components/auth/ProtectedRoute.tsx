@@ -1,13 +1,15 @@
 'use client';
 
-import { DashboardSkeleton } from '@/components/atoms';
+import { TopProgressBar } from '@/components/atoms/TopProgressBar';
 import { ErrorDisplay } from '@/components/molecules';
-import { useRouter } from '@/i18n/routing';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
 import {
   getAccessToken,
   isAuthenticated,
   parseJwt,
   refreshAccessToken,
+  AUTH_INIT_COMPLETE_EVENT,
+  isAuthInitComplete,
 } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -20,55 +22,66 @@ export function useAuthReady() {
 }
 
 /**
- * Check if user has specified permissions
+ * Check if user has any of the required scopes
  */
-function hasPermission(requiredPermission: string): boolean {
+function hasAnyScope(requiredScopes: string[]): boolean {
+  if (!requiredScopes || requiredScopes.length === 0) return true;
+
   const token = getAccessToken();
   if (!token) return false;
 
   const payload = parseJwt(token);
   if (!payload) return false;
 
-  // Check access scopes（Scope level permissions, e.g., ADMIN_SCOPE）
-  const accessScopes = payload.accessScopes as string[] | undefined;
+  const accessScopes = (payload.accessScopes as string[]) || [];
+  return requiredScopes.some((scope) => accessScopes.includes(scope));
+}
 
-  // If required permission is a scope (ends with _SCOPE), check directly in accessScopes
-  if (requiredPermission.endsWith('_SCOPE')) {
-    return accessScopes?.includes(requiredPermission) || false;
-  }
+/**
+ * Check if user has any of the required permissions (using JWT permissions array)
+ */
+function hasAnyPermission(requiredPermissions: string[]): boolean {
+  if (!requiredPermissions || requiredPermissions.length === 0) return true;
 
-  // Admin has all non-scope level permissions
-  if (accessScopes?.includes('ADMIN_SCOPE')) {
+  const token = getAccessToken();
+  if (!token) return false;
+
+  const payload = parseJwt(token);
+  if (!payload) return false;
+
+  // Use permissions array from JWT payload
+  const userPermissions = (payload.permissions as string[]) || [];
+
+  // Only SUPER_HQ role bypasses all permission checks
+  const accessScopes = (payload.accessScopes as string[]) || [];
+  const roles =
+    (payload.roles as Array<{ scope: string; roleNames: string[] }>) || [];
+  const isSuperHQ =
+    accessScopes.includes('HQ_SCOPE') &&
+    roles.some((r) => r.roleNames?.includes('SUPER_HQ'));
+  if (isSuperHQ) {
     return true;
   }
 
-  // Check roles（Detailed permissions, e.g., sessions:read_all）
-  const roles = payload.roles as
-    | Array<{ scope: string; roleNames: string[] }>
-    | undefined;
-  if (!roles || !Array.isArray(roles)) return false;
+  // Check if user has any of the required permissions
+  return requiredPermissions.some((permission) =>
+    userPermissions.includes(permission),
+  );
+}
 
-  // iterate all scope permissions
-  for (const role of roles) {
-    if (
-      role.roleNames &&
-      Array.isArray(role.roleNames) &&
-      role.roleNames.includes(requiredPermission)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredPermission?: string; // Legacy support (single permission)
+  requiredPermissions?: string[]; // Array of permissions (any match)
+  requiredScopes?: string[]; // Array of scopes (any match)
 }
 
 export default function ProtectedRoute({
   children,
   requiredPermission,
-}: {
-  children: React.ReactNode;
-  requiredPermission?: string;
-}) {
+  requiredPermissions,
+  requiredScopes,
+}: ProtectedRouteProps) {
   const router = useRouter();
   const t = useTranslations('common.error');
   const [checking, setChecking] = useState(true);
@@ -83,6 +96,22 @@ export default function ProtectedRoute({
       isAuthenticated(),
     );
 
+    const checkPermissions = (): boolean => {
+      // Check scopes if required
+      if (requiredScopes && !hasAnyScope(requiredScopes)) {
+        return false;
+      }
+
+      // Check permissions if required
+      const permsToCheck =
+        requiredPermissions || (requiredPermission ? [requiredPermission] : []);
+      if (permsToCheck.length > 0 && !hasAnyPermission(permsToCheck)) {
+        return false;
+      }
+
+      return true;
+    };
+
     const check = async () => {
       try {
         // ✅ prioritize checking whether authenticated（avoid repeated calls to refreshAccessToken）
@@ -91,8 +120,8 @@ export default function ProtectedRoute({
             '[ProtectedRoute] Already authenticated, setting authReady to true',
           );
 
-          // check permissions
-          if (requiredPermission && !hasPermission(requiredPermission)) {
+          // check permissions and scopes
+          if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
             setChecking(false);
@@ -105,14 +134,38 @@ export default function ProtectedRoute({
           return;
         }
 
-        // ⚠️ no token，Wait a moment for useAuthInit initialization complete
-        // useAuthInit will automatically call initializeAuth() on application startup
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // ⚠️ no token，等待 useAuthInit 初始化完成（事件驅動，避免長時間輪詢）
+        console.log(
+          '[ProtectedRoute] Waiting for authentication to complete...',
+        );
 
-        // check again whether authenticated (useAuthInit may have already recovered session)
-        if (isAuthenticated()) {
-          // check permissions
-          if (requiredPermission && !hasPermission(requiredPermission)) {
+        const authenticated = await new Promise<boolean>((resolve) => {
+          // 若 initializeAuth 已完成（事件已觸發過），直接檢查結果
+          if (isAuthInitComplete()) {
+            console.log(
+              '[ProtectedRoute] Auth init already complete, checking result...',
+            );
+            resolve(isAuthenticated());
+            return;
+          }
+
+          const timeout = setTimeout(() => {
+            window.removeEventListener(AUTH_INIT_COMPLETE_EVENT, handler);
+            resolve(isAuthenticated());
+          }, 5000);
+
+          const handler = () => {
+            clearTimeout(timeout);
+            window.removeEventListener(AUTH_INIT_COMPLETE_EVENT, handler);
+            resolve(isAuthenticated());
+          };
+
+          window.addEventListener(AUTH_INIT_COMPLETE_EVENT, handler);
+        });
+
+        if (authenticated) {
+          // check permissions and scopes
+          if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
             setChecking(false);
@@ -122,6 +175,16 @@ export default function ProtectedRoute({
           setAuthed(true);
           setChecking(false);
           setAuthReady(true);
+          return;
+        }
+
+        // 如果 auth init 已完成且確認未登入，直接重導，不再重試 refresh
+        if (isAuthInitComplete()) {
+          console.log(
+            '[ProtectedRoute] Auth init completed but not authenticated, redirecting to login',
+          );
+          setChecking(false);
+          router.push('/login');
           return;
         }
 
@@ -132,8 +195,8 @@ export default function ProtectedRoute({
         const refreshed = await refreshAccessToken('protected-route-fallback');
 
         if (refreshed) {
-          // check permissions
-          if (requiredPermission && !hasPermission(requiredPermission)) {
+          // check permissions and scopes
+          if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));
             setIsPermissionError(true);
             setChecking(false);
@@ -154,11 +217,12 @@ export default function ProtectedRoute({
     };
 
     check();
-  }, [requiredPermission, router, t]);
+  }, [requiredPermission, requiredPermissions, requiredScopes, router, t]);
 
-  // Authentication checking - show loading screen
+  // Authentication checking — show a thin fixed top progress bar (NextTopLoader-style)
+  // so the user gets immediate feedback instead of staring at a blank page.
   if (checking) {
-    return <DashboardSkeleton />;
+    return <TopProgressBar />;
   }
 
   // Authentication error - displayError message
@@ -177,9 +241,10 @@ export default function ProtectedRoute({
     );
   }
 
-  // not authenticated - redirecting tologinPage（render nothingContent）
+  // not authenticated — redirecting to login page; keep the progress bar so
+  // the brief navigation gap doesn't flash to a fully blank screen.
   if (!authed) {
-    return <DashboardSkeleton />;
+    return <TopProgressBar />;
   }
 
   // authenticated - use Context NotificationsChildcomponent

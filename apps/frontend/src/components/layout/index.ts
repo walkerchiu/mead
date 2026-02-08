@@ -5,3 +5,4 @@
  */
 
 export { MainAppBar, type MainAppBarProps } from './MainAppBar';
+export { AppShell, type AppShellProps } from './AppShell';

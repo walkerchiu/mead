@@ -29,6 +29,13 @@ export class DistributedPubSubService implements OnModuleDestroy {
       port: redisPort,
       password: redisPassword,
       retryStrategy: (times: number) => {
+        // 限制最大重試次數為 10 次，之後返回 null 停止重試
+        if (times > 10) {
+          this.logger.warn(
+            `Distributed PubSub connection failed after ${times} attempts, stopping retries`,
+          );
+          return null; // 停止重試
+        }
         const delay = Math.min(times * 50, 2000);
         this.logger.warn(
           `Distributed PubSub connection retry attempt ${times}, delay: ${delay}ms`,
@@ -38,12 +45,27 @@ export class DistributedPubSubService implements OnModuleDestroy {
       maxRetriesPerRequest: 3,
       enableReadyCheck: true,
       showFriendlyErrorStack: true,
+      lazyConnect: true, // 延遲連接，不阻塞啟動
     };
 
     try {
+      const publisher = new Redis(options);
+      const subscriber = new Redis(options);
+
+      // 添加錯誤處理，防止未處理的錯誤導致進程崩潰
+      publisher.on('error', (err) => {
+        this.logger.warn(`Redis publisher connection error: ${err.message}`);
+        // 不拋出錯誤，讓應用繼續運行
+      });
+
+      subscriber.on('error', (err) => {
+        this.logger.warn(`Redis subscriber connection error: ${err.message}`);
+        // 不拋出錯誤，讓應用繼續運行
+      });
+
       this.pubSub = new RedisPubSub({
-        publisher: new Redis(options),
-        subscriber: new Redis(options),
+        publisher,
+        subscriber,
       });
 
       this.logger.log('✅ Distributed PubSub initialized successfully');

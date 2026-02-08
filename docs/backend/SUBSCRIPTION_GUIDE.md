@@ -2,8 +2,6 @@
 
 實時 WebSocket 訂閱功能，支援審計日誌即時推送和其他實時更新場景。
 
-**狀態**: ✅ **已實現 - 審計日誌實時訂閱 + 生產就緒**
-
 ---
 
 ## 📋 目錄
@@ -93,7 +91,7 @@ GraphQL Subscription 適用於需要**實時推送**的場景：
 
 ### 功能描述
 
-管理員可以訂閱審計日誌創建事件，實時接收新的日誌記錄，無需手動刷新頁面。
+管理員可以訂閱審計日誌創建事件，實時接收新的日誌記錄，無需手動重新整理頁面。
 
 ### 架構圖
 
@@ -146,16 +144,16 @@ export class AuditLogPubSubService {
 ```typescript
 @Subscription(() => AuditLogType, {
   name: 'auditLogCreated',
-  description: '訂閱新稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+  description: '訂閱新稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   filter: (payload, variables, context) => {
     // WebSocket context 從 extra 中取得 user
     const user = context?.extra?.user || context?.req?.user;
 
     if (!user) return false;
 
-    // 檢查 ADMIN_SCOPE
-    const hasAdminScope = user.accessScopes?.includes(AccessScope.ADMIN_SCOPE);
-    if (!hasAdminScope) return false;
+    // 檢查 HQ_SCOPE
+    const hasHQScope = user.accessScopes?.includes(AccessScope.HQ_SCOPE);
+    if (!hasHQScope) return false;
 
     // 檢查 audit-logs:read 權限
     const permissions = user.permissions || [];
@@ -345,7 +343,7 @@ filter: (payload, variables, context) => {
   if (!user) return false;
 
   // 2. 檢查 Scope
-  if (!user.accessScopes?.includes(AccessScope.ADMIN_SCOPE)) {
+  if (!user.accessScopes?.includes(AccessScope.HQ_SCOPE)) {
     return false;
   }
 
@@ -759,7 +757,7 @@ app.enableCors({
 });
 
 // 問題 3: Token 過期
-// 在 token 快過期時自動刷新
+// 在 token 快過期時自動重新整理
 useEffect(() => {
   const interval = setInterval(async () => {
     if (isTokenExpiringSoon()) {
@@ -870,9 +868,9 @@ subscriptions: {
 
 ### 相關文檔
 
-- [FIELD_AUTHORIZATION.md](./FIELD_AUTHORIZATION.md) - 字段級權限控制
-- [AUTHENTICATION.md](../authentication/AUTHENTICATION.md) - JWT 認證機制
-- [PERMISSIONS_GUIDE.md](./PERMISSIONS_GUIDE.md) - 權限系統
+- [FIELD_AUTHORIZATION.md](../authentication/FIELD_AUTHORIZATION.md) - 字段級權限控制
+- [Token 配置](../authentication/TOKEN-CONFIGURATION.md) - JWT 認證機制
+- [權限系統](../authentication/PERMISSION_SYSTEM.md) - RBAC 權限系統
 
 ---
 

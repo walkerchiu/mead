@@ -144,20 +144,20 @@ const requestId = req.headers['x-request-id'] || uuidv7();
 
 ```bash
 # 1. 安裝 UUID v7 套件
-pnpm --filter @wind/backend add uuidv7
-pnpm --filter @wind/backend remove uuid @types/uuid
+pnpm --filter @npt/backend add uuidv7
+pnpm --filter @npt/backend remove uuid @types/uuid
 
 # 2. 套用資料庫 migration
 # 使用動態容器名稱
 PG_CONTAINER=$(grep POSTGRES_CONTAINER_NAME .env.docker | cut -d'=' -f2)
-docker exec -i "$PG_CONTAINER" psql -U postgres -d wind_db < \
+docker exec -i "$PG_CONTAINER" psql -U postgres -d npt_db < \
   packages/database/prisma/migrations/enable_uuid_v7.sql
 
 # 3. 推送 schema 變更
 pnpm db:push
 
 # 4. 重建 API
-pnpm --filter @wind/backend build
+pnpm --filter @npt/backend build
 ```
 
 ---

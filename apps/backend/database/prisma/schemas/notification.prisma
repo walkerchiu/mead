@@ -1,0 +1,114 @@
+// ============================================
+// Notification Schema
+// ============================================
+
+/// Notification - 用戶通知
+/// 記錄所有發送給用戶的通知訊息
+model Notification {
+  /// 通知唯一識別碼（UUID v7）
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+
+  /// 接收通知的用戶 ID
+  userId    String   @map("user_id") @db.Uuid
+
+  /// 通知類型
+  type      NotificationType
+
+  /// 通知標題
+  title     String
+
+  /// 通知內容
+  message   String   @db.Text
+
+  /// 是否已讀
+  isRead    Boolean  @default(false) @map("is_read")
+
+  /// 額外資料（JSON 格式）
+  /// 例如：連結、操作按鈕、相關資料等
+  data      Json?
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 已讀時間
+  readAt    DateTime? @map("read_at")
+
+  /// 關聯用戶
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引（優化查詢效能）===
+  // 查詢用戶通知（過濾已讀/未讀）
+  @@index([userId, isRead, createdAt(sort: Desc)])
+
+  // 查詢用戶所有通知
+  @@index([userId, createdAt(sort: Desc)])
+
+  // 按類型過濾通知
+  @@index([userId, type, createdAt(sort: Desc)])
+
+  @@map("notifications")
+}
+
+/// 通知類型枚舉
+enum NotificationType {
+  INFO       // 一般資訊
+  WARNING    // 警告訊息
+  SUCCESS    // 成功訊息
+  ERROR      // 錯誤訊息
+}
+
+/// NotificationPreferences - 用戶通知偏好設定
+/// 儲存每個用戶的通知偏好配置
+model NotificationPreferences {
+  /// 設定唯一識別碼（UUID v7）
+  id        String   @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
+
+  /// 用戶 ID（唯一）
+  userId    String   @unique @map("user_id") @db.Uuid
+
+  // === 通知類型開關 ===
+  /// 是否啟用資訊通知
+  enableInfo    Boolean @default(true) @map("enable_info")
+
+  /// 是否啟用成功通知
+  enableSuccess Boolean @default(true) @map("enable_success")
+
+  /// 是否啟用警告通知
+  enableWarning Boolean @default(true) @map("enable_warning")
+
+  /// 是否啟用錯誤通知
+  enableError   Boolean @default(true) @map("enable_error")
+
+  // === 通知渠道開關 ===
+  /// 是否啟用瀏覽器通知（應用程式內）
+  enableBrowser Boolean @default(true) @map("enable_browser")
+
+  /// 是否啟用電子郵件通知
+  enableEmail   Boolean @default(true) @map("enable_email")
+
+  /// 是否啟用推送通知
+  enablePush    Boolean @default(false) @map("enable_push")
+
+  // === 進階設定 ===
+  /// 是否啟用通知音效
+  enableSound   Boolean @default(true) @map("enable_sound")
+
+  /// 是否啟用桌面通知
+  enableDesktop Boolean @default(true) @map("enable_desktop")
+
+  /// 是否啟用行動裝置通知
+  enableMobile  Boolean @default(true) @map("enable_mobile")
+
+  /// 建立時間
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 更新時間
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// 關聯用戶
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // === 索引 ===
+  @@index([userId])
+  @@map("notification_preferences")
+}

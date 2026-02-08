@@ -1,6 +1,6 @@
 # Email 服務配置指南 (Email Configuration)
 
-完整的 Email 服務設定，支援 SMTP 和多語系模板，可用於密碼重設和通知發送。
+完整的 Email 服務設定，支援 SMTP 和 Microsoft Graph API 雙模式，可用於密碼重設和通知發送。
 
 ---
 
@@ -10,7 +10,6 @@
   - [📋 目錄](#-目錄)
   - [📖 概述](#-概述)
     - [技術棧](#技術棧)
-    - [檔案結構](#檔案結構)
   - [🚀 快速開始](#-快速開始)
     - [1. 安裝依賴](#1-安裝依賴)
     - [2. 環境變數配置](#2-環境變數配置)
@@ -23,64 +22,40 @@
     - [1. 密碼重設 (password-reset.hbs)](#1-密碼重設-password-resethbs)
     - [2. 雙因素驗證碼 (two-factor-code.hbs)](#2-雙因素驗證碼-two-factor-codehbs)
     - [3. 密碼變更通知 (password-changed.hbs)](#3-密碼變更通知-password-changedhbs)
-  - [✨ 支援功能](#-支援功能)
-    - [Mail Service API](#mail-service-api)
-      - [1. sendPasswordResetEmail()](#1-sendpasswordresetemail)
-      - [2. sendTwoFactorCode()](#2-sendtwofactorcode)
-      - [3. sendPasswordChangedEmail()](#3-sendpasswordchangedemail)
+  - [✨ 郵件種類與觸發邏輯](#-郵件種類與觸發邏輯)
+    - [郵件總覽](#郵件總覽)
+    - [各郵件觸發時機與呼叫者](#各郵件觸發時機與呼叫者)
     - [多語系 Email](#多語系-email)
   - [🔧 開發環境](#-開發環境)
-    - [Ethereal Email 設置](#ethereal-email-設置)
-      - [1. 取得測試帳號](#1-取得測試帳號)
-      - [2. 配置 .env](#2-配置-env)
-      - [3. 查看發送的郵件](#3-查看發送的郵件)
+    - [方案一：Ethereal Email（線上測試）](#方案一ethereal-email線上測試)
+    - [方案二：Mailpit（本地測試）](#方案二mailpit本地測試)
+    - [開發環境方案比較](#開發環境方案比較)
+  - [📬 郵件發送模式](#-郵件發送模式)
+    - [SMTP 模式（預設）](#smtp-模式預設)
+    - [Graph API 模式](#graph-api-模式)
   - [🚀 生產環境](#-生產環境)
     - [推薦 SMTP 服務](#推薦-smtp-服務)
     - [配置範例（SendGrid）](#配置範例sendgrid)
     - [安全最佳實踐](#安全最佳實踐)
-      - [1. 使用專用 API Key](#1-使用專用-api-key)
-      - [2. 限制 API Key 權限](#2-限制-api-key-權限)
-      - [3. 啟用 SPF 和 DKIM](#3-啟用-spf-和-dkim)
-      - [4. 監控發送狀態](#4-監控發送狀態)
   - [🚨 疑難排解](#-疑難排解)
-    - [問題 1: 郵件無法發送](#問題-1-郵件無法發送)
-    - [問題 2: 郵件進入垃圾郵件](#問題-2-郵件進入垃圾郵件)
-    - [問題 3: 開發環境看不到郵件](#問題-3-開發環境看不到郵件)
-    - [問題 4: 模板變數未替換](#問題-4-模板變數未替換)
-    - [問題 5: 連接超時](#問題-5-連接超時)
   - [🧪 測試範例](#-測試範例)
-    - [單元測試](#單元測試)
-  - [📚 相關文檔](#-相關文檔)
+  - [📁 相關檔案](#-相關檔案)
 
 ---
 
 ## 📖 概述
 
-Wind 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 協議和 Handlebars 模板引擎。
+NPT 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 和 Microsoft Graph API 雙模式，搭配 Handlebars 模板引擎。
+
+- **MailService** — 核心服務：根據 `MAIL_PROVIDER` 自動選擇 SMTP 或 Graph API 發送
+- **GraphMailService** — Graph API 發送：使用 Microsoft OAuth2 Client Credentials Flow
 
 ### 技術棧
 
 - **框架**: @nestjs-modules/mailer
 - **模板引擎**: Handlebars (.hbs)
-- **傳輸協議**: SMTP
-- **開發測試**: Ethereal Email (虛擬 SMTP)
-
-### 檔案結構
-
-```text
-apps/backend/src/mail/
-├── mail.service.ts              # Email 服務核心（含多語系支援）
-├── mail.module.ts               # NestJS 模組配置
-└── templates/                   # Email 模板目錄（按語言分類）
-    ├── en/                      # 英文模板
-    │   ├── password-reset.hbs
-    │   ├── two-factor-code.hbs
-    │   └── password-changed.hbs
-    └── zh-TW/                   # 繁體中文模板
-        ├── password-reset.hbs
-        ├── two-factor-code.hbs
-        └── password-changed.hbs
-```
+- **傳輸協議**: SMTP / Microsoft Graph API
+- **開發測試**: Ethereal Email (線上測試) / Mailpit (本地測試)
 
 ---
 
@@ -108,7 +83,7 @@ cp apps/backend/.env.production.example apps/backend/.env.production
 ### 3. 啟動服務
 
 ```bash
-# 使用 Wind CLI
+# 使用 NPT CLI
 ./scripts/cli.sh dev
 
 # 或手動啟動
@@ -132,17 +107,58 @@ https://ethereal.email/login
 
 ### 環境變數
 
+#### 共用變數
+
 | 變數                    | 說明                   | 開發環境                             | 生產環境                               |
 | ----------------------- | ---------------------- | ------------------------------------ | -------------------------------------- |
-| `MAIL_HOST`             | SMTP 伺服器            | smtp.ethereal.email                  | smtp.example.com                       |
-| `MAIL_PORT`             | SMTP 埠號              | 587                                  | 587                                    |
-| `MAIL_SECURE`           | 是否使用 TLS           | false                                | true                                   |
-| `MAIL_USER`             | SMTP 帳號              | (Ethereal 帳號)                      | (真實帳號)                             |
-| `MAIL_PASS`             | SMTP 密碼              | (Ethereal 密碼)                      | (真實密碼)                             |
+| `MAIL_PROVIDER`         | 郵件發送模式           | smtp                                 | graph                                  |
 | `MAIL_FROM`             | 寄件者 Email           | noreply@ethereal.email               | noreply@example.com                    |
-| `MAIL_FROM_NAME`        | 寄件者名稱             | Wind App                             | Your App Name                          |
+| `MAIL_FROM_NAME`        | 寄件者名稱             | NPT App                              | Your App Name                          |
 | `PASSWORD_RESET_EXPIRY` | 密碼重設有效期（分鐘） | 30                                   | 15                                     |
 | `PASSWORD_RESET_URL`    | 密碼重設頁面 URL       | http://localhost:3000/reset-password | https://app.example.com/reset-password |
+
+#### SMTP 模式變數（`MAIL_PROVIDER=smtp`）
+
+| 變數          | 說明         | 開發環境            | 生產環境         |
+| ------------- | ------------ | ------------------- | ---------------- |
+| `MAIL_HOST`   | SMTP 伺服器  | smtp.ethereal.email | smtp.example.com |
+| `MAIL_PORT`   | SMTP 埠號    | 587                 | 587              |
+| `MAIL_SECURE` | 是否使用 TLS | false               | true             |
+| `MAIL_USER`   | SMTP 帳號    | (Ethereal 帳號)     | (真實帳號)       |
+| `MAIL_PASS`   | SMTP 密碼    | (Ethereal 密碼)     | (真實密碼)       |
+
+#### Graph API 模式變數（`MAIL_PROVIDER=graph`）
+
+| 變數                     | 說明                 | 生產環境                             |
+| ------------------------ | -------------------- | ------------------------------------ |
+| `AZURE_AD_TENANT_ID`     | Azure AD 租戶 ID     | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
+| `AZURE_AD_CLIENT_ID`     | Azure AD 應用程式 ID | xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx |
+| `AZURE_AD_CLIENT_SECRET` | Azure AD 用戶端密碼  | your-client-secret                   |
+
+#### 通知開關
+
+控制非核心郵件通知是否發送。密碼重設連結與 2FA 驗證碼為核心功能，無法關閉。
+
+| 變數                                 | 說明             | 預設    |
+| ------------------------------------ | ---------------- | ------- |
+| `MAIL_NOTIFY_PASSWORD_CHANGED`       | 密碼變更通知     | `true`  |
+| `MAIL_NOTIFY_PROFILE_UPDATED`        | 個人資料更新通知 | `false` |
+| `MAIL_NOTIFY_ACCOUNT_LOCKED`         | 帳號鎖定通知     | `true`  |
+| `MAIL_NOTIFY_SESSION_REVOKED`        | 會話撤銷通知     | `false` |
+| `MAIL_NOTIFY_BATCH_SESSIONS_REVOKED` | 批量會話撤銷通知 | `false` |
+| `MAIL_NOTIFY_PAT`                    | 個人存取權杖通知 | `true`  |
+
+#### 系統通知開關（鈴鐺 + 通知中心）
+
+控制事件是否產生系統通知（出現在鈴鐺下拉選單和通知中心頁面）。
+
+| 變數                                 | 說明             | 預設   |
+| ------------------------------------ | ---------------- | ------ |
+| `PUSH_NOTIFY_PASSWORD_CHANGED`       | 密碼變更通知     | `true` |
+| `PUSH_NOTIFY_ACCOUNT_LOCKED`         | 帳號鎖定通知     | `true` |
+| `PUSH_NOTIFY_SESSION_REVOKED`        | 會話撤銷通知     | `true` |
+| `PUSH_NOTIFY_BATCH_SESSIONS_REVOKED` | 批量會話撤銷通知 | `true` |
+| `PUSH_NOTIFY_PAT`                    | 個人存取權杖通知 | `true` |
 
 ### Mail Module 配置
 
@@ -191,11 +207,11 @@ export class MailModule {}
 
 ### 1. 密碼重設 (password-reset.hbs)
 
-**用途**: 使用者忘記密碼時發送重設連結
+**用途**: 用戶忘記密碼時發送重設連結
 
 **模板變數**:
 
-- `name`: 使用者名稱
+- `name`: 用戶名稱
 - `url`: 密碼重設連結
 - `ipAddress`: 請求 IP 地址
 - `expiresIn`: 有效期（分鐘）
@@ -229,7 +245,7 @@ export class MailModule {}
 
 **模板變數**:
 
-- `name`: 使用者名稱
+- `name`: 用戶名稱
 - `code`: 6 位數驗證碼
 - `expiryMinutes`: 有效期（10 分鐘）
 - `purpose`: 用途（LOGIN/ENABLE/DISABLE）
@@ -264,7 +280,7 @@ export class MailModule {}
 
 **模板變數**:
 
-- `name`: 使用者名稱
+- `name`: 用戶名稱
 - `ipAddress`: 操作 IP 地址
 - `timestamp`: 變更時間戳
 
@@ -289,163 +305,114 @@ export class MailModule {}
 
 ---
 
-## ✨ 支援功能
+## ✨ 郵件種類與觸發邏輯
 
-### Mail Service API
+系統共有 **9 種郵件**（使用 9 個模板 × 2 語言 = 18 個模板檔案），分為**核心功能**、**帳號安全通知**和**業務模組通知**。
 
-`/src/mail/mail.service.ts`
+### 郵件總覽
 
-#### 1. sendPasswordResetEmail()
+#### 帳號安全（7 種）
 
-```typescript
-async sendPasswordResetEmail(
-  email: string,
-  name: string | null,
-  resetToken: string,
-  resetUrl: string,
-  ipAddress?: string,
-  lang?: string,
-): Promise<void> {
-  const locale = this.getLocale(lang);
-  const url = `${resetUrl}?token=${resetToken}`;
+| #   | 方法                            | 模板                     | 分類 | 開關                                 | 預設     |
+| --- | ------------------------------- | ------------------------ | ---- | ------------------------------------ | -------- |
+| 1   | `sendPasswordResetEmail`        | `password-reset`         | 核心 | —                                    | 永遠開啟 |
+| 2   | `sendTwoFactorCode`             | `two-factor-code`        | 核心 | —                                    | 永遠開啟 |
+| 3   | `sendPasswordChangedEmail`      | `password-changed`       | 通知 | `MAIL_NOTIFY_PASSWORD_CHANGED`       | `true`   |
+| 4   | `sendProfileUpdatedEmail`       | `profile-updated`        | 通知 | `MAIL_NOTIFY_PROFILE_UPDATED`        | `false`  |
+| 5   | `sendAccountLockedEmail`        | `account-locked`         | 通知 | `MAIL_NOTIFY_ACCOUNT_LOCKED`         | `true`   |
+| 6   | `sendSessionRevokedEmail`       | `session-revoked`        | 通知 | `MAIL_NOTIFY_SESSION_REVOKED`        | `false`  |
+| 7   | `sendBatchSessionsRevokedEmail` | `sessions-batch-revoked` | 通知 | `MAIL_NOTIFY_BATCH_SESSIONS_REVOKED` | `false`  |
 
-  await this.mailerService.sendMail({
-    to: email,
-    subject: this.i18n.translate('email.passwordReset.subject', {
-      lang: locale,
-    }),
-    template: `./${locale}/password-reset`,
-    context: {
-      name: name || email,
-      url,
-      ipAddress: ipAddress || this.i18n.translate('common.unknown', { lang: locale }),
-      expiresIn: locale === 'zh-TW' ? '30 分鐘' : '30 minutes',
-      timestamp: new Date().toLocaleString(
-        locale === 'zh-TW' ? 'zh-TW' : 'en-US',
-        { timeZone: locale === 'zh-TW' ? 'Asia/Taipei' : 'UTC' },
-      ),
-    },
-  });
-}
-```
+#### PAT 通知
 
-**使用範例**:
+| #   | 方法                       | 模板               | 涵蓋事件                  | 開關              | 預設   |
+| --- | -------------------------- | ------------------ | ------------------------- | ----------------- | ------ |
+| 8   | `sendPatNotificationEmail` | `pat-notification` | 權杖建立/撤銷（2 種事件） | `MAIL_NOTIFY_PAT` | `true` |
 
-```typescript
-await this.mailService.sendPasswordResetEmail(
-  'user@example.com',
-  '張三',
-  'reset-token-123',
-  'http://localhost:3000/reset-password',
-  '192.168.1.1',
-  'zh-TW',
-);
-```
+> 業務模組可依需要新增自己的通知方法與模板。
 
-#### 2. sendTwoFactorCode()
+### 各郵件觸發時機與呼叫者
 
-```typescript
-async sendTwoFactorCode(
-  email: string,
-  name: string,
-  code: string,
-  expiryMinutes: number,
-  purpose: string,
-  ipAddress?: string,
-  lang?: string,
-): Promise<void> {
-  const locale = this.getLocale(lang);
+#### 1. 密碼重設連結（核心）
 
-  const subjectKey =
-    {
-      LOGIN: 'email.twoFactorCode.login',
-      ENABLE: 'email.twoFactorCode.enable',
-      DISABLE: 'email.twoFactorCode.disable',
-    }[purpose] || 'email.twoFactorCode.default';
+- **觸發**：用戶點擊「忘記密碼」提交 email 後
+- **呼叫者**：`PasswordResetService.requestPasswordReset()`
+- **模板變數**：`name`, `url`, `expiresIn`, `ipAddress`, `timestamp`
+- **備註**：連結有效期由 `PASSWORD_RESET_EXPIRE_MINUTES` 控制；URL 自動由 `APP_URL/reset-password` 產生
 
-  await this.mailerService.sendMail({
-    to: email,
-    subject: this.i18n.translate(subjectKey, { lang: locale }),
-    template: `./${locale}/two-factor-code`,
-    context: {
-      name,
-      code,
-      expiryMinutes,
-      purpose,
-      ipAddress: ipAddress || this.i18n.translate('common.unknown', { lang: locale }),
-      timestamp: new Date().toLocaleString(
-        locale === 'zh-TW' ? 'zh-TW' : 'en-US',
-        { timeZone: locale === 'zh-TW' ? 'Asia/Taipei' : 'UTC' },
-      ),
-    },
-  });
-}
-```
+#### 2. 雙因素認證驗證碼（核心）
 
-**使用範例**:
+- **觸發**：
+  - 啟用 2FA 的用戶登入時（`purpose: LOGIN`）
+  - 用戶啟用 2FA 時（`purpose: ENABLE`）
+  - 用戶停用 2FA 時（`purpose: DISABLE`）
+- **呼叫者**：`TwoFactorAuthService.sendLoginCode()` / `requestEnable()` / `requestDisable()`
+- **模板變數**：`name`, `code`, `expiryMinutes`, `purpose`, `ipAddress`, `timestamp`
+- **備註**：6 位數驗證碼，10 分鐘有效，最多嘗試 5 次
 
-```typescript
-await this.mailService.sendTwoFactorCode(
-  'user@example.com',
-  '張三',
-  '123456',
-  10,
-  'LOGIN',
-  '192.168.1.1',
-  'zh-TW',
-);
-```
+#### 3. 密碼變更通知
 
-#### 3. sendPasswordChangedEmail()
+- **觸發**：
+  - 用戶透過重設連結成功設定新密碼
+  - 用戶自行修改密碼
+  - 管理員重設用戶密碼
+- **呼叫者**：`PasswordResetService.resetPassword()` / `UserService.changePasswordSelf()` / `UserService.hqResetPassword()`
+- **模板變數**：`name`, `ipAddress`, `timestamp`
 
-```typescript
-async sendPasswordChangedEmail(
-  email: string,
-  name: string | null,
-  ipAddress?: string,
-  lang?: string,
-): Promise<void> {
-  const locale = this.getLocale(lang);
+#### 4. 個人資料更新通知
 
-  await this.mailerService.sendMail({
-    to: email,
-    subject: this.i18n.translate('email.passwordChanged.subject', {
-      lang: locale,
-    }),
-    template: `./${locale}/password-changed`,
-    context: {
-      name: name || email,
-      ipAddress: ipAddress || this.i18n.translate('common.unknown', { lang: locale }),
-      timestamp: new Date().toLocaleString(
-        locale === 'zh-TW' ? 'zh-TW' : 'en-US',
-        { timeZone: locale === 'zh-TW' ? 'Asia/Taipei' : 'UTC' },
-      ),
-    },
-  });
-}
-```
+- **觸發**：用戶更新自己的姓名或 Email
+- **呼叫者**：`UserService.updateUserSelf()`
+- **模板變數**：`name`, `changes[]`（變更列表）, `ipAddress`, `timestamp`
+- **備註**：預設關閉
 
-**使用範例**:
+#### 5. 帳號鎖定通知
 
-```typescript
-await this.mailService.sendPasswordChangedEmail(
-  'user@example.com',
-  '張三',
-  '192.168.1.1',
-  'zh-TW',
-);
-```
+- **觸發**：連續 5 次登入失敗，帳號被鎖定 15 分鐘
+- **呼叫者**：`AccountLockoutService.recordFailedLogin()`
+- **模板變數**：`name`, `lockoutMinutes`, `ipAddress`, `timestamp`
+- **備註**：失敗計數器有 30 分鐘重設視窗
+
+#### 6. 會話撤銷通知
+
+- **觸發**：管理員撤銷單一用戶會話
+- **呼叫者**：`HQSessionService.sendRevocationNotification()`
+- **模板變數**：`userName`, `deviceInfo`, `browser`, `os`, `ipAddress`, `location`, `revokedByName`, `reason`, `customMessage`, `timestamp`
+- **備註**：預設關閉
+
+#### 7. 批量會話撤銷通知
+
+- **觸發**：管理員批量撤銷用戶的多個會話
+- **呼叫者**：`HQSessionService.sendBatchRevocationNotification()`
+- **模板變數**：`userName`, `sessionCount`, `sessions[]`, `revokedByName`, `reason`, `customMessage`, `timestamp`
+- **備註**：預設關閉
+
+#### 8. 個人存取權杖通知
+
+- **觸發**：
+  - 建立 Token → Token 擁有者
+  - 撤銷 Token → Token 擁有者
+- **呼叫者**：`PersonalAccessTokenService.create()` / `PersonalAccessTokenService.revoke()`
+- **模板變數**：`userName`, `isCreated`, `tokenName`, `tokenPrefix`, `scopes`, `expiresAt`, `timestamp`, `supportEmail`
+- **備註**：同時觸發系統鈴鐺通知（`PUSH_NOTIFY_PAT`）與 Email 通知（`MAIL_NOTIFY_PAT`），按鈕連結指向 `APP_URL/settings/pat`
 
 ### 多語系 Email
 
-Mail Service 支援根據使用者語言偏好發送對應語言的 Email。
+Mail Service 支援根據用戶語言偏好發送對應語言的 Email。
 
 **語言選擇邏輯**：
 
-- 所有 send 方法都接受可選的 `lang` 參數。
-- 使用 `getLocale()` 方法驗證並回退語言：支援 `en`、`zh-TW`，`zh` 自動映射為 `zh-TW`，其餘回退至 `en`。
-- Email 主旨透過 `I18nService` 翻譯，模板路徑使用 `./${locale}/template-name` 格式。
-- 時間戳格式和時區根據語言自動調整（`zh-TW` 使用 `Asia/Taipei` 時區）。
+- 所有 send 方法都接受可選的 `lang` 參數
+- 使用 `getLocale()` 方法驗證並回退語言：支援 `en`、`zh-TW`，`zh` 自動映射為 `zh-TW`，其餘回退至 `en`
+- Email 主旨透過 `I18nService` 翻譯，模板路徑使用 `./${locale}/template-name` 格式
+- 時間戳格式和時區根據語言自動調整（`zh-TW` 使用 `Asia/Taipei` 時區）
+
+**前後端語言聯動**：
+
+- 用戶的語言偏好儲存在 `profile.language` 欄位
+- **Top Bar 語言切換**：切換介面語言時，自動呼叫 `updateMyProfileDetails` 同步更新 `profile.language`，確保後續寄出的 Email 語言與介面一致
+- **登入自動跳轉**：登入成功後查詢 `profile.language`，若與當前 URL locale 不同，自動跳轉到對應語言的 Dashboard
+- **Profile Settings**：個人資料設定頁的「偏好語言」欄位與 Top Bar 語言切換完全同步
 
 詳細的 i18n 配置請參考 [後端 i18n 設置指南](I18N_SETUP.md)。
 
@@ -453,9 +420,11 @@ Mail Service 支援根據使用者語言偏好發送對應語言的 Email。
 
 ## 🔧 開發環境
 
-### Ethereal Email 設置
+NPT 專案提供兩種開發環境的 Email 測試方案，您可以根據需求選擇：
 
-**Ethereal Email** 是免費的虛擬 SMTP 服務，用於開發測試。
+### 方案一：Ethereal Email（線上測試）
+
+**Ethereal Email** 是免費的虛擬 SMTP 服務，適合快速測試。
 
 #### 1. 取得測試帳號
 
@@ -470,7 +439,7 @@ MAIL_SECURE=false
 MAIL_USER=your-ethereal-username@ethereal.email
 MAIL_PASS=your-ethereal-password
 MAIL_FROM=noreply@ethereal.email
-MAIL_FROM_NAME=Wind App (Dev)
+MAIL_FROM_NAME=NPT App (Dev)
 ```
 
 #### 3. 查看發送的郵件
@@ -480,14 +449,153 @@ MAIL_FROM_NAME=Wind App (Dev)
 **優點**:
 
 - ✅ 免費無限制
-- ✅ 不需要真實 SMTP 伺服器
+- ✅ 不需要本地服務
 - ✅ 可查看完整郵件內容和原始碼
 - ✅ 支援附件和 HTML
 
 **限制**:
 
 - ❌ 郵件僅保留 24 小時
+- ❌ 需要網路連接
 - ❌ 無法發送到真實 Email 地址
+
+---
+
+### 方案二：Mailpit（本地測試）
+
+**Mailpit** 是開源的本地 SMTP 測試工具，提供現代化的 Web UI，適合離線開發和團隊協作。
+
+#### 1. Docker Compose 配置
+
+NPT 專案已整合 Mailpit 到 Docker Compose。服務配置位於 `docker-compose.yml`：
+
+```yaml
+services:
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: npt-mailpit
+    restart: unless-stopped
+    ports:
+      - '1025:1025' # SMTP 埠
+      - '8025:8025' # Web UI 埠
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - npt-network
+```
+
+#### 2. 環境變數配置
+
+在 `apps/backend/.env` 中設定：
+
+```env
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_SECURE=false
+MAIL_USER=any
+MAIL_PASS=any
+MAIL_FROM=noreply@localhost
+MAIL_FROM_NAME=NPT App (Dev)
+```
+
+#### 3. 啟動服務
+
+使用 NPT CLI 快速啟動：
+
+```bash
+# 啟動所有服務（包含 Mailpit）
+./scripts/cli.sh dev
+
+# 或單獨啟動 Mailpit
+docker-compose up -d mailpit
+```
+
+#### 4. 存取 Web UI
+
+Mailpit 啟動後，開啟瀏覽器訪問：
+
+```
+http://localhost:8025
+```
+
+#### 5. 查看郵件
+
+Web UI 提供以下功能：
+
+- 📧 **郵件列表**：即時顯示所有接收的郵件
+- 🔍 **搜尋功能**：支援收件人、主旨、內容搜尋
+- 📎 **附件下載**：直接下載郵件附件
+- 💻 **HTML 預覽**：完整渲染 HTML 郵件
+- 📝 **原始碼檢視**：查看郵件原始內容
+- 🗑️ **批次刪除**：清空測試郵件
+
+**優點**:
+
+- ✅ 完全離線運行
+- ✅ 現代化的 Web UI
+- ✅ 支援 REST API
+- ✅ 無需註冊帳號
+- ✅ 郵件永久保存（直到容器重啟）
+- ✅ 支援 WebSocket 即時更新
+
+**限制**:
+
+- ❌ 需要 Docker 環境
+- ❌ 佔用本地埠 (1025, 8025)
+
+---
+
+### 開發環境方案比較
+
+| 特性           | Ethereal Email | Mailpit        |
+| -------------- | -------------- | -------------- |
+| **部署方式**   | 線上服務       | 本地 Docker    |
+| **網路要求**   | 需要           | 不需要         |
+| **郵件保留**   | 24 小時        | 永久（重啟前） |
+| **Web UI**     | 簡單           | 現代化         |
+| **設定複雜度** | 低             | 中             |
+| **團隊協作**   | 需分享帳號     | 共用本地服務   |
+| **推薦場景**   | 快速測試       | 離線開發       |
+
+---
+
+## 📬 郵件發送模式
+
+### SMTP 模式（預設）
+
+傳統 SMTP 協議，適用於開發環境與支援 SMTP 的生產環境。
+
+```env
+MAIL_PROVIDER=smtp
+```
+
+### Graph API 模式
+
+使用 Microsoft Graph API 透過 OAuth2 Client Credentials Flow 發送郵件，適用於已導入 Microsoft 365 的組織。
+
+```env
+MAIL_PROVIDER=graph
+```
+
+**前置條件**：
+
+1. 在 Azure AD 註冊應用程式
+2. 授予 `Mail.Send` 應用程式權限（非委派權限）
+3. 管理員同意（Admin Consent）
+4. 設定 `AZURE_AD_TENANT_ID`、`AZURE_AD_CLIENT_ID`、`AZURE_AD_CLIENT_SECRET`
+
+**運作流程**：
+
+1. GraphMailService 使用 Client Credentials 向 Azure AD 取得 Access Token（自動快取）
+2. MailService 使用 Handlebars 手動渲染模板為 HTML
+3. 透過 `POST https://graph.microsoft.com/v1.0/users/{from}/sendMail` 發送郵件
+
+**注意事項**：
+
+- `MAIL_FROM` 必須是 Microsoft 365 中存在的信箱（共用信箱或授權信箱）
+- Token 有效期約 1 小時，到期自動重新取得
+- 若未設定 `MAIL_PROVIDER` 或值為空，預設使用 `graph` 模式
 
 ---
 
@@ -675,8 +783,36 @@ describe('MailService', () => {
 
 ---
 
-## 📚 相關文檔
+## 📁 相關檔案
 
-- [TWO_FACTOR_AUTH.md](../authentication/TWO_FACTOR_AUTH.md) - 2FA 驗證碼發送
-- [REGISTRATION.md](../authentication/REGISTRATION.md) - 使用者註冊流程
-- [ENVIRONMENT_VARIABLES.md](../infrastructure/ENVIRONMENT_VARIABLES.md) - 環境變數管理
+### 後端
+
+| 檔案                                                    | 說明                                |
+| ------------------------------------------------------- | ----------------------------------- |
+| `apps/backend/src/mail/mail.module.ts`                  | 模組定義（SMTP + Graph 雙模式註冊） |
+| `apps/backend/src/mail/mail.service.ts`                 | 核心服務（路由 SMTP/Graph、多語系） |
+| `apps/backend/src/mail/graph-mail.service.ts`           | Graph API 發送服務（OAuth2 Token）  |
+| `apps/backend/src/mail/templates/en/`                   | 英文 Email 模板（9 個）             |
+| `apps/backend/src/mail/templates/zh-TW/`                | 繁體中文 Email 模板（9 個）         |
+| `apps/backend/src/notification/notification.service.ts` | 系統通知服務 + 多語系文案常數       |
+
+### 模板檔案
+
+| 模板                         | 用途             |
+| ---------------------------- | ---------------- |
+| `password-reset.hbs`         | 密碼重設連結     |
+| `two-factor-code.hbs`        | 2FA 驗證碼       |
+| `password-changed.hbs`       | 密碼變更通知     |
+| `account-locked.hbs`         | 帳號鎖定通知     |
+| `profile-updated.hbs`        | 個人資料更新通知 |
+| `session-revoked.hbs`        | 會話撤銷通知     |
+| `sessions-batch-revoked.hbs` | 批量會話撤銷通知 |
+| `pat-notification.hbs`       | 個人存取權杖通知 |
+
+### 相關文檔
+
+| 文件                                                                   | 說明           |
+| ---------------------------------------------------------------------- | -------------- |
+| [TWO_FACTOR_AUTH.md](../authentication/TWO_FACTOR_AUTH.md)             | 2FA 驗證碼發送 |
+| [REGISTRATION.md](../authentication/REGISTRATION.md)                   | 用戶註冊流程   |
+| [ENVIRONMENT_VARIABLES.md](../infrastructure/ENVIRONMENT_VARIABLES.md) | 環境變數管理   |

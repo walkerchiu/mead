@@ -50,7 +50,7 @@
 
 ## 📖 概述
 
-Wind 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
+NPT 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
 
 ### 技術棧
 
@@ -102,7 +102,7 @@ Wind 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化�
 services:
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.5
-    container_name: wind-dragonfly
+    container_name: npt-dragonfly
     ports:
       - '6379:6379'
     volumes:
@@ -116,14 +116,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - wind-network
+      - npt-network
 
 volumes:
   dragonfly-data:
     driver: local
 
 networks:
-  wind-network:
+  npt-network:
     driver: bridge
 ```
 
@@ -383,7 +383,7 @@ const cacheKey = `${module}:${context}:${id}:${params}`;
 
 | 資料類型       | 是否快取 | TTL     | 原因         |
 | -------------- | -------- | ------- | ------------ |
-| 使用者資訊     | ✅       | 5 分鐘  | 讀取頻繁     |
+| 用戶資訊       | ✅       | 5 分鐘  | 讀取頻繁     |
 | 審計日誌       | ✅       | 5 分鐘  | 查詢密集     |
 | 統計資料       | ✅       | 1 分鐘  | 即時性要求   |
 | 交易記錄       | ❌       | -       | 強一致性需求 |
@@ -514,7 +514,7 @@ async getWithLock(key: string, fetchFn: () => Promise<any>) {
 #### 1. 不要快取敏感資料
 
 ```typescript
-// ❌ 錯誤：快取包含密碼的完整使用者物件
+// ❌ 錯誤：快取包含密碼的完整用戶物件
 await this.cacheManager.set('user:123', userWithPassword);
 
 // ✅ 正確：只快取安全的欄位
@@ -555,6 +555,6 @@ try {
 
 ## 📚 相關文檔
 
-- [AUDIT_LOG_SYSTEM.md](../infrastructure/AUDIT_LOG_SYSTEM.md) - 審計日誌快取應用
+- [AUDIT_LOG_SYSTEM.md](./AUDIT_LOG_SYSTEM.md) - 審計日誌快取應用
 - [RABBITMQ_DRAGONFLY.md](../infrastructure/RABBITMQ_DRAGONFLY.md) - Dragonfly 詳細配置
 - [DOCKER_SETUP.md](../getting-started/DOCKER_SETUP.md) - Docker 環境設置

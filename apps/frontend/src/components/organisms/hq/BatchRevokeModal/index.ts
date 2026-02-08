@@ -1,0 +1,1 @@
+export { BatchRevokeModal } from './BatchRevokeModal';

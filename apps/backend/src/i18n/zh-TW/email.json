@@ -8,6 +8,19 @@
   "profileUpdated": {
     "subject": "您的個人資料已更新"
   },
+  "accountLocked": {
+    "subject": "帳號已暫時鎖定"
+  },
+  "sessionRevoked": {
+    "subject": "您的登入會話已被終止"
+  },
+  "batchSessionsRevoked": {
+    "subject": "您的 {count} 個登入會話已被終止"
+  },
+  "pat": {
+    "created": "已建立新的個人存取權杖",
+    "revoked": "您的個人存取權杖已被撤銷"
+  },
   "twoFactorCode": {
     "login": "登入驗證碼",
     "enable": "啟用雙因素認證驗證碼",

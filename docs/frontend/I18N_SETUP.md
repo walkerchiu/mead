@@ -1,6 +1,13 @@
 # 前端 i18n 設置指南
 
-Next.js 多語系國際化完整設置與使用指南
+Next.js 多語系國際化完整設置與使用指南。
+
+> 📚 **閱讀導覽**：本文件專注於**前端（Next.js）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或後端實作，請參考：
+>
+> - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) — 整合流程、CLI 工具、測試
+> - [後端 i18n 設置指南](../backend/I18N_SETUP.md) — NestJS 端實作
+
+---
 
 ## 📋 目錄
 
@@ -32,6 +39,9 @@ Next.js 多語系國際化完整設置與使用指南
     - [Link 元件](#link-元件)
     - [useRouter](#userouter)
     - [usePathname](#usepathname)
+  - [🔗 語言偏好聯動](#-語言偏好聯動)
+    - [聯動機制](#聯動機制)
+    - [相關元件](#相關元件)
   - [📚 Storybook 整合](#-storybook-整合)
   - [➕ 新增語言](#-新增語言)
     - [步驟 1：更新 routing 配置](#步驟-1更新-routing-配置)
@@ -39,8 +49,6 @@ Next.js 多語系國際化完整設置與使用指南
     - [步驟 3：驗證](#步驟-3驗證)
     - [步驟 4：生成類型](#步驟-4生成類型)
   - [🛠️ CLI 工具支援](#️-cli-工具支援)
-    - [翻譯測試與類型生成](#翻譯測試與類型生成)
-    - [手動執行命令](#手動執行命令)
   - [📚 相關文檔](#-相關文檔)
 
 ---
@@ -299,7 +307,7 @@ cd apps/frontend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @wind/frontend generate-i18n-types
+pnpm --filter @npt/frontend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -461,10 +469,12 @@ import { Link } from '@/i18n/routing';
 
 ### useRouter
 
+Client component 內呼叫 `router.push/replace/back/forward` 時，請改用 `useNavRouter`（locale-aware + 自動觸發頂部進度條）：
+
 ```typescript
 'use client';
 
-import { useRouter } from '@/i18n/routing';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
 
 export function LoginButton() {
   const router = useRouter();
@@ -472,9 +482,14 @@ export function LoginButton() {
   const handleLogin = () => {
     router.push('/dashboard');
     // 自動導航至 /en/dashboard 或 /zh-TW/dashboard
+    // 並在點擊瞬間 fire 頂部 4px 琥珀色進度條
   };
 }
 ```
+
+**為什麼不直接 `from '@/i18n/routing'`**：原 `useRouter` 不會觸發 `@bprogress/next` 的進度條（bprogress 只攔 `<Link>` / anchor click），程式式 `router.push(...)` 會讓使用者點完按鈕後到下一個頁面 mount 完成那段時間沒有任何視覺回饋。`useNavRouter` 是同型別的 wrapper，每次程式式導航前先 `progress.start()`。
+
+**例外**：middleware (`src/proxy.ts`) 與 server component 仍然使用 `from '@/i18n/routing'`（`useNavRouter` 是 `'use client'`，無法在 Edge runtime 載入）。
 
 ### usePathname
 
@@ -484,6 +499,29 @@ import { usePathname } from '@/i18n/routing';
 // 回傳不含 locale 前綴的路徑
 const pathname = usePathname(); // "/dashboard" 而非 "/en/dashboard"
 ```
+
+---
+
+## 🔗 語言偏好聯動
+
+前端介面語言與後端 `profile.language` 自動同步，確保 Email 通知語言與介面一致。
+
+### 聯動機制
+
+| 情境                      | 行為                                                                                 |
+| ------------------------- | ------------------------------------------------------------------------------------ |
+| **Top Bar 切換語言**      | URL locale 變更 + 自動呼叫 `updateMyProfileDetails({ language })` 同步後端           |
+| **登入成功**              | 查詢 `me.profile.language`，若與當前 URL locale 不同，自動跳轉到對應語言的 Dashboard |
+| **Profile Settings 修改** | 儲存後 `profile.language` 更新，下次登入會以新語言顯示                               |
+| **未登入時切換**          | 僅變更 URL locale，不呼叫 API                                                        |
+
+### 相關元件
+
+| 元件                | 檔案                                                             | 說明                                   |
+| ------------------- | ---------------------------------------------------------------- | -------------------------------------- |
+| LanguageSwitcher    | `src/components/molecules/LanguageSwitcher/LanguageSwitcher.tsx` | Top Bar 語言切換，已登入時同步 profile |
+| LoginPage           | `src/app/[locale]/login/page.tsx`                                | 登入後根據 profile.language 跳轉       |
+| ProfileSettingsPage | `src/app/[locale]/settings/profile/page.tsx`                     | 偏好語言下拉選單                       |
 
 ---
 
@@ -539,7 +577,7 @@ cp messages/en.json messages/ja.json
 
 ```bash
 # 啟動開發伺服器
-pnpm --filter @wind/frontend dev
+pnpm --filter @npt/frontend dev
 
 # 訪問
 # http://localhost:3000/ja/login
@@ -550,43 +588,20 @@ pnpm --filter @wind/frontend dev
 
 ```bash
 # 重新生成類型以包含新語言
-pnpm --filter @wind/frontend generate-i18n-types
+pnpm --filter @npt/frontend generate-i18n-types
 ```
 
 ---
 
 ## 🛠️ CLI 工具支援
 
-### 翻譯測試與類型生成
-
-```bash
-# 啟動 Wind CLI
-./scripts/cli.sh
-
-# 選擇 14（i18n 多語系管理）
-# 可執行：
-# 1) 測試翻譯檔案
-# 2) 生成類型定義（前後端）
-# 3) 查看翻譯統計
-```
-
-### 手動執行命令
-
-```bash
-# 前端：生成類型
-pnpm --filter @wind/frontend generate-i18n-types
-
-# 後端：生成類型
-pnpm --filter @wind/backend generate-i18n-types
-
-# 類型檢查
-pnpm type-check
-```
+> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#️-cli-工具支援)，以避免文件重複。
 
 ---
 
 ## 📚 相關文檔
 
+- [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) - 整合流程與 CLI 工具
 - [後端 i18n 設置](../backend/I18N_SETUP.md) - 後端國際化配置
 - [前端認證整合](FRONTEND_INTEGRATION.md) - 認證系統與 i18n 路由
 - [組件庫開發指南](COMPONENT_LIBRARY.md) - Storybook 組件開發

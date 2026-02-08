@@ -4,7 +4,7 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
+import { Reflector, ModuleRef } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { I18nService } from 'nestjs-i18n';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -22,33 +22,109 @@ import {
 
 /**
  * Permission Guard
- * 1. 先驗證 JWT Token
+ * 1. 先驗證 JWT Token 或 PAT Token
  * 2. 檢查 AccessScope（如果有設定）
  * 3. 檢查 Permission（如果有設定）
  */
 @Injectable()
 export class PermissionGuard extends JwtAuthGuard implements CanActivate {
+  private patAuthGuard: any; // 延遲載入，避免跨模組依賴問題
+
   constructor(
     private reflector: Reflector,
     private permissionService: PermissionService,
     private i18n: I18nService,
+    private moduleRef: ModuleRef,
   ) {
     super();
   }
 
+  /**
+   * 延遲取得 PatAuthGuard 實例
+   */
+  private async getPatAuthGuard() {
+    if (!this.patAuthGuard) {
+      try {
+        const { PatAuthGuard } = await import('../../auth/pat-auth.guard');
+        this.patAuthGuard = this.moduleRef.get(PatAuthGuard, { strict: false });
+      } catch {
+        return null;
+      }
+    }
+    return this.patAuthGuard;
+  }
+
+  /**
+   * 檢查 Authorization header 是否為 PAT Token（npt_ 前綴）
+   */
+  private isPatRequest(context: ExecutionContext): boolean {
+    try {
+      // 嘗試 HTTP REST 請求
+      const httpRequest = context.switchToHttp().getRequest();
+      if (
+        httpRequest &&
+        httpRequest.url &&
+        !httpRequest.url.includes('/graphql')
+      ) {
+        const authHeader = httpRequest.headers?.authorization;
+        return !!authHeader && authHeader.includes('npt_');
+      }
+
+      // GraphQL 請求
+      const ctx = GqlExecutionContext.create(context);
+      const req = ctx.getContext().req;
+      const authHeader = req?.headers?.authorization;
+      return !!authHeader && authHeader.includes('npt_');
+    } catch {
+      return false;
+    }
+  }
+
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // Step 1: 驗證 JWT Token
-    const authenticated = await super.canActivate(context);
+    const ctx = GqlExecutionContext.create(context);
+    const operationName = ctx.getInfo()?.fieldName;
+
+    console.log(
+      `🔒 [PermissionGuard] canActivate called for operation: ${operationName}`,
+    );
+
+    // Step 1: 驗證認證（JWT 或 PAT）
+    let authenticated: boolean;
+
+    if (this.isPatRequest(context)) {
+      // PAT Token 路徑
+      console.log(
+        `🔒 [PermissionGuard] PAT token detected, using PAT auth guard`,
+      );
+      try {
+        const guard = await this.getPatAuthGuard();
+        authenticated = guard ? await guard.canActivate(context) : false;
+      } catch {
+        authenticated = false;
+      }
+    } else {
+      // JWT Token 路徑（原有邏輯）
+      authenticated = await super.canActivate(context);
+    }
+
+    console.log(`🔒 [PermissionGuard] Authentication result: ${authenticated}`);
     if (!authenticated) {
+      console.log(
+        `🔒 [PermissionGuard] Authentication failed, rejecting request`,
+      );
       return false;
     }
 
-    // Step 2: 取得使用者資訊
-    const ctx = GqlExecutionContext.create(context);
+    // Step 2: 取得用戶資訊
     const { req } = ctx.getContext();
     const user = req.user;
 
+    console.log(`🔒 [PermissionGuard] req.user:`, JSON.stringify(user));
+
     if (!user || !user.userId) {
+      console.log(
+        `🔒 [PermissionGuard] User validation failed - user: ${user}, userId: ${user?.userId}`,
+      );
       throw new ForbiddenException(
         this.i18n.translate('common.forbidden.noUserInfo', {
           lang: this.getLang(context),
@@ -59,22 +135,46 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     const lang = this.getLang(context);
 
     // Step 3: 檢查 AccessScope
+    console.log(
+      `🔒 [PermissionGuard] Checking AccessScope for user: ${user.userId}`,
+    );
     const scopeCheckPassed = await this.checkAccessScope(context, user, lang);
+    console.log(
+      `🔒 [PermissionGuard] AccessScope check result: ${scopeCheckPassed}`,
+    );
     if (!scopeCheckPassed) {
+      console.log(
+        `🔒 [PermissionGuard] AccessScope check failed, rejecting request`,
+      );
       return false;
     }
 
     // Step 4: 檢查 Permission
+    console.log(
+      `🔒 [PermissionGuard] Checking Permission for user: ${user.userId}`,
+    );
     const permissionCheckPassed = await this.checkPermission(
       context,
       user,
       lang,
     );
+    console.log(
+      `🔒 [PermissionGuard] Permission check result: ${permissionCheckPassed}`,
+    );
     if (!permissionCheckPassed) {
+      console.log(
+        `🔒 [PermissionGuard] Permission check failed, rejecting request`,
+      );
       return false;
     }
 
-    return true;
+    console.log(
+      `🔒 [PermissionGuard] All checks passed, allowing request for operation: ${operationName}`,
+    );
+    console.log(`🔒 [PermissionGuard] About to return true`);
+    const result = true;
+    console.log(`🔒 [PermissionGuard] Returning:`, result);
+    return result;
   }
 
   private getLang(context: ExecutionContext): string {
@@ -102,7 +202,10 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredScope) {
-      if (!user.accessScopes || !user.accessScopes.includes(requiredScope)) {
+      if (
+        !user.isSuperHQ &&
+        (!user.accessScopes || !user.accessScopes.includes(requiredScope))
+      ) {
         throw new ForbiddenException(
           this.i18n.translate('common.forbidden.requireScope', {
             lang,
@@ -182,10 +285,15 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredAnyPermissions && requiredAnyPermissions.length > 0) {
-      const hasAnyPermission = await this.permissionService.checkAnyPermission(
-        user.userId,
-        scope,
-        requiredAnyPermissions,
+      // 只有 SUPER_HQ 角色才自動繞過所有權限檢查
+      if (user.isSuperHQ) {
+        return true;
+      }
+
+      // 優先使用 JWT 中的 permissions（避免資料庫查詢）
+      const userPermissions: string[] = user.permissions || [];
+      const hasAnyPermission = requiredAnyPermissions.some((permission) =>
+        userPermissions.includes(permission),
       );
 
       if (!hasAnyPermission) {
@@ -246,7 +354,7 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredAnyScopes && requiredAnyScopes.length > 0) {
-      // 找出使用者擁有的 scope 中，符合要求的那些
+      // 找出用戶擁有的 scope 中，符合要求的那些
       const matchingScopes =
         user.accessScopes?.filter((scope: AccessScope) =>
           requiredAnyScopes.includes(scope),
@@ -262,7 +370,7 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
       return null;
     }
 
-    // 如果使用者只有一個 scope，使用該 scope
+    // 如果用戶只有一個 scope，使用該 scope
     if (user.accessScopes?.length === 1) {
       return user.accessScopes[0];
     }

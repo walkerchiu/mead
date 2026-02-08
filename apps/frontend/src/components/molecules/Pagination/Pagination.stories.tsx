@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Pagination } from './Pagination';
 import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
@@ -45,6 +45,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// 1. Default - Basic pagination
 export const Default: Story = {
   args: {
     count: 10,
@@ -53,6 +54,7 @@ export const Default: Story = {
   },
 };
 
+// 2. WithInfo - Display pagination information
 export const WithInfo: Story = {
   args: {
     count: 10,
@@ -64,42 +66,101 @@ export const WithInfo: Story = {
   },
 };
 
-export const Outlined: Story = {
+// 3. Disabled - Disabled state
+export const Disabled: Story = {
   args: {
     count: 10,
     page: 5,
-    variant: 'outlined',
+    disabled: true,
     onChange: () => {},
   },
 };
 
-export const Rounded: Story = {
-  args: {
-    count: 10,
-    page: 5,
-    shape: 'rounded',
-    onChange: () => {},
+// 4. AllVariants - All variant combinations
+export const AllVariants: Story = {
+  render: () => {
+    const [page, setPage] = useState(5);
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Text (default)
+          </Typography>
+          <Pagination
+            count={10}
+            page={page}
+            onChange={setPage}
+            variant="text"
+          />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Outlined
+          </Typography>
+          <Pagination
+            count={10}
+            page={page}
+            onChange={setPage}
+            variant="outlined"
+          />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Rounded
+          </Typography>
+          <Pagination
+            count={10}
+            page={page}
+            onChange={setPage}
+            shape="rounded"
+          />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Secondary Color
+          </Typography>
+          <Pagination
+            count={10}
+            page={page}
+            onChange={setPage}
+            color="secondary"
+          />
+        </Box>
+      </Box>
+    );
   },
 };
 
-export const Small: Story = {
-  args: {
-    count: 10,
-    page: 5,
-    size: 'small',
-    onChange: () => {},
+// 5. Sizes - All size variants
+export const Sizes: Story = {
+  render: () => {
+    const [page, setPage] = useState(5);
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Small
+          </Typography>
+          <Pagination count={10} page={page} onChange={setPage} size="small" />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Medium (default)
+          </Typography>
+          <Pagination count={10} page={page} onChange={setPage} size="medium" />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            Large
+          </Typography>
+          <Pagination count={10} page={page} onChange={setPage} size="large" />
+        </Box>
+      </Box>
+    );
   },
 };
 
-export const Large: Story = {
-  args: {
-    count: 10,
-    page: 5,
-    size: 'large',
-    onChange: () => {},
-  },
-};
-
+// 6. WithFirstLast - Show first and last page buttons
 export const WithFirstLast: Story = {
   args: {
     count: 20,
@@ -110,39 +171,52 @@ export const WithFirstLast: Story = {
   },
 };
 
-export const Secondary: Story = {
-  args: {
-    count: 10,
-    page: 5,
-    color: 'secondary',
-    onChange: () => {},
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    count: 10,
-    page: 5,
-    disabled: true,
-    onChange: () => {},
-  },
-};
-
-export const Interactive: Story = {
+// 7. CustomSiblingCount - Control number of sibling pages shown
+export const CustomSiblingCount: Story = {
   render: () => {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(10);
     return (
-      <Box>
-        <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          Current page: {page}
-        </Typography>
-        <Pagination count={10} page={page} onChange={setPage} />
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            siblingCount = 0
+          </Typography>
+          <Pagination
+            count={20}
+            page={page}
+            onChange={setPage}
+            siblingCount={0}
+          />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            siblingCount = 1 (default)
+          </Typography>
+          <Pagination
+            count={20}
+            page={page}
+            onChange={setPage}
+            siblingCount={1}
+          />
+        </Box>
+        <Box>
+          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+            siblingCount = 2
+          </Typography>
+          <Pagination
+            count={20}
+            page={page}
+            onChange={setPage}
+            siblingCount={2}
+          />
+        </Box>
       </Box>
     );
   },
 };
 
-export const WithInfoInteractive: Story = {
+// 8. Interactive - Interactive pagination with current page display
+export const Interactive: Story = {
   render: () => {
     const [page, setPage] = useState(1);
     const totalItems = 95;
@@ -151,7 +225,7 @@ export const WithInfoInteractive: Story = {
     return (
       <Box>
         <Typography variant="body2" sx={{ mb: 2, textAlign: 'center' }}>
-          Current page: {page} / 10
+          Current page: {page} / {Math.ceil(totalItems / itemsPerPage)}
         </Typography>
         <Pagination
           count={Math.ceil(totalItems / itemsPerPage)}
@@ -166,6 +240,7 @@ export const WithInfoInteractive: Story = {
   },
 };
 
+// 9. ManyPages - Pagination with many pages
 export const ManyPages: Story = {
   render: () => {
     const [page, setPage] = useState(50);
@@ -186,104 +261,7 @@ export const ManyPages: Story = {
   },
 };
 
-export const CustomSiblingCount: Story = {
-  render: () => {
-    const [page, setPage] = useState(10);
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            siblingCount = 0
-          </Typography>
-          <Pagination
-            count={20}
-            page={page}
-            onChange={setPage}
-            siblingCount={0}
-          />
-        </Box>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            siblingCount = 1 (default)
-          </Typography>
-          <Pagination
-            count={20}
-            page={page}
-            onChange={setPage}
-            siblingCount={1}
-          />
-        </Box>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            siblingCount = 2
-          </Typography>
-          <Pagination
-            count={20}
-            page={page}
-            onChange={setPage}
-            siblingCount={2}
-          />
-        </Box>
-      </Box>
-    );
-  },
-};
-
-export const Variants: Story = {
-  render: () => {
-    const [page, setPage] = useState(5);
-    return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Text (default)
-          </Typography>
-          <Pagination
-            count={10}
-            page={page}
-            onChange={setPage}
-            variant="text"
-          />
-        </Box>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Outlined
-          </Typography>
-          <Pagination
-            count={10}
-            page={page}
-            onChange={setPage}
-            variant="outlined"
-          />
-        </Box>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Rounded
-          </Typography>
-          <Pagination
-            count={10}
-            page={page}
-            onChange={setPage}
-            shape="rounded"
-          />
-        </Box>
-        <Box>
-          <Typography variant="body2" sx={{ mb: 1 }}>
-            Outlined + Rounded
-          </Typography>
-          <Pagination
-            count={10}
-            page={page}
-            onChange={setPage}
-            variant="outlined"
-            shape="rounded"
-          />
-        </Box>
-      </Box>
-    );
-  },
-};
-
+// 10. TablePagination - Real-world table pagination example
 export const TablePagination: Story = {
   render: () => {
     const [page, setPage] = useState(1);

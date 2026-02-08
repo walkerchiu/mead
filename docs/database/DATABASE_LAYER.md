@@ -60,16 +60,15 @@ apps/backend/database/
 │   ├── schema.prisma       # 自動產生的完整 schema（請勿直接編輯）
 │   ├── schemas/            # Schema 模組化檔案（在此編輯）
 │   │   ├── base.prisma     # Generator 和 Datasource 設定
-│   │   ├── user.prisma     # 使用者相關 models
+│   │   ├── user.prisma     # 用戶相關 models
 │   │   ├── role.prisma     # 角色相關 models
 │   │   ├── metric.prisma   # TimescaleDB 時間序列
 │   │   └── ...
 │   ├── migrations/         # 資料庫遷移檔案
 │   ├── seed.ts             # Seed 主腳本
 │   └── seeds/              # 環境別 seed 資料
-│       ├── base.ts         # 基礎資料（所有環境）
-│       ├── development.ts  # 開發環境測試資料
-│       └── uat.ts          # 測試環境資料
+│       ├── base.ts         # 基礎資料（所有環境）：權限 / 角色 / 角色權限對應 / Cron 配置
+│       └── development.ts  # 測試帳號（development 與 uat 共用）
 └── scripts/
     └── merge-schemas.js    # Schema 合併腳本
 ```
@@ -198,12 +197,11 @@ datasource db {
 
 ### 環境別載入
 
-Seed 系統根據 `WIND_ENV` 環境變數載入對應資料：
+Seed 系統根據 `NPT_ENV` 環境變數載入對應資料：
 
-- **base**: 所有環境的基礎資料（roles, permissions）
-- **development**: 開發環境測試帳號
-- **uat**: 測試環境資料
-- **production**: 生產環境（通常只載入 base）
+- **base**: 所有環境的基礎資料（roles、permissions、cron-job configs）
+- **development / uat**: 共用同一組測試帳號（`hq@example.com` 與 `public@example.com`）
+- **production**: 僅載入 base，**不**建立任何測試帳號
 
 ### 執行 Seed
 
@@ -212,8 +210,17 @@ Seed 系統根據 `WIND_ENV` 環境變數載入對應資料：
 pnpm db:seed
 
 # 指定環境
-WIND_ENV=uat pnpm db:seed
+NPT_ENV=uat pnpm db:seed
 ```
+
+### 預設帳號（development / uat）
+
+| Email                | 密碼           | 角色                   |
+| -------------------- | -------------- | ---------------------- |
+| `hq@example.com`     | `Password123!` | `SUPER_HQ` + `MANAGER` |
+| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE） |
+
+> Production 環境**不**建立任何測試帳號，部署前需自行建立正式帳號流程。
 
 ---
 
@@ -373,7 +380,7 @@ generator client {
 
 ### 快速備份/還原
 
-使用 Wind CLI 進行資料庫備份與還原：
+使用 NPT CLI 進行資料庫備份與還原：
 
 ```bash
 # 備份資料庫
@@ -398,11 +405,11 @@ generator client {
 ```text
 backups/
 ├── development/
-│   └── wind_db_development_YYYYMMDD_HHMMSS.sql.gz
+│   └── npt_db_development_YYYYMMDD_HHMMSS.sql.gz
 ├── uat/
-│   └── wind_db_uat_YYYYMMDD_HHMMSS.sql.gz
+│   └── npt_db_uat_YYYYMMDD_HHMMSS.sql.gz
 └── production/
-    └── wind_db_production_YYYYMMDD_HHMMSS.sql.gz
+    └── npt_db_production_YYYYMMDD_HHMMSS.sql.gz
 ```
 
 ### 環境差異
@@ -429,4 +436,3 @@ backups/
 - [軟刪除實現](./SOFT_DELETE.md)
 - [UUID v7 遷移](./UUID_V7_MIGRATION.md)
 - [資料庫備份與還原](./BACKUP_RESTORE.md)
-- [TimescaleDB 整合](../backend/TIMESCALEDB_INTEGRATION.md)

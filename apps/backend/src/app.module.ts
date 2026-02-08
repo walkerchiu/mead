@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -19,14 +20,19 @@ import * as jwt from 'jsonwebtoken';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
+import { RequestContextModule } from './common/request-context/request-context.module';
 import { GqlThrottlerGuard } from './common/guards/gql-throttler.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { AuditLogModule } from './audit-log/audit-log.module';
+import { NotificationModule } from './notification/notification.module';
+import { SystemStatusModule } from './system-status/system-status.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { RbacModule } from './rbac/rbac.module';
 import { TwoFactorAuthModule } from './two-factor-auth/two-factor-auth.module';
+import { CacheModule } from './cache/cache.module';
+import { HealthModule } from './health/health.module';
 import { FieldAuthPlugin } from './common/plugins/field-auth.plugin';
 import { RequestIdPlugin } from './common/plugins/request-id.plugin';
 import { QueryComplexityPlugin } from './common/plugins/query-complexity.plugin';
@@ -36,11 +42,18 @@ import { SubscriptionRateLimiterService } from './common/services/subscription-r
 import { WebSocketModule } from './common/services/websocket.module';
 import { PubSubModule } from './common/services/pubsub.module';
 import { GeoIPModule } from './common/services/geoip.module';
+import { CronMonitoringModule } from './cron-monitoring/cron-monitoring.module';
+import { PersonalAccessTokenModule } from './modules/personal-access-token/personal-access-token.module';
+import { TlsModule } from './tls/tls.module';
 import { UserType, ProfileType } from './modules/user/user.types';
+import { UserDataLoaderService } from './modules/user/user.dataloader';
 import { logger } from './common/services/logger.service';
 
 @Module({
   imports: [
+    // Per-request ALS（提供 RequestContextService）— 必須最早載入，
+    // 中間件對所有路由註冊 ALS scope，後續所有 service 即可透過注入取得當前 requestId
+    RequestContextModule,
     // Environment
     ConfigModule.forRoot({
       isGlobal: true,
@@ -53,10 +66,14 @@ import { logger } from './common/services/logger.service';
         watch: true,
       },
       resolvers: [new HeaderResolver(['x-lang']), AcceptLanguageResolver],
-      typesOutputPath: path.join(process.cwd(), 'src/i18n/i18n.types.ts'),
+      typesOutputPath: path.join(__dirname, 'i18n/i18n.types.ts'),
     }),
     // Database
     PrismaModule,
+    // Cache (Redis)
+    CacheModule,
+    // Task Scheduling (Cron Jobs)
+    ScheduleModule.forRoot(),
     // Rate Limiting 設定
     ThrottlerModule.forRoot([
       {
@@ -78,16 +95,18 @@ import { logger } from './common/services/logger.service';
     // 官方 GraphQL 配置（單一端點 + 動態欄位控制 + 查詢複雜度限制 + Subscriptions）
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [ConfigModule, WebSocketModule],
+      imports: [ConfigModule, WebSocketModule, UserModule],
       inject: [
         ConfigService,
         WebSocketConnectionService,
         SubscriptionRateLimiterService,
+        UserDataLoaderService,
       ],
       useFactory: (
         configService: ConfigService,
         wsConnectionService: WebSocketConnectionService,
         rateLimiterService: SubscriptionRateLimiterService,
+        userDataLoaderService: UserDataLoaderService,
       ) => ({
         autoSchemaFile: 'schema.gql',
         sortSchema: true,
@@ -226,7 +245,7 @@ import { logger } from './common/services/logger.service';
           ...(process.env.NODE_ENV !== 'production'
             ? [ApolloServerPluginLandingPageLocalDefault()]
             : []),
-          // 僅允許 Admin 使用 Introspection（安全性增強）
+          // 僅允許 HQ 使用 Introspection（安全性增強）
           {
             async requestDidStart() {
               return {
@@ -235,13 +254,9 @@ import { logger } from './common/services/logger.service';
                   // 攔截 introspection query
                   if (operationName === 'IntrospectionQuery') {
                     const user = requestContext.contextValue?.req?.user;
-                    const hasAdminScope =
-                      user?.accessScopes?.includes('ADMIN_SCOPE');
+                    const hasHQScope = user?.accessScopes?.includes('HQ_SCOPE');
 
-                    if (
-                      !hasAdminScope &&
-                      process.env.NODE_ENV === 'production'
-                    ) {
+                    if (!hasHQScope && process.env.NODE_ENV === 'production') {
                       throw new Error(
                         'GraphQL introspection is disabled in production',
                       );
@@ -253,15 +268,27 @@ import { logger } from './common/services/logger.service';
           },
         ],
         validationRules: [depthLimit(10)],
-        context: ({ req, res, extra, connection, connectionParams }: any) => ({
-          req,
-          res,
-          extra, // ✅ 傳遞 WebSocket 的 extra（包含 onConnect 返回值）
-          connection, // ✅ 傳遞 WebSocket connection 對象
-          connectionParams, // ✅ 傳遞連接參數
-          // WebSocket subscriptions 的 user context（向後兼容）
-          user: extra?.user || req?.user,
-        }),
+        context: ({ req, res, extra, connection, connectionParams }: any) => {
+          // ✅ DataLoader: 為每個請求建立新的 loader 實例
+          // 這確保快取只在單個請求週期內有效，避免跨請求快取導致的資料不一致
+          const loaders = {
+            user: userDataLoaderService.createLoader(),
+            userBasic: userDataLoaderService.createBasicLoader(),
+            userByEmail: userDataLoaderService.createEmailLoader(),
+          };
+
+          return {
+            req,
+            res,
+            extra, // ✅ 傳遞 WebSocket 的 extra（包含 onConnect 返回值）
+            connection, // ✅ 傳遞 WebSocket connection 對象
+            connectionParams, // ✅ 傳遞連接參數
+            // WebSocket subscriptions 的 user context（向後兼容）
+            user: extra?.user || req?.user,
+            // ✅ DataLoader 實例（用於批量查詢，解決 N+1 問題）
+            loaders,
+          };
+        },
       }),
     }),
     // Feature Modules
@@ -271,9 +298,15 @@ import { logger } from './common/services/logger.service';
     TwoFactorAuthModule,
     UserModule,
     AuditLogModule,
+    NotificationModule,
+    SystemStatusModule,
+    HealthModule, // ✅ 健康檢查
     PubSubModule, // ✅ 全局 PubSub
     WebSocketModule, // ✅ WebSocket 服務
     GeoIPModule, // ✅ IP 地理位置服務
+    CronMonitoringModule, // ✅ Cron Job 監控
+    PersonalAccessTokenModule, // ✅ 個人存取權杖模組
+    TlsModule, // ✅ TLS 憑證自動化（Let's Encrypt / Cloudflare / AWS ACM）
   ],
   controllers: [AppController],
   providers: [
@@ -290,6 +323,7 @@ import { logger } from './common/services/logger.service';
     FieldMetadataCache, // 欄位權限規則快取
     // GraphQL Plugins
     FieldAuthPlugin, // ✅ 完整的欄位級權限控制
+    // DebugPlugin, // 🔍 Debug plugin (用於除錯，已修復)
     RequestIdPlugin,
     QueryComplexityPlugin, // Query Complexity 限制防止 DoS
   ],

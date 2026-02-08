@@ -1,0 +1,49 @@
+// Cron Job 執行記錄
+// 記錄每次 Cron Job 的執行狀態、結果和效能指標
+
+model CronJobExecution {
+  id          String   @id @default(uuid())
+
+  // Job 識別
+  jobName     String   @db.VarChar(100)   // 例如: 'cleanup-expired-sessions'
+  jobType     String   @db.VarChar(50)    // 例如: 'cleanup', 'archiving', 'notification'
+
+  // 執行時間
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  duration    Int?                        // 執行時長（毫秒）
+
+  // 執行狀態
+  status      CronJobStatus               // RUNNING, SUCCESS, FAILED, TIMEOUT, SKIPPED
+
+  // 執行結果
+  processedCount Int?                     // 處理數量
+  successCount   Int?                     // 成功數量
+  errorCount     Int?                     // 錯誤數量
+
+  // 詳細資訊
+  details     Json?                       // 額外資訊（彈性欄位）
+  errorMessage String?   @db.Text         // 錯誤訊息
+  errorStack   String?   @db.Text         // 錯誤堆疊
+
+  // 執行環境
+  instanceId  String    @db.VarChar(100)  // 實例 ID（多實例環境）
+  lockId      String?   @db.VarChar(100)  // 分散式鎖 ID
+
+  // 下次執行時間（參考）
+  nextRunAt   DateTime?
+
+  // 索引優化
+  @@index([jobName, startedAt])
+  @@index([status])
+  @@index([startedAt])
+  @@map("cron_job_executions")
+}
+
+enum CronJobStatus {
+  RUNNING    // 執行中
+  SUCCESS    // 成功完成
+  FAILED     // 執行失敗
+  TIMEOUT    // 執行超時
+  SKIPPED    // 被跳過（無法獲取鎖）
+}

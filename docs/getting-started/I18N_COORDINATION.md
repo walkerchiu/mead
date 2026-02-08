@@ -1,6 +1,13 @@
 # 前後端 i18n 協調機制
 
-說明前端（next-intl）與後端（nestjs-i18n）如何協調語言設定，包含完整流程與實現細節。
+說明前端（next-intl）與後端（nestjs-i18n）如何協調語言設定，包含完整流程、CLI 工具與實現細節。
+
+> 📚 **閱讀導覽**：本文件是 i18n 系列的**整合指南與入口**。若需了解單側實作細節，請參考：
+>
+> - [前端 i18n 設置](../frontend/I18N_SETUP.md) — Next.js（routing、useTranslations、Link）
+> - [後端 i18n 設置](../backend/I18N_SETUP.md) — NestJS（I18nModule、Decorator、Email 模板）
+
+---
 
 ## 📋 目錄
 
@@ -125,7 +132,7 @@ const handleLanguageChange = (locale: Locale) => {
 
 **流程**：
 
-1. 使用者點擊語言選單
+1. 用戶點擊語言選單
 2. `router.replace()` 更新 URL 路徑
 3. Next.js middleware 攔截並驗證
 4. 頁面重新渲染，載入新語言的翻譯
@@ -442,8 +449,43 @@ defaultOptions: {
 
 ---
 
+## 🛠️ CLI 工具支援
+
+前後端共用同一套 i18n CLI 工具，可執行翻譯完整性測試、類型生成、翻譯統計等。
+
+### 互動式 CLI
+
+```bash
+# 啟動 NPT CLI
+./scripts/cli.sh
+
+# 選擇 14（i18n 多語系管理）
+# 可執行：
+# 1) 測試翻譯檔案（執行完整性測試）
+# 2) 生成類型定義（前後端）
+# 3) 查看翻譯統計
+```
+
+### 手動執行命令
+
+```bash
+# 後端：生成類型
+pnpm --filter @npt/backend generate-i18n-types
+
+# 後端：測試翻譯完整性
+pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
+
+# 前端：生成類型
+pnpm --filter @npt/frontend generate-i18n-types
+
+# 全專案類型檢查
+pnpm type-check
+```
+
+---
+
 ## 📚 相關文檔
 
-- [前端 i18n 設置](../frontend/I18N_SETUP.md)
-- [後端 i18n 設置](../backend/I18N_SETUP.md)
+- [前端 i18n 設置](../frontend/I18N_SETUP.md) — Next.js 端實作細節
+- [後端 i18n 設置](../backend/I18N_SETUP.md) — NestJS 端實作細節
 - [Apollo Client 配置](../frontend/FRONTEND_INTEGRATION.md)

@@ -213,7 +213,7 @@ JWT_REFRESH_EXPIRES_IN=7d
         ✅ 用戶無感知，繼續使用
 
 09:16 - 繼續正常使用
-        ✅ 每 15 分鐘自動刷新 Access Token
+        ✅ 每 15 分鐘自動重新整理 Access Token
         ✅ 持續 7 天無需重新登入
 ```
 
@@ -234,7 +234,7 @@ JWT_REFRESH_EXPIRES_IN=7d
         後端: ✅ JWT 驗證通過
         結果: ✅ 請求成功（但最多只能再用到 10:15）
 
-10:15 - Access Token 過期，前端嘗試刷新
+10:15 - Access Token 過期，前端嘗試重新整理
         前端: 用 xyz789 調用 refreshToken mutation
         後端: ❌ user.refreshToken 是 null
         返回: "Invalid refresh token"
@@ -299,7 +299,7 @@ Session 撤銷時會記錄：
 info: [SessionManagement] Session revoked {
   userId: "user-123",
   sessionId: "session-456",
-  revokedBy: "admin-789",
+  revokedBy: "hq-789",
   reason: "Suspicious activity"
 }
 ```
@@ -322,16 +322,16 @@ info: [SessionManagement] Session revoked {
   - Refresh Token ≤ 14d
 
 - [ ] 測試 Token 過期機制
-  - Access Token 過期後自動刷新
+  - Access Token 過期後自動重新整理
   - Refresh Token 過期後強制重新登入
 
 - [ ] 測試 Session 撤銷
-  - 撤銷後無法刷新 token
+  - 撤銷後無法重新整理 token
   - 收到撤銷通知郵件
 
 ### 監控指標
 
-- [ ] 追蹤 Token 刷新頻率
+- [ ] 追蹤 Token 重新整理頻率
 - [ ] 監控 Session 撤銷數量
 - [ ] 檢查異常登入嘗試
 
@@ -339,7 +339,7 @@ info: [SessionManagement] Session revoked {
 
 ## 📖 相關文檔
 
-- **Session 管理**: 參見 `apps/backend/src/auth/admin-session.service.ts`
+- **Session 管理**: 參見 `apps/backend/src/auth/hq-session.service.ts`
 - [Two Factor Auth](./TWO_FACTOR_AUTH.md) - 雙因素認證系統
 - [Registration](./REGISTRATION.md) - 用戶註冊與權限分配
 - [RBAC Architecture](./RBAC_ARCHITECTURE.md) - 角色權限系統架構

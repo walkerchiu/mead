@@ -1,0 +1,9 @@
+{
+  "invalidName": "Invalid token name (1-100 characters)",
+  "scopesRequired": "At least one scope is required",
+  "invalidScopes": "Invalid scopes: {scopes}",
+  "invalidExpireDays": "Expiration must be 30, 90, or 180 days",
+  "maxTokensReached": "Maximum number of active tokens reached ({max})",
+  "notFound": "Token not found",
+  "alreadyRevoked": "Token has already been revoked"
+}

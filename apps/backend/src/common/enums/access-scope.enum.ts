@@ -1,11 +1,11 @@
 /**
  * AccessScope - 訪問範圍枚舉
- * 決定使用者可以訪問哪個介面
+ * 決定用戶可以訪問哪個介面
  */
 export enum AccessScope {
   PUBLIC_SCOPE = 'PUBLIC_SCOPE', // 公開頁面訪問
   CUSTOMER_SCOPE = 'CUSTOMER_SCOPE', // 客戶儀表板訪問
-  ADMIN_SCOPE = 'ADMIN_SCOPE', // 管理後台訪問
+  HQ_SCOPE = 'HQ_SCOPE', // 管理後台訪問
 }
 
 /**
@@ -29,7 +29,7 @@ export function parseAccessScopes(scopes?: string | string[]): AccessScope[] {
 }
 
 /**
- * 檢查使用者是否有指定的 AccessScope
+ * 檢查用戶是否有指定的 AccessScope
  */
 export function hasAccessScope(
   userScopes: AccessScope[],
@@ -39,7 +39,7 @@ export function hasAccessScope(
 }
 
 /**
- * 檢查使用者是否有任一指定的 AccessScope（OR 邏輯）
+ * 檢查用戶是否有任一指定的 AccessScope（OR 邏輯）
  */
 export function hasAnyAccessScope(
   userScopes: AccessScope[],

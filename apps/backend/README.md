@@ -1,4 +1,4 @@
-# Wind API - NestJS 後端
+# NPT API - NestJS 後端
 
 NestJS 11 GraphQL API，具備完整認證授權、RBAC、2FA、審計日誌、訊息佇列與快取。
 
@@ -6,7 +6,7 @@ NestJS 11 GraphQL API，具備完整認證授權、RBAC、2FA、審計日誌、�
 
 - **NestJS**: 11.1.12
 - **GraphQL**: 16.12.0 (Apollo Server 5.3.0)
-- **Prisma**: 6.1.0（透過 `@wind/database`）
+- **Prisma**: 6.1.0（透過 `@npt/database`）
 - **TypeScript**: 5.9.3
 - **nestjs-i18n**: 多語系（en、zh-TW）
 - **測試**: Jest 30
@@ -45,7 +45,7 @@ apps/backend/
 │   │   ├── auth.resolver.ts   # 認證 GraphQL resolver
 │   │   ├── jwt.strategy.ts    # JWT 策略
 │   │   ├── password-reset.service.ts  # 密碼重設服務
-│   │   ├── admin-session.service.ts   # Session 管理服務
+│   │   ├── hq-session.service.ts   # Session 管理服務
 │   │   └── account-lockout.service.ts # 帳號鎖定服務
 │   ├── two-factor-auth/       # 雙因素認證（Email-based 2FA）
 │   ├── rbac/                  # RBAC 角色權限控制
@@ -63,7 +63,7 @@ apps/backend/
 │   ├── cache/                 # Dragonfly/Redis 快取層
 │   ├── prisma/                # Prisma 資料庫整合
 │   ├── modules/
-│   │   └── user/              # 使用者管理模組
+│   │   └── user/              # 用戶管理模組
 │   ├── generated/             # 自動生成的檔案
 │   │   └── i18n.generated.ts  # i18n 型別定義
 │   └── common/
@@ -102,7 +102,7 @@ apps/backend/
 ```env
 PORT=4000
 NODE_ENV=development
-DATABASE_URL="postgresql://postgres:password@localhost:5432/wind_db?schema=public"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/npt_db?schema=public"
 ```
 
 ## 存取

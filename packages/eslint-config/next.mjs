@@ -22,7 +22,11 @@ export default tseslint.config(
       'prettier/prettier': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
-        { argsIgnorePattern: '^_' },
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
       ],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -38,6 +42,9 @@ export default tseslint.config(
       '**/out/',
       '**/coverage/',
       '**/next-env.d.ts',
+      '**/generated/',
+      '**/*.generated.ts',
+      '**/i18n.types.ts',
     ],
   },
 );

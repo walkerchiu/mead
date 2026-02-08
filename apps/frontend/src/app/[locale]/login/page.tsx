@@ -9,18 +9,23 @@ import { LoginForm, TwoFactorForm } from '@/components/organisms';
 import {
   LOGIN_MUTATION,
   VERIFY_TWO_FACTOR_LOGIN_MUTATION,
+  ME_QUERY,
 } from '@/lib/graphql';
 import { setAuthTokens, isAuthenticated } from '@/lib/auth';
 import { getErrorMessage } from '@/lib/error-utils';
-import { useRouter } from '@/i18n/routing';
-import { DashboardSkeleton } from '@/components/atoms';
+import { useNavRouter as useRouter } from '@/i18n/use-nav-router';
+import { useParams } from 'next/navigation';
+import { useApolloClient } from '@apollo/client/react';
 
 export default function LoginPage() {
   const router = useRouter();
+  const params = useParams();
+  const apolloClient = useApolloClient();
   const { enqueueSnackbar } = useSnackbar();
   const t = useTranslations('auth.login');
   const t2fa = useTranslations('auth.twoFactor');
-  const [checking, setChecking] = useState(true);
+  const [redirecting, setRedirecting] = useState(false);
+  const currentLocale = (params.locale as string) || 'en';
 
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [temporaryToken, setTemporaryToken] = useState('');
@@ -32,21 +37,55 @@ export default function LoginPage() {
     VERIFY_TWO_FACTOR_LOGIN_MUTATION,
   );
 
-  // 檢查是否已登入，如果已登入則重定向到首頁
+  // 背景檢查是否已登入，如果已登入則重定向到首頁
   useEffect(() => {
     const checkAuth = async () => {
-      // 等待一小段時間讓 useAuthInit 完成初始化
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
+      // 立即檢查一次
       if (isAuthenticated()) {
+        setRedirecting(true);
         router.replace('/dashboard');
-      } else {
-        setChecking(false);
+        return;
+      }
+
+      // 使用輪詢機制再檢查幾次（最多 300ms）
+      const maxAttempts = 3;
+      let attempts = 0;
+
+      while (attempts < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        attempts++;
+
+        if (isAuthenticated()) {
+          setRedirecting(true);
+          router.replace('/dashboard');
+          return;
+        }
       }
     };
 
     checkAuth();
   }, [router]);
+
+  /**
+   * 登入成功後根據 profile.language 導向正確 locale 的 dashboard
+   */
+  const redirectToDashboard = async () => {
+    try {
+      const { data: meData } = await apolloClient.query({
+        query: ME_QUERY,
+        fetchPolicy: 'network-only',
+      });
+      const profileLanguage = (meData as any)?.me?.profile?.language;
+      if (profileLanguage && profileLanguage !== currentLocale) {
+        // locale 不同，用完整 URL 跳轉到正確 locale
+        window.location.href = `/${profileLanguage}/dashboard`;
+        return;
+      }
+    } catch {
+      // 查詢失敗，使用當前 locale
+    }
+    router.push('/dashboard');
+  };
 
   const handleLogin = async (data: { email: string; password: string }) => {
     setLoginError(undefined);
@@ -88,7 +127,7 @@ export default function LoginPage() {
           accessToken: response.accessToken,
         });
         enqueueSnackbar(t('success'), { variant: 'success' });
-        router.push('/dashboard');
+        await redirectToDashboard();
       }
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, t('error'));
@@ -130,7 +169,7 @@ export default function LoginPage() {
       });
 
       enqueueSnackbar(t('success'), { variant: 'success' });
-      router.push('/dashboard');
+      await redirectToDashboard();
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error, t2fa('codeInvalid'));
       if (errorMessage) {
@@ -145,11 +184,6 @@ export default function LoginPage() {
     setTwoFactorError(undefined);
   };
 
-  // 正在檢查認證狀態
-  if (checking) {
-    return <DashboardSkeleton />;
-  }
-
   return (
     <AuthLayout
       title={showTwoFactor ? t2fa('title') : t('title')}
@@ -158,13 +192,13 @@ export default function LoginPage() {
       {!showTwoFactor ? (
         <LoginForm
           onSubmit={handleLogin}
-          loading={loginLoading}
+          loading={loginLoading || redirecting}
           error={loginError}
         />
       ) : (
         <TwoFactorForm
           onSubmit={handleTwoFactor}
-          loading={twoFactorLoading}
+          loading={twoFactorLoading || redirecting}
           error={twoFactorError}
           onBack={handleBack}
         />

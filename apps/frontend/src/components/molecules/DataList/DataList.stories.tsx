@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { DataList, type DataListItem } from './DataList';
 import { Icon } from '@/components/atoms';

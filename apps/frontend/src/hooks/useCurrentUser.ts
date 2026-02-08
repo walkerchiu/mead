@@ -36,7 +36,7 @@ export interface CurrentUser {
 }
 
 /**
- * 取得當前登入使用者資訊
+ * 取得當前登入用戶資訊
  */
 export function useCurrentUser(options?: { skip?: boolean }) {
   const { data, loading, error, refetch } = useQuery<MeQueryData>(ME_QUERY, {

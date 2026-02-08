@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - stop 命令
+# NPT CLI - stop 命令
 # 停止服務
 # ==========================================
 
@@ -129,10 +129,36 @@ kill_process() {
 stop_docker() {
   print_header "停止 Docker 服務"
 
-  log_info "停止 Docker 容器..."
-  docker-compose --env-file .env.docker down
+  # 檢查 SeaweedFS 是否在運行
+  local seaweedfs_running=false
+  if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
+    seaweedfs_running=true
+  fi
 
-  log_success "Docker 服務已停止"
+  # 如果 SeaweedFS 在運行，詢問是否一起停止
+  local stop_storage=false
+  if [ "$seaweedfs_running" = true ]; then
+    echo ""
+    if confirm "是否也要停止 SeaweedFS?" "y"; then
+      stop_storage=true
+    fi
+  fi
+
+  # 停止 Docker 容器
+  log_info "停止 Docker 容器..."
+  if [ "$stop_storage" = true ]; then
+    # 停止所有容器
+    docker-compose --env-file .env.docker --profile storage down
+    log_success "所有 Docker 服務已停止"
+  else
+    # 只停止核心服務
+    docker-compose --env-file .env.docker down
+    if [ "$seaweedfs_running" = true ]; then
+      log_success "核心服務已停止（SeaweedFS 保持運行）"
+    else
+      log_success "Docker 服務已停止"
+    fi
+  fi
 }
 
 # 停止前端
@@ -163,7 +189,7 @@ stop_prisma_studio() {
 stop_all() {
   print_header "停止所有服務"
 
-  log_warning "這將停止前端、後端、Storybook、Prisma Studio 和 Docker 服務"
+  log_warning "這將停止前端、後端、Storybook、Prisma Studio 和所有 Docker 服務"
   if ! confirm "確定要繼續嗎?" "n"; then
     log_info "已取消"
     exit 0
@@ -175,8 +201,9 @@ stop_all() {
   kill_process 6006 "Storybook"
   kill_process 5555 "Prisma Studio"
 
-  # 停止 Docker
-  stop_docker
+  # 停止所有 Docker 服務
+  log_info "停止所有 Docker 容器..."
+  docker-compose --env-file .env.docker --profile storage down
 
   echo ""
   log_success "所有服務已停止"

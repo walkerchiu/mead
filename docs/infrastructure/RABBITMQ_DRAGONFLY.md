@@ -84,7 +84,7 @@ AuditLogConsumer 批次處理
 
 - **AMQP 端口**: 5672
 - **管理介面**: http://localhost:15672
-- **預設帳號**: admin / password
+- **預設帳號**: hq / password
 - **佇列名稱**: `audit_logs`
 
 ### 管理介面
@@ -101,7 +101,7 @@ AuditLogConsumer 批次處理
 ### 用途
 
 - **查詢快取**: 快取常用查詢結果
-- **Session 儲存**: 使用者 Session 管理
+- **Session 儲存**: 用戶 Session 管理
 - **Rate Limiting 共享**: 分散式 Rate Limit
 - **即時資料**: 減少資料庫負載
 
@@ -153,7 +153,7 @@ docker-compose logs -f dragonfly
 
 ```bash
 # RabbitMQ
-curl -u admin:password http://localhost:15672/api/healthchecks/node
+curl -u hq:password http://localhost:15672/api/healthchecks/node
 
 # Dragonfly
 redis-cli ping
@@ -169,7 +169,7 @@ docker exec $(grep DRAGONFLY_CONTAINER_NAME .env.docker | cut -d'=' -f2) redis-c
 
 ```env
 # RabbitMQ
-RABBITMQ_URL=amqp://admin:password@localhost:5672
+RABBITMQ_URL=amqp://hq:password@localhost:5672
 
 # Dragonfly/Redis
 REDIS_HOST=localhost

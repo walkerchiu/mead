@@ -1,12 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { FormField } from './FormField';
 import { Button } from '@/components/atoms';
 import Stack from '@mui/material/Stack';
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
+import FormLabel from '@mui/material/FormLabel';
 import {
   Search as SearchIcon,
   Person as PersonIcon,
@@ -53,6 +55,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+// ============================================
+// Default
+// ============================================
+
 /**
  * Basic usage
  * Normal state without errors
@@ -64,6 +70,10 @@ export const Default: Story = {
     helperText: 'Please enter your email address',
   },
 };
+
+// ============================================
+// States
+// ============================================
 
 /**
  * With error message
@@ -103,6 +113,456 @@ export const Required: Story = {
     helperText: 'This field is required',
   },
 };
+
+// ============================================
+// Features: Text Alignment
+// ============================================
+
+/**
+ * Text Alignment
+ * Demonstrates different alignment options
+ */
+export const TextAlignment: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Text Alignment</Typography>
+
+      <FormField
+        label="Left aligned (default)"
+        textAlign="left"
+        defaultValue="Left aligned text"
+        helperText="textAlign='left'"
+      />
+
+      <FormField
+        label="Right aligned"
+        textAlign="right"
+        defaultValue="Right aligned text"
+        helperText="textAlign='right'"
+      />
+
+      <FormField
+        label="Center aligned"
+        textAlign="center"
+        defaultValue="Center aligned text"
+        helperText="textAlign='center'"
+      />
+
+      <FormField
+        label="Auto aligned (numbers)"
+        type="number"
+        textAlign="auto"
+        defaultValue={12345}
+        helperText="textAlign='auto' - Numbers auto-align right"
+      />
+
+      <FormField
+        label="Auto aligned (text)"
+        textAlign="auto"
+        defaultValue="Auto aligned text"
+        helperText="textAlign='auto' - Text auto-aligns left"
+      />
+
+      <FormField
+        label="Force left (numbers)"
+        type="number"
+        textAlign="left"
+        defaultValue={12345}
+        helperText="Numbers can be forced left"
+      />
+    </Stack>
+  ),
+};
+
+// ============================================
+// Features: Adornments (Units)
+// ============================================
+
+/**
+ * With start adornment
+ * Display unit or label before the field (numbers auto-align right)
+ */
+export const WithStartAdornment: Story = {
+  args: {
+    label: 'Price',
+    type: 'number',
+    startAdornment: '$',
+    placeholder: '0.00',
+    helperText: 'Enter product price (numbers auto-align right)',
+  },
+};
+
+/**
+ * With end adornment
+ * Display unit after the field
+ */
+export const WithEndAdornment: Story = {
+  args: {
+    label: 'Weight',
+    type: 'number',
+    endAdornment: 'kg',
+    placeholder: '0',
+    helperText: 'Enter product weight',
+  },
+};
+
+/**
+ * With both adornments
+ * Display currency symbol and unit
+ */
+export const WithBothAdornments: Story = {
+  args: {
+    label: 'Amount',
+    type: 'number',
+    startAdornment: 'NT$',
+    endAdornment: 'TWD',
+    placeholder: '0.00',
+    helperText: 'Enter amount （TWD）',
+  },
+};
+
+/**
+ * Various Unit Examples
+ * Demonstrates different unit labels
+ */
+export const UnitsExamples: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Various Unit Examples</Typography>
+
+      <FormField
+        label="Price"
+        type="number"
+        startAdornment="$"
+        placeholder="0.00"
+      />
+
+      <FormField
+        label="Discount"
+        type="number"
+        endAdornment="%"
+        placeholder="0"
+      />
+
+      <FormField
+        label="Weight"
+        type="number"
+        endAdornment="kg"
+        placeholder="0"
+      />
+
+      <FormField
+        label="Distance"
+        type="number"
+        endAdornment="km"
+        placeholder="0"
+      />
+
+      <FormField
+        label="Temperature"
+        type="number"
+        endAdornment="°C"
+        placeholder="0"
+      />
+
+      <FormField
+        label="Volume"
+        type="number"
+        endAdornment="L"
+        placeholder="0"
+      />
+    </Stack>
+  ),
+};
+
+// ============================================
+// Features: Adornments (Icons)
+// ============================================
+
+/**
+ * With icon start
+ * Using MUI icon as prefix
+ */
+export const WithIconStart: Story = {
+  args: {
+    label: 'Search',
+    startAdornment: <SearchIcon />,
+    placeholder: 'Enter keywords to search...',
+  },
+};
+
+/**
+ * With icon end
+ * Using MUI icon as suffix
+ */
+export const WithIconEnd: Story = {
+  args: {
+    label: 'Username',
+    endAdornment: <PersonIcon />,
+    placeholder: 'Enter username',
+  },
+};
+
+/**
+ * Various Icon Examples
+ * Demonstrates different icon decorations
+ */
+export const IconExamples: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Various Icon Examples</Typography>
+
+      <FormField
+        label="Search"
+        startAdornment={<SearchIcon />}
+        placeholder="Enter keywords..."
+      />
+
+      <FormField
+        label="Email"
+        startAdornment={<EmailIcon />}
+        placeholder="your@email.com"
+      />
+
+      <FormField
+        label="Phone"
+        startAdornment={<PhoneIcon />}
+        placeholder="+886 912 345 678"
+      />
+
+      <FormField
+        label="Username"
+        startAdornment={<PersonIcon />}
+        placeholder="username"
+      />
+
+      <FormField
+        label="Password"
+        type="password"
+        startAdornment={<LockIcon />}
+        placeholder="Enter password"
+      />
+    </Stack>
+  ),
+};
+
+// ============================================
+// Features: Number Formatting
+// ============================================
+
+/**
+ * Number Formatting - Basic Thousands
+ * Auto-add thousands separator
+ */
+export const NumberFormatting: Story = {
+  args: {
+    label: 'Amount',
+    formatNumber: true,
+    startAdornment: '$',
+    defaultValue: '1234567.89',
+    helperText: 'Numbers will auto-add thousands separator',
+  },
+};
+
+/**
+ * Number Formatting - Comparison
+ * Comparison between formatted and unformatted
+ */
+export const NumberFormattingComparison: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Formatting Comparison</Typography>
+
+      <FormField
+        label="Unformatted"
+        type="number"
+        startAdornment="$"
+        defaultValue={1234567.89}
+        helperText="type='number' - No thousands separator"
+      />
+
+      <FormField
+        label="Formatted"
+        formatNumber
+        startAdornment="$"
+        defaultValue="1234567.89"
+        helperText="formatNumber={true} - Auto-add thousands separator"
+      />
+
+      <Alert severity="info">
+        When formatNumber is enabled, formatting is removed on focus for easier
+        editing, and automatically formatted on blur
+      </Alert>
+    </Stack>
+  ),
+};
+
+/**
+ * Number Formatting - Different Locales
+ * Demonstrates formatting rules for different locales
+ */
+export const NumberFormattingLocales: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Formatting for Different Locales</Typography>
+
+      <FormField
+        label="US Format (en-US)"
+        formatNumber
+        numberLocale="en-US"
+        startAdornment="$"
+        defaultValue="1234567.89"
+        helperText="1,234,567.89 - Uses comma and dot"
+      />
+
+      <FormField
+        label="Taiwan Format (zh-TW)"
+        formatNumber
+        numberLocale="zh-TW"
+        startAdornment="$"
+        defaultValue="1234567.89"
+        helperText="1,234,567.89 - Same as en-US"
+      />
+
+      <FormField
+        label="German Format (de-DE)"
+        formatNumber
+        numberLocale="de-DE"
+        startAdornment="€"
+        defaultValue="1234567.89"
+        helperText="1.234.567,89 - Uses dot and comma (reversed)"
+      />
+
+      <Alert severity="info">
+        Different locales have different rules for thousands and decimal
+        separators
+      </Alert>
+    </Stack>
+  ),
+};
+
+/**
+ * Number Formatting - Decimal Places Control
+ * Control the number of decimal places displayed
+ */
+export const NumberFormattingDecimalPlaces: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <Typography variant="h6">Decimal Places Control</Typography>
+
+      <FormField
+        label="No decimal limit"
+        formatNumber
+        startAdornment="$"
+        defaultValue="1234.56789"
+        helperText="decimalPlaces not set - Show all decimals"
+      />
+
+      <FormField
+        label="2 decimal places"
+        formatNumber
+        decimalPlaces={2}
+        startAdornment="$"
+        defaultValue="1234.56789"
+        helperText="decimalPlaces={2} - Fixed 2 decimal places"
+      />
+
+      <FormField
+        label="0 decimal places"
+        formatNumber
+        decimalPlaces={0}
+        defaultValue="1234.56789"
+        helperText="decimalPlaces={0} - Only show integers"
+      />
+
+      <FormField
+        label="4 decimal places"
+        formatNumber
+        decimalPlaces={4}
+        startAdornment="$"
+        defaultValue="1234.5678"
+        helperText="decimalPlaces={4} - 4 decimal places (for precise calculations)"
+      />
+    </Stack>
+  ),
+};
+
+/**
+ * Number Formatting - Interactive Demo
+ * Real-time formatting effect display
+ */
+export const NumberFormattingInteractive: Story = {
+  render: function NumberFormattingInteractiveComponent() {
+    const schema = z.object({
+      amount: z.string(),
+    });
+
+    type FormData = z.infer<typeof schema>;
+
+    const { control, watch } = useForm<FormData>({
+      resolver: zodResolver(schema),
+      mode: 'onChange',
+      defaultValues: {
+        amount: '1234.56',
+      },
+    });
+
+    const amount = watch('amount');
+    const numericValue = parseFloat((amount || '').replace(/,/g, '')) || 0;
+
+    return (
+      <Stack spacing={2}>
+        <Typography variant="h6">Interactive Formatting Demo</Typography>
+
+        <Controller
+          name="amount"
+          control={control}
+          render={({ field }) => (
+            <FormField
+              label="Enter Amount"
+              formatNumber
+              decimalPlaces={2}
+              startAdornment="$"
+              {...field}
+              helperText="Remove format on focus, auto-format on blur"
+            />
+          )}
+        />
+
+        <Alert severity="info">
+          <Typography variant="body2">
+            <strong>Current Input Value:</strong>
+            {amount}
+            <br />
+            <strong>Numeric Value:</strong>
+            {numericValue}
+            <br />
+            <strong>Formatted Display:</strong>
+            {numericValue.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </Typography>
+        </Alert>
+
+        <Alert severity="warning">
+          <Typography variant="body2">
+            <strong>Usage Tips:</strong>
+            <br />
+            • When focused, displays raw numeric value for easier editing
+            <br />
+            • When blurred, automatically formats the display
+            <br />• Form submission receives raw numeric value (without commas)
+          </Typography>
+        </Alert>
+      </Stack>
+    );
+  },
+};
+
+// ============================================
+// Interactive Examples
+// ============================================
 
 /**
  * Complete form example
@@ -244,6 +704,70 @@ export const LoginForm: Story = {
 };
 
 /**
+ * Login Form with Icons
+ * Practical application with icon decoration
+ */
+export const LoginWithIcons: Story = {
+  render: function LoginWithIconsComponent() {
+    const schema = z.object({
+      email: z.string().email('Enter valid email'),
+      password: z.string().min(8, 'Password must be at least 8 characters'),
+    });
+
+    type FormData = z.infer<typeof schema>;
+
+    const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting },
+    } = useForm<FormData>({
+      resolver: zodResolver(schema),
+    });
+
+    const onSubmit = async (data: FormData) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Login data:', data);
+      alert('Login successful!');
+    };
+
+    return (
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={2}>
+          <Typography variant="h6">Login</Typography>
+
+          <FormField
+            label="Email"
+            type="email"
+            startAdornment={<EmailIcon />}
+            placeholder="your@email.com"
+            {...register('email')}
+            error={errors.email}
+          />
+
+          <FormField
+            label="Password"
+            type="password"
+            startAdornment={<LockIcon />}
+            placeholder="Enter password"
+            {...register('password')}
+            error={errors.password}
+          />
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            loading={isSubmitting}
+          >
+            Login
+          </Button>
+        </Stack>
+      </form>
+    );
+  },
+};
+
+/**
  * Realtime validation
  * Using mode: 'onChange' for realtime validation
  */
@@ -290,170 +814,6 @@ export const RealtimeValidation: Story = {
       </form>
     );
   },
-};
-
-/**
- * With start adornment
- * Display unit or label before the field (numbers auto-align right)
- */
-export const WithStartAdornment: Story = {
-  args: {
-    label: 'Price',
-    type: 'number',
-    startAdornment: '$',
-    placeholder: '0.00',
-    helperText: 'Enter product price (numbers auto-align right)',
-  },
-};
-
-/**
- * With end adornment
- * Display unit after the field
- */
-export const WithEndAdornment: Story = {
-  args: {
-    label: 'Weight',
-    type: 'number',
-    endAdornment: 'kg',
-    placeholder: '0',
-    helperText: 'Enter product weight',
-  },
-};
-
-/**
- * With both adornments
- * Display currency symbol and unit
- */
-export const WithBothAdornments: Story = {
-  args: {
-    label: 'Amount',
-    type: 'number',
-    startAdornment: '$',
-    endAdornment: 'USD',
-    placeholder: '0.00',
-    helperText: 'Enter amount (USD)',
-  },
-};
-
-/**
- * With icon start
- * Using MUI icon as prefix
- */
-export const WithIconStart: Story = {
-  args: {
-    label: 'Search',
-    startAdornment: <SearchIcon />,
-    placeholder: 'Enter keywords to search...',
-  },
-};
-
-/**
- * With icon end
- * Using MUI icon as suffix
- */
-export const WithIconEnd: Story = {
-  args: {
-    label: 'Username',
-    endAdornment: <PersonIcon />,
-    placeholder: 'Enter username',
-  },
-};
-
-/**
- * Various Unit Examples
- * Demonstrates different unit labels
- */
-export const UnitsExamples: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Various Unit Examples</Typography>
-
-      <FormField
-        label="Price"
-        type="number"
-        startAdornment="$"
-        placeholder="0.00"
-      />
-
-      <FormField
-        label="Discount"
-        type="number"
-        endAdornment="%"
-        placeholder="0"
-      />
-
-      <FormField
-        label="Weight"
-        type="number"
-        endAdornment="kg"
-        placeholder="0"
-      />
-
-      <FormField
-        label="Distance"
-        type="number"
-        endAdornment="km"
-        placeholder="0"
-      />
-
-      <FormField
-        label="Temperature"
-        type="number"
-        endAdornment="°C"
-        placeholder="0"
-      />
-
-      <FormField
-        label="Volume"
-        type="number"
-        endAdornment="L"
-        placeholder="0"
-      />
-    </Stack>
-  ),
-};
-
-/**
- * Various Icon Examples
- * Demonstrates different icon decorations
- */
-export const IconExamples: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Various Icon Examples</Typography>
-
-      <FormField
-        label="Search"
-        startAdornment={<SearchIcon />}
-        placeholder="Enter keywords..."
-      />
-
-      <FormField
-        label="Email"
-        startAdornment={<EmailIcon />}
-        placeholder="your@email.com"
-      />
-
-      <FormField
-        label="Phone"
-        startAdornment={<PhoneIcon />}
-        placeholder="+886 912 345 678"
-      />
-
-      <FormField
-        label="Username"
-        startAdornment={<PersonIcon />}
-        placeholder="username"
-      />
-
-      <FormField
-        label="Password"
-        type="password"
-        startAdornment={<LockIcon />}
-        placeholder="Enter password"
-      />
-    </Stack>
-  ),
 };
 
 /**
@@ -536,8 +896,8 @@ export const CurrencyInput: Story = {
                 label="Original Price"
                 formatNumber
                 decimalPlaces={2}
-                startAdornment="$"
-                endAdornment="USD"
+                startAdornment="NT$"
+                endAdornment="TWD"
                 {...field}
                 error={errors.amount}
                 helperText="Enter Original Price"
@@ -788,263 +1148,6 @@ export const ProductSpecForm: Story = {
 };
 
 /**
- * Text Alignment
- * Demonstrates different alignment options
- */
-export const TextAlignment: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Text Alignment</Typography>
-
-      <FormField
-        label="Left aligned (default)"
-        textAlign="left"
-        defaultValue="Left aligned text"
-        helperText="textAlign='left'"
-      />
-
-      <FormField
-        label="Right aligned"
-        textAlign="right"
-        defaultValue="Right aligned text"
-        helperText="textAlign='right'"
-      />
-
-      <FormField
-        label="Center aligned"
-        textAlign="center"
-        defaultValue="Center aligned text"
-        helperText="textAlign='center'"
-      />
-
-      <FormField
-        label="Auto aligned (numbers)"
-        type="number"
-        textAlign="auto"
-        defaultValue={12345}
-        helperText="textAlign='auto' - Numbers auto-align right"
-      />
-
-      <FormField
-        label="Auto aligned (text)"
-        textAlign="auto"
-        defaultValue="Auto aligned text"
-        helperText="textAlign='auto' - Text auto-aligns left"
-      />
-
-      <FormField
-        label="Force left (numbers)"
-        type="number"
-        textAlign="left"
-        defaultValue={12345}
-        helperText="Numbers can be forced left"
-      />
-    </Stack>
-  ),
-};
-
-/**
- * Login Form with Icons
- * Practical application with icon decoration
- */
-export const LoginWithIcons: Story = {
-  render: function LoginWithIconsComponent() {
-    const schema = z.object({
-      email: z.string().email('Enter valid email'),
-      password: z.string().min(8, 'Password must be at least 8 characters'),
-    });
-
-    type FormData = z.infer<typeof schema>;
-
-    const {
-      register,
-      handleSubmit,
-      formState: { errors, isSubmitting },
-    } = useForm<FormData>({
-      resolver: zodResolver(schema),
-    });
-
-    const onSubmit = async (data: FormData) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log('Login data:', data);
-      alert('Login successful!');
-    };
-
-    return (
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
-          <Typography variant="h6">Login</Typography>
-
-          <FormField
-            label="Email"
-            type="email"
-            startAdornment={<EmailIcon />}
-            placeholder="your@email.com"
-            {...register('email')}
-            error={errors.email}
-          />
-
-          <FormField
-            label="Password"
-            type="password"
-            startAdornment={<LockIcon />}
-            placeholder="Enter password"
-            {...register('password')}
-            error={errors.password}
-          />
-
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            loading={isSubmitting}
-          >
-            Login
-          </Button>
-        </Stack>
-      </form>
-    );
-  },
-};
-
-/**
- * Number Formatting - Basic Thousands
- * Auto-add thousands separator
- */
-export const NumberFormatting: Story = {
-  args: {
-    label: 'Amount',
-    formatNumber: true,
-    startAdornment: '$',
-    defaultValue: '1234567.89',
-    helperText: 'Numbers will auto-add thousands separator',
-  },
-};
-
-/**
- * Number Formatting - Comparison
- * Comparison between formatted and unformatted
- */
-export const NumberFormattingComparison: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Formatting Comparison</Typography>
-
-      <FormField
-        label="Unformatted"
-        type="number"
-        startAdornment="$"
-        defaultValue={1234567.89}
-        helperText="type='number' - No thousands separator"
-      />
-
-      <FormField
-        label="Formatted"
-        formatNumber
-        startAdornment="$"
-        defaultValue="1234567.89"
-        helperText="formatNumber={true} - Auto-add thousands separator"
-      />
-
-      <Alert severity="info">
-        When formatNumber is enabled, formatting is removed on focus for easier
-        editing, and automatically formatted on blur
-      </Alert>
-    </Stack>
-  ),
-};
-
-/**
- * Number Formatting - Different Locales
- * Demonstrates formatting rules for different locales
- */
-export const NumberFormattingLocales: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Formatting for Different Locales</Typography>
-
-      <FormField
-        label="US Format (en-US)"
-        formatNumber
-        numberLocale="en-US"
-        startAdornment="$"
-        defaultValue="1234567.89"
-        helperText="1,234,567.89 - Uses comma and dot"
-      />
-
-      <FormField
-        label="Taiwan Format (zh-TW)"
-        formatNumber
-        numberLocale="zh-TW"
-        startAdornment="$"
-        defaultValue="1234567.89"
-        helperText="1,234,567.89 - Same as en-US"
-      />
-
-      <FormField
-        label="German Format (de-DE)"
-        formatNumber
-        numberLocale="de-DE"
-        startAdornment="€"
-        defaultValue="1234567.89"
-        helperText="1.234.567,89 - Uses dot and comma (reversed)"
-      />
-
-      <Alert severity="info">
-        Different locales have different rules for thousands and decimal
-        separators
-      </Alert>
-    </Stack>
-  ),
-};
-
-/**
- * Number Formatting - Decimal Places Control
- * Control the number of decimal places displayed
- */
-export const NumberFormattingDecimalPlaces: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <Typography variant="h6">Decimal Places Control</Typography>
-
-      <FormField
-        label="No decimal limit"
-        formatNumber
-        startAdornment="$"
-        defaultValue="1234.56789"
-        helperText="decimalPlaces not set - Show all decimals"
-      />
-
-      <FormField
-        label="2 decimal places"
-        formatNumber
-        decimalPlaces={2}
-        startAdornment="$"
-        defaultValue="1234.56789"
-        helperText="decimalPlaces={2} - Fixed 2 decimal places"
-      />
-
-      <FormField
-        label="0 decimal places"
-        formatNumber
-        decimalPlaces={0}
-        defaultValue="1234.56789"
-        helperText="decimalPlaces={0} - Only show integers"
-      />
-
-      <FormField
-        label="4 decimal places"
-        formatNumber
-        decimalPlaces={4}
-        startAdornment="$"
-        defaultValue="1234.5678"
-        helperText="decimalPlaces={4} - 4 decimal places (for precise calculations)"
-      />
-    </Stack>
-  ),
-};
-
-/**
  * Number Formatting - Real World Example
  * Complete form with formatting
  */
@@ -1176,74 +1279,129 @@ export const NumberFormattingRealWorld: Story = {
 };
 
 /**
- * Number Formatting - Interactive Demo
- * Real-time formatting effect display
+ * Department Form Example
+ * Real-world example from department management
+ * Demonstrates proper usage of multiline textarea with external label
  */
-export const NumberFormattingInteractive: Story = {
-  render: function NumberFormattingInteractiveComponent() {
+export const DepartmentForm: Story = {
+  render: function DepartmentFormComponent() {
     const schema = z.object({
-      amount: z.string(),
+      name: z
+        .string()
+        .min(2, 'Name must be at least 2 characters')
+        .max(100, 'Name cannot exceed 100 characters'),
+      code: z
+        .string()
+        .min(2, 'Code must be at least 2 characters')
+        .max(50, 'Code cannot exceed 50 characters')
+        .regex(
+          /^[A-Z0-9_-]+$/,
+          'Code must contain only uppercase, numbers, underscore, and hyphen',
+        ),
+      description: z
+        .string()
+        .max(500, 'Description cannot exceed 500 characters')
+        .optional(),
     });
 
     type FormData = z.infer<typeof schema>;
 
-    const { control, watch } = useForm<FormData>({
+    const {
+      register,
+      handleSubmit,
+      formState: { errors, isSubmitting },
+    } = useForm<FormData>({
       resolver: zodResolver(schema),
       mode: 'onChange',
       defaultValues: {
-        amount: '1234.56',
+        name: '',
+        code: '',
+        description: '',
       },
     });
 
-    const amount = watch('amount');
-    const numericValue = parseFloat((amount || '').replace(/,/g, '')) || 0;
+    const onSubmit = async (data: FormData) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Department data:', data);
+      alert('Department created successfully!');
+    };
 
     return (
-      <Stack spacing={2}>
-        <Typography variant="h6">Interactive Formatting Demo</Typography>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Stack spacing={3}>
+          <Typography variant="h6">Create Department</Typography>
 
-        <Controller
-          name="amount"
-          control={control}
-          render={({ field }) => (
+          <FormField
+            {...register('name')}
+            label="Department Name"
+            required
+            placeholder="Enter department name"
+            error={errors.name}
+            helperText={
+              errors.name?.message || 'Enter department name (2-100 characters)'
+            }
+            autoFocus
+          />
+
+          <FormField
+            {...register('code')}
+            label="Department Code"
+            required
+            placeholder="DEPT-CODE"
+            error={errors.code}
+            helperText={
+              errors.code?.message ||
+              'Enter department code (uppercase letters, numbers, underscore, hyphen)'
+            }
+          />
+
+          {/* Multiline textarea with external label */}
+          <Box sx={{ mt: 3 }}>
+            <FormLabel
+              component="div"
+              sx={{
+                display: 'block',
+                mb: 2,
+                color: 'text.secondary',
+                fontWeight: 500,
+                fontSize: '0.875rem',
+              }}
+            >
+              Description
+            </FormLabel>
             <FormField
-              label="Enter Amount"
-              formatNumber
-              decimalPlaces={2}
-              startAdornment="$"
-              {...field}
-              helperText="Remove format on focus, auto-format on blur"
+              {...register('description')}
+              fullWidth
+              multiline
+              rows={5}
+              error={errors.description}
+              helperText={
+                errors.description?.message ||
+                'Enter department description (optional, max 500 characters)'
+              }
+              placeholder="Enter detailed description of the department's responsibilities and scope..."
             />
-          )}
-        />
+          </Box>
 
-        <Alert severity="info">
-          <Typography variant="body2">
-            <strong>Current Input Value:</strong>
-            {amount}
-            <br />
-            <strong>Numeric Value:</strong>
-            {numericValue}
-            <br />
-            <strong>Formatted Display:</strong>
-            {numericValue.toLocaleString('en-US', {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </Typography>
-        </Alert>
+          <Alert severity="info">
+            <Typography variant="body2">
+              <strong>Note:</strong> The description field uses an external
+              FormLabel (with component="div") instead of the built-in label
+              prop. This is the recommended approach for multiline textarea to
+              avoid positioning issues.
+            </Typography>
+          </Alert>
 
-        <Alert severity="warning">
-          <Typography variant="body2">
-            <strong>Usage Tips:</strong>
-            <br />
-            • When focused, displays raw numeric value for easier editing
-            <br />
-            • When blurred, automatically formats the display
-            <br />• Form submission receives raw numeric value (without commas)
-          </Typography>
-        </Alert>
-      </Stack>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            loading={isSubmitting}
+          >
+            Create Department
+          </Button>
+        </Stack>
+      </form>
     );
   },
 };

@@ -11,7 +11,8 @@
     "similarToName": "密碼不應包含您的姓名",
     "similarToUsername": "密碼不應包含您的用戶名",
     "currentIncorrect": "當前密碼不正確",
-    "mustBeDifferent": "新密碼必須與當前密碼不同"
+    "mustBeDifferent": "新密碼必須與當前密碼不同",
+    "recentlyUsed": "此密碼與最近使用過的密碼相同，請選擇不同的密碼"
   },
   "email": {
     "invalid": "無效的電子郵件格式",
@@ -27,6 +28,6 @@
     "invalid": "無效的語言選擇"
   },
   "user": {
-    "notFound": "找不到使用者"
+    "notFound": "找不到用戶"
   }
 }

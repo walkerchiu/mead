@@ -30,6 +30,8 @@ export const getButtonVariantStyles = ({
   tokens,
   size = 'medium',
 }: VariantStyleParams): CSSObject => {
+  if (!tokens) return {};
+
   const baseStyles: CSSObject = {
     boxShadow: 'none',
   };

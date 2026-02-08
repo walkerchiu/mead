@@ -1,10 +1,12 @@
-# Wind CLI 完整指南
+# NPT CLI 完整指南
 
-> 直覺的互動式命令列工具，讓你無需記憶任何命令就能管理整個開發工作流程
+直覺的互動式命令列工具，讓你無需記憶任何命令就能管理整個開發工作流程。
+
+---
 
 ## 📋 目錄
 
-- [Wind CLI 完整指南](#wind-cli-完整指南)
+- [NPT CLI 完整指南](#npt-cli-完整指南)
   - [📋 目錄](#-目錄)
   - [📖 概述](#-概述)
     - [核心特色](#核心特色)
@@ -49,13 +51,15 @@
     - [./scripts/cli.sh restart - 重啟服務](#scriptsclish-restart---重啟服務)
     - [./scripts/cli.sh logs - 查看日誌](#scriptsclish-logs---查看日誌)
     - [./scripts/cli.sh test - 執行測試](#scriptsclish-test---執行測試)
-    - [./scripts/cli.sh clean - 清理快取](#scriptsclish-clean---清理快取)
-    - [./scripts/cli.sh db - 資料庫管理](#scriptsclish-db---資料庫管理)
+    - [./scripts/cli.sh clean - 環境清理](#scriptsclish-clean---環境清理)
+    - [./scripts/cli.sh db - 資料管理](#scriptsclish-db---資料管理)
+    - [./scripts/cli.sh storage - SeaweedFS 儲存管理](#scriptsclish-storage---seaweedfs-儲存管理)
     - [./scripts/cli.sh i18n - 多語系管理](#scriptsclish-i18n---多語系管理)
     - [./scripts/cli.sh port - Port 管理](#scriptsclish-port---port-管理)
     - [./scripts/cli.sh env - 環境切換](#scriptsclish-env---環境切換)
     - [./scripts/cli.sh doctor - 環境診斷](#scriptsclish-doctor---環境診斷)
     - [./scripts/cli.sh deps - 依賴管理](#scriptsclish-deps---依賴管理)
+    - [./scripts/cli.sh drift - 跨 repo convention drift 檢查](#scriptsclish-drift---跨-repo-convention-drift-檢查)
   - [🎯 最佳實踐](#-最佳實踐)
     - [新開發者學習路徑](#新開發者學習路徑)
     - [開發工作流程](#開發工作流程)
@@ -80,7 +84,7 @@
 
 ## 📖 概述
 
-Wind CLI 是一個**直覺的互動式命令列工具**，讓你無需記憶任何命令就能管理整個開發工作流程。
+NPT CLI 是一個**直覺的互動式命令列工具**，讓你無需記憶任何命令就能管理整個開發工作流程。
 
 ### 核心特色
 
@@ -111,13 +115,17 @@ Wind CLI 是一個**直覺的互動式命令列工具**，讓你無需記憶任�
 ```bash
 # 一鍵完成所有設置
 ./scripts/cli.sh init
+
+# 查看所有可用命令
+./scripts/cli.sh --help
+./scripts/cli.sh --version
 ```
 
 **這會自動完成**：
 
 - ✅ 檢查系統需求（Node.js, pnpm, Docker）
 - ✅ 安裝所有依賴（pnpm install）
-- ✅ 啟動 Docker 服務（PostgreSQL, RabbitMQ, Dragonfly, Mailpit）
+- ✅ 啟動 Docker 服務（PostgreSQL, RabbitMQ, Dragonfly, Mailpit, SeaweedFS）
 - ✅ 初始化資料庫（migrations + seed data）
 - ✅ 驗證所有服務正常
 
@@ -329,7 +337,8 @@ open http://localhost:8025
 ### 方式 1：互動式選單（推薦新手）
 
 ```bash
-./scripts/cli.sh  # 無參數直接進入選單
+./scripts/cli.sh        # 無參數直接進入選單
+./scripts/cli.sh menu   # 從任意位置強制進入選單
 ```
 
 **優點**：
@@ -372,10 +381,12 @@ open http://localhost:8025
 ### 選單結構
 
 ```text
-╔═══════════════════════════════════════════════════════════╗
-║              🌪️  Wind CLI v1.0.0                          ║
-║         開發工作流程管理工具 - 互動式選單                  ║
-╚═══════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════╗
+║                                               ║
+║               NPT CLI v1.1.0                 ║
+║         開發工作流程管理工具 - 互動式選單          ║
+║                                               ║
+╚═══════════════════════════════════════════════╝
 
 🚀 快速開始
   1) 初始化環境
@@ -383,19 +394,19 @@ open http://localhost:8025
   3) 查看服務狀態
 
 🔧 開發工具
-  4) 重啟服務
-  5) 查看日誌
-  6) 執行測試
+  4) 停止服務
+  5) 重啟服務
+  6) 查看日誌
+  7) 執行測試
 
-💾 資料庫管理
-  7) 資料庫遷移
-  8) 重置資料庫
-  9) 資料庫備份/還原
+💾 資料管理
+  8) 資料庫遷移
+  9) 重置資料
+  10) 備份/還原
 
 🏥 診斷修復
-  10) 環境診斷
-  11) 清理快取
-  12) 健康檢查
+  11) 環境診斷
+  12) 環境清理
 
 ⚙️ 進階功能
   13) i18n 多語系管理
@@ -404,7 +415,6 @@ open http://localhost:8025
   16) 依賴管理
 
 📚 說明文件
-  h) 查看完整指令說明
   d) 開啟文檔
   q) 離開
 ```
@@ -413,24 +423,24 @@ open http://localhost:8025
 
 > **重要**：在執行任何操作前，請確認你了解該操作是否會影響資料。
 
-| 選項                | 操作                                       |                              會刪除資料嗎                              | 保護機制                                 |
-| ------------------- | ------------------------------------------ | :--------------------------------------------------------------------: | ---------------------------------------- |
-| 1) 初始化環境       | 安裝依賴、啟動 Docker、跑 migration/seed   |                                   ❌                                   | -                                        |
-| 2) 啟動開發伺服器   | 啟動 frontend/backend/storybook            |                                   ❌                                   | -                                        |
-| 3) 查看服務狀態     | 唯讀查詢                                   |                                   ❌                                   | -                                        |
-| 4) 停止服務         | 停止運行中的服務                           |                                   ❌                                   | -                                        |
-| 5) 重啟服務         | 重啟指定服務                               |                                   ❌                                   | -                                        |
-| 6) 查看日誌         | 唯讀查詢                                   |                                   ❌                                   | -                                        |
-| 7) 執行測試         | 跑測試                                     |                                   ❌                                   | -                                        |
-| 8) 資料庫遷移       | 建立/執行/回滾 migration                   |               ⚠️ `migrate:down` 會回滾最後一次 migration               | 確認提示                                 |
-| 9) 重置資料庫       | `prisma migrate reset --force` + 重新 seed |                       ✅ **刪除所有資料並重建**                        | production 檢查 + 確認提示（預設「否」） |
-| 10) 資料庫備份/還原 | pg_dump / pg_restore                       |                         ⚠️ 還原會覆蓋現有資料                          | 確認提示                                 |
-| 11) 環境診斷        | 唯讀檢查                                   |                                   ❌                                   | -                                        |
-| 12) 清理快取        | 刪除 node_modules、.next、dist 等建置產物  |                      ⚠️ 刪除建置快取（非資料庫）                       | `--dry-run` 預覽                         |
-| 13) i18n 多語系管理 | 執行翻譯測試、生成類型、檢查未使用鍵       |               ⚠️ `unused --cleanup` 會刪除未使用的翻譯鍵               | 預覽模式 + 確認提示                      |
-| 14) Port 管理       | 查看、釋放 Port，掃描衝突                  |                     ⚠️ `free-all` 會終止占用的進程                     | 確認提示                                 |
-| 15) 環境切換        | 切換 .env、重啟 Docker                     | ⚠️ 清除 Dragonfly cache 和 RabbitMQ queue volume（**不會刪除資料庫**） | 確認提示                                 |
-| 16) 依賴管理        | 安裝/更新套件                              |                                   ❌                                   | -                                        |
+| 選項                | 操作                                      |                                   會刪除資料嗎                                   | 保護機制                                 |
+| ------------------- | ----------------------------------------- | :------------------------------------------------------------------------------: | ---------------------------------------- |
+| 1) 初始化環境       | 安裝依賴、啟動 Docker、跑 migration/seed  |                                        ❌                                        | -                                        |
+| 2) 啟動開發伺服器   | 啟動 frontend/backend/storybook           |                                        ❌                                        | -                                        |
+| 3) 查看服務狀態     | 唯讀查詢（包含 SeaweedFS）                |                                        ❌                                        | -                                        |
+| 4) 停止服務         | 停止運行中的服務（可選 SeaweedFS）        |                                        ❌                                        | -                                        |
+| 5) 重啟服務         | 重啟指定服務（可選 SeaweedFS）            |                                        ❌                                        | -                                        |
+| 6) 查看日誌         | 唯讀查詢（可查看 SeaweedFS 日誌）         |                                        ❌                                        | -                                        |
+| 7) 執行測試         | 跑測試                                    |                                        ❌                                        | -                                        |
+| 8) 資料庫遷移       | 建立/執行/回滾 migration                  |                    ⚠️ `migrate:down` 會回滾最後一次 migration                    | 確認提示                                 |
+| 9) 重置資料         | `prisma migrate reset + 可選檔案清理`     |                   ✅ **刪除所有資料庫資料，可選刪除上傳檔案**                    | production 檢查 + 兩次確認（預設「否」） |
+| 10) 資料備份/還原   | 資料庫 + 檔案儲存備份/還原                |                       ⚠️ 還原會覆蓋現有資料（資料庫+檔案）                       | 顯示環境 + 確認提示                      |
+| 11) 環境診斷        | 檢查系統、Docker、資料庫、SeaweedFS       |                                        ❌                                        | 可選自動修復（`--fix`）                  |
+| 12) 環境清理        | 刪除 node_modules、.next、dist 等建置產物 | ⚠️ 刪除建置快取（不含用戶資料和 Docker volumes）；`--clean-env` 會刪除 .env 檔案 | 互動式選擇 + `--dry-run` 預覽            |
+| 13) i18n 多語系管理 | 執行翻譯測試、生成類型、檢查未使用鍵      |                    ⚠️ `unused --cleanup` 會刪除未使用的翻譯鍵                    | 預覽模式 + 確認提示                      |
+| 14) Port 管理       | 查看、釋放 Port，掃描衝突                 |                          ⚠️ `free-all` 會終止占用的進程                          | 確認提示                                 |
+| 15) 環境切換        | 切換 .env、重啟 Docker                    |      ⚠️ 清除 Dragonfly cache 和 RabbitMQ queue volume（**不會刪除資料庫**）      | 確認提示                                 |
+| 16) 依賴管理        | 安裝/更新套件                             |                                        ❌                                        | -                                        |
 
 **圖例**：❌ 安全　⚠️ 部分影響　✅ 會刪除資料
 
@@ -693,6 +703,11 @@ open http://localhost:8025
 - `rabbitmq` - RabbitMQ 訊息佇列
 - `redis` - Dragonfly/Redis 快取
 - `mailpit` - Mailpit 郵件測試服務
+- `seaweedfs` - SeaweedFS 全部 4 個容器
+- `seaweedfs-master` - 僅 SeaweedFS Master
+- `seaweedfs-volume` - 僅 SeaweedFS Volume
+- `seaweedfs-filer` - 僅 SeaweedFS Filer
+- `seaweedfs-s3` - 僅 SeaweedFS S3 API
 - `docker` - 所有 Docker 容器
 - `all` - 全部服務
 
@@ -760,9 +775,9 @@ open http://localhost:8025
 ./scripts/cli.sh test --coverage     # 產生覆蓋率報告
 ```
 
-### ./scripts/cli.sh clean - 清理快取
+### ./scripts/cli.sh clean - 環境清理
 
-**用途**: 清理快取、暫存檔、釋放空間
+**用途**: 清理快取、暫存檔、建置產物、釋放空間
 
 **使用方式**
 
@@ -773,28 +788,31 @@ open http://localhost:8025
 **選項**
 
 - `--dry-run` - 預覽不實際刪除
-- `--deep` - 深度清理（包含 Docker）
+- `--deep` - 深度清理（包含 node_modules）
+- `--clean-env` - 清理所有 .env 和 .env.docker 檔案
 
 **清理項目**
 
-| 項目           | 位置           | 大小影響 |
-| -------------- | -------------- | -------- |
-| node_modules   | 所有 workspace | 🔴 大    |
-| .next          | apps/frontend  | 🟡 中    |
-| dist           | apps/backend   | 🟢 小    |
-| Docker volumes | Docker         | 🔴 大    |
+| 項目               | 位置                | 大小影響 |
+| ------------------ | ------------------- | -------- |
+| node_modules       | 所有 workspace      | 🔴 大    |
+| .next              | apps/frontend       | 🟡 中    |
+| dist               | apps/backend        | 🟢 小    |
+| Docker volumes     | Docker              | 🔴 大    |
+| .env / .env.docker | 根目錄、各 app 目錄 | 🟢 小    |
 
 **範例**
 
 ```bash
-./scripts/cli.sh clean              # 互動式選擇
-./scripts/cli.sh clean --dry-run    # 預覽
-./scripts/cli.sh clean --deep       # 深度清理
+./scripts/cli.sh clean                  # 互動式選擇
+./scripts/cli.sh clean --dry-run        # 預覽
+./scripts/cli.sh clean --deep           # 深度清理
+./scripts/cli.sh clean --clean-env      # 清理環境變數檔案
 ```
 
-### ./scripts/cli.sh db - 資料庫管理
+### ./scripts/cli.sh db - 資料管理
 
-**用途**: 完整的資料庫生命週期管理
+**用途**: 完整的資料生命週期管理（資料庫 + 檔案儲存）
 
 **子命令**
 
@@ -819,9 +837,12 @@ open http://localhost:8025
 **備份與還原**
 
 ```bash
-./scripts/cli.sh db backup     # 備份資料庫
-./scripts/cli.sh db restore    # 還原資料庫
+./scripts/cli.sh db backup     # 備份資料（資料庫 + 檔案儲存）
+./scripts/cli.sh db restore    # 還原資料（資料庫 + 檔案儲存）
+./scripts/cli.sh db cleanup    # 清理舊備份
 ```
+
+**注意**: 備份和還原現在包含檔案儲存（根據 `STORAGE_TYPE` 設定為 `local` 或 `seaweedfs`）
 
 **環境支援**
 
@@ -844,6 +865,85 @@ open http://localhost:8025
 # 測試環境重置
 ./scripts/cli.sh db reset --env uat
 ```
+
+### ./scripts/cli.sh storage - SeaweedFS 儲存管理
+
+**用途**: 管理 SeaweedFS 分散式檔案系統
+
+**使用方式**
+
+```bash
+./scripts/cli.sh storage <subcommand>
+```
+
+**子命令**
+
+```bash
+./scripts/cli.sh storage start       # 啟動 SeaweedFS
+./scripts/cli.sh storage stop        # 停止 SeaweedFS
+./scripts/cli.sh storage restart     # 重啟 SeaweedFS
+./scripts/cli.sh storage status      # 查看 4 個服務運行狀態
+./scripts/cli.sh storage logs        # 查看所有 SeaweedFS 容器日誌
+./scripts/cli.sh storage diagnose    # 健康診斷
+./scripts/cli.sh storage info        # 顯示連接資訊
+./scripts/cli.sh storage reset       # 重置資料（⚠️ 刪除所有檔案）
+```
+
+**功能**
+
+- 🗄️ **本地 S3 儲存** - 無需依賴 AWS 雲端服務
+- 📦 **分散式架構** - Master、Volume、Filer、S3 API
+- 🔌 **S3 相容** - 完整支援 AWS S3 API
+- 💾 **備份整合** - 自動包含在資料備份/還原中
+
+**服務組件**
+
+- **Master** (Port 9333) - 中央協調器
+- **Volume** (Port 8080) - 檔案儲存
+- **Filer** (Port 8888) - 檔案系統介面
+- **S3 API** (Port 8333) - S3 相容 API
+
+**範例**
+
+```bash
+# 啟動 SeaweedFS
+./scripts/cli.sh storage start
+
+# 檢查所有組件健康狀態
+./scripts/cli.sh storage diagnose
+
+# 顯示 S3 連接資訊
+./scripts/cli.sh storage info
+# 輸出：
+#   S3 端點:      http://localhost:8333
+#   Access Key:   admin
+#   Secret Key:   admin123
+#   Master UI:    http://localhost:9333
+#   Filer UI:     http://localhost:8888
+
+# 使用 AWS CLI 操作
+aws --endpoint-url=http://localhost:8333 s3 ls s3://uploads/
+
+# 重置所有資料（包含 Docker volumes）
+./scripts/cli.sh storage reset
+```
+
+**配置**
+
+在 `apps/backend/.env` 中設置：
+
+```bash
+# 儲存類型（local 或 seaweedfs）
+STORAGE_TYPE=seaweedfs
+
+# S3 配置
+S3_ENDPOINT=http://localhost:8333
+S3_BUCKET=uploads
+S3_ACCESS_KEY=admin
+S3_SECRET_KEY=admin123
+```
+
+**詳細文檔**: 參考 [SeaweedFS Storage Guide](../infrastructure/SEAWEEDFS_STORAGE.md)
 
 ### ./scripts/cli.sh i18n - 多語系管理
 
@@ -878,6 +978,7 @@ open http://localhost:8025
 
 自動生成：
 
+- `apps/backend/src/generated/i18n.generated.ts` - 後端類型定義
 - `apps/frontend/src/types/i18n.generated.ts` - 前端類型定義
 - 基於實際翻譯檔案自動生成，確保類型安全
 
@@ -1174,9 +1275,23 @@ node cleanup-unused-i18n-keys.js --confirm  # 確認刪除
 # 診斷問題
 ./scripts/cli.sh doctor
 
-# 診斷並自動修復
+# 診斷並自動修復（互動確認每一步）
 ./scripts/cli.sh doctor --fix
+
+# 診斷並完整自動修復（跳過所有確認，適合 CI / 管線執行）
+./scripts/cli.sh doctor --fix --yes
+
+# 等效用環境變數（給 shell 別名 / 腳本用）
+AUTO_YES=1 ./scripts/cli.sh doctor --fix
 ```
+
+**非互動 / CI 環境**
+
+`confirm` 機制的行為：
+
+- stdin 非 TTY（管線執行）→ 直接用 prompt 的 default，不卡住 `read`
+- `AUTO_YES=1` 或 `--yes` → 一律視為 Yes，適合自動化完整修復
+- 互動終端 → 照常 prompt
 
 ### ./scripts/cli.sh deps - 依賴管理
 
@@ -1340,6 +1455,41 @@ No unused dependencies
   }
 }
 ```
+
+---
+
+### ./scripts/cli.sh drift - Backend convention 檢查
+
+**用途**：檢查 backend 程式碼是否符合 [backend/CONVENTIONS.md](../backend/CONVENTIONS.md) 的慣例。
+
+**使用方式**
+
+```bash
+./scripts/cli.sh drift            # 執行檢查
+./scripts/cli.sh drift --help     # 顯示用法說明
+```
+
+**檢查項目**（依 CONVENTIONS.md）
+
+1. §5 baseline permission — seed 必須包含核心 perm（`users:*`、`roles:read/manage`、`cron_jobs:read/write` 等）
+2. §1 Dead permissions — 已廢棄的 perm 不得復活
+3. §2 Mutation / Query arg — single-target 操作必須用 `@Args('id')`
+4. §4 Resolver 守法 — `*.resolver.ts` 內不得硬編角色名
+5. §3 共用型別 — `PageInfo` 與分頁 wrapper 欄位完整
+
+**輸出範例**
+
+```text
+🔍 Convention check (npt)
+
+✓  npt
+
+🎉 無違規
+```
+
+**建議時機**：送 PR 前。修改 GraphQL schema / RBAC seed 的 PR 必跑。
+
+**加新規則**：編輯 `scripts/check-drift.py` 頂部的常數（`BASELINE_PERMS` / `FORBIDDEN_PERMS` / `SINGLE_TARGET_VIOLATIONS` 等）。新增業務模組時，請於 `SINGLE_TARGET_VIOLATIONS` 維護命名規則。
 
 ---
 
@@ -1551,7 +1701,6 @@ scripts/
 │   ├── status.sh               # 服務狀態
 │   ├── stop.sh                 # 停止服務
 │   ├── test.sh                 # 測試執行
-│   └── test-services-safe.sh   # 服務健康檢查（內部使用）
 └── utils/
     └── common.sh               # 共用函數庫（35+ 函數）
 ```

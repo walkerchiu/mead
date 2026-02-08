@@ -20,7 +20,7 @@ import { TextField } from './TextField';
  * - Use appropriate type attribute (email, password, number, etc.)
  */
 const meta = {
-  title: 'Atoms/TextField',
+  title: 'Atoms/Fields/TextField',
   component: TextField,
   parameters: {
     layout: 'centered',
@@ -231,7 +231,7 @@ export const FormExample: Story = {
 export const Sizes: Story = {
   render: () => (
     <Stack spacing={2}>
-      <TextField label="Small Size" size="small" defaultValue="Small size" />
+      <TextField label="Small Size" size="medium" defaultValue="Small size" />
       <TextField label="Medium Size" size="medium" defaultValue="Medium size" />
       <TextField label="Large Size" size="large" defaultValue="Large size" />
     </Stack>
@@ -316,10 +316,10 @@ export const Variants: Story = {
     <Stack spacing={4}>
       <TextFieldRow size="large" hasValue />
       <TextFieldRow size="medium" hasValue />
-      <TextFieldRow size="small" hasValue />
+      <TextFieldRow size="medium" hasValue />
       <TextFieldRow size="large" hasValue={false} />
       <TextFieldRow size="medium" hasValue={false} />
-      <TextFieldRow size="small" hasValue={false} />
+      <TextFieldRow size="medium" hasValue={false} />
     </Stack>
   ),
 };

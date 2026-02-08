@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Cron } from '@nestjs/schedule';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
+import { DistributedLockService } from '../cache/distributed-lock.service';
+import { CronJobMonitorService } from '../cron-monitoring/cron-job-monitor.service';
+import { CronJobStatus } from '@prisma/client';
 import { logger } from '../common/services/logger.service';
 import {
   calculateSkip,
@@ -33,6 +37,9 @@ export class AuditLogService {
     private prisma: PrismaService,
     @Inject('AUDIT_LOG_QUEUE') private queueClient: ClientProxy,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private distributedLockService: DistributedLockService,
+    @Inject(forwardRef(() => CronJobMonitorService))
+    private cronMonitorService: CronJobMonitorService,
   ) {}
 
   /**
@@ -41,7 +48,17 @@ export class AuditLogService {
   async create(data: CreateAuditLogDto): Promise<any> {
     try {
       // 非阻塞發送到 RabbitMQ 佇列
-      this.queueClient.emit('audit_log.create', data);
+      // emit() 返回 Observable，需要轉換為 Promise 或不等待
+      const observable = this.queueClient.emit('audit_log.create', data);
+
+      // 訂閱但不等待完成（fire-and-forget）
+      observable.subscribe({
+        error: (err) => {
+          logger.error('[AuditLog] 佇列發送失敗:', err);
+        },
+      });
+
+      // 立即返回，不等待 Observable 完成
       return { queued: true };
     } catch (error) {
       // 佇列失敗時降級為直接寫入資料庫
@@ -55,7 +72,7 @@ export class AuditLogService {
    */
   async createDirect(data: CreateAuditLogDto): Promise<any> {
     try {
-      return await this.prisma.auditLog.create({
+      const auditLog = await this.prisma.auditLog.create({
         data: {
           requestId: data.requestId,
           userId: data.userId,
@@ -70,7 +87,23 @@ export class AuditLogService {
           details: data.details,
           duration: data.duration,
         },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
       });
+
+      // 轉換格式：將 user.name 和 user.email 提取到頂層
+      return {
+        ...auditLog,
+        userName: auditLog.user?.name,
+        userEmail: auditLog.user?.email,
+        user: undefined, // 移除 user 物件
+      };
     } catch (error) {
       // 稽核日誌失敗不應影響主要業務邏輯
       logger.error('[AuditLog] 建立失敗:', error);
@@ -140,13 +173,27 @@ export class AuditLogService {
         userAgent: true,
         timestamp: true,
         duration: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
-    // 寫入快取（TTL 5 分鐘）
-    await this.cacheManager.set(cacheKey, results, 300000);
+    // 轉換格式：將 user.name 和 user.email 提取到頂層
+    const transformedResults = results.map((log: any) => ({
+      ...log,
+      userName: log.user?.name,
+      userEmail: log.user?.email,
+      user: undefined, // 移除 user 物件
+    }));
 
-    return results;
+    // 寫入快取（TTL 5 分鐘）
+    await this.cacheManager.set(cacheKey, transformedResults, 300000);
+
+    return transformedResults;
   }
 
   /**
@@ -177,15 +224,29 @@ export class AuditLogService {
         userAgent: true,
         timestamp: true,
         duration: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
-    await this.cacheManager.set(cacheKey, results, 300000);
-    return results;
+    // 轉換格式
+    const transformedResults = results.map((log: any) => ({
+      ...log,
+      userName: log.user?.name,
+      userEmail: log.user?.email,
+      user: undefined,
+    }));
+
+    await this.cacheManager.set(cacheKey, transformedResults, 300000);
+    return transformedResults;
   }
 
   /**
-   * 依使用者查詢（帶快取）
+   * 依用戶查詢（帶快取）
    */
   async findByUser(userId: string, limit = 50) {
     const cacheKey = `audit_logs:user:${userId}:${limit}`;
@@ -213,11 +274,25 @@ export class AuditLogService {
         userAgent: true,
         timestamp: true,
         duration: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     });
 
-    await this.cacheManager.set(cacheKey, results, 300000);
-    return results;
+    // 轉換格式
+    const transformedResults = results.map((log: any) => ({
+      ...log,
+      userName: log.user?.name,
+      userEmail: log.user?.email,
+      user: undefined,
+    }));
+
+    await this.cacheManager.set(cacheKey, transformedResults, 300000);
+    return transformedResults;
   }
 
   /**
@@ -243,6 +318,49 @@ export class AuditLogService {
         duration: true,
       },
     });
+  }
+
+  /**
+   * 依 ID 查詢單一審計日誌（包含完整 details）
+   */
+  async findById(id: string): Promise<any | null> {
+    const cacheKey = `audit_logs:id:${id}`;
+
+    // 嘗試從快取獲取
+    const cached = await this.cacheManager.get(cacheKey);
+    if (cached) {
+      logger.debug('[AuditLog] 快取命中:', cacheKey);
+      return cached;
+    }
+
+    // 查詢資料庫（包含所有欄位和用戶信息）
+    const result = await this.prisma.auditLog.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    if (result) {
+      // 轉換格式：將 user.name 和 user.email 提取到頂層
+      const transformedResult = {
+        ...result,
+        userName: result.user?.name,
+        userEmail: result.user?.email,
+        user: undefined, // 移除 user 物件
+      };
+
+      // 寫入快取（10 分鐘）
+      await this.cacheManager.set(cacheKey, transformedResult, 600000);
+      return transformedResult;
+    }
+
+    return null;
   }
 
   /**
@@ -363,7 +481,7 @@ export class AuditLogService {
     page: number,
     limit: number,
     filters?: {
-      userId?: string;
+      userSearch?: string;
       action?: string;
       entity?: string;
       status?: string;
@@ -380,8 +498,28 @@ export class AuditLogService {
 
     // 2. 構建查詢條件（支持模糊匹配）
     const where: any = {};
-    if (filters?.userId) {
-      where.userId = { contains: filters.userId, mode: 'insensitive' };
+    if (filters?.userSearch) {
+      // 支援搜尋 userName 或 userEmail
+      // 注意：userId 是 UUID 類型，不支持 contains 操作，所以不搜尋 userId
+      // user relation 可能為 null（未登入用戶或已刪除用戶）
+      where.OR = [
+        // 搜尋關聯的 user.name（需要確保 userId 存在且 user 未被刪除）
+        {
+          user: {
+            is: {
+              name: { contains: filters.userSearch, mode: 'insensitive' },
+            },
+          },
+        },
+        // 搜尋關聯的 user.email（需要確保 userId 存在且 user 未被刪除）
+        {
+          user: {
+            is: {
+              email: { contains: filters.userSearch, mode: 'insensitive' },
+            },
+          },
+        },
+      ];
     }
     if (filters?.action) {
       where.action = { contains: filters.action, mode: 'insensitive' };
@@ -445,6 +583,12 @@ export class AuditLogService {
           timestamp: true,
           duration: true,
           // details: false - 排除此欄位以提升效能
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
         },
       }),
       this.prisma.auditLog.count({ where }),
@@ -464,8 +608,21 @@ export class AuditLogService {
         : null,
     });
 
+    // 4.5. 轉換資料格式：將 user.name 和 user.email 提取到頂層
+    const transformedData = data.map((log: any) => ({
+      ...log,
+      userName: log.user?.name,
+      userEmail: log.user?.email,
+      user: undefined, // 移除 user 物件，避免重複資料
+    }));
+
     // 5. 組裝分頁結果
-    const result = createPaginationResult(data, totalCount, page, limit);
+    const result = createPaginationResult(
+      transformedData,
+      totalCount,
+      page,
+      limit,
+    );
 
     // 6. 寫入快取（5 分鐘）
     if (USE_CACHE) {
@@ -476,5 +633,92 @@ export class AuditLogService {
     logger.info('[AuditLog] 總處理時間', { totalTime: `${totalTime}ms` });
 
     return result;
+  }
+
+  /**
+   * 定期清理舊審計日誌（Cron Job）
+   *
+   * 排程：每週日凌晨 12:00（台北時區）
+   * 保留期限：180 天（6 個月）
+   *
+   * 此 Cron Job 會自動執行審計日誌的歸檔清理工作，
+   * 刪除超過 180 天的舊記錄，以維持資料庫效能和儲存空間。
+   *
+   * 使用分散式鎖防止多實例重複執行
+   */
+  @Cron('0 0 * * 0', {
+    name: 'cleanup-audit-logs',
+    timeZone: 'Asia/Taipei',
+  })
+  async handleAuditLogArchiving(): Promise<void> {
+    const jobName = 'cleanup-audit-logs';
+    const jobType = 'archiving';
+    const instanceId = process.env.INSTANCE_ID || 'default';
+
+    // 記錄執行開始
+    const executionId = await this.cronMonitorService.startExecution({
+      jobName,
+      jobType,
+      instanceId,
+    });
+
+    try {
+      // 使用分散式鎖執行任務
+      // TTL: 1800 秒（30 分鐘），足夠執行整個歸檔任務
+      await this.distributedLockService.executeWithLock(
+        'cron:cleanup-audit-logs',
+        async () => {
+          logger.info(
+            '[AuditLog Cron] Starting scheduled audit log archiving',
+            {
+              executionId,
+            },
+          );
+
+          const result = await this.cleanup(180);
+
+          logger.info(
+            '[AuditLog Cron] Audit log archiving completed successfully',
+            {
+              deletedCount: result.count,
+              retentionDays: 180,
+              nextRun: 'Next Sunday 00:00',
+            },
+          );
+
+          // 記錄執行成功
+          await this.cronMonitorService.completeExecution({
+            executionId,
+            status: CronJobStatus.SUCCESS,
+            processedCount: result.count,
+            successCount: result.count,
+            errorCount: 0,
+            details: {
+              retentionDays: 180,
+            },
+          });
+        },
+        1800, // TTL: 30 分鐘
+      );
+    } catch (error) {
+      logger.error('[AuditLog Cron] Audit log archiving failed', {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        executionId,
+      });
+
+      // 記錄執行失敗
+      await this.cronMonitorService.completeExecution({
+        executionId,
+        status: CronJobStatus.FAILED,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // 檢查告警
+      await this.cronMonitorService.checkAndAlert(executionId);
+
+      throw error;
+    }
   }
 }

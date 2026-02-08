@@ -11,11 +11,11 @@
   - [📖 概述](#-概述)
   - [🔧 註冊端點](#-註冊端點)
     - [1. `registerCustomer` - 註冊客戶用戶](#1-registercustomer---註冊客戶用戶)
-    - [2. `registerAdmin` - 註冊管理員用戶](#2-registeradmin---註冊管理員用戶)
+    - [2. `registerHQ` - 註冊管理員用戶](#2-registerhq---註冊管理員用戶)
   - [🔒 密碼要求](#-密碼要求)
   - [🎯 訪問層級說明](#-訪問層級說明)
     - [CUSTOMER_SCOPE 客戶層級](#customer_scope-客戶層級)
-    - [ADMIN_SCOPE 管理員層級](#admin_scope-管理員層級)
+    - [HQ_SCOPE 管理員層級](#hq_scope-管理員層級)
   - [🚀 初始化系統](#-初始化系統)
     - [方法 1：使用 Seed 腳本（推薦）](#方法-1使用-seed-腳本推薦)
     - [方法 2：直接在數據庫創建](#方法-2直接在數據庫創建)
@@ -40,7 +40,7 @@
     - [Q: 如果沒有任何用戶，如何創建第一個管理員？](#q-如果沒有任何用戶如何創建第一個管理員)
     - [Q: 客戶可以邀請無限多的用戶嗎？](#q-客戶可以邀請無限多的用戶嗎)
     - [Q: 創建的用戶會自動分配角色嗎？](#q-創建的用戶會自動分配角色嗎)
-    - [Q: 可以將 Customer 升級為 Admin 嗎？](#q-可以將-customer-升級為-admin-嗎)
+    - [Q: 可以將 Customer 升級為 HQ 嗎？](#q-可以將-customer-升級為-hq-嗎)
     - [Q: 密碼可以在註冊後修改嗎？](#q-密碼可以在註冊後修改嗎)
   - [📖 相關文檔](#-相關文檔)
 
@@ -48,7 +48,7 @@
 
 ## 📖 概述
 
-本系統採用**受邀請制註冊**，不提供公開註冊端點。新用戶需要由現有的 Customer 或 Admin 用戶創建。
+本系統採用**受邀請制註冊**，不提供公開註冊端點。新用戶需要由現有的 Customer 或 HQ 用戶創建。
 
 ---
 
@@ -59,7 +59,7 @@
 **權限要求**：
 
 - ✅ `CUSTOMER_SCOPE`（客戶層級用戶）
-- ✅ `ADMIN_SCOPE`（管理員層級用戶）
+- ✅ `HQ_SCOPE`（管理員層級用戶）
 
 **創建的用戶層級**：`CUSTOMER_SCOPE`
 
@@ -97,19 +97,19 @@ mutation RegisterCustomer($email: String!, $password: String!, $name: String) {
 
 ---
 
-### 2. `registerAdmin` - 註冊管理員用戶
+### 2. `registerHQ` - 註冊管理員用戶
 
 **權限要求**：
 
-- ✅ `ADMIN_SCOPE`（僅管理員）
+- ✅ `HQ_SCOPE`（僅管理員）
 
-**創建的用戶層級**：`ADMIN_SCOPE`
+**創建的用戶層級**：`HQ_SCOPE`
 
 **GraphQL Mutation**：
 
 ```graphql
-mutation RegisterAdmin($email: String!, $password: String!, $name: String) {
-  registerAdmin(email: $email, password: $password, name: $name) {
+mutation RegisterHQ($email: String!, $password: String!, $name: String) {
+  registerHQ(email: $email, password: $password, name: $name) {
     accessToken
     refreshToken
     user {
@@ -126,9 +126,9 @@ mutation RegisterAdmin($email: String!, $password: String!, $name: String) {
 
 ```json
 {
-  "email": "newadmin@example.com",
-  "password": "AdminPass123",
-  "name": "New Administrator"
+  "email": "newhq@example.com",
+  "password": "HQPass123",
+  "name": "New HQistrator"
 }
 ```
 
@@ -180,8 +180,6 @@ mutation RegisterAdmin($email: String!, $password: String!, $name: String) {
 
 - ✅ 查看和管理自己的用戶資料
 - ✅ 訪問 `usersPaginated`（查看用戶列表）
-- ✅ 創建和管理專案 (projects)
-- ✅ 查看和管理帳務 (billing)
 - ✅ **可以邀請新的客戶用戶**（調用 `registerCustomer`）
 
 **無法訪問**：
@@ -190,15 +188,15 @@ mutation RegisterAdmin($email: String!, $password: String!, $name: String) {
 - ❌ 管理系統權限和角色
 - ❌ 查看稽核日誌
 
-### ADMIN_SCOPE 管理員層級
+### HQ_SCOPE 管理員層級
 
-創建方式：`registerAdmin`
+創建方式：`registerHQ`
 
 **可訪問的功能**：
 
 - ✅ **所有 Customer 功能**
 - ✅ 創建客戶帳號（`registerCustomer`）
-- ✅ **創建管理員帳號**（`registerAdmin`）
+- ✅ **創建管理員帳號**（`registerHQ`）
 - ✅ 管理所有用戶
 - ✅ 查看稽核日誌
 - ✅ 管理角色和權限
@@ -218,8 +216,8 @@ pnpm db:seed
 
 這將創建：
 
-- ✅ `admin@example.com` (ADMIN_SCOPE, 密碼: `Password123!`)
-- ✅ `customer@example.com` (CUSTOMER_SCOPE, 密碼: `Password123!`)
+- ✅ `hq@example.com` (HQ_SCOPE, 密碼: `Password123!`)
+- ✅ `public@example.com` (PUBLIC_SCOPE, 密碼: `Password123!`)
 
 ### 方法 2：直接在數據庫創建
 
@@ -230,7 +228,7 @@ cd packages/database
 npx prisma studio
 ```
 
-在 Prisma Studio 中手動創建用戶，設置 `accessScopes: ["ADMIN_SCOPE"]`
+在 Prisma Studio 中手動創建用戶，設置 `accessScopes: ["HQ_SCOPE"]`
 
 ---
 
@@ -246,7 +244,7 @@ pnpm db:seed
 
 ```graphql
 mutation Login {
-  login(email: "admin@example.com", password: "Password123!") {
+  login(email: "hq@example.com", password: "Password123!") {
     accessToken
     refreshToken
   }
@@ -354,7 +352,7 @@ curl -X POST http://localhost:4000/graphql \
 
 **原因**：
 
-- 客戶用戶嘗試調用 `registerAdmin` ❌
+- 客戶用戶嘗試調用 `registerHQ` ❌
 - PUBLIC_SCOPE 用戶嘗試註冊新用戶 ❌
 
 #### 3. `CONFLICT` - Email 已存在
@@ -403,8 +401,8 @@ curl -X POST http://localhost:4000/graphql \
 
 ### 2. **層級權限分離**
 
-- ✅ Customer 不能創建 Admin
-- ✅ Admin 可以創建所有層級用戶
+- ✅ Customer 不能創建 HQ
+- ✅ HQ 可以創建所有層級用戶
 - ✅ 遵循最小權限原則
 
 ### 3. **密碼強度驗證**
@@ -435,7 +433,7 @@ curl -X POST http://localhost:4000/graphql \
 
 **A**: 不會，創建時只分配 Access Scope。角色需要後續通過用戶管理功能分配
 
-### Q: 可以將 Customer 升級為 Admin 嗎？
+### Q: 可以將 Customer 升級為 HQ 嗎？
 
 **A**: 可以，管理員可以通過更新用戶的 `accessScopes` 來升級權限
 

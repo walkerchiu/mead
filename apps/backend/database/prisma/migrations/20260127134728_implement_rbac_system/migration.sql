@@ -5,7 +5,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "AccessScope" AS ENUM ('PUBLIC_SCOPE', 'CUSTOMER_SCOPE', 'ADMIN_SCOPE');
+CREATE TYPE "AccessScope" AS ENUM ('PUBLIC_SCOPE', 'CUSTOMER_SCOPE', 'HQ_SCOPE');
 
 -- DropIndex
 DROP INDEX "users_role_idx";

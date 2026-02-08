@@ -1,6 +1,8 @@
 # 前端認證系統集成指南
 
-完整的前端認證系統實現與整合文檔
+完整的前端認證系統實現與整合文檔。
+
+---
 
 ## 📋 目錄
 
@@ -39,7 +41,7 @@
     - [問題 1：Apollo Client 導入錯誤](#問題-1apollo-client-導入錯誤)
     - [問題 2：Token 無法自動帶入 header](#問題-2token-無法自動帶入-header)
     - [問題 3：CORS 錯誤](#問題-3cors-錯誤)
-    - [問題 4：頁面刷新後被踢回登入頁](#問題-4頁面刷新後被踢回登入頁)
+    - [問題 4：頁面重新整理後被踢回登入頁](#問題-4頁面重新整理後被踢回登入頁)
     - [問題 5：GraphQL Schema 類型不匹配](#問題-5graphql-schema-類型不匹配)
   - [📚 參考資源](#-參考資源)
     - [官方文檔](#官方文檔)
@@ -66,12 +68,12 @@
 
 ### 功能特性
 
-- ✅ 使用者登入/登出
+- ✅ 用戶登入/登出
 - ✅ 密碼重設流程
 - ✅ Email-based 雙因素認證 (2FA)
 - ✅ 受保護路由
 - ✅ JWT Token 管理（Access Token 記憶體 + Refresh Token HttpOnly Cookie）
-- ✅ 自動 Token 刷新（401 時自動重試）
+- ✅ 自動 Token 重新整理（401 時自動重試）
 - ✅ MSW 模擬 API（開發/測試）
 - ✅ Storybook 組件開發
 - ✅ i18n 多語系支援（next-intl）
@@ -115,7 +117,7 @@ apps/frontend/
     ├── lib/
     │   ├── apollo-client.ts          # Apollo Client 配置（含 refresh-on-401）
     │   ├── apollo-provider.tsx       # Apollo Provider 組件
-    │   ├── auth.ts                   # 認證輔助函數（記憶體 Token + Cookie 刷新）
+    │   ├── auth.ts                   # 認證輔助函數（記憶體 Token + Cookie 重新整理）
     │   └── graphql.ts                # GraphQL queries/mutations
     ├── components/auth/
     │   ├── LoginForm.tsx             # 登入表單
@@ -123,7 +125,7 @@ apps/frontend/
     │   ├── ForgotPasswordForm.tsx    # 忘記密碼表單
     │   ├── ResetPasswordForm.tsx     # 重設密碼表單
     │   ├── TwoFactorSettings.tsx     # 2FA 設定組件
-    │   └── ProtectedRoute.tsx        # 受保護路由 HOC（含自動刷新）
+    │   └── ProtectedRoute.tsx        # 受保護路由 HOC（含自動重新整理）
     └── app/
         ├── layout.tsx                # Root Layout
         └── [locale]/
@@ -218,7 +220,7 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
-// 錯誤處理 Link：401 時自動嘗試使用 HttpOnly Cookie 刷新 token
+// 錯誤處理 Link：401 時自動嘗試使用 HttpOnly Cookie 重新整理 token
 const errorLink = onError(
   ({ graphQLErrors, networkError, operation, forward }) => {
     if (graphQLErrors) {
@@ -266,8 +268,8 @@ export const createApolloClient = () => {
 
 - ✅ 自動從記憶體讀取 accessToken 並加入 Authorization header
 - ✅ `credentials: 'include'` 自動發送 HttpOnly Cookie（含 refresh token）
-- ✅ 401 時自動嘗試用 refresh token 刷新，成功則重試原始請求
-- ✅ 刷新失敗才清除 token 並跳轉登入頁
+- ✅ 401 時自動嘗試用 refresh token 重新整理，成功則重試原始請求
+- ✅ 重新整理失敗才清除 token 並跳轉登入頁
 - ✅ 統一錯誤處理和日誌記錄
 
 ### 2. 認證輔助函數 (`lib/auth.ts`)
@@ -291,7 +293,7 @@ export const clearAuthTokens = (): void => {
   accessToken = null;
 };
 
-// 檢查使用者是否已登入
+// 檢查用戶是否已登入
 export const isAuthenticated = (): boolean => {
   return !!getAccessToken();
 };
@@ -360,7 +362,7 @@ export const VERIFY_TWO_FACTOR_LOGIN_MUTATION = gql`
   }
 `;
 
-// 刷新 Access Token（Refresh Token 透過 HttpOnly Cookie 自動帶入，無需參數）
+// 重新整理 Access Token（Refresh Token 透過 HttpOnly Cookie 自動帶入，無需參數）
 export const REFRESH_TOKEN_MUTATION = gql`
   mutation RefreshToken {
     refreshToken {
@@ -400,7 +402,7 @@ export const REFRESH_TOKEN_MUTATION = gql`
 2. `ProtectedRoute` 組件偵測到未認證狀態
 3. 自動呼叫 `refreshAccessToken()`，利用 HttpOnly Cookie 中的 refresh token
 4. 後端驗證 cookie 並返回新的 access token
-5. 前端更新記憶體中的 access token，使用者無感繼續操作
+5. 前端更新記憶體中的 access token，用戶無感繼續操作
 
 ### 密碼重設流程
 
@@ -521,8 +523,8 @@ useEffect(() => {
 **特點**：
 
 - ✅ 先檢查記憶體中的 access token
-- ✅ 頁面刷新後自動嘗試用 HttpOnly Cookie 恢復 session
-- ✅ 刷新失敗才跳轉登入頁
+- ✅ 頁面重新整理後自動嘗試用 HttpOnly Cookie 恢復 session
+- ✅ 重新整理失敗才跳轉登入頁
 
 ### 密碼重設表單 (ResetPasswordForm.tsx)
 
@@ -577,7 +579,7 @@ const resetPasswordSchema = z
 // ✅ Refresh Token 透過 HttpOnly Cookie 傳遞，前端無法存取
 // ✅ 每次 API 請求自動帶入 Authorization header（access token）
 // ✅ 每次 API 請求自動帶入 Cookie（refresh token，由瀏覽器管理）
-// ✅ 401 時自動嘗試刷新，成功則重試原始請求
+// ✅ 401 時自動嘗試重新整理，成功則重試原始請求
 // ✅ Cookie 使用 SameSite=Strict 防護 CSRF
 // ✅ 生產環境 Cookie 使用 Secure flag（僅 HTTPS）
 ```
@@ -661,7 +663,7 @@ app.enableCors({
 });
 ```
 
-### 問題 4：頁面刷新後被踢回登入頁
+### 問題 4：頁面重新整理後被踢回登入頁
 
 **原因**：`refreshAccessToken()` 失敗
 
@@ -710,19 +712,13 @@ cat apps/backend/schema.gql
 
 ### 短期
 
-- [x] ~~改善錯誤處理~~ ✅ **已完成 (2026-02-01)**
-- [x] ~~添加 loading 骨架屏~~ ✅ **已完成 (2026-02-01)**
 - [ ] 修復 Next.js 16 兼容性問題
 - [ ] 添加 E2E 測試
-
-**已完成改進詳情**: 參見 [錯誤處理和 Loading 骨架屏改進](./ERROR_HANDLING_LOADING_IMPROVEMENTS.md)
 
 ### 長期
 
 - [ ] 支援 TOTP (Google Authenticator)
 - [ ] 支援 SMS 2FA
-- [x] ~~改用 HttpOnly Cookie 存儲 token~~（已完成）
-- [x] ~~添加 refresh token 自動更新邏輯~~（已完成）
 - [ ] 實現「記住我」功能
 - [ ] 添加社交登入 (Google/GitHub)
 
@@ -736,7 +732,7 @@ cat apps/backend/schema.gql
 
 - Apollo Client 配置（含 `credentials: 'include'`）
 - Token 管理系統（Access Token 記憶體 + Refresh Token HttpOnly Cookie）
-- 自動 Token 刷新（401 時自動重試）
+- 自動 Token 重新整理（401 時自動重試）
 - GraphQL queries/mutations
 - 錯誤處理和通知系統
 

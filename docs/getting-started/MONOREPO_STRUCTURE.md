@@ -1,6 +1,8 @@
 # Monorepo 專案結構說明
 
-> 使用 pnpm workspace 和 Turborepo 管理的 Monorepo 架構完整指南
+使用 pnpm workspace 和 Turborepo 管理的 Monorepo 架構完整指南。
+
+---
 
 ## 📋 目錄
 
@@ -11,10 +13,10 @@
     - [技術棧](#技術棧)
   - [📐 目錄結構](#-目錄結構)
   - [✨ 應用程式 (Apps)](#-應用程式-apps)
-    - [Frontend (@wind/frontend)](#frontend-windfrontend)
-    - [Backend (@wind/backend)](#backend-windbackend)
+    - [Frontend (@npt/frontend)](#frontend-nptfrontend)
+    - [Backend (@npt/backend)](#backend-nptbackend)
   - [📦 共用套件 (Packages)](#-共用套件-packages)
-    - [@wind/typescript-config](#windtypescript-config)
+    - [@npt/typescript-config](#npttypescript-config)
     - [@repo/eslint-config](#repoeslint-config)
   - [🔧 工作區配置](#-工作區配置)
     - [pnpm-workspace.yaml](#pnpm-workspaceyaml)
@@ -41,7 +43,7 @@
 
 ## 📖 概述
 
-Wind 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo** 管理多個應用程式和共用套件。
+NPT 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo** 管理多個應用程式和共用套件。
 
 ### 為什麼選擇 Monorepo？
 
@@ -67,12 +69,12 @@ Wind 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborep
 ## 📐 目錄結構
 
 ```text
-wind/
+npt/
 ├── apps/                          # 應用程式目錄
 │   ├── frontend/                  # Next.js 前端應用
 │   │   ├── src/
 │   │   ├── public/
-│   │   ├── package.json           # @wind/frontend
+│   │   ├── package.json           # @npt/frontend
 │   │   └── next.config.js
 │   │
 │   └── backend/                   # NestJS 後端應用
@@ -83,7 +85,7 @@ wind/
 │       │   │   ├── migrations/
 │       │   │   └── seeds/
 │       │   └── seed.ts
-│       ├── package.json           # @wind/backend
+│       ├── package.json           # @npt/backend
 │       └── nest-cli.json
 │
 ├── packages/                      # 共用套件目錄
@@ -92,7 +94,7 @@ wind/
 │   │   ├── nextjs.json
 │   │   ├── nestjs.json
 │   │   ├── react-library.json
-│   │   └── package.json           # @wind/typescript-config
+│   │   └── package.json           # @npt/typescript-config
 │   │
 │   └── eslint-config/             # ESLint 配置
 │       ├── library.js
@@ -100,7 +102,7 @@ wind/
 │       └── package.json           # @repo/eslint-config
 │
 ├── scripts/                       # 開發者腳本
-│   ├── cli.sh                    # Wind CLI 主腳本
+│   ├── cli.sh                    # NPT CLI 主腳本
 │   └── commands/                  # 各種命令
 │
 ├── docs/                          # 專案文檔
@@ -114,7 +116,7 @@ wind/
 
 ## ✨ 應用程式 (Apps)
 
-### Frontend (@wind/frontend)
+### Frontend (@npt/frontend)
 
 **技術棧**:
 
@@ -126,7 +128,7 @@ wind/
 
 **主要功能**:
 
-- 使用者介面
+- 用戶介面
 - GraphQL 客戶端
 - 認證流程（登入、2FA）
 - 組件開發與測試（Storybook）
@@ -156,7 +158,7 @@ pnpm build      # 建置生產版本
 pnpm storybook  # 啟動 Storybook（http://localhost:6006）
 ```
 
-### Backend (@wind/backend)
+### Backend (@npt/backend)
 
 **技術棧**:
 
@@ -181,7 +183,7 @@ apps/backend/
 ├── src/                   # 業務邏輯程式碼
 │   ├── modules/          # 功能模組
 │   │   ├── auth/         # 認證模組
-│   │   ├── user/         # 使用者模組
+│   │   ├── user/         # 用戶模組
 │   │   ├── role/         # 角色模組
 │   │   └── ...
 │   ├── common/           # 共用程式碼
@@ -214,9 +216,9 @@ pnpm test       # 執行測試
 
 ## 📦 共用套件 (Packages)
 
-Wind 專案只保留真正需要跨應用共用的配置套件。
+NPT 專案只保留真正需要跨應用共用的配置套件。
 
-### @wind/typescript-config
+### @npt/typescript-config
 
 **用途**: 統一的 TypeScript 配置
 
@@ -232,7 +234,7 @@ Wind 專案只保留真正需要跨應用共用的配置套件。
 ```json
 // apps/frontend/tsconfig.json
 {
-  "extends": "@wind/typescript-config/nextjs.json",
+  "extends": "@npt/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": "./src"
   }
@@ -267,12 +269,12 @@ packages:
 ### 套件依賴關係
 
 ```typescript
-@wind/frontend
-└── @wind/typescript-config (workspace:*)
+@npt/frontend
+└── @npt/typescript-config (workspace:*)
 
-@wind/backend
+@npt/backend
 ├── @prisma/client (npm package)
-└── @wind/typescript-config (workspace:*)
+└── @npt/typescript-config (workspace:*)
 ```
 
 **說明**:
@@ -330,13 +332,13 @@ pnpm 會自動處理所有 workspace 套件的連結。
 ### 2. 啟動開發環境
 
 ```bash
-# 使用 Wind CLI（推薦）
+# 使用 NPT CLI（推薦）
 ./scripts/cli.sh dev
 
 # 或手動啟動
 pnpm dev          # 啟動所有應用
-pnpm dev --filter=@wind/frontend  # 只啟動前端
-pnpm dev --filter=@wind/backend   # 只啟動後端
+pnpm dev --filter=@npt/frontend  # 只啟動前端
+pnpm dev --filter=@npt/backend   # 只啟動後端
 ```
 
 ### 3. 建置專案
@@ -346,7 +348,7 @@ pnpm dev --filter=@wind/backend   # 只啟動後端
 pnpm build
 
 # 建置特定應用
-pnpm build --filter=@wind/frontend
+pnpm build --filter=@npt/frontend
 ```
 
 Turborepo 會自動處理依賴順序，並快取建置結果。
@@ -358,7 +360,7 @@ Turborepo 會自動處理依賴順序，並快取建置結果。
 pnpm test
 
 # 執行特定應用的測試
-pnpm test --filter=@wind/backend
+pnpm test --filter=@npt/backend
 ```
 
 ### 5. 型別檢查
@@ -368,7 +370,7 @@ pnpm test --filter=@wind/backend
 pnpm type-check
 
 # 檢查特定專案
-pnpm type-check --filter=@wind/frontend
+pnpm type-check --filter=@npt/frontend
 ```
 
 ### 6. Lint 檢查
@@ -394,7 +396,7 @@ pnpm lint --fix
 ```json
 {
   "dependencies": {
-    "@wind/typescript-config": "workspace:*"
+    "@npt/typescript-config": "workspace:*"
   }
 }
 ```
@@ -452,7 +454,7 @@ git commit -m "feat: add user profile feature"
 }
 
 // ✅ 正確：在 root package.json 安裝共用依賴
-// 或建立 @wind/shared 套件
+// 或建立 @npt/shared 套件
 ```
 
 **2. 不要直接引用其他應用的程式碼**
@@ -488,7 +490,7 @@ pnpm init
 
 # 2. 更新 package.json
 {
-  "name": "@wind/my-app",
+  "name": "@npt/my-app",
   "version": "1.0.0"
 }
 
@@ -505,12 +507,12 @@ pnpm init
 
 # 2. 設定為 workspace 套件
 {
-  "name": "@wind/my-package",
+  "name": "@npt/my-package",
   "version": "1.0.0"
 }
 
 # 3. 在其他專案引用
-pnpm add @wind/my-package --filter=@wind/frontend
+pnpm add @npt/my-package --filter=@npt/frontend
 ```
 
 ### Q3: 為什麼有些依賴要放在 root？

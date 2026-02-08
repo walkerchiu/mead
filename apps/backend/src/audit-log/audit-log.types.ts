@@ -13,6 +13,12 @@ export class AuditLogType {
   @Field({ nullable: true })
   userId?: string;
 
+  @Field({ nullable: true })
+  userName?: string;
+
+  @Field({ nullable: true })
+  userEmail?: string;
+
   @Field()
   action: string;
 

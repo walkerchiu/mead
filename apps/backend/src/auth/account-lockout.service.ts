@@ -1,6 +1,8 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
+import { NotificationService } from '../notification/notification.service';
 import { logger } from '../common/services/logger.service';
 
 export interface AccountLockInfo {
@@ -19,7 +21,9 @@ export class AccountLockoutService {
 
   constructor(
     private prisma: PrismaService,
+    private config: ConfigService,
     private mailService: MailService,
+    private notificationService: NotificationService,
   ) {}
 
   /**
@@ -133,7 +137,7 @@ export class AccountLockoutService {
         lockedUntil,
       });
 
-      // 發送鎖定通知 email
+      // 發送鎖定通知（email + 系統通知）
       try {
         await this.mailService.sendAccountLockedEmail(
           email,
@@ -142,9 +146,36 @@ export class AccountLockoutService {
           ipAddress,
         );
       } catch (error) {
-        logger.error('[AccountLockout] Failed to send lock notification', {
+        logger.error('[AccountLockout] Failed to send lock email', {
           error,
         });
+      }
+
+      if (
+        this.config.get<string>('PUSH_NOTIFY_ACCOUNT_LOCKED', 'true') !==
+        'false'
+      ) {
+        try {
+          await this.notificationService.createLocalizedNotification(
+            userId,
+            'WARNING',
+            'ACCOUNT_LOCKED',
+            [failedAttempts, this.LOCKOUT_DURATION_MINUTES],
+            {
+              event: 'ACCOUNT_LOCKED',
+              failedAttempts,
+              lockoutMinutes: this.LOCKOUT_DURATION_MINUTES,
+              ipAddress,
+            },
+          );
+        } catch (error) {
+          logger.error(
+            '[AccountLockout] Failed to create system notification',
+            {
+              error,
+            },
+          );
+        }
       }
 
       return {

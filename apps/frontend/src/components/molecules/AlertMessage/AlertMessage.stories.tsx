@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { AlertMessage } from './AlertMessage';
 import Stack from '@mui/material/Stack';
@@ -106,6 +106,49 @@ export const Info: Story = {
 };
 
 /**
+ * All severity types
+ * Shows all four message types
+ */
+export const AllSeverities: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <AlertMessage severity="success" title="Success">
+        Data saved successfully
+      </AlertMessage>
+      <AlertMessage severity="error" title="Error">
+        Unable to connect to server
+      </AlertMessage>
+      <AlertMessage severity="warning" title="Warning">
+        Your password will expire in 7 days
+      </AlertMessage>
+      <AlertMessage severity="info" title="Info">
+        System maintenance will begin in 5 minutes
+      </AlertMessage>
+    </Stack>
+  ),
+};
+
+/**
+ * Different variants
+ * Three styles: Filled, Outlined, Standard
+ */
+export const Variants: Story = {
+  render: () => (
+    <Stack spacing={2}>
+      <AlertMessage severity="info" variant="filled">
+        Filled style (default)
+      </AlertMessage>
+      <AlertMessage severity="info" variant="outlined">
+        Outlined style
+      </AlertMessage>
+      <AlertMessage severity="info" variant="standard">
+        Standard style
+      </AlertMessage>
+    </Stack>
+  ),
+};
+
+/**
  * With title
  * Provides more detailed message structure
  */
@@ -131,46 +174,91 @@ export const Closable: Story = {
 };
 
 /**
- * Different variants
- * Three styles: Filled, Outlined, Standard
+ * Multi-line content
+ * Display longer messages
  */
-export const Variants: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <AlertMessage severity="info" variant="filled">
-        Filled style (default)
-      </AlertMessage>
-      <AlertMessage severity="info" variant="outlined">
-        Outlined style
-      </AlertMessage>
-      <AlertMessage severity="info" variant="standard">
-        Standard style
-      </AlertMessage>
-    </Stack>
-  ),
+export const LongContent: Story = {
+  args: {
+    severity: 'warning',
+    title: 'Important Notice',
+    closable: true,
+    children: (
+      <>
+        <div>To ensure your account security, please note the following:</div>
+        <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+          <li>Do not share your password with others</li>
+          <li>Update your password regularly</li>
+          <li>Enable two-factor authentication</li>
+          <li>Watch for suspicious login activity</li>
+        </ul>
+      </>
+    ),
+  },
 };
 
 /**
- * All severity types
- * Shows all four message types
+ * With retry button
+ * Provides retry functionality when API request fails
  */
-export const AllSeverities: Story = {
-  render: () => (
-    <Stack spacing={2}>
-      <AlertMessage severity="success" title="Success">
-        Data saved successfully
-      </AlertMessage>
-      <AlertMessage severity="error" title="Error">
-        Unable to connect to server
-      </AlertMessage>
-      <AlertMessage severity="warning" title="Warning">
-        Your password will expire in 7 days
-      </AlertMessage>
-      <AlertMessage severity="info" title="Info">
-        System maintenance will begin in 5 minutes
-      </AlertMessage>
-    </Stack>
-  ),
+export const WithRetry: Story = {
+  render: function WithRetryExample() {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+
+    const handleRetry = () => {
+      setLoading(true);
+      setError(false);
+      // Simulate API request
+      setTimeout(() => {
+        setLoading(false);
+        setError(Math.random() > 0.5);
+      }, 1500);
+    };
+
+    return (
+      <Stack spacing={2}>
+        <Button onClick={handleRetry} variant="contained" disabled={loading}>
+          {loading ? 'Loading...' : 'Send Request'}
+        </Button>
+
+        {error && (
+          <AlertMessage
+            severity="error"
+            title="Connection Failed"
+            showRetry
+            retryText="Retry"
+            onRetry={handleRetry}
+          >
+            Unable to connect to server. Please check your network connection.
+          </AlertMessage>
+        )}
+
+        {!error && !loading && (
+          <AlertMessage severity="success">
+            Request completed successfully!
+          </AlertMessage>
+        )}
+      </Stack>
+    );
+  },
+};
+
+/**
+ * Custom action button
+ * Provides additional action options
+ */
+export const WithCustomAction: Story = {
+  args: {
+    severity: 'warning',
+    title: 'Password Expiring Soon',
+    children:
+      'Your password will expire in 7 days. Please update it promptly to keep your account secure.',
+    action: (
+      <Button color="inherit" size="small" variant="outlined">
+        Update Now
+      </Button>
+    ),
+  },
 };
 
 /**
@@ -252,151 +340,6 @@ export const FormValidation: Story = {
         )}
       </Stack>
     );
-  },
-};
-
-/**
- * Multi-line content
- * Display longer messages
- */
-export const LongContent: Story = {
-  args: {
-    severity: 'warning',
-    title: 'Important Notice',
-    closable: true,
-    children: (
-      <>
-        <div>To ensure your account security, please note the following:</div>
-        <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
-          <li>Do not share your password with others</li>
-          <li>Update your password regularly</li>
-          <li>Enable two-factor authentication</li>
-          <li>Watch for suspicious login activity</li>
-        </ul>
-      </>
-    ),
-  },
-};
-
-/**
- * Notification stack
- * Multiple messages displayed simultaneously
- */
-export const NotificationStack: Story = {
-  render: function NotificationStackExample() {
-    const [notifications, setNotifications] = useState([
-      {
-        id: 1,
-        severity: 'success' as const,
-        message: 'File uploaded successfully',
-      },
-      { id: 2, severity: 'info' as const, message: 'You have new messages' },
-      { id: 3, severity: 'warning' as const, message: 'Low disk space' },
-    ]);
-
-    const removeNotification = (id: number) => {
-      setNotifications(notifications.filter((n) => n.id !== id));
-    };
-
-    return (
-      <Box>
-        <Button
-          onClick={() => {
-            const newId = Math.max(0, ...notifications.map((n) => n.id)) + 1;
-            setNotifications([
-              ...notifications,
-              {
-                id: newId,
-                severity: 'info',
-                message: `New notification #${newId}`,
-              },
-            ]);
-          }}
-          variant="outlined"
-          sx={{ mb: 2 }}
-        >
-          Add Notification
-        </Button>
-
-        <Stack spacing={1}>
-          {notifications.map((notif) => (
-            <AlertMessage
-              key={notif.id}
-              severity={notif.severity}
-              closable
-              onClose={() => removeNotification(notif.id)}
-            >
-              {notif.message}
-            </AlertMessage>
-          ))}
-        </Stack>
-      </Box>
-    );
-  },
-};
-
-/**
- * With retry button
- * Provides retry functionality when API request fails
- */
-export const WithRetry: Story = {
-  render: function WithRetryExample() {
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-
-    const handleRetry = () => {
-      setLoading(true);
-      setError(false);
-      // Simulate API request
-      setTimeout(() => {
-        setLoading(false);
-        setError(Math.random() > 0.5);
-      }, 1500);
-    };
-
-    return (
-      <Stack spacing={2}>
-        <Button onClick={handleRetry} variant="contained" disabled={loading}>
-          {loading ? 'Loading...' : 'Send Request'}
-        </Button>
-
-        {error && (
-          <AlertMessage
-            severity="error"
-            title="Connection Failed"
-            showRetry
-            retryText="Retry"
-            onRetry={handleRetry}
-          >
-            Unable to connect to server. Please check your network connection.
-          </AlertMessage>
-        )}
-
-        {!error && !loading && (
-          <AlertMessage severity="success">
-            Request completed successfully!
-          </AlertMessage>
-        )}
-      </Stack>
-    );
-  },
-};
-
-/**
- * Custom action button
- * Provides additional action options
- */
-export const WithCustomAction: Story = {
-  args: {
-    severity: 'warning',
-    title: 'Password Expiring Soon',
-    children:
-      'Your password will expire in 7 days. Please update it promptly to keep your account secure.',
-    action: (
-      <Button color="inherit" size="small" variant="outlined">
-        Update Now
-      </Button>
-    ),
   },
 };
 
@@ -484,4 +427,61 @@ export const FormValidationErrors: Story = {
       </Stack>
     </Box>
   ),
+};
+
+/**
+ * Notification stack
+ * Multiple messages displayed simultaneously
+ */
+export const NotificationStack: Story = {
+  render: function NotificationStackExample() {
+    const [notifications, setNotifications] = useState([
+      {
+        id: 1,
+        severity: 'success' as const,
+        message: 'File uploaded successfully',
+      },
+      { id: 2, severity: 'info' as const, message: 'You have new messages' },
+      { id: 3, severity: 'warning' as const, message: 'Low disk space' },
+    ]);
+
+    const removeNotification = (id: number) => {
+      setNotifications(notifications.filter((n) => n.id !== id));
+    };
+
+    return (
+      <Box>
+        <Button
+          onClick={() => {
+            const newId = Math.max(0, ...notifications.map((n) => n.id)) + 1;
+            setNotifications([
+              ...notifications,
+              {
+                id: newId,
+                severity: 'info',
+                message: `New notification #${newId}`,
+              },
+            ]);
+          }}
+          variant="outlined"
+          sx={{ mb: 2 }}
+        >
+          Add Notification
+        </Button>
+
+        <Stack spacing={1}>
+          {notifications.map((notif) => (
+            <AlertMessage
+              key={notif.id}
+              severity={notif.severity}
+              closable
+              onClose={() => removeNotification(notif.id)}
+            >
+              {notif.message}
+            </AlertMessage>
+          ))}
+        </Stack>
+      </Box>
+    );
+  },
 };

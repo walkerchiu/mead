@@ -102,7 +102,7 @@ export function useErrorRecovery() {
 
           enqueueSnackbar('Recovery successful', {
             variant: 'success',
-            autoHideDuration: 2000,
+            autoHideDuration: 1500,
           });
         } else {
           console.warn('[ErrorRecovery] No recovery action available');
@@ -111,7 +111,7 @@ export function useErrorRecovery() {
         console.error('[ErrorRecovery] Recovery failed:', err);
         enqueueSnackbar('Recovery failed', {
           variant: 'error',
-          autoHideDuration: 3000,
+          autoHideDuration: 5000,
         });
       } finally {
         setIsRecovering(false);
@@ -142,7 +142,7 @@ export function useErrorRecovery() {
 
         enqueueSnackbar('Operation successful', {
           variant: 'success',
-          autoHideDuration: 2000,
+          autoHideDuration: 1500,
         });
       } catch (err) {
         // Update with new error

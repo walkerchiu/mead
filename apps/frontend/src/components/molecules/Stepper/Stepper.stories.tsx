@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Stepper } from './Stepper';
 import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';

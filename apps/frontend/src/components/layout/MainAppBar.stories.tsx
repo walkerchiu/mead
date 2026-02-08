@@ -1,42 +1,56 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { MainAppBar } from './MainAppBar';
 import { Box, Typography, IconButton, Container } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
-import type { Notification } from '@/components/atoms';
+import type { UnifiedNotification } from '@/types/notification';
+import { NotificationType } from '@/types/notification';
 
 const mockUser = {
   name: 'John Doe',
   email: 'john.doe@example.com',
   avatar: 'https://i.pravatar.cc/150?img=1',
-  role: 'Admin',
+  role: 'HQ',
   status: 'online' as const,
 };
 
-const mockNotifications: Notification[] = [
+const mockNotifications: UnifiedNotification[] = [
   {
     id: '1',
-    type: 'info',
+    type: NotificationType.INFO,
     title: 'System Maintenance',
     message:
       'System maintenance scheduled for tonight at 11:00 PM, estimated duration 2 hours',
-    timestamp: new Date(Date.now() - 5 * 60 * 1000),
-    read: false,
+    isRead: false,
+    createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+    readAt: undefined,
   },
   {
     id: '2',
-    type: 'success',
+    type: NotificationType.SUCCESS,
     title: 'Password Updated',
     message: 'Your password has been successfully updated',
-    timestamp: new Date(Date.now() - 60 * 60 * 1000),
-    read: true,
+    isRead: true,
+    createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+    readAt: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
   },
   {
     id: '3',
-    type: 'warning',
+    type: NotificationType.WARNING,
     title: 'Security Warning',
     message: 'Login detected from a new device',
-    timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
-    read: false,
+    isRead: false,
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+    readAt: undefined,
+  },
+  {
+    id: '4',
+    type: NotificationType.ERROR,
+    title: 'Payment Failed',
+    message:
+      'Your credit card payment failed. Please check your card information',
+    isRead: false,
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+    readAt: undefined,
   },
 ];
 
@@ -58,7 +72,7 @@ const mockNotifications: Notification[] = [
  *
  * **Use Cases**:
  * - Application top navigation bar
- * - Admin panel page header
+ * - HQ panel page header
  * - Dashboard page header
  */
 const meta = {
@@ -196,6 +210,8 @@ export const FullFeatured: Story = {
     onMarkAllNotificationsRead: () => console.log('Mark all as read'),
     onViewAllNotifications: () => console.log('View all notifications'),
     onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -325,6 +341,13 @@ export const WithNotificationsAndUser: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -346,6 +369,7 @@ export const WithUserName: Story = {
     showUserName: true,
     showUserStatus: true,
     unreadNotificationCount: 0,
+    notifications: [],
     onAccountClick: () => console.log('Account clicked'),
     onProfileClick: () => console.log('Profile clicked'),
     onSecurityClick: () => console.log('Security clicked'),
@@ -353,6 +377,13 @@ export const WithUserName: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -377,6 +408,8 @@ export const WithoutUserAvatar: Story = {
     },
     showUserName: true,
     showUserStatus: true,
+    unreadNotificationCount: 0,
+    notifications: [],
     onAccountClick: () => console.log('Account clicked'),
     onProfileClick: () => console.log('Profile clicked'),
     onSecurityClick: () => console.log('Security clicked'),
@@ -384,6 +417,13 @@ export const WithoutUserAvatar: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -411,6 +451,13 @@ export const ManyNotifications: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -423,6 +470,10 @@ export const NoNotifications: Story = {
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
         <p>Notification menu shows empty state</p>
+        <p>
+          <strong>Note</strong>: Settings button is still visible in the
+          notification menu even when there are no notifications
+        </p>
       </Box>
     </Box>
   ),
@@ -438,6 +489,13 @@ export const NoNotifications: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -458,6 +516,7 @@ export const WithTitleLink: Story = {
     titleLink: '/',
     user: mockUser,
     unreadNotificationCount: 2,
+    notifications: mockNotifications,
     onAccountClick: () => console.log('Account clicked'),
     onProfileClick: () => console.log('Profile clicked'),
     onSecurityClick: () => console.log('Security clicked'),
@@ -465,6 +524,13 @@ export const WithTitleLink: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -502,6 +568,7 @@ export const WithLogo: Story = {
     titleLink: '/dashboard',
     user: mockUser,
     unreadNotificationCount: 3,
+    notifications: mockNotifications,
     showUserName: true,
     onAccountClick: () => console.log('Account clicked'),
     onProfileClick: () => console.log('Profile clicked'),
@@ -510,6 +577,13 @@ export const WithLogo: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -541,6 +615,10 @@ export const WithoutUserMenu: Story = {
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
         <p>User menu is hidden (e.g., public pages)</p>
+        <p>
+          <strong>Note</strong>: Notification settings button still available
+          even without user menu
+        </p>
       </Box>
     </Box>
   ),
@@ -548,6 +626,14 @@ export const WithoutUserMenu: Story = {
     title: 'Public Dashboard',
     showUserMenu: false,
     unreadNotificationCount: 0,
+    notifications: [],
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -560,6 +646,10 @@ export const WithoutSettings: Story = {
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
         <p>Settings menu is hidden</p>
+        <p>
+          <strong>Note</strong>: Notification settings button still available in
+          notification menu
+        </p>
       </Box>
     </Box>
   ),
@@ -568,23 +658,33 @@ export const WithoutSettings: Story = {
     user: mockUser,
     showSettings: false,
     unreadNotificationCount: 2,
+    notifications: mockNotifications,
+    onAccountClick: () => console.log('Account clicked'),
+    onLogout: () => console.log('Logout clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
 /**
- * Admin View example
+ * HQ View example
  */
-export const AdminView: Story = {
+export const HQView: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
-        <h2>Admin Panel</h2>
-        <p>Full featured admin navigation bar with:</p>
+        <h2>HQ Panel</h2>
+        <p>Full featured hq navigation bar with:</p>
         <ul>
           <li>Logo and title with link</li>
           <li>12 unread notifications</li>
-          <li>Admin user with status</li>
+          <li>HQ user with status</li>
           <li>Dark theme selected</li>
         </ul>
         <p>
@@ -606,12 +706,12 @@ export const AdminView: Story = {
         ⚙️
       </Box>
     ),
-    title: 'Admin Panel',
-    titleLink: '/admin',
+    title: 'HQ Panel',
+    titleLink: '/hq',
     user: {
-      name: 'Admin User',
-      email: 'admin@example.com',
-      role: 'Super Admin',
+      name: 'HQ User',
+      email: 'hq@example.com',
+      role: 'Super HQ',
       status: 'online',
     },
     unreadNotificationCount: 12,
@@ -627,6 +727,13 @@ export const AdminView: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -661,6 +768,13 @@ export const MobileView: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
   parameters: {
     viewport: {
@@ -705,6 +819,15 @@ export const DashboardHeader: Story = {
         onThemeChange={(theme) => console.log('Theme changed to:', theme)}
         onHelpClick={() => console.log('Help clicked')}
         onAboutClick={() => console.log('About clicked')}
+        onNotificationClick={(notification) =>
+          console.log('Notification clicked:', notification)
+        }
+        onMarkAllNotificationsRead={() => console.log('Mark all as read')}
+        onViewAllNotifications={() => console.log('View all notifications')}
+        onClearAllNotifications={() => console.log('Clear all notifications')}
+        onNotificationSettingsClick={() =>
+          console.log('Notification settings clicked')
+        }
       />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
         <h2>Welcome to Dashboard</h2>
@@ -754,6 +877,7 @@ export const LogoOnly: Story = {
     titleLink: '/',
     user: mockUser,
     unreadNotificationCount: 5,
+    notifications: mockNotifications,
     onAccountClick: () => console.log('Account clicked'),
     onProfileClick: () => console.log('Profile clicked'),
     onSecurityClick: () => console.log('Security clicked'),
@@ -761,6 +885,13 @@ export const LogoOnly: Story = {
     onThemeChange: (theme) => console.log('Theme changed to:', theme),
     onHelpClick: () => console.log('Help clicked'),
     onAboutClick: () => console.log('About clicked'),
+    onNotificationClick: (notification) =>
+      console.log('Notification clicked:', notification),
+    onMarkAllNotificationsRead: () => console.log('Mark all as read'),
+    onViewAllNotifications: () => console.log('View all notifications'),
+    onClearAllNotifications: () => console.log('Clear all notifications'),
+    onNotificationSettingsClick: () =>
+      console.log('Notification settings clicked'),
   },
 };
 
@@ -786,7 +917,7 @@ export const SettingsPagePattern: Story = {
             📊
           </Box>
         }
-        title="Wind Dashboard"
+        title="NPT Dashboard"
         titleLink="/dashboard"
         user={mockUser}
         unreadNotificationCount={2}
@@ -802,6 +933,17 @@ export const SettingsPagePattern: Story = {
         onThemeChange={(theme) => console.log('Theme changed to:', theme)}
         onHelpClick={() => console.log('Help clicked')}
         onAboutClick={() => console.log('About clicked')}
+        onNotificationClick={(notification) =>
+          console.log('Notification clicked:', notification)
+        }
+        onMarkAllNotificationsRead={() =>
+          console.log('Mark all notifications as read')
+        }
+        onViewAllNotifications={() => console.log('View all notifications')}
+        onClearAllNotifications={() => console.log('Clear all notifications')}
+        onNotificationSettingsClick={() =>
+          console.log('Notification settings clicked')
+        }
       />
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
         {/* Back button placed in page content area */}
@@ -822,7 +964,7 @@ export const SettingsPagePattern: Story = {
         </Typography>
         <ul>
           <li>
-            <strong>AppBar</strong> - Displays site title "Wind Dashboard"
+            <strong>AppBar</strong> - Displays site title "NPT Dashboard"
             (global navigation, consistent across all pages)
           </li>
           <li>
@@ -844,6 +986,361 @@ export const SettingsPagePattern: Story = {
           <li>Click back button in page → Return to previous page</li>
         </ul>
       </Container>
+    </Box>
+  ),
+};
+
+/**
+ * Notification Features - Interactive Demo
+ *
+ * Demonstrates all notification-related features:
+ * - Click notification bell to view notifications
+ * - Click individual notification to mark as read
+ * - Click "Mark All as Read" to mark all as read
+ * - Click "View All" to navigate to notification center
+ * - Click "Clear" to remove read notifications
+ */
+export const NotificationFeatures: Story = {
+  render: () => (
+    <Box>
+      <MainAppBar
+        title="Notification Demo"
+        user={mockUser}
+        notifications={mockNotifications}
+        unreadNotificationCount={3}
+        showUserName={true}
+        currentTheme="light"
+        onAccountClick={() => console.log('Account clicked')}
+        onProfileClick={() => console.log('Profile clicked')}
+        onSecurityClick={() => console.log('Security clicked')}
+        onLogout={() => console.log('Logout clicked')}
+        onThemeChange={(theme) => console.log('Theme changed to:', theme)}
+        onHelpClick={() => console.log('Help clicked')}
+        onAboutClick={() => console.log('About clicked')}
+        onNotificationClick={(notification) => {
+          console.log('Notification clicked:', notification);
+          alert(`Clicked: ${notification.title}\n\n${notification.message}`);
+        }}
+        onMarkAllNotificationsRead={() => {
+          console.log('Mark all notifications as read');
+          alert('All notifications marked as read');
+        }}
+        onViewAllNotifications={() => {
+          console.log('Navigate to notification center');
+          alert('Navigate to /notifications');
+        }}
+        onClearAllNotifications={() => {
+          console.log('Clear all read notifications');
+          alert('All read notifications cleared');
+        }}
+        onNotificationSettingsClick={() => {
+          console.log('Navigate to notification settings');
+          alert('Navigate to /settings/notifications');
+        }}
+      />
+      <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
+        <Typography variant="h5" gutterBottom>
+          Notification Features Demo
+        </Typography>
+        <Typography variant="body1" paragraph>
+          Click the notification bell (🔔) in the AppBar to try these features:
+        </Typography>
+        <Box component="ul" sx={{ pl: 3 }}>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>View Notifications</strong>: Click the bell icon to open
+              the notification menu
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>Click Individual Notification</strong>: Click any
+              notification to view details and mark as read
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>Mark All as Read</strong>: Click "Mark All as Read" button
+              in the menu footer (shown when there are unread notifications)
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>View All Notifications</strong>: Click "Notifications"
+              title in menu header to navigate to notification center
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>Clear Read Notifications</strong>: Click "Clear" button in
+              menu header to remove all read notifications
+            </Typography>
+          </li>
+          <li>
+            <Typography variant="body2" gutterBottom>
+              <strong>Notification Settings</strong>: Click settings icon (⚙️)
+              in menu header to navigate to notification settings
+            </Typography>
+          </li>
+        </Box>
+        <Box sx={{ mt: 3, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
+          <Typography variant="body2">
+            <strong>Current State</strong>: {mockNotifications.length} total
+            notifications, 3 unread
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
+  ),
+};
+
+/**
+ * Notification Types - All Types Demo
+ *
+ * Shows all different notification types with their respective icons and colors
+ */
+export const NotificationTypes: Story = {
+  render: () => {
+    const allTypesNotifications: UnifiedNotification[] = [
+      {
+        id: '1',
+        type: NotificationType.INFO,
+        title: 'Info Notification',
+        message: 'This is an informational notification',
+        isRead: false,
+        createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '2',
+        type: NotificationType.SUCCESS,
+        title: 'Success Notification',
+        message: 'Operation completed successfully',
+        isRead: false,
+        createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '3',
+        type: NotificationType.WARNING,
+        title: 'Warning Notification',
+        message: 'Please pay attention to this warning',
+        isRead: false,
+        createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '4',
+        type: NotificationType.ERROR,
+        title: 'Error Notification',
+        message: 'An error has occurred',
+        isRead: false,
+        createdAt: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '5',
+        type: NotificationType.SYSTEM,
+        title: 'System Notification',
+        message: 'System maintenance scheduled',
+        isRead: false,
+        createdAt: new Date(Date.now() - 25 * 60 * 1000).toISOString(),
+      },
+    ];
+
+    return (
+      <Box>
+        <MainAppBar
+          title="All Notification Types"
+          user={mockUser}
+          notifications={allTypesNotifications}
+          unreadNotificationCount={5}
+          currentTheme="light"
+          onAccountClick={() => console.log('Account clicked')}
+          onLogout={() => console.log('Logout clicked')}
+          onNotificationClick={(notification) =>
+            console.log('Notification clicked:', notification)
+          }
+          onMarkAllNotificationsRead={() => console.log('Mark all as read')}
+          onViewAllNotifications={() => console.log('View all notifications')}
+          onClearAllNotifications={() => console.log('Clear all notifications')}
+          onNotificationSettingsClick={() =>
+            console.log('Notification settings clicked')
+          }
+        />
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            All Notification Types
+          </Typography>
+          <Typography variant="body2">
+            Click the notification bell to see all 5 notification types:
+          </Typography>
+          <Box component="ul" sx={{ mt: 2 }}>
+            <li>
+              <Typography variant="body2">
+                <strong>INFO</strong>: Blue - Informational messages
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                <strong>SUCCESS</strong>: Green - Success confirmations
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                <strong>WARNING</strong>: Orange - Warning messages
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                <strong>ERROR</strong>: Red - Error messages
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                <strong>SYSTEM</strong>: Gray - System notifications
+              </Typography>
+            </li>
+          </Box>
+        </Box>
+      </Box>
+    );
+  },
+};
+
+/**
+ * Notification States - Read vs Unread
+ *
+ * Demonstrates the visual difference between read and unread notifications
+ */
+export const NotificationStates: Story = {
+  render: () => {
+    const mixedNotifications: UnifiedNotification[] = [
+      {
+        id: '1',
+        type: NotificationType.INFO,
+        title: 'Unread Notification 1',
+        message: 'This notification has not been read',
+        isRead: false,
+        createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '2',
+        type: NotificationType.SUCCESS,
+        title: 'Read Notification 1',
+        message: 'This notification has been read',
+        isRead: true,
+        createdAt: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+        readAt: new Date(Date.now() - 55 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '3',
+        type: NotificationType.WARNING,
+        title: 'Unread Notification 2',
+        message: 'Another unread notification',
+        isRead: false,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+      },
+      {
+        id: '4',
+        type: NotificationType.ERROR,
+        title: 'Read Notification 2',
+        message: 'This has also been read',
+        isRead: true,
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
+        readAt: new Date(Date.now() - 23 * 60 * 60 * 1000).toISOString(),
+      },
+    ];
+
+    return (
+      <Box>
+        <MainAppBar
+          title="Notification States"
+          user={mockUser}
+          notifications={mixedNotifications}
+          unreadNotificationCount={2}
+          currentTheme="light"
+          onAccountClick={() => console.log('Account clicked')}
+          onLogout={() => console.log('Logout clicked')}
+          onNotificationClick={(notification) =>
+            console.log('Notification clicked:', notification)
+          }
+          onMarkAllNotificationsRead={() => console.log('Mark all as read')}
+          onViewAllNotifications={() => console.log('View all notifications')}
+          onClearAllNotifications={() => console.log('Clear all notifications')}
+          onNotificationSettingsClick={() =>
+            console.log('Notification settings clicked')
+          }
+        />
+        <Box sx={{ p: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Notification States Demo
+          </Typography>
+          <Typography variant="body2" paragraph>
+            This demo shows 4 notifications: 2 unread and 2 read
+          </Typography>
+          <Typography variant="body2">
+            <strong>Visual Differences:</strong>
+          </Typography>
+          <Box component="ul" sx={{ mt: 1 }}>
+            <li>
+              <Typography variant="body2">
+                Unread notifications have a <strong>blue dot indicator</strong>
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                Unread notifications have <strong>stronger text weight</strong>
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                Read notifications have <strong>lighter text color</strong>
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body2">
+                Badge shows <strong>unread count (2)</strong>
+              </Typography>
+            </li>
+          </Box>
+        </Box>
+      </Box>
+    );
+  },
+};
+
+/**
+ * Empty Notification State
+ *
+ * Shows the empty state when there are no notifications
+ */
+export const EmptyNotifications: Story = {
+  render: () => (
+    <Box>
+      <MainAppBar
+        title="Empty Notifications"
+        user={mockUser}
+        notifications={[]}
+        unreadNotificationCount={0}
+        currentTheme="light"
+        onAccountClick={() => console.log('Account clicked')}
+        onLogout={() => console.log('Logout clicked')}
+        onNotificationClick={(notification) =>
+          console.log('Notification clicked:', notification)
+        }
+        onMarkAllNotificationsRead={() => console.log('Mark all as read')}
+        onViewAllNotifications={() => console.log('View all notifications')}
+        onClearAllNotifications={() => console.log('Clear all notifications')}
+        onNotificationSettingsClick={() =>
+          console.log('Notification settings clicked')
+        }
+      />
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h6" gutterBottom>
+          Empty Notification State
+        </Typography>
+        <Typography variant="body2">
+          Click the notification bell to see the empty state message when there
+          are no notifications.
+        </Typography>
+      </Box>
     </Box>
   ),
 };

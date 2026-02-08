@@ -1,0 +1,9 @@
+{
+  "invalidName": "權杖名稱無效（1-100 個字元）",
+  "scopesRequired": "至少選擇一個授權範圍",
+  "invalidScopes": "無效的授權範圍：{scopes}",
+  "invalidExpireDays": "到期天數必須為 30、90 或 180",
+  "maxTokensReached": "已達到最大權杖數量上限（{max} 個）",
+  "notFound": "找不到該權杖",
+  "alreadyRevoked": "該權杖已被撤銷"
+}

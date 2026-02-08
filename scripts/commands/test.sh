@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - test 命令
+# NPT CLI - test 命令
 # 執行測試
 # ==========================================
 
@@ -96,11 +96,11 @@ if [ "$I18N_ONLY" = true ]; then
   echo ""
 
   log_info "▶ 後端 i18n 測試"
-  pnpm --filter @wind/backend test:i18n
+  pnpm --filter @npt/backend test:i18n
 
   echo ""
   log_info "▶ 前端 i18n 測試"
-  pnpm --filter @wind/frontend test:i18n
+  pnpm --filter @npt/frontend test:i18n
 
 elif [ "$BACKEND_ONLY" = true ]; then
   log_info "執行後端測試..."
@@ -108,7 +108,7 @@ elif [ "$BACKEND_ONLY" = true ]; then
 
   # TypeScript 型別檢查
   log_info "▶ 1/2 TypeScript 型別檢查"
-  if pnpm --filter @wind/backend type-check; then
+  if pnpm --filter @npt/backend type-check; then
     log_success "型別檢查通過"
   else
     log_error "型別檢查失敗"
@@ -118,11 +118,11 @@ elif [ "$BACKEND_ONLY" = true ]; then
   echo ""
   log_info "▶ 2/2 單元測試"
   if [ "$WATCH" = true ]; then
-    pnpm --filter @wind/backend test:watch
+    pnpm --filter @npt/backend test:watch
   elif [ "$COVERAGE" = true ]; then
-    pnpm --filter @wind/backend test:cov
+    pnpm --filter @npt/backend test:cov
   else
-    pnpm --filter @wind/backend test
+    pnpm --filter @npt/backend test
   fi
 
 elif [ "$FRONTEND_ONLY" = true ]; then
@@ -131,7 +131,7 @@ elif [ "$FRONTEND_ONLY" = true ]; then
 
   # TypeScript 型別檢查
   log_info "▶ 1/2 TypeScript 型別檢查"
-  if pnpm --filter @wind/frontend type-check; then
+  if pnpm --filter @npt/frontend type-check; then
     log_success "型別檢查通過"
   else
     log_error "型別檢查失敗"
@@ -141,11 +141,11 @@ elif [ "$FRONTEND_ONLY" = true ]; then
   echo ""
   log_info "▶ 2/2 單元測試"
   if [ "$WATCH" = true ]; then
-    pnpm --filter @wind/frontend test -- --watch
+    pnpm --filter @npt/frontend test -- --watch
   elif [ "$COVERAGE" = true ]; then
-    pnpm --filter @wind/frontend test -- --coverage
+    pnpm --filter @npt/frontend test -- --coverage
   else
-    pnpm --filter @wind/frontend test
+    pnpm --filter @npt/frontend test
   fi
 
 else
@@ -158,7 +158,7 @@ else
   TYPE_CHECK_FAILED=false
 
   log_info "  • 後端型別檢查"
-  if pnpm --filter @wind/backend type-check; then
+  if pnpm --filter @npt/backend type-check; then
     log_success "  後端型別檢查通過"
   else
     log_error "  後端型別檢查失敗"
@@ -166,7 +166,7 @@ else
   fi
 
   log_info "  • 前端型別檢查"
-  if pnpm --filter @wind/frontend type-check; then
+  if pnpm --filter @npt/frontend type-check; then
     log_success "  前端型別檢查通過"
   else
     log_error "  前端型別檢查失敗"
@@ -180,11 +180,11 @@ else
 
   echo ""
   log_info "▶ 2/3 後端測試"
-  pnpm --filter @wind/backend test
+  pnpm --filter @npt/backend test
 
   echo ""
   log_info "▶ 3/3 前端測試"
-  pnpm --filter @wind/frontend test
+  pnpm --filter @npt/frontend test
 fi
 
 log_success "所有測試通過"

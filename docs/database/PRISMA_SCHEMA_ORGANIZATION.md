@@ -115,10 +115,10 @@ datasource db {
 
 ### user.prisma
 
-**使用者相關 models**：
+**用戶相關 models**：
 
-- `User` - 使用者基本資料
-- `Profile` - 使用者詳細資料
+- `User` - 用戶基本資料
+- `Profile` - 用戶詳細資料
 
 ### metric.prisma
 
@@ -142,7 +142,7 @@ datasource db {
 **✅ 正確**：編輯 `prisma/schemas/` 中的檔案
 
 ```bash
-# 編輯使用者相關 schema
+# 編輯用戶相關 schema
 vim packages/database/prisma/schemas/user.prisma
 
 # 新增文章相關 schema
@@ -356,7 +356,7 @@ git add prisma/schema.prisma
 
 ```text
 schemas/
-├── user.prisma      # 使用者相關
+├── user.prisma      # 用戶相關
 ├── post.prisma      # 文章相關
 ├── comment.prisma   # 評論相關
 ├── order.prisma     # 訂單相關
@@ -372,13 +372,13 @@ schemas/
 ### 3. 加上清楚的註解
 
 ```prisma
-// User - 使用者基本資料
+// User - 用戶基本資料
 // 包含認證資訊和基本個人資料
 model User {
   // ...
 }
 
-// Profile - 使用者詳細資料
+// Profile - 用戶詳細資料
 // 與 User 一對一關聯，包含擴展資訊
 model Profile {
   // ...

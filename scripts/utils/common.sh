@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - 共用工具函數庫
+# NPT CLI - 共用工具函數庫
 # ==========================================
 
 # 顏色定義
@@ -45,6 +45,10 @@ print_header() {
 }
 
 # 確認函數
+#
+# 非互動規則：
+#   1. AUTO_YES=1（或非空）— 一律視為 Yes，不 prompt（適合 --yes / CI）
+#   2. stdin 非 TTY 且未設 AUTO_YES — 直接用 default（避免 read 在管線環境卡死）
 confirm() {
   local message="$1"
   local default="${2:-n}"
@@ -55,6 +59,19 @@ confirm() {
   else
     local prompt="[y/N]"
     local default_answer="n"
+  fi
+
+  # AUTO_YES=1 → 一律 Yes
+  if [[ -n "${AUTO_YES:-}" ]]; then
+    echo -e "${YELLOW}?${NC}  $message $prompt: ${GREEN}y${NC} ${DIM}(AUTO_YES)${NC}"
+    return 0
+  fi
+
+  # 非 TTY → 直接用 default 不 read，避免卡死
+  if [[ ! -t 0 ]]; then
+    echo -e "${YELLOW}?${NC}  $message $prompt: ${DIM}$default_answer (非互動模式)${NC}"
+    [[ "$default_answer" == "y" ]]
+    return $?
   fi
 
   echo -ne "${YELLOW}?${NC}  $message $prompt: "
@@ -257,7 +274,7 @@ spinner() {
 show_help() {
   local command="${1:-}"
 
-  echo -e "\n${GREEN}Wind CLI${NC} - 專案管理工具\n"
+  echo -e "\n${GREEN}NPT CLI${NC} - 專案管理工具\n"
   echo -e "${YELLOW}使用方式:${NC}"
   echo "  ./scripts/cli.sh <command> [options]"
   echo ""
@@ -266,7 +283,7 @@ show_help() {
   echo -e "  ${CYAN}doctor${NC}    診斷開發環境"
   echo -e "  ${CYAN}dev${NC}       啟動開發環境"
   echo -e "  ${CYAN}db${NC}        資料庫管理"
-  echo -e "  ${CYAN}clean${NC}     清理快取和建置產物"
+  echo -e "  ${CYAN}clean${NC}     環境清理"
   echo -e "  ${CYAN}test${NC}      執行測試"
   echo -e "  ${CYAN}help${NC}      顯示此幫助訊息"
   echo ""
@@ -274,7 +291,7 @@ show_help() {
   echo "  ./scripts/cli.sh init              # 初始化專案"
   echo "  ./scripts/cli.sh doctor            # 檢查環境"
   echo "  ./scripts/cli.sh db reset          # 重置資料庫"
-  echo "  ./scripts/cli.sh clean --dry-run   # 預覽清理操作"
+  echo "  ./scripts/cli.sh clean --dry-run   # 預覽環境清理操作"
   echo ""
   echo -e "${YELLOW}更多資訊:${NC}"
   echo "  ./scripts/cli.sh <command> --help  # 查看特定命令的幫助"
@@ -319,22 +336,42 @@ get_container_name() {
     timescaledb|postgres|postgresql)
       env_var_name="POSTGRES_CONTAINER_NAME"
       compose_service_name="timescaledb"
-      default_name="wind-timescaledb"
+      default_name="npt-timescaledb"
       ;;
     rabbitmq|rabbit)
       env_var_name="RABBITMQ_CONTAINER_NAME"
       compose_service_name="rabbitmq"
-      default_name="wind-rabbitmq"
+      default_name="npt-rabbitmq"
       ;;
     dragonfly|redis)
       env_var_name="DRAGONFLY_CONTAINER_NAME"
       compose_service_name="dragonfly"
-      default_name="wind-dragonfly"
+      default_name="npt-dragonfly"
       ;;
     mailpit|mail)
       env_var_name="MAILPIT_CONTAINER_NAME"
       compose_service_name="mailpit"
-      default_name="wind-mailpit"
+      default_name="npt-mailpit"
+      ;;
+    seaweedfs-master|seaweedfs_master)
+      env_var_name="SEAWEEDFS_MASTER_CONTAINER_NAME"
+      compose_service_name="seaweedfs-master"
+      default_name="npt-seaweedfs-master"
+      ;;
+    seaweedfs-volume|seaweedfs_volume)
+      env_var_name="SEAWEEDFS_VOLUME_CONTAINER_NAME"
+      compose_service_name="seaweedfs-volume"
+      default_name="npt-seaweedfs-volume"
+      ;;
+    seaweedfs-filer|seaweedfs_filer)
+      env_var_name="SEAWEEDFS_FILER_CONTAINER_NAME"
+      compose_service_name="seaweedfs-filer"
+      default_name="npt-seaweedfs-filer"
+      ;;
+    seaweedfs-s3|seaweedfs_s3)
+      env_var_name="SEAWEEDFS_S3_CONTAINER_NAME"
+      compose_service_name="seaweedfs-s3"
+      default_name="npt-seaweedfs-s3"
       ;;
     *)
       log_error "不支援的服務類型: $service_name"

@@ -5,16 +5,16 @@
 
 /**
  * AccessScope - 訪問範圍枚舉
- * 決定使用者可以訪問哪個介面
+ * 決定用戶可以訪問哪個介面
  */
 export enum AccessScope {
   PUBLIC_SCOPE = 'PUBLIC_SCOPE', // 公開頁面訪問
   CUSTOMER_SCOPE = 'CUSTOMER_SCOPE', // 客戶儀表板訪問
-  ADMIN_SCOPE = 'ADMIN_SCOPE', // 管理後台訪問
+  HQ_SCOPE = 'HQ_SCOPE', // 管理後台訪問
 }
 
 /**
- * 使用者基本資訊類型
+ * 用戶基本資訊類型
  */
 export interface User {
   id: string;

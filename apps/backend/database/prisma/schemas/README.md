@@ -9,7 +9,7 @@ prisma/
 ├── schema.prisma          # ⚠️ 自動產生，請勿編輯
 └── schemas/               # ✅ 在這裡編輯
     ├── base.prisma       # 基礎設定
-    ├── user.prisma       # 使用者相關
+    ├── user.prisma       # 用戶相關
     └── metric.prisma     # 時間序列
 ```
 

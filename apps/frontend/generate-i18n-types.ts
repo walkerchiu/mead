@@ -11,6 +11,14 @@ interface TranslationObject {
 }
 
 /**
+ * 合法 JS identifier：首字元字母/底線/$，其餘可加數字
+ * 不合法（例如開頭是數字、含連字號）須以字串字面量包起來
+ */
+function formatKey(key: string): string {
+  return /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(key) ? key : JSON.stringify(key);
+}
+
+/**
  * Convert translation object to TypeScript interface
  */
 function generateInterface(obj: TranslationObject, indentLevel = 0): string {
@@ -18,10 +26,11 @@ function generateInterface(obj: TranslationObject, indentLevel = 0): string {
   const lines: string[] = [];
 
   for (const [key, value] of Object.entries(obj)) {
+    const safeKey = formatKey(key);
     if (typeof value === 'string') {
-      lines.push(`${indent}  ${key}: string;`);
+      lines.push(`${indent}  ${safeKey}: string;`);
     } else {
-      lines.push(`${indent}  ${key}: {`);
+      lines.push(`${indent}  ${safeKey}: {`);
       lines.push(generateInterface(value, indentLevel + 1));
       lines.push(`${indent}  };`);
     }

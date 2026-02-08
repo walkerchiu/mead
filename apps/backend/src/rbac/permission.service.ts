@@ -8,31 +8,101 @@ export class PermissionService {
   constructor(private prisma: PrismaService) {}
 
   /**
-   * 檢查使用者是否有指定權限（OR 邏輯）
-   * 只要有任一符合的權限即通過
+   * 檢查用戶是否有指定權限（支援權限層級）
+   * 如果用戶有 resource:manage 權限，則自動擁有該資源的所有 CRUD 權限
    */
   async checkPermission(
     userId: string,
     scope: AccessScope,
     permissionName: string,
   ): Promise<boolean> {
-    // 查詢使用者在指定 scope 內的所有權限
+    // 查詢用戶在指定 scope 內的所有權限
     const userPermissions = await this.getUserPermissions(userId, scope);
 
-    logger.debug('[PermissionService] checkPermission', {
+    // 直接檢查是否包含所需權限
+    if (userPermissions.includes(permissionName)) {
+      logger.debug('[PermissionService] checkPermission - Direct match', {
+        userId,
+        scope,
+        permissionName,
+        hasPermission: true,
+      });
+      return true;
+    }
+
+    // 檢查權限層級：如果用戶有 manage 權限，則自動擁有所有子權限
+    const parts = permissionName.split(':');
+    if (parts.length === 2) {
+      const [resource] = parts;
+      const managePermission = `${resource}:manage`;
+
+      if (userPermissions.includes(managePermission)) {
+        logger.debug(
+          '[PermissionService] checkPermission - Implied by manage',
+          {
+            userId,
+            scope,
+            permissionName,
+            managePermission,
+            hasPermission: true,
+          },
+        );
+        return true;
+      }
+    }
+
+    // 跨 scope 權限檢查：HQ_SCOPE 角色（CONTENT_EDITOR/VIEWER）可能擁有 CUSTOMER_SCOPE 的權限
+    if (scope !== AccessScope.HQ_SCOPE) {
+      const hqPermissions = await this.getUserPermissions(
+        userId,
+        AccessScope.HQ_SCOPE,
+      );
+      if (hqPermissions.includes(permissionName)) {
+        logger.debug(
+          '[PermissionService] checkPermission - Cross-scope match from HQ',
+          {
+            userId,
+            scope,
+            permissionName,
+            hasPermission: true,
+          },
+        );
+        return true;
+      }
+
+      // 也檢查 HQ_SCOPE 的 manage 權限是否隱含所需權限
+      if (parts.length === 2) {
+        const [resource] = parts;
+        const managePermission = `${resource}:manage`;
+        if (hqPermissions.includes(managePermission)) {
+          logger.debug(
+            '[PermissionService] checkPermission - Cross-scope implied by HQ manage',
+            {
+              userId,
+              scope,
+              permissionName,
+              managePermission,
+              hasPermission: true,
+            },
+          );
+          return true;
+        }
+      }
+    }
+
+    logger.debug('[PermissionService] checkPermission - No permission', {
       userId,
       scope,
       permissionName,
       userPermissions,
-      hasPermission: userPermissions.includes(permissionName),
+      hasPermission: false,
     });
 
-    // 檢查是否包含所需權限
-    return userPermissions.includes(permissionName);
+    return false;
   }
 
   /**
-   * 檢查使用者是否有任一指定權限（OR 邏輯）
+   * 檢查用戶是否有任一指定權限（OR 邏輯）
    */
   async checkAnyPermission(
     userId: string,
@@ -48,7 +118,7 @@ export class PermissionService {
   }
 
   /**
-   * 檢查使用者是否有所有指定權限（AND 邏輯）
+   * 檢查用戶是否有所有指定權限（AND 邏輯）
    */
   async checkAllPermissions(
     userId: string,
@@ -64,13 +134,13 @@ export class PermissionService {
   }
 
   /**
-   * 取得使用者在指定 scope 內的所有權限名稱
+   * 取得用戶在指定 scope 內的所有權限名稱
    */
   async getUserPermissions(
     userId: string,
     scope: AccessScope,
   ): Promise<string[]> {
-    // 查詢使用者的角色和權限
+    // 查詢用戶的角色和權限
     const userRoles = await this.prisma.userRole.findMany({
       where: {
         userId,
@@ -103,7 +173,7 @@ export class PermissionService {
   }
 
   /**
-   * 取得使用者在指定 scope 內的所有角色
+   * 取得用戶在指定 scope 內的所有角色
    */
   async getUserRoles(userId: string, scope: AccessScope) {
     return this.prisma.userRole.findMany({
@@ -120,7 +190,7 @@ export class PermissionService {
   }
 
   /**
-   * 授予角色給使用者
+   * 授予角色給用戶
    */
   async grantRole(
     userId: string,
@@ -137,7 +207,7 @@ export class PermissionService {
   }
 
   /**
-   * 撤銷使用者的角色
+   * 撤銷用戶的角色
    */
   async revokeRole(userId: string, roleId: string): Promise<void> {
     await this.prisma.userRole.deleteMany({
@@ -149,7 +219,7 @@ export class PermissionService {
   }
 
   /**
-   * 檢查使用者是否有指定角色
+   * 檢查用戶是否有指定角色
    */
   async hasRole(
     userId: string,

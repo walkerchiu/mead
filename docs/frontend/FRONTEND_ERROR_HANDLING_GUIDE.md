@@ -1,6 +1,6 @@
 # 前端錯誤處理與 Apollo 配置完整指南
 
-Wind Frontend 錯誤處理系統與 Apollo Client 配置的完整使用指南
+NPT Frontend 錯誤處理系統與 Apollo Client 配置的完整使用指南。
 
 ---
 
@@ -238,7 +238,7 @@ NEXT_PUBLIC_SENTRY_DSN=your-prod-dsn    # 啟用 Sentry 追蹤線上錯誤
 | `NEXT_PUBLIC_APOLLO_MAX_RETRIES`         | 最大自動重試次數             | 3      | 0-10           |
 | `NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY` | 首次重試延遲（毫秒）         | 300    | 100-60000      |
 | `NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY`     | 最大重試延遲（毫秒）         | 10000  | 100-60000      |
-| `NEXT_PUBLIC_SENTRY_DSN`                 | Sentry 錯誤追蹤 DSN          | (空)   | Sentry DSN URL |
+| `NEXT_PUBLIC_SENTRY_DSN`                 | Sentry 錯誤追蹤 DSN          | （空） | Sentry DSN URL |
 
 ---
 
@@ -468,9 +468,9 @@ enum ErrorCategory {
   NETWORK = 'NETWORK', // 網路錯誤
   GRAPHQL = 'GRAPHQL', // GraphQL 錯誤
   VALIDATION = 'VALIDATION', // 驗證錯誤
-  BUSINESS = 'BUSINESS', // 業務邏輯錯誤
+  BUSINESS_LOGIC = 'BUSINESS_LOGIC', // 業務邏輯錯誤
   COMPONENT = 'COMPONENT', // 組件錯誤
-  SYSTEM = 'SYSTEM', // 系統錯誤
+  RUNTIME = 'RUNTIME', // 運行時錯誤
   UNKNOWN = 'UNKNOWN', // 未知錯誤
 }
 ```
@@ -617,19 +617,19 @@ function MyForm() {
 大多數操作使用環境變數定義的預設值：
 
 ```typescript
-import { useQuery } from '@apollo/client';
-import { GET_USER } from '@/graphql/queries';
+import { useQuery } from '@apollo/client/react';
+import { ME_QUERY } from '@/lib/graphql';
 
 function UserProfile() {
   // 使用預設配置:
   // - Timeout: 30s (開發環境) / 60s (生產環境)
   // - Max Retries: 3 (開發環境) / 5 (生產環境)
-  const { data, loading, error } = useQuery(GET_USER);
+  const { data, loading, error } = useQuery(ME_QUERY);
 
   if (loading) return <div>載入中...</div>;
   if (error) return <div>錯誤: {error.message}</div>;
 
-  return <div>{data.user.name}</div>;
+  return <div>{data.me.name}</div>;
 }
 ```
 
@@ -1052,7 +1052,7 @@ describe('Apollo Config Validation', () => {
 #### 14. 超時處理測試
 
 ```typescript
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import { render, waitFor } from '@testing-library/react';
 import { GET_DATA } from '@/graphql/queries';
 
@@ -1084,7 +1084,7 @@ describe('Timeout Handling', () => {
 #### 15. 重試行為測試
 
 ```typescript
-import { MockedProvider } from '@apollo/client/testing';
+import { MockedProvider } from '@apollo/client/testing/react';
 import { render, waitFor } from '@testing-library/react';
 
 describe('Retry Behavior', () => {
@@ -1430,7 +1430,7 @@ if (
 | `NEXT_PUBLIC_APOLLO_MAX_RETRIES`         | 3      | 0-10        | 最大重試次數     |
 | `NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY` | 300    | 100-60000   | 初始延遲（毫秒） |
 | `NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY`     | 10000  | 100-60000   | 最大延遲（毫秒） |
-| `NEXT_PUBLIC_SENTRY_DSN`                 | (空)   | -           | Sentry DSN       |
+| `NEXT_PUBLIC_SENTRY_DSN`                 | （空） | -           | Sentry DSN       |
 
 ### Per-Operation 參數
 
@@ -1449,8 +1449,8 @@ if (
 | `NETWORK`        | 網路錯誤       | ✅ 是           |
 | `GRAPHQL`        | GraphQL 錯誤   | ✅ 是（視情況） |
 | `COMPONENT`      | 組件錯誤       | ❌ 否           |
-| `BUSINESS`       | 業務邏輯錯誤   | ❌ 否           |
-| `SYSTEM`         | 系統錯誤       | ❌ 否           |
+| `BUSINESS_LOGIC` | 業務邏輯錯誤   | ❌ 否           |
+| `RUNTIME`        | 運行時錯誤     | ❌ 否           |
 | `UNKNOWN`        | 未知錯誤       | ❌ 否           |
 
 ### 常見場景配置

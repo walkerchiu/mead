@@ -8,9 +8,9 @@ type ActionStatType {
 }
 
 """
-Profile 資料（Admin - 完整）
+Profile 資料（HQ - 完整）
 """
-type AdminProfileType {
+type HQProfileType {
   address: String
   avatar: String
   bio: String
@@ -73,12 +73,12 @@ type PublicUserType {
 
 type Query {
   """
-  查詢公開使用者資料
+  查詢公開用戶資料
   """
   publicUser(id: String!): PublicUserType
 
   """
-  查詢所有公開使用者
+  查詢所有公開用戶
   """
   publicUsers(skip: Int! = 0, take: Int! = 20): [PublicUserType!]!
 }

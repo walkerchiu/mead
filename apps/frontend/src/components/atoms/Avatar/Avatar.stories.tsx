@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Avatar, AvatarGroup } from './Avatar';
 
 const meta = {
@@ -68,34 +68,6 @@ export const WithInitials: Story = {
   },
 };
 
-export const Small: Story = {
-  args: {
-    children: 'S',
-    size: 'small',
-  },
-};
-
-export const Medium: Story = {
-  args: {
-    children: 'M',
-    size: 'medium',
-  },
-};
-
-export const Large: Story = {
-  args: {
-    children: 'L',
-    size: 'large',
-  },
-};
-
-export const CustomSize: Story = {
-  args: {
-    children: 'XL',
-    size: 80,
-  },
-};
-
 export const Rounded: Story = {
   args: {
     children: 'R',
@@ -110,16 +82,6 @@ export const Square: Story = {
   },
 };
 
-export const Variants: Story = {
-  render: () => (
-    <div style={{ display: 'flex', gap: '16px' }}>
-      <Avatar variant="circular" src="https://i.pravatar.cc/150?img=2" />
-      <Avatar variant="rounded" src="https://i.pravatar.cc/150?img=3" />
-      <Avatar variant="square" src="https://i.pravatar.cc/150?img=4" />
-    </div>
-  ),
-};
-
 export const Sizes: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -127,6 +89,16 @@ export const Sizes: Story = {
       <Avatar size="medium">M</Avatar>
       <Avatar size="large">L</Avatar>
       <Avatar size={80}>XL</Avatar>
+    </div>
+  ),
+};
+
+export const Variants: Story = {
+  render: () => (
+    <div style={{ display: 'flex', gap: '16px' }}>
+      <Avatar variant="circular" src="https://i.pravatar.cc/150?img=2" />
+      <Avatar variant="rounded" src="https://i.pravatar.cc/150?img=3" />
+      <Avatar variant="square" src="https://i.pravatar.cc/150?img=4" />
     </div>
   ),
 };

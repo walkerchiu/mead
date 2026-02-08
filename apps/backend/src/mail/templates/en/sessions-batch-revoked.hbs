@@ -1,147 +1,71 @@
-<html>
+<html lang='en'>
   <head>
     <meta charset='UTF-8' />
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Multiple Sessions Terminated</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
-      .container {
-        max-width: 600px;
-        margin: 20px auto;
-        background-color: #ffffff;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      }
-      .header {
-        background-color: #f44336;
-        color: white;
-        padding: 30px 20px;
-        text-align: center;
-      }
-      .header h2 {
-        margin: 0;
-        font-size: 24px;
-      }
-      .content {
-        padding: 30px 20px;
-      }
-      .info-box {
-        background-color: #f9f9f9;
-        padding: 20px;
-        margin: 20px 0;
-        border-left: 4px solid #2196f3;
-        border-radius: 4px;
-      }
-      .info-box h3 {
-        margin-top: 0;
-        color: #2196f3;
-        font-size: 18px;
-      }
-      .session-item {
-        padding: 15px;
-        margin: 10px 0;
-        background-color: #ffffff;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-      }
-      .session-item p {
-        margin: 5px 0;
-        font-size: 14px;
-      }
-      .custom-message {
-        background-color: #fff3cd;
-        padding: 20px;
-        margin: 20px 0;
-        border-left: 4px solid #ffc107;
-        border-radius: 4px;
-      }
-      .custom-message h3 {
-        margin-top: 0;
-        color: #856404;
-        font-size: 18px;
-      }
-      .footer {
-        background-color: #f9f9f9;
-        padding: 20px;
-        text-align: center;
-        color: #666;
-        font-size: 14px;
-        border-top: 1px solid #e0e0e0;
-      }
-      strong {
-        color: #333;
-      }
-      .highlight {
-        color: #f44336;
-        font-size: 20px;
-        font-weight: bold;
-      }
+      body { font-family: -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f6f9; }
+      .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+      .header { background-color: #1a365d; color: white; padding: 28px 24px; text-align: center; }
+      .header h2 { margin: 0; font-size: 22px; font-weight: 600; }
+      .content { padding: 32px 24px; }
+      .content p { margin: 0 0 16px; }
+      .info-box { background-color: #f7f8fa; border-left: 4px solid #2b6cb0; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
+      .info-box h3 { margin: 0 0 10px; font-size: 16px; color: #1a365d; }
+      .session-item { padding: 12px 14px; margin: 8px 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; }
+      .session-item p { margin: 4px 0; font-size: 14px; }
+      .admin-message { background-color: #fffbeb; border-left: 4px solid #d69e2e; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
+      .admin-message h3 { margin: 0 0 8px; font-size: 16px; color: #744210; }
+      .footer { background-color: #f7f8fa; padding: 20px 24px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #e8ecf1; }
     </style>
   </head>
   <body>
     <div class='container'>
       <div class='header'>
-        <h2>🔒
-          <span class='highlight'>{{sessionCount}}</span>
-          of Your Sessions Have Been Terminated</h2>
+        <h2>🔒 {{sessionCount}} of Your Sessions Have Been Terminated</h2>
       </div>
 
       <div class='content'>
         <p>Dear {{userName}},</p>
 
-        <p><strong>{{sessionCount}}</strong>
-          of your login sessions have been terminated by an administrator.</p>
+        <p>Your <strong>{{sessionCount}}</strong> login sessions have been terminated by an administrator.</p>
 
         <div class='info-box'>
           <h3>Affected Sessions</h3>
           {{#each sessions}}
             <div class='session-item'>
               <p><strong>Device:</strong> {{this.deviceInfo}}</p>
-              {{#if this.browser}}
-                <p><strong>Browser:</strong> {{this.browser}}</p>
-              {{/if}}
-              {{#if this.ipAddress}}
-                <p><strong>IP Address:</strong> {{this.ipAddress}}</p>
-              {{/if}}
-              <p><strong>Last Activity:</strong> {{this.lastUsedAt}}</p>
+              {{#if this.browser}}<p><strong>Browser:</strong> {{this.browser}}</p>{{/if}}
+              {{#if this.ipAddress}}<p><strong>IP Address:</strong> {{this.ipAddress}}</p>{{/if}}
+              <p><strong>Last Active:</strong> {{this.lastUsedAt}}</p>
             </div>
           {{/each}}
         </div>
 
         <div class='info-box'>
           <h3>Revocation Details</h3>
-          <p><strong>Revoked By:</strong> {{revokedByName}} ({{revokedBy}})</p>
-          <p><strong>Reason:</strong> {{reason}}</p>
-          <p><strong>Time:</strong> {{timestamp}}</p>
+          <p style='margin: 0;'><strong>Revoked by:</strong> {{revokedByName}} ({{revokedBy}})</p>
+          <p style='margin: 4px 0 0;'><strong>Reason:</strong> {{reason}}</p>
+          <p style='margin: 4px 0 0;'><strong>Time:</strong> {{timestamp}}</p>
         </div>
 
         {{#if customMessage}}
-          <div class='custom-message'>
+          <div class='admin-message'>
             <h3>📝 Administrator Message</h3>
-            <p>{{customMessage}}</p>
+            <p style='margin: 0;'>{{customMessage}}</p>
           </div>
         {{/if}}
 
-        <p>To log in again, please visit our website.</p>
-
-        <p>If you have any questions, please contact our support team.</p>
-
-        <p>
-          <strong>Support Email:</strong>
-          <a href='mailto:{{supportEmail}}'>{{supportEmail}}</a>
+        <p>To continue using the system, please sign in again. If you have any questions, please contact our support team.</p>
+        <p><strong>Support Email:</strong> <a href='mailto:{{supportEmail}}' style='color: #2b6cb0;'>{{supportEmail}}</a></p>
+        <p style='text-align: center; margin-top: 24px;'>
+          <a href='{{dashboardUrl}}' style='display: inline-block; padding: 12px 32px; background-color: #2b6cb0; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;'>Go to Dashboard</a>
         </p>
       </div>
 
       <div class='footer'>
-        <p>This is an automated email. Please do not reply directly.</p>
-        <p>© 2026 Wind Platform. All rights reserved.</p>
+        <p>This email was sent automatically. Please do not reply directly.</p>
+        <p>&copy; 2026 Intelligent Cloud Plus, Inc. All rights reserved.</p>
       </div>
     </div>
   </body>

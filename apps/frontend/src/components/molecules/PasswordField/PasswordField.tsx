@@ -147,20 +147,23 @@ export const PasswordField = forwardRef<HTMLDivElement, PasswordFieldProps>(
           onChange={handleChange}
           error={hasError}
           helperText={errorMessage || helperText}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="togglepassworddisplay"
-                  onClick={handleClickShowPassword}
-                  onMouseDown={handleMouseDownPassword}
-                  edge="end"
-                  size="small"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              sx: { paddingRight: '12px !important' },
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="togglepassworddisplay"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                    size="small"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
           }}
         />
 

@@ -1,4 +1,4 @@
-# Wind Web - Next.js 前端
+# NPT Web - Next.js 前端
 
 Next.js 16 應用程式，使用 MUI 7、Apollo Client 和 Atomic Design 架構。
 
@@ -49,7 +49,7 @@ apps/frontend/
     │       ├── providers.tsx      # Client Providers
     │       ├── login/             # 登入頁
     │       ├── dashboard/         # 儀表板（需認證）
-    │       ├── admin/             # 管理後台
+    │       ├── hq/             # 管理後台
     │       │   ├── audit-logs/    # 審計日誌管理
     │       │   └── sessions/      # Session 管理
     │       ├── settings/          # 設定頁面
@@ -77,7 +77,7 @@ apps/frontend/
     │   │   ├── LoginForm/         # 登入表單
     │   │   ├── TwoFactorForm/     # 2FA 驗證表單
     │   │   └── ...                # 其他認證組件
-    │   ├── admin/                 # 管理組件
+    │   ├── hq/                 # 管理組件
     │   │   ├── AuditLogFilters/   # 審計日誌過濾器
     │   │   └── SessionFilters/    # Session 過濾器
     │   ├── settings/              # 設定組件

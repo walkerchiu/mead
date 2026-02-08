@@ -1,6 +1,10 @@
 import { Module, Global } from '@nestjs/common';
 import { CacheModule as NestCacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis-yet';
+import { CacheService } from './cache.service';
+import { CacheResolver } from './cache.resolver';
+import { DistributedLockService } from './distributed-lock.service';
+import { RbacModule } from '../rbac/rbac.module';
 
 @Global()
 @Module({
@@ -17,7 +21,9 @@ import { redisStore } from 'cache-manager-ioredis-yet';
         }),
       }),
     }),
+    RbacModule,
   ],
-  exports: [NestCacheModule],
+  providers: [CacheService, CacheResolver, DistributedLockService],
+  exports: [NestCacheModule, CacheService, DistributedLockService],
 })
 export class CacheModule {}

@@ -122,16 +122,16 @@ export class User {
 
 @registerEnumType(UserRole, {
   name: 'UserRole',
-  description: '使用者角色',
+  description: '用戶角色',
 })
 export enum UserRole {
-  ADMIN = 'ADMIN',
+  HQ = 'HQ',
   CUSTOMER = 'CUSTOMER',
 }
 
 // ❌ 差：使用字串
 @Field(() => String)
-role: string;  // 'admin' | 'customer' | ???
+role: string;  // 'hq' | 'customer' | ???
 ```
 
 ---
@@ -373,7 +373,7 @@ export enum ErrorCode {
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }
 
-throw new GraphQLError('使用者不存在', {
+throw new GraphQLError('用戶不存在', {
   extensions: {
     code: ErrorCode.NOT_FOUND,
     userId: id,
@@ -498,7 +498,7 @@ export class UserResolver {
   @ResolveField(() => String)
   email(@Parent() user: User, @Context() context) {
     // 只有本人或管理員可以看到 email
-    if (context.user.id === user.id || context.user.role === 'ADMIN') {
+    if (context.user.id === user.id || context.user.role === 'HQ') {
       return user.email;
     }
     return null;

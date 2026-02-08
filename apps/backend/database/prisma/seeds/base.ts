@@ -1,184 +1,247 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, AccessScope } from '@prisma/client';
+import { seedCronJobConfigs } from './cron-job-configs';
 
 export async function seedBase(prisma: PrismaClient) {
+  // ==================== 0. 清理廢棄權限 ====================
+  // 模板版本不再保留先前的業務模組權限（proposals / cases / projects / issues / departments / work_journals / committees）
+  // Prisma 會自動 cascade 刪除 rolePermission 關聯（onDelete: Cascade）
+  const deprecatedPermissionNames = [
+    'profile:read',
+    'profile:update',
+    'permissions:manage',
+    // 已移除模組的權限（若先前資料庫中存在則一併清除）
+    'departments:read',
+    'departments:manage',
+    'proposals:create',
+    'proposals:read',
+    'proposals:read_all',
+    'proposals:update',
+    'proposals:delete',
+    'proposals:submit',
+    'proposals:review',
+    'proposals:manage',
+    'proposals:assign',
+    'committees:manage',
+    'cases:create',
+    'cases:read',
+    'cases:read_all',
+    'cases:update',
+    'cases:delete',
+    'cases:submit',
+    'cases:review',
+    'cases:manage',
+    'cases:assign',
+    'projects:create',
+    'projects:read',
+    'projects:read_all',
+    'projects:update',
+    'projects:delete',
+    'projects:manage',
+    'projects:manage_members',
+    'issues:create',
+    'issues:read',
+    'issues:update',
+    'issues:delete',
+    'issues:manage',
+    'work_journals:read',
+    'work_journals:write',
+    'work_journals:manage',
+    'work-calendar:read',
+    'work-calendar:manage',
+  ];
+  const deleted = await prisma.permission.deleteMany({
+    where: { name: { in: deprecatedPermissionNames } },
+  });
+  if (deleted.count > 0) {
+    console.log(`\n🗑️  清理 ${deleted.count} 個廢棄權限`);
+  }
+
   // ==================== 1. 創建權限 ====================
   console.log('\n📋 創建權限...');
 
-  const permissions = [
-    // Admin Scope Permissions
+  const permissions: Array<{
+    name: string;
+    resource: string;
+    action: string;
+    scope: AccessScope;
+    description?: string;
+  }> = [
+    // HQ Scope Permissions — Users
     {
       name: 'users:create',
       resource: 'users',
       action: 'create',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'users:read',
       resource: 'users',
       action: 'read',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'users:list',
       resource: 'users',
       action: 'list',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'users:update',
       resource: 'users',
       action: 'update',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'users:delete',
       resource: 'users',
       action: 'delete',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'users:restore',
       resource: 'users',
       action: 'restore',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
+    {
+      name: 'users:reset_password',
+      resource: 'users',
+      action: 'reset_password',
+      scope: AccessScope.HQ_SCOPE,
+    },
+    // HQ Scope — Audit Logs
     {
       name: 'audit-logs:read',
       resource: 'audit-logs',
       action: 'read',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'audit-logs:export',
       resource: 'audit-logs',
       action: 'export',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
+    // HQ Scope — Roles
     {
       name: 'roles:manage',
       resource: 'roles',
       action: 'manage',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
-      name: 'permissions:manage',
-      resource: 'permissions',
-      action: 'manage',
-      scope: 'ADMIN_SCOPE',
+      name: 'roles:read',
+      resource: 'roles',
+      action: 'read',
+      scope: AccessScope.HQ_SCOPE,
+      description: '讀取角色（viewer 用）',
     },
 
-    // Session Management Permissions (Admin Scope)
+    // HQ Scope — Sessions
     {
       name: 'sessions:read',
       resource: 'sessions',
       action: 'read',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:read_user',
       resource: 'sessions',
       action: 'read_user',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:read_all',
       resource: 'sessions',
       action: 'read_all',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:revoke',
       resource: 'sessions',
       action: 'revoke',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:revoke_user',
       resource: 'sessions',
       action: 'revoke_user',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:revoke_batch',
       resource: 'sessions',
       action: 'revoke_batch',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
     {
       name: 'sessions:revoke_all',
       resource: 'sessions',
       action: 'revoke_all',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
     },
 
-    // Customer Scope Permissions
+    // HQ Scope — Cron Jobs
+    {
+      name: 'cron_jobs:read',
+      resource: 'cron_jobs',
+      action: 'read',
+      scope: AccessScope.HQ_SCOPE,
+    },
+    {
+      name: 'cron_jobs:write',
+      resource: 'cron_jobs',
+      action: 'write',
+      scope: AccessScope.HQ_SCOPE,
+    },
+
+    // Customer Scope — Users（基本查詢）
     {
       name: 'users:read',
       resource: 'users',
       action: 'read',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
     },
     {
       name: 'users:list',
       resource: 'users',
       action: 'list',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
+    },
+    {
+      name: 'users:create',
+      resource: 'users',
+      action: 'create',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '建立用戶',
     },
     {
       name: 'users:update',
       resource: 'users',
       action: 'update',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '修改用戶資料',
     },
     {
-      name: 'projects:create',
-      resource: 'projects',
-      action: 'create',
-      scope: 'CUSTOMER_SCOPE',
-    },
-    {
-      name: 'projects:read',
-      resource: 'projects',
-      action: 'read',
-      scope: 'CUSTOMER_SCOPE',
-    },
-    {
-      name: 'projects:update',
-      resource: 'projects',
-      action: 'update',
-      scope: 'CUSTOMER_SCOPE',
-    },
-    {
-      name: 'projects:delete',
-      resource: 'projects',
+      name: 'users:delete',
+      resource: 'users',
       action: 'delete',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '刪除用戶',
     },
     {
-      name: 'billing:view',
-      resource: 'billing',
-      action: 'view',
-      scope: 'CUSTOMER_SCOPE',
+      name: 'users:reset_password',
+      resource: 'users',
+      action: 'reset_password',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '重設用戶密碼',
     },
     {
-      name: 'billing:manage',
-      resource: 'billing',
+      name: 'roles:manage',
+      resource: 'roles',
       action: 'manage',
-      scope: 'CUSTOMER_SCOPE',
-    },
-
-    // Public Scope Permissions (minimal)
-    {
-      name: 'profile:read',
-      resource: 'profile',
-      action: 'read',
-      scope: 'PUBLIC_SCOPE',
-    },
-    {
-      name: 'profile:update',
-      resource: 'profile',
-      action: 'update',
-      scope: 'PUBLIC_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '管理用戶角色分配',
     },
   ];
 
@@ -187,91 +250,115 @@ export async function seedBase(prisma: PrismaClient) {
       where: {
         name_scope: {
           name: perm.name,
-          scope: perm.scope as string,
+          scope: perm.scope,
         },
       },
       update: {},
-      create: perm,
+      create: {
+        name: perm.name,
+        resource: perm.resource,
+        action: perm.action,
+        scope: perm.scope,
+        description: perm.description,
+      },
     });
   }
 
   console.log(`✅ 創建了 ${permissions.length} 個權限`);
 
-  // ==================== 2. 創建 Admin Scope 角色 ====================
-  console.log('\n👑 創建 Admin Scope 角色...');
+  // ==================== 2. 創建 HQ Scope 角色 ====================
+  console.log('\n👑 創建 HQ Scope 角色...');
 
-  const superAdminRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'SUPER_ADMIN', scope: 'ADMIN_SCOPE' } },
+  const superHQRole = await prisma.role.upsert({
+    where: { name_scope: { name: 'SUPER_HQ', scope: AccessScope.HQ_SCOPE } },
     update: {},
     create: {
-      name: 'SUPER_ADMIN',
+      name: 'SUPER_HQ',
       displayName: '超級管理員',
-      scope: 'ADMIN_SCOPE',
+      scope: AccessScope.HQ_SCOPE,
       description: '擁有所有權限',
       isSystem: true,
     },
   });
 
   const contentEditorRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'CONTENT_EDITOR', scope: 'ADMIN_SCOPE' } },
+    where: {
+      name_scope: { name: 'CONTENT_EDITOR', scope: AccessScope.HQ_SCOPE },
+    },
     update: {},
     create: {
       name: 'CONTENT_EDITOR',
       displayName: '內容編輯',
-      scope: 'ADMIN_SCOPE',
-      description: '可管理使用者和內容',
+      scope: AccessScope.HQ_SCOPE,
+      description: '可編輯客戶端資料，無法管理 HQ 設定',
       isSystem: true,
     },
   });
 
   const viewerRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'VIEWER', scope: 'ADMIN_SCOPE' } },
+    where: { name_scope: { name: 'VIEWER', scope: AccessScope.HQ_SCOPE } },
     update: {},
     create: {
       name: 'VIEWER',
       displayName: '檢視者',
-      scope: 'ADMIN_SCOPE',
-      description: '僅能檢視稽核日誌',
+      scope: AccessScope.HQ_SCOPE,
+      description: '僅能查看客戶端資料，無法編輯',
       isSystem: true,
     },
   });
 
-  console.log('✅ Admin Scope 角色創建完成');
+  console.log('✅ HQ Scope 角色創建完成');
 
   // ==================== 3. 創建 Customer Scope 角色 ====================
   console.log('\n👤 創建 Customer Scope 角色...');
 
   const ownerRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'OWNER', scope: 'CUSTOMER_SCOPE' } },
+    where: { name_scope: { name: 'OWNER', scope: AccessScope.CUSTOMER_SCOPE } },
     update: {},
     create: {
       name: 'OWNER',
       displayName: '擁有者',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
       description: '擁有所有客戶端權限',
       isSystem: true,
     },
   });
 
+  const managerRole = await prisma.role.upsert({
+    where: {
+      name_scope: { name: 'MANAGER', scope: AccessScope.CUSTOMER_SCOPE },
+    },
+    update: {},
+    create: {
+      name: 'MANAGER',
+      displayName: '管理者',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '可管理工作日曆與一般用戶',
+      isSystem: true,
+    },
+  });
+
   const memberRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'MEMBER', scope: 'CUSTOMER_SCOPE' } },
+    where: {
+      name_scope: { name: 'MEMBER', scope: AccessScope.CUSTOMER_SCOPE },
+    },
     update: {},
     create: {
       name: 'MEMBER',
       displayName: '成員',
-      scope: 'CUSTOMER_SCOPE',
-      description: '可建立和編輯專案',
+      scope: AccessScope.CUSTOMER_SCOPE,
+      description: '一般成員，可查詢用戶與工作日曆',
       isSystem: true,
     },
   });
 
   const guestRole = await prisma.role.upsert({
-    where: { name_scope: { name: 'GUEST', scope: 'CUSTOMER_SCOPE' } },
+    where: { name_scope: { name: 'GUEST', scope: AccessScope.CUSTOMER_SCOPE } },
     update: {},
     create: {
       name: 'GUEST',
       displayName: '訪客',
-      scope: 'CUSTOMER_SCOPE',
+      scope: AccessScope.CUSTOMER_SCOPE,
       description: '僅能檢視',
       isSystem: true,
     },
@@ -279,47 +366,51 @@ export async function seedBase(prisma: PrismaClient) {
 
   console.log('✅ Customer Scope 角色創建完成');
 
-  // ==================== 4. 分配權限給 Admin Roles ====================
-  console.log('\n🔑 分配權限給 Admin Roles...');
+  // ==================== 4. 分配權限給 HQ Roles ====================
+  console.log('\n🔑 分配權限給 HQ Roles...');
 
-  // SUPER_ADMIN: 所有 ADMIN_SCOPE 權限
-  const adminPermissions = await prisma.permission.findMany({
-    where: { scope: 'ADMIN_SCOPE' },
+  // SUPER_HQ: 所有 HQ_SCOPE 權限
+  const hqPermissions = await prisma.permission.findMany({
+    where: { scope: AccessScope.HQ_SCOPE },
   });
 
-  for (const perm of adminPermissions) {
+  for (const perm of hqPermissions) {
     await prisma.rolePermission.upsert({
       where: {
         roleId_permissionId: {
-          roleId: superAdminRole.id,
+          roleId: superHQRole.id,
           permissionId: perm.id,
         },
       },
       update: {},
       create: {
-        roleId: superAdminRole.id,
+        roleId: superHQRole.id,
         permissionId: perm.id,
       },
     });
   }
 
-  // CONTENT_EDITOR: users:*, audit-logs:read, sessions (limited)
-  const editorPermissionNames = [
-    'users:create',
+  // 先清除 CONTENT_EDITOR 和 VIEWER 的既有權限
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: contentEditorRole.id },
+  });
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: viewerRole.id },
+  });
+
+  // CONTENT_EDITOR: HQ_SCOPE 用戶管理權限
+  const editorHQPermissionNames = [
     'users:read',
     'users:list',
+    'users:create',
     'users:update',
     'users:delete',
     'users:restore',
-    'audit-logs:read',
-    'sessions:read',
-    'sessions:read_user',
-    'sessions:revoke',
-    'sessions:revoke_user',
+    'users:reset_password',
   ];
-  for (const permName of editorPermissionNames) {
+  for (const permName of editorHQPermissionNames) {
     const perm = await prisma.permission.findFirst({
-      where: { name: permName, scope: 'ADMIN_SCOPE' },
+      where: { name: permName, scope: AccessScope.HQ_SCOPE },
     });
     if (perm) {
       await prisma.rolePermission.upsert({
@@ -338,34 +429,96 @@ export async function seedBase(prisma: PrismaClient) {
     }
   }
 
-  // VIEWER: audit-logs:read
-  const viewerPerm = await prisma.permission.findFirst({
-    where: { name: 'audit-logs:read', scope: 'ADMIN_SCOPE' },
-  });
-  if (viewerPerm) {
-    await prisma.rolePermission.upsert({
-      where: {
-        roleId_permissionId: {
-          roleId: viewerRole.id,
-          permissionId: viewerPerm.id,
-        },
-      },
-      update: {},
-      create: {
-        roleId: viewerRole.id,
-        permissionId: viewerPerm.id,
-      },
+  // CONTENT_EDITOR: CUSTOMER_SCOPE 編輯用戶
+  const editorCustomerPermissionNames = [
+    'users:read',
+    'users:list',
+    'users:create',
+    'users:update',
+    'users:delete',
+    'users:reset_password',
+    'roles:manage',
+  ];
+  for (const permName of editorCustomerPermissionNames) {
+    const perm = await prisma.permission.findFirst({
+      where: { name: permName, scope: AccessScope.CUSTOMER_SCOPE },
     });
+    if (perm) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: contentEditorRole.id,
+            permissionId: perm.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: contentEditorRole.id,
+          permissionId: perm.id,
+        },
+      });
+    }
   }
 
-  console.log('✅ Admin 權限分配完成');
+  // VIEWER: HQ_SCOPE 查詢權限
+  const viewerHQPermissionNames = [
+    'users:read',
+    'users:list',
+    'audit-logs:read',
+    'roles:read',
+  ];
+  for (const permName of viewerHQPermissionNames) {
+    const perm = await prisma.permission.findFirst({
+      where: { name: permName, scope: AccessScope.HQ_SCOPE },
+    });
+    if (perm) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: viewerRole.id,
+            permissionId: perm.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: viewerRole.id,
+          permissionId: perm.id,
+        },
+      });
+    }
+  }
+
+  // VIEWER: CUSTOMER_SCOPE 查詢權限
+  const viewerCustomerPermissionNames = ['users:read', 'users:list'];
+  for (const permName of viewerCustomerPermissionNames) {
+    const perm = await prisma.permission.findFirst({
+      where: { name: permName, scope: AccessScope.CUSTOMER_SCOPE },
+    });
+    if (perm) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: viewerRole.id,
+            permissionId: perm.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: viewerRole.id,
+          permissionId: perm.id,
+        },
+      });
+    }
+  }
+
+  console.log('✅ HQ 權限分配完成');
 
   // ==================== 5. 分配權限給 Customer Roles ====================
   console.log('\n🔑 分配權限給 Customer Roles...');
 
   // OWNER: 所有 CUSTOMER_SCOPE 權限
   const customerPermissions = await prisma.permission.findMany({
-    where: { scope: 'CUSTOMER_SCOPE' },
+    where: { scope: AccessScope.CUSTOMER_SCOPE },
   });
 
   for (const perm of customerPermissions) {
@@ -384,18 +537,43 @@ export async function seedBase(prisma: PrismaClient) {
     });
   }
 
-  // MEMBER: projects:*, users:read
-  const memberPermissionNames = [
-    'projects:create',
-    'projects:read',
-    'projects:update',
-    'projects:delete',
+  // MANAGER: 用戶管理
+  await prisma.rolePermission.deleteMany({ where: { roleId: managerRole.id } });
+  const managerPermissionNames = [
     'users:read',
     'users:list',
+    'users:create',
+    'users:update',
+    'users:delete',
+    'users:reset_password',
   ];
+  for (const permName of managerPermissionNames) {
+    const perm = await prisma.permission.findFirst({
+      where: { name: permName, scope: AccessScope.CUSTOMER_SCOPE },
+    });
+    if (perm) {
+      await prisma.rolePermission.upsert({
+        where: {
+          roleId_permissionId: {
+            roleId: managerRole.id,
+            permissionId: perm.id,
+          },
+        },
+        update: {},
+        create: {
+          roleId: managerRole.id,
+          permissionId: perm.id,
+        },
+      });
+    }
+  }
+
+  // MEMBER: 一般成員，僅查詢
+  await prisma.rolePermission.deleteMany({ where: { roleId: memberRole.id } });
+  const memberPermissionNames = ['users:read', 'users:list'];
   for (const permName of memberPermissionNames) {
     const perm = await prisma.permission.findFirst({
-      where: { name: permName, scope: 'CUSTOMER_SCOPE' },
+      where: { name: permName, scope: AccessScope.CUSTOMER_SCOPE },
     });
     if (perm) {
       await prisma.rolePermission.upsert({
@@ -414,28 +592,13 @@ export async function seedBase(prisma: PrismaClient) {
     }
   }
 
-  // GUEST: projects:read, users:read
-  const guestPermissionNames = ['projects:read', 'users:read'];
-  for (const permName of guestPermissionNames) {
-    const perm = await prisma.permission.findFirst({
-      where: { name: permName, scope: 'CUSTOMER_SCOPE' },
-    });
-    if (perm) {
-      await prisma.rolePermission.upsert({
-        where: {
-          roleId_permissionId: {
-            roleId: guestRole.id,
-            permissionId: perm.id,
-          },
-        },
-        update: {},
-        create: {
-          roleId: guestRole.id,
-          permissionId: perm.id,
-        },
-      });
-    }
-  }
+  // GUEST: 無任何權限
+  await prisma.rolePermission.deleteMany({
+    where: { roleId: guestRole.id },
+  });
 
   console.log('✅ Customer 權限分配完成');
+
+  // ==================== 6. 創建 Cron Job 配置 ====================
+  await seedCronJobConfigs(prisma);
 }

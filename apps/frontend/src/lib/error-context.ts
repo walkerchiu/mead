@@ -33,7 +33,7 @@ interface BrowserContext {
 export function getEnvironmentContext(): EnvironmentContext {
   return {
     appVersion: process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0',
-    appName: 'Wind Frontend',
+    appName: 'NPT Frontend',
     environment: process.env.NODE_ENV,
     buildId: process.env.NEXT_PUBLIC_BUILD_ID,
     commitSha: process.env.NEXT_PUBLIC_COMMIT_SHA,

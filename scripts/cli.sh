@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - 主入口（互動式）
+# NPT CLI - 主入口（互動式）
 # ==========================================
 
 set -euo pipefail
@@ -19,15 +19,54 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # 載入共用函數
 source "$SCRIPT_DIR/utils/common.sh"
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # 顯示版本
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-  echo -e "Wind CLI v$VERSION"
+  echo -e "NPT CLI v$VERSION"
   exit 0
 fi
 
-# 等待使用者按 Enter 後返回選單
+# 顯示 top-level help
+if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "help" ]]; then
+  cat <<EOF
+NPT CLI v$VERSION - 開發工作流程管理工具
+
+使用方式:
+  ./scripts/cli.sh                進入互動式選單（16 個功能）
+  ./scripts/cli.sh <command> [options]
+  ./scripts/cli.sh --version      顯示版本
+  ./scripts/cli.sh --help         顯示此說明
+
+可用命令:
+  init                初始化 NPT 專案
+  dev                 啟動開發伺服器（支援 --frontend-only / --backend-only 等）
+  test                執行測試（型別檢查 + 單元測試）
+  status              查看服務狀態（--health 含健康檢查）
+  doctor              診斷環境（--fix 自動修復，加 --yes 跳過確認）
+  stop <target>       停止服務（all / frontend / backend / docker / ...）
+  restart <target>    重啟服務
+  logs <service>      查看日誌（-f 跟隨 / --tail N / --since 5m）
+  db <sub>            資料庫（migrate:up|down|create|status / reset / backup / restore / cleanup / studio）
+  clean               清理快取與建置產物
+  port <sub>          Port 管理（status / free <port> / free-all）
+  env <sub>           環境切換（current / list / switch <env> / diff <env>）
+  deps <sub>          依賴管理（outdated / audit / update / cleanup）
+  i18n <sub>          多語系（test / generate / unused / stats）
+  storage <sub>       SeaweedFS（start / stop / restart / status / info / logs / diagnose / reset）
+  drift               檢查 backend convention 是否符合（CONVENTIONS.md）
+  menu                強制進入互動式選單
+
+每個命令都支援 --help 查看詳細選項，例如:
+  ./scripts/cli.sh db --help
+  ./scripts/cli.sh doctor --help
+
+完整文件: docs/getting-started/CLI_GUIDE.md
+EOF
+  exit 0
+fi
+
+# 等待用戶按 Enter 後返回選單
 wait_and_return() {
   echo -e ""
   echo -e "${DIM}────────────────────────────────────────────────────────────────${NC}"
@@ -40,12 +79,12 @@ show_interactive_menu() {
   while true; do
     clear
     echo -e ""
-    echo -e "${GREEN}╔═══════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}║                                                               ║${NC}"
-    echo -e "${GREEN}║                   🌪️  ${NC}${CYAN}Wind CLI${NC} ${GREEN}v$VERSION                       ║${NC}"
-    echo -e "${GREEN}║              開發工作流程管理工具 - 互動式選單                ║${NC}"
-    echo -e "${GREEN}║                                                               ║${NC}"
-    echo -e "${GREEN}╚═══════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║                                                          ║${NC}"
+    echo -e "${GREEN}║                      ${NC}${BLUE}${BOLD}NPT CLI${NC} ${GREEN}v$VERSION                     ║${NC}"
+    echo -e "${GREEN}║             開發工作流程管理工具 - 互動式選單            ║${NC}"
+    echo -e "${GREEN}║                                                          ║${NC}"
+    echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
     echo -e ""
 
     echo -e "${YELLOW}🚀 快速開始${NC}"
@@ -61,15 +100,15 @@ show_interactive_menu() {
     echo -e "  ${CYAN}7${NC})  執行測試            ${DIM}│${NC}  測試程式是否正常"
     echo -e ""
 
-    echo -e "${YELLOW}💾 資料庫管理${NC}"
+    echo -e "${YELLOW}💾 資料管理${NC}"
     echo -e "  ${CYAN}8${NC})  資料庫遷移          ${DIM}│${NC}  更新資料庫結構"
-    echo -e "  ${CYAN}9${NC})  重置資料庫          ${DIM}│${NC}  清空並重新建立"
-    echo -e "  ${CYAN}10${NC}) 資料庫備份/還原     ${DIM}│${NC}  保存或恢復資料"
+    echo -e "  ${CYAN}9${NC})  重置資料            ${DIM}│${NC}  清空資料庫與檔案"
+    echo -e "  ${CYAN}10${NC}) 備份/還原           ${DIM}│${NC}  資料庫 + 檔案儲存"
     echo -e ""
 
     echo -e "${YELLOW}🏥 診斷修復${NC}"
-    echo -e "  ${CYAN}11${NC}) 環境診斷 (Doctor)   ${DIM}│${NC}  全面診斷開發環境問題"
-    echo -e "  ${CYAN}12${NC}) 清理快取            ${DIM}│${NC}  清理暫存檔釋放空間"
+    echo -e "  ${CYAN}11${NC}) 環境診斷            ${DIM}│${NC}  診斷環境並可選自動修復"
+    echo -e "  ${CYAN}12${NC}) 環境清理            ${DIM}│${NC}  清理環境以釋放空間"
     echo -e ""
 
     echo -e "${YELLOW}⚙️  進階功能${NC}"
@@ -80,12 +119,11 @@ show_interactive_menu() {
     echo -e ""
 
     echo -e "${YELLOW}📚 說明文件${NC}"
-    echo -e "  ${CYAN}h${NC})  查看完整指令說明    ${DIM}│${NC}  所有命令的詳細說明"
     echo -e "  ${CYAN}d${NC})  開啟文檔            ${DIM}│${NC}  在編輯器中開啟 CLI 文檔"
     echo -e "  ${CYAN}q${NC})  離開                ${DIM}│${NC}  結束 CLI"
     echo -e ""
     echo -e "${DIM}────────────────────────────────────────────────────────────────${NC}"
-    echo -ne "${GREEN}❯${NC} 請選擇功能 [1-16, h, d, q]: "
+    echo -ne "${GREEN}❯${NC} 請選擇功能 [1-16, d, q]: "
     read -r choice
 
     case "$choice" in
@@ -132,7 +170,8 @@ show_interactive_menu() {
         echo -e "  ${CYAN}7${NC}) 僅 Storybook"
         echo -e "  ${CYAN}8${NC}) 僅 Prisma Studio"
         echo -e "  ${CYAN}9${NC}) Docker 服務"
-        echo -ne "${GREEN}請選擇 [1-9]:${NC} "
+        echo -e "  ${CYAN}10${NC}) SeaweedFS"
+        echo -ne "${GREEN}請選擇 [1-10]:${NC} "
         read -r svc
         case "$svc" in
           1) bash "$SCRIPT_DIR/commands/stop.sh" all || true ;;
@@ -154,6 +193,7 @@ show_interactive_menu() {
           7) bash "$SCRIPT_DIR/commands/stop.sh" storybook || true ;;
           8) bash "$SCRIPT_DIR/commands/stop.sh" prisma-studio || true ;;
           9) bash "$SCRIPT_DIR/commands/stop.sh" docker || true ;;
+          10) bash "$SCRIPT_DIR/commands/storage.sh" stop || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -170,7 +210,8 @@ show_interactive_menu() {
         echo -e "  ${CYAN}7${NC}) 僅 Storybook"
         echo -e "  ${CYAN}8${NC}) 僅 Prisma Studio"
         echo -e "  ${CYAN}9${NC}) Docker 服務"
-        echo -ne "${GREEN}請選擇 [1-9]:${NC} "
+        echo -e "  ${CYAN}10${NC}) SeaweedFS"
+        echo -ne "${GREEN}請選擇 [1-10]:${NC} "
         read -r svc
         case "$svc" in
           1) bash "$SCRIPT_DIR/commands/restart.sh" all || true ;;
@@ -195,6 +236,7 @@ show_interactive_menu() {
           7) bash "$SCRIPT_DIR/commands/restart.sh" storybook || true ;;
           8) bash "$SCRIPT_DIR/commands/restart.sh" prisma-studio || true ;;
           9) bash "$SCRIPT_DIR/commands/restart.sh" docker || true ;;
+          10) bash "$SCRIPT_DIR/commands/storage.sh" restart || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -209,7 +251,13 @@ show_interactive_menu() {
         echo -e "  ${CYAN}5${NC}) PostgreSQL"
         echo -e "  ${CYAN}6${NC}) RabbitMQ"
         echo -e "  ${CYAN}7${NC}) Redis/Dragonfly"
-        echo -ne "${GREEN}請選擇 [1-7]:${NC} "
+        echo -e "  ${CYAN}8${NC}) Mailpit"
+        echo -e "  ${CYAN}9${NC}) SeaweedFS (所有)"
+        echo -e "  ${CYAN}10${NC}) SeaweedFS Master"
+        echo -e "  ${CYAN}11${NC}) SeaweedFS Volume"
+        echo -e "  ${CYAN}12${NC}) SeaweedFS Filer"
+        echo -e "  ${CYAN}13${NC}) SeaweedFS S3"
+        echo -ne "${GREEN}請選擇 [1-13]:${NC} "
         read -r log_choice
         case "$log_choice" in
           1) bash "$SCRIPT_DIR/commands/logs.sh" docker -f || true ;;
@@ -219,6 +267,12 @@ show_interactive_menu() {
           5) bash "$SCRIPT_DIR/commands/logs.sh" postgres -f || true ;;
           6) bash "$SCRIPT_DIR/commands/logs.sh" rabbitmq -f || true ;;
           7) bash "$SCRIPT_DIR/commands/logs.sh" redis -f || true ;;
+          8) bash "$SCRIPT_DIR/commands/logs.sh" mailpit -f || true ;;
+          9) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs -f || true ;;
+          10) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-master -f || true ;;
+          11) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-volume -f || true ;;
+          12) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-filer -f || true ;;
+          13) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-s3 -f || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -249,20 +303,31 @@ show_interactive_menu() {
       9) bash "$SCRIPT_DIR/commands/db.sh" reset || true; wait_and_return ;;
       10)
         echo -e ""
-        echo -e "${YELLOW}資料庫備份/還原:${NC}"
-        echo -e "  ${CYAN}1${NC}) 備份資料庫"
-        echo -e "  ${CYAN}2${NC}) 還原資料庫"
+        echo -e "${YELLOW}資料備份/還原:${NC}"
+        echo -e "  ${CYAN}1${NC}) 備份資料（資料庫 + 檔案儲存）"
+        echo -e "  ${CYAN}2${NC}) 還原資料（資料庫 + 檔案儲存）"
         echo -e "  ${CYAN}3${NC}) 列出備份"
         echo -e "  ${CYAN}4${NC}) 刪除舊備份"
         echo -ne "${GREEN}請選擇 [1-4]:${NC} "
         read -r backup_choice
         case "$backup_choice" in
           1)
-            bash "$SCRIPT_DIR/commands/db.sh" backup || true
+            CURRENT_ENV="${NPT_ENV:-development}"
+            echo -e ""
+            echo -e "${YELLOW}將備份環境:${NC} ${CYAN}$CURRENT_ENV${NC}"
+            echo -e "${DIM}提示: 使用 NPT_ENV 環境變數可指定其他環境${NC}"
+            echo -e ""
+            if confirm "確定要繼續嗎?" "y"; then
+              bash "$SCRIPT_DIR/commands/db.sh" backup || true
+            else
+              echo -e "${YELLOW}已取消${NC}"
+              sleep 1
+            fi
             ;;
           2)
             # 列出可用備份供選擇
-            BACKUP_DIR="$SCRIPT_DIR/../backups/${WIND_ENV:-development}"
+            CURRENT_ENV="${NPT_ENV:-development}"
+            BACKUP_DIR="$SCRIPT_DIR/../backups/$CURRENT_ENV"
 
             # 檢查是否有任何備份檔案
             has_backups=false
@@ -274,7 +339,7 @@ show_interactive_menu() {
 
             if [ "$has_backups" = true ]; then
               echo -e ""
-              echo -e "${YELLOW}選擇要還原的備份:${NC}"
+              echo -e "${YELLOW}選擇要還原的備份 (環境: ${CYAN}$CURRENT_ENV${YELLOW}):${NC}"
               echo -e ""
 
               # 列出備份並編號（包含 .sql 和 .sql.gz）
@@ -293,7 +358,12 @@ show_interactive_menu() {
                   filename=$(basename "$backup")
                   timestamp=$(echo "$filename" | sed -n 's/.*_\([0-9]\{8\}_[0-9]\{6\}\).*/\1/p')
                   date_formatted=$(echo "$timestamp" | sed 's/\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)_\([0-9]\{2\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)/\1-\2-\3 \4:\5:\6/')
-                  echo -e "  ${CYAN}$count${NC}) $date_formatted  ${DIM}($size, $filename)${NC}"
+
+                  # 提取環境名稱（從檔名中）
+                  env_name=$(echo "$filename" | sed -n 's/.*_db_\([^_]*\)_.*/\1/p')
+
+                  echo -e "  ${CYAN}$count${NC}) $date_formatted  ${DIM}[$size]${NC}  ${YELLOW}($env_name)${NC}"
+                  echo -e "      ${DIM}$filename${NC}"
                   ((count++))
                 done
                 echo -e "  ${CYAN}0${NC}) 取消"
@@ -310,7 +380,10 @@ show_interactive_menu() {
                 fi
               fi
             else
-              echo -e "${YELLOW}目前沒有可用的備份${NC}"
+              echo -e ""
+              echo -e "${YELLOW}環境 ${CYAN}$CURRENT_ENV${YELLOW} 目前沒有可用的備份${NC}"
+              echo -e ""
+              echo -e "${DIM}提示: 使用選項 1 建立備份${NC}"
               sleep 2
             fi
             ;;
@@ -325,7 +398,7 @@ show_interactive_menu() {
             for env in development uat production; do
               if [[ -d "$BACKUP_BASE/$env" ]]; then
                 # 收集該環境的所有備份檔案
-                local backup_files=()
+                backup_files=()
                 while IFS= read -r file; do
                   [[ -f "$file" ]] && backup_files+=("$file")
                 done < <(ls -t "$BACKUP_BASE/$env"/*.sql "$BACKUP_BASE/$env"/*.sql.gz 2>/dev/null)
@@ -333,7 +406,8 @@ show_interactive_menu() {
                 # 如果有備份檔案才顯示
                 if [ ${#backup_files[@]} -gt 0 ]; then
                   found_backups=true
-                  echo -e "${CYAN}環境: $env${NC}"
+                  backup_count=${#backup_files[@]}
+                  echo -e "${CYAN}━━━ 環境: $env${NC} ${DIM}($backup_count 個備份)${NC}"
 
                   # 顯示每個備份檔案
                   for file in "${backup_files[@]}"; do
@@ -344,12 +418,12 @@ show_interactive_menu() {
                     if [[ "$filename" =~ _([0-9]{8})_([0-9]{6}) ]]; then
                       date_part="${BASH_REMATCH[1]}"
                       time_part="${BASH_REMATCH[2]}"
-                      formatted_date="${date_part:4:2}月${date_part:6:2} ${time_part:0:2}:${time_part:2:2}"
+                      formatted_date="${date_part:0:4}-${date_part:4:2}-${date_part:6:2} ${time_part:0:2}:${time_part:2:2}:${time_part:4:2}"
                     else
                       formatted_date="unknown"
                     fi
 
-                    echo -e "  • $filename  ${DIM}($size, $formatted_date)${NC}"
+                    echo -e "  • ${formatted_date}  ${DIM}[${size}]${NC}  $filename"
                   done
                   echo -e ""
                 fi
@@ -368,10 +442,16 @@ show_interactive_menu() {
             echo -e "  ${CYAN}2${NC}) uat"
             echo -e "  ${CYAN}3${NC}) production"
             echo -e "  ${CYAN}4${NC}) 全部環境"
-            echo -ne "${GREEN}請選擇 [1-4]:${NC} "
+            echo -e "  ${CYAN}0${NC}) 取消"
+            echo -ne "${GREEN}請選擇 [0-4]:${NC} "
             read -r env_choice
 
             case "$env_choice" in
+              0)
+                echo -e "${YELLOW}已取消${NC}"
+                sleep 1
+                continue
+                ;;
               1) env="development" ;;
               2) env="uat" ;;
               3) env="production" ;;
@@ -394,7 +474,20 @@ show_interactive_menu() {
               continue
             fi
 
-            bash "$SCRIPT_DIR/commands/db.sh" cleanup --env "$env" --keep "$keep_count" || true
+            echo -e ""
+            if [ "$env" = "all" ]; then
+              echo -e "${YELLOW}將清理所有環境的舊備份，保留最近 ${CYAN}$keep_count${YELLOW} 個${NC}"
+            else
+              echo -e "${YELLOW}將清理環境 ${CYAN}$env${YELLOW} 的舊備份，保留最近 ${CYAN}$keep_count${YELLOW} 個${NC}"
+            fi
+            echo -e ""
+
+            if confirm "確定要繼續嗎?" "n"; then
+              bash "$SCRIPT_DIR/commands/db.sh" cleanup --env "$env" --keep "$keep_count" || true
+            else
+              echo -e "${YELLOW}已取消${NC}"
+              sleep 1
+            fi
             ;;
           *)
             echo -e "${RED}無效選擇${NC}"
@@ -408,8 +501,8 @@ show_interactive_menu() {
         echo -e ""
         echo -e "${YELLOW}環境診斷選項:${NC}"
         echo -e "  ${CYAN}1${NC}) 快速診斷（基本環境檢查）"
-        echo -e "  ${CYAN}2${NC}) 完整診斷（包含服務健康檢查）"
-        echo -e "  ${CYAN}3${NC}) 診斷並自動修復問題"
+        echo -e "  ${CYAN}2${NC}) 完整診斷（基本 + 服務健康檢查）"
+        echo -e "  ${CYAN}3${NC}) 完整診斷並自動修復"
         echo -ne "${GREEN}請選擇 [1-3]:${NC} "
         read -r doctor_choice
         case "$doctor_choice" in
@@ -420,7 +513,12 @@ show_interactive_menu() {
             echo -e "${YELLOW}執行服務健康檢查...${NC}"
             bash "$SCRIPT_DIR/commands/status.sh" --health || true
             ;;
-          3) bash "$SCRIPT_DIR/commands/doctor.sh" --fix || true ;;
+          3)
+            bash "$SCRIPT_DIR/commands/doctor.sh" --fix || true
+            echo -e ""
+            echo -e "${YELLOW}執行服務健康檢查...${NC}"
+            bash "$SCRIPT_DIR/commands/status.sh" --health || true
+            ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -447,11 +545,6 @@ show_interactive_menu() {
       14) bash "$SCRIPT_DIR/commands/port.sh" || true; wait_and_return ;;
       15) bash "$SCRIPT_DIR/commands/env.sh" || true; wait_and_return ;;
       16) bash "$SCRIPT_DIR/commands/deps.sh" || true; wait_and_return ;;
-      h|H)
-        clear
-        show_command_help
-        wait_and_return
-        ;;
       d|D)
         if command -v open >/dev/null 2>&1; then
           open "$SCRIPT_DIR/../docs/getting-started/CLI_GUIDE.md" 2>/dev/null || cat "$SCRIPT_DIR/../docs/getting-started/CLI_GUIDE.md" | less
@@ -472,103 +565,9 @@ show_interactive_menu() {
   done
 }
 
-# 顯示命令列表幫助
-show_command_help() {
-  echo -e ""
-  echo -e "${GREEN}Wind CLI${NC} - 開發工作流程管理工具 v$VERSION"
-  echo -e ""
-  echo -e "${YELLOW}使用方式:${NC}"
-  echo -e "  ./scripts/cli.sh            # 進入互動式選單（推薦）"
-  echo -e "  ./scripts/cli.sh <command>  # 直接執行命令"
-  echo -e ""
-  echo -e "${YELLOW}🚀 核心命令:${NC}"
-  echo -e "  ${CYAN}init${NC}              初始化開發環境（新開發者使用）"
-  echo -e "                    - 自動安裝依賴"
-  echo -e "                    - 啟動 Docker 服務"
-  echo -e "                    - 初始化資料庫"
-  echo -e ""
-  echo -e "  ${CYAN}dev${NC}               啟動開發伺服器"
-  echo -e "                    - 同時啟動前端和後端"
-  echo -e "                    - 支援 Storybook 模式"
-  echo -e "                    - 支援熱重載"
-  echo -e ""
-  echo -e "  ${CYAN}test${NC}              執行測試"
-  echo -e "                    - 前端、後端或全部測試"
-  echo -e "                    - 支援 watch 模式"
-  echo -e ""
-  echo -e "  ${CYAN}clean${NC}             清理快取和暫存檔"
-  echo -e "                    - 釋放磁碟空間"
-  echo -e "                    - 修復依賴問題"
-  echo -e ""
-  echo -e "${YELLOW}🛠️  服務管理:${NC}"
-  echo -e "  ${CYAN}status${NC}            查看所有服務狀態"
-  echo -e "  ${CYAN}stop <service>${NC}    停止指定服務（frontend/backend/storybook/docker/all）"
-  echo -e "  ${CYAN}restart <service>${NC} 重啟指定服務（frontend/backend/storybook/docker/all）"
-  echo -e "  ${CYAN}logs <service>${NC}    查看服務日誌（frontend/backend/storybook/docker，支援 -f）"
-  echo -e ""
-  echo -e "${YELLOW}💾 資料庫命令:${NC}"
-  echo -e "  ${CYAN}db migrate:create${NC} 建立新的 migration"
-  echo -e "  ${CYAN}db migrate:up${NC}     執行 migration"
-  echo -e "  ${CYAN}db migrate:down${NC}   回滾 migration"
-  echo -e "  ${CYAN}db migrate:status${NC} 查看 migration 狀態"
-  echo -e "  ${CYAN}db reset${NC}          重置資料庫"
-  echo -e "  ${CYAN}db seed${NC}           填充測試資料"
-  echo -e "  ${CYAN}db backup${NC}         備份資料庫"
-  echo -e "  ${CYAN}db restore${NC}        還原資料庫"
-  echo -e "  ${CYAN}db studio${NC}         開啟資料庫 GUI"
-  echo -e ""
-  echo -e "${YELLOW}⚙️  進階工具:${NC}"
-  echo -e "  ${CYAN}i18n test${NC}         執行翻譯完整性測試"
-  echo -e "  ${CYAN}i18n generate${NC}     生成 TypeScript 類型定義"
-  echo -e "  ${CYAN}i18n unused${NC}       檢查未使用的翻譯鍵"
-  echo -e "  ${CYAN}i18n unused --show${NC} 顯示詳細未使用鍵列表"
-  echo -e "  ${CYAN}i18n unused --cleanup${NC} 生成清理腳本"
-  echo -e "  ${CYAN}i18n stats${NC}        顯示翻譯統計資訊"
-  echo -e "  ${CYAN}port${NC}              Port 管理（查看狀態、釋放、掃描衝突）"
-  echo -e "  ${CYAN}env${NC}               環境切換（local/dev/uat/prod）"
-  echo -e "  ${CYAN}deps${NC}              依賴管理（過時檢查、安全審計、更新、清理）"
-  echo ""
-  echo -e "${YELLOW}🏥 診斷工具:${NC}"
-  echo -e "  ${CYAN}doctor${NC}            環境診斷"
-  echo -e "  ${CYAN}doctor --fix${NC}      自動修復問題"
-  echo -e ""
-  echo -e "${YELLOW}📝 常用範例:${NC}"
-  echo -e "  ${DIM}# 新手第一次使用${NC}"
-  echo -e "  ./scripts/cli.sh init"
-  echo -e ""
-  echo -e "  ${DIM}# 每天開始開發${NC}"
-  echo -e "  ./scripts/cli.sh dev"
-  echo -e ""
-  echo -e "  ${DIM}# 後端改完快速重啟${NC}"
-  echo -e "  ./scripts/cli.sh restart backend"
-  echo -e ""
-  echo -e "  ${DIM}# 即時查看日誌${NC}"
-  echo -e "  ./scripts/cli.sh logs backend -f"
-  echo -e ""
-  echo -e "  ${DIM}# 測試掛了修修看${NC}"
-  echo -e "  ./scripts/cli.sh doctor --fix"
-  echo -e ""
-  echo -e "  ${DIM}# 資料庫搞壞了重來${NC}"
-  echo -e "  ./scripts/cli.sh db reset"
-  echo -e ""
-  echo -e "${YELLOW}💡 小技巧:${NC}"
-  echo -e "  - 不知道用什麼？直接輸入 ${CYAN}./scripts/cli.sh${NC} 進入選單"
-  echo -e "  - 每個命令都支援 ${CYAN}--help${NC} 查看詳細說明"
-  echo -e "  - 遇到問題先跑 ${CYAN}./scripts/cli.sh doctor${NC}"
-  echo -e ""
-  echo -e "${YELLOW}📚 完整文檔:${NC}"
-  echo -e "  ${CYAN}docs/getting-started/CLI_GUIDE.md${NC}"
-}
-
 # 沒有參數 = 互動式選單
 if [[ -z "${1:-}" ]]; then
   show_interactive_menu
-  exit 0
-fi
-
-# 顯示幫助
-if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]]; then
-  show_command_help
   exit 0
 fi
 
@@ -619,7 +618,21 @@ case "$COMMAND" in
   i18n)
     exec "$SCRIPT_DIR/commands/i18n.sh" "$@"
     ;;
+  storage)
+    exec "$SCRIPT_DIR/commands/storage.sh" "$@"
+    ;;
+  drift)
+    exec python3 "$SCRIPT_DIR/check-drift.py" "$@"
+    ;;
   menu)
+    case "${1:-}" in
+      -h|--help)
+        echo "Usage: ./scripts/cli.sh menu"
+        echo ""
+        echo "強制進入互動式選單（與不帶任何參數呼叫 cli.sh 等價）。"
+        exit 0
+        ;;
+    esac
     show_interactive_menu
     ;;
   *)

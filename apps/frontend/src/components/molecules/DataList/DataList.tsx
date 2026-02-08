@@ -325,7 +325,9 @@ export function DataList({
       {(sortOptions || onFilterChange || selectable) && (
         <Box
           sx={{
-            p: 2,
+            py: 2,
+            pr: 2,
+            pl: 2,
             display: 'flex',
             gap: 2,
             alignItems: 'center',
@@ -338,6 +340,7 @@ export function DataList({
               checked={allSelected}
               indeterminate={someSelected}
               onChange={(e) => handleSelectAll(e.target.checked)}
+              sx={{ mr: 1 }}
             />
           )}
 
@@ -413,21 +416,27 @@ export function DataList({
                   </Box>
                 }
               >
-                {selectable && (
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={(e) =>
-                      handleSelectItem(item.id, e.target.checked)
-                    }
-                    sx={{ ml: 1 }}
-                  />
-                )}
-
                 <ListItemButton
                   onClick={() => onItemClick?.(item)}
-                  sx={{ py: 2 }}
+                  sx={{ py: 2, pl: 2, pr: 2 }}
                 >
-                  {item.icon && <ListItemIcon>{item.icon}</ListItemIcon>}
+                  {selectable && (
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleSelectItem(item.id, e.target.checked);
+                      }}
+                      tabIndex={-1}
+                      disableRipple
+                      sx={{ mr: 1 }}
+                    />
+                  )}
+                  {item.icon && (
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {item.icon}
+                    </ListItemIcon>
+                  )}
                   <ListItemText
                     primary={item.title}
                     secondary={item.subtitle}

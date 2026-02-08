@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client/react';
 import { AUDIT_LOGS_PAGINATED_QUERY } from '@/lib/audit-logs-queries';
 
 interface AuditLogFilters {
-  userId?: string;
+  userSearch?: string;
   action?: string;
   entity?: string;
   status?: string;
@@ -20,6 +20,8 @@ interface AuditLog {
   id: string;
   requestId: string;
   userId: string;
+  userName?: string;
+  userEmail?: string;
   action: string;
   entity: string;
   entityId?: string;

@@ -48,7 +48,7 @@ describe('FieldAuthPlugin', () => {
         req: {
           user: {
             userId: '1',
-            accessScopes: [AccessScope.ADMIN_SCOPE],
+            accessScopes: [AccessScope.HQ_SCOPE],
             roles: [],
           },
         },
@@ -72,7 +72,7 @@ describe('FieldAuthPlugin', () => {
       expect(data.users[0]).toHaveProperty('name');
     });
 
-    it('Admin 應該可以看到所有欄位（除了 password）', async () => {
+    it('HQ 應該可以看到所有欄位（除了 password）', async () => {
       const listener = await plugin.requestDidStart();
       const data = {
         users: [
@@ -90,7 +90,7 @@ describe('FieldAuthPlugin', () => {
         req: {
           user: {
             userId: '2',
-            accessScopes: [AccessScope.ADMIN_SCOPE],
+            accessScopes: [AccessScope.HQ_SCOPE],
             roles: [],
           },
         },
@@ -192,7 +192,7 @@ describe('FieldAuthPlugin', () => {
       expect(data.users[0]).toHaveProperty('name');
     });
 
-    it('Customer 不能看到 Admin-only 欄位', async () => {
+    it('Customer 不能看到 HQ-only 欄位', async () => {
       const listener = await plugin.requestDidStart();
       const data = {
         users: [

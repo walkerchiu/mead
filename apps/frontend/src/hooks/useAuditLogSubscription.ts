@@ -130,7 +130,7 @@ export const useAuditLogSubscription = (
             );
 
             // ✅ 不清除統計數據的 cache，避免觸發額外的查詢
-            // 統計數據會在用戶手動刷新或重新進入頁面時自動更新
+            // 統計數據會在用戶手動重新整理或重新進入頁面時自動更新
 
             console.log('[Audit Log] New log inserted into cache');
           } catch (error) {

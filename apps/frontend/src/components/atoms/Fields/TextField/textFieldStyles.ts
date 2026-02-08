@@ -31,6 +31,10 @@ export const getTextFieldStyles = ({
       lineHeight: 1,
       zIndex: 1,
       pointerEvents: 'none',
+      maxWidth: 'calc(100% - 24px)',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
     },
     '& .MuiFormLabel-root.Mui-focused': {
       color: colors.focusLabel,
@@ -97,6 +101,19 @@ export const getTextFieldStyles = ({
       padding: `${Math.max(sizeToken.paddingX - 4, 8)}px ${sizeToken.paddingX}px`,
       height: 'auto',
     },
+    // Select specific styles
+    '& .MuiSelect-select': {
+      padding: `0 ${sizeToken.paddingX}px !important`,
+      paddingRight: `${sizeToken.paddingX + 34}px !important`,
+      height: '100%',
+      minHeight: 'unset !important',
+      display: 'flex',
+      alignItems: 'center',
+      boxSizing: 'border-box',
+    },
+    '& .MuiSelect-icon': {
+      right: `${sizeToken.paddingX}px`,
+    },
     '& .MuiInputBase-root.Mui-multiline': {
       height: 'auto',
       minHeight: sizeToken.height,
@@ -141,6 +158,13 @@ export const getTextFieldStyles = ({
     '& .MuiInputBase-root.Mui-disabled .MuiOutlinedInput-notchedOutline': {
       borderColor: colors.disabledBorder,
     },
+    '& .MuiOutlinedInput-input:-webkit-autofill, & .MuiOutlinedInput-input:-webkit-autofill:hover, & .MuiOutlinedInput-input:-webkit-autofill:focus':
+      {
+        WebkitBoxShadow: `0 0 0 1000px ${colors.bg} inset !important`,
+        WebkitTextFillColor: `${colors.text} !important`,
+        caretColor: colors.text,
+        borderRadius: 'inherit',
+      },
     '& .MuiInputBase-input::placeholder': {
       color: colors.placeholder,
       opacity: 1,

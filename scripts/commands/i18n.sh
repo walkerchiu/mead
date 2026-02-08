@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - i18n 命令
+# NPT CLI - i18n 命令
 # 多語系管理工具
 # ==========================================
 
@@ -73,8 +73,8 @@ generate_types() {
   log_success "✅ TypeScript 類型定義已生成"
   echo ""
   log_info "生成的檔案:"
-  echo "  • apps/backend/src/i18n/i18n.types.ts"
-  echo "  • apps/frontend/src/types/i18n.types.ts"
+  echo "  • apps/backend/src/generated/i18n.generated.ts"
+  echo "  • apps/frontend/src/types/i18n.generated.ts"
 }
 
 # 檢查未使用的翻譯鍵

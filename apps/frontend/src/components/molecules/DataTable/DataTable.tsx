@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -14,6 +14,7 @@ import {
   IconButton,
   Collapse,
   Typography,
+  keyframes,
 } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import {
@@ -208,7 +209,45 @@ export interface DataTableProps<T = unknown> {
    * custom style
    */
   sx?: SxProps<Theme>;
+
+  /**
+   * Table layout algorithm: 'auto' (default) or 'fixed'
+   */
+  tableLayout?: 'auto' | 'fixed';
+
+  /**
+   * Enable animation for highlighted rows
+   * @default false
+   */
+  animateHighlight?: boolean;
 }
+
+// Define animation keyframes
+const slideInFromLeft = keyframes`
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+`;
+
+const highlightPulse = keyframes`
+  0% {
+    background-color: rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.4);
+  }
+  50% {
+    background-color: rgba(76, 175, 80, 0.2);
+    box-shadow: 0 0 0 8px rgba(76, 175, 80, 0);
+  }
+  100% {
+    background-color: rgba(76, 175, 80, 0.1);
+    box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+  }
+`;
 
 export function DataTable<T extends { id: string | number }>({
   columns,
@@ -231,6 +270,8 @@ export function DataTable<T extends { id: string | number }>({
   maxHeight,
   expandIconPosition = 'right',
   sx,
+  tableLayout,
+  animateHighlight = false,
 }: DataTableProps<T>) {
   // sortstate
   const [orderBy, setOrderBy] = useState<string | null>(null);
@@ -338,32 +379,18 @@ export function DataTable<T extends { id: string | number }>({
     return result;
   }, [data, filters, orderBy, order, columns]);
 
-  // loadingstate
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-        <Progress type="circular" />
-      </Box>
-    );
-  }
-
-  // empty datastate
-  if (data.length === 0) {
-    return (
-      <Paper sx={{ p: 4, textAlign: 'center', ...sx }}>
-        <Typography color="text.secondary">{emptyText}</Typography>
-      </Paper>
-    );
-  }
-
   const allSelected =
     processedData.length > 0 && selectedRows.length === processedData.length;
   const someSelected = selectedRows.length > 0 && !allSelected;
 
+  // Compute colspan for loading and empty states
+  const totalColumns =
+    columns.length + (selectable ? 1 : 0) + (expandable ? 1 : 0);
+
   return (
-    <Paper sx={{ width: '100%', overflow: 'hidden', ...sx }}>
+    <Paper elevation={2} sx={{ width: '100%', overflow: 'hidden', ...sx }}>
       <TableContainer sx={{ maxHeight }}>
-        <Table stickyHeader>
+        <Table stickyHeader sx={tableLayout ? { tableLayout } : undefined}>
           <TableHead>
             {/* Filterrow */}
             {columns.some((col) => col.filterable) && (
@@ -392,29 +419,98 @@ export function DataTable<T extends { id: string | number }>({
             {/* Header row */}
             <TableRow>
               {selectable && (
-                <TableCell padding="checkbox">
+                <TableCell
+                  padding="checkbox"
+                  sx={{
+                    backgroundColor: 'secondary.main',
+                    color: 'secondary.contrastText',
+                  }}
+                >
                   <Checkbox
                     checked={allSelected}
                     indeterminate={someSelected}
                     onChange={(e) => handleSelectAll(e.target.checked)}
+                    sx={{
+                      color: 'secondary.contrastText',
+                      '&.Mui-checked': {
+                        color: 'secondary.contrastText',
+                      },
+                      '&.MuiCheckbox-indeterminate': {
+                        color: 'secondary.contrastText',
+                      },
+                    }}
                   />
                 </TableCell>
               )}
-              {expandable && <TableCell />}
+              {expandable && (
+                <TableCell
+                  sx={{
+                    backgroundColor: 'secondary.main',
+                    color: 'secondary.contrastText',
+                  }}
+                />
+              )}
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ width: column.width }}
+                  style={
+                    column.width
+                      ? { width: column.width, maxWidth: column.width }
+                      : undefined
+                  }
+                  sx={{
+                    backgroundColor: 'secondary.main',
+                    color: 'secondary.contrastText',
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    padding: column.sortable ? '6px 16px' : undefined,
+                  }}
                 >
                   {column.sortable ? (
-                    <TableSortLabel
-                      active={orderBy === column.id}
-                      direction={orderBy === column.id ? order : 'asc'}
-                      onClick={() => handleSort(column.id)}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent:
+                          column.align === 'right'
+                            ? 'flex-end'
+                            : column.align === 'center'
+                              ? 'center'
+                              : 'flex-start',
+                        width: '100%',
+                      }}
                     >
-                      {column.label}
-                    </TableSortLabel>
+                      <TableSortLabel
+                        active={orderBy === column.id}
+                        direction={orderBy === column.id ? order : 'asc'}
+                        onClick={() => handleSort(column.id)}
+                        sx={{
+                          color: 'secondary.contrastText',
+                          flexDirection: 'row',
+                          '& .MuiTableSortLabel-icon': {
+                            color: 'secondary.contrastText',
+                            marginLeft: '4px',
+                            marginRight: 0,
+                          },
+                          '&:hover': {
+                            color: 'secondary.contrastText',
+                            '& .MuiTableSortLabel-icon': {
+                              opacity: 0.5,
+                            },
+                          },
+                          '&.Mui-active': {
+                            color: 'secondary.contrastText',
+                            '& .MuiTableSortLabel-icon': {
+                              color: 'secondary.contrastText',
+                              opacity: 1,
+                            },
+                          },
+                        }}
+                      >
+                        {column.label}
+                      </TableSortLabel>
+                    </Box>
                   ) : (
                     column.label
                   )}
@@ -424,97 +520,128 @@ export function DataTable<T extends { id: string | number }>({
           </TableHead>
 
           <TableBody>
-            {processedData.map((row) => {
-              const isSelected = selectedRows.includes(String(row.id));
-              const isExpanded = expandedRows.has(row.id);
-              const isHighlighted = highlightRow?.(row) || false;
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={totalColumns} align="center" sx={{ py: 4 }}>
+                  <Progress type="circular" />
+                </TableCell>
+              </TableRow>
+            ) : data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={totalColumns} align="center" sx={{ py: 4 }}>
+                  <Typography color="text.secondary">{emptyText}</Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              processedData.map((row) => {
+                const isSelected = selectedRows.includes(String(row.id));
+                const isExpanded = expandedRows.has(row.id);
+                const isHighlighted = highlightRow?.(row) || false;
 
-              return (
-                <>
-                  <TableRow
-                    key={row.id}
-                    hover
-                    selected={isSelected}
-                    onClick={() => onRowClick?.(row)}
-                    sx={{
-                      cursor: onRowClick ? 'pointer' : 'default',
-                      ...(isHighlighted && {
-                        backgroundColor: highlightColor,
-                        '&:hover': {
+                return (
+                  <React.Fragment key={row.id}>
+                    <TableRow
+                      hover
+                      selected={isSelected}
+                      onClick={() => onRowClick?.(row)}
+                      sx={{
+                        cursor: onRowClick ? 'pointer' : 'default',
+                        ...(isHighlighted && {
                           backgroundColor: highlightColor,
-                        },
-                      }),
-                    }}
-                  >
-                    {selectable && (
-                      <TableCell padding="checkbox">
-                        <Checkbox
-                          checked={isSelected}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            handleSelectRow(row.id, e.target.checked);
-                          }}
-                        />
-                      </TableCell>
-                    )}
+                          '&:hover': {
+                            backgroundColor: highlightColor,
+                          },
+                          ...(animateHighlight && {
+                            animation: `${slideInFromLeft} 0.5s ease-out, ${highlightPulse} 2s ease-out 0.5s`,
+                          }),
+                        }),
+                      }}
+                    >
+                      {selectable && (
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={isSelected}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleSelectRow(row.id, e.target.checked);
+                            }}
+                          />
+                        </TableCell>
+                      )}
+                      {expandable && (
+                        <TableCell>
+                          <IconButton
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleExpandRow(row.id);
+                            }}
+                          >
+                            {isExpanded ? (
+                              expandIconPosition === 'down' ? (
+                                <KeyboardArrowUp />
+                              ) : (
+                                <KeyboardArrowDown />
+                              )
+                            ) : expandIconPosition === 'down' ? (
+                              <KeyboardArrowDown />
+                            ) : (
+                              <KeyboardArrowRight />
+                            )}
+                          </IconButton>
+                        </TableCell>
+                      )}
+                      {columns.map((column) => (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={
+                            column.width
+                              ? { maxWidth: column.width }
+                              : undefined
+                          }
+                        >
+                          {column.render
+                            ? column.render(row[column.id as keyof T], row)
+                            : String(row[column.id as keyof T] || '')}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+
+                    {/* expandedrow */}
                     {expandable && (
-                      <TableCell>
-                        <IconButton
-                          size="small"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleExpandRow(row.id);
+                      <TableRow>
+                        <TableCell
+                          colSpan={
+                            columns.length +
+                            (selectable ? 1 : 0) +
+                            (expandable ? 1 : 0)
+                          }
+                          sx={{
+                            py: 0,
+                            borderBottom: isExpanded ? undefined : 0,
                           }}
                         >
-                          {isExpanded ? (
-                            expandIconPosition === 'down' ? (
-                              <KeyboardArrowUp />
-                            ) : (
-                              <KeyboardArrowDown />
-                            )
-                          ) : expandIconPosition === 'down' ? (
-                            <KeyboardArrowDown />
-                          ) : (
-                            <KeyboardArrowRight />
-                          )}
-                        </IconButton>
-                      </TableCell>
+                          <Collapse
+                            in={isExpanded}
+                            timeout="auto"
+                            unmountOnExit
+                          >
+                            <Box sx={{ py: 2 }}>{renderExpandedRow?.(row)}</Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
                     )}
-                    {columns.map((column) => (
-                      <TableCell key={column.id} align={column.align}>
-                        {column.render
-                          ? column.render(row[column.id as keyof T], row)
-                          : String(row[column.id as keyof T] || '')}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-
-                  {/* expandedrow */}
-                  {expandable && (
-                    <TableRow>
-                      <TableCell
-                        colSpan={
-                          columns.length +
-                          (selectable ? 1 : 0) +
-                          (expandable ? 1 : 0)
-                        }
-                        sx={{ py: 0, borderBottom: isExpanded ? undefined : 0 }}
-                      >
-                        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                          <Box sx={{ py: 2 }}>{renderExpandedRow?.(row)}</Box>
-                        </Collapse>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </>
-              );
-            })}
+                  </React.Fragment>
+                );
+              })
+            )}
           </TableBody>
         </Table>
       </TableContainer>
 
       {/* Pagination */}
-      {pagination && totalPages && onPageChange && (
+      {pagination && onPageChange && !!totalPages && totalPages > 0 && (
         <Box
           sx={{
             display: 'flex',

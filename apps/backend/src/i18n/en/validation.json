@@ -11,7 +11,8 @@
     "similarToName": "Password should not contain your name",
     "similarToUsername": "Password should not contain your username",
     "currentIncorrect": "Current password is incorrect",
-    "mustBeDifferent": "New password must be different from current password"
+    "mustBeDifferent": "New password must be different from current password",
+    "recentlyUsed": "This password matches a recently used password, please choose a different one"
   },
   "email": {
     "invalid": "Invalid email format",

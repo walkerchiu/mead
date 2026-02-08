@@ -2,6 +2,11 @@
 
 完整的後端國際化實作，支援錯誤訊息、Email 模板和 API 回應多語系。
 
+> 📚 **閱讀導覽**：本文件專注於**後端（NestJS）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或前端實作，請參考：
+>
+> - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) — 整合流程、CLI 工具、測試
+> - [前端 i18n 設置指南](../frontend/I18N_SETUP.md) — Next.js 端實作
+
 ---
 
 ## 📋 目錄
@@ -128,7 +133,7 @@ apps/backend/src/i18n/
 {
   "emailAlreadyRegistered": "此 Email 已被註冊",
   "invalidCredentials": "帳號或密碼錯誤",
-  "userNotFound": "找不到使用者",
+  "userNotFound": "找不到用戶",
   "twoFactorCodeSent": "驗證碼已發送至您的 Email"
 }
 ```
@@ -153,7 +158,7 @@ cd apps/backend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @wind/backend generate-i18n-types
+pnpm --filter @npt/backend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -274,7 +279,7 @@ describe('I18n Translations Completeness', () => {
 pnpm test src/i18n/i18n-completeness.spec.ts
 
 # 或從根目錄
-pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
 ```
 
 ### 測試失敗範例
@@ -533,46 +538,23 @@ curl -X POST http://localhost:4000/graphql \
   -d '{"query":"{ __typename }"}'
 
 # 執行完整性測試
-pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
 
 # 重新生成類型
-pnpm --filter @wind/backend generate-i18n-types
+pnpm --filter @npt/backend generate-i18n-types
 ```
 
 ---
 
 ## 🛠️ CLI 工具支援
 
-### 翻譯測試與類型生成
-
-```bash
-# 啟動 Wind CLI
-./scripts/cli.sh
-
-# 選擇 14（i18n 多語系管理）
-# 可執行：
-# 1) 測試翻譯檔案（執行完整性測試）
-# 2) 生成類型定義（前後端）
-# 3) 查看翻譯統計
-```
-
-### 手動執行命令
-
-```bash
-# 後端：生成類型
-pnpm --filter @wind/backend generate-i18n-types
-
-# 後端：測試翻譯完整性
-pnpm --filter @wind/backend test src/i18n/i18n-completeness.spec.ts
-
-# 前端：生成類型
-pnpm --filter @wind/frontend generate-i18n-types
-```
+> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#️-cli-工具支援)，以避免文件重複。
 
 ---
 
 ## 📚 相關文檔
 
+- [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) - 整合流程與 CLI 工具
 - [前端 i18n 設置](../frontend/I18N_SETUP.md) - 前端國際化配置
 - [Email 服務配置](EMAIL_CONFIGURATION.md) - SMTP 配置與多語系 Email 模板
 - [API 回應格式規範](API_RESPONSE_FORMAT.md) - 錯誤訊息格式

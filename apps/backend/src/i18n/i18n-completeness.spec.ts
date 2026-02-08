@@ -4,7 +4,14 @@ import * as path from 'path';
 describe('i18n Translation Completeness', () => {
   const i18nDir = path.join(__dirname);
   const languages = ['en', 'zh-TW'];
-  const namespaces = ['auth', 'common', 'email', 'twoFactor', 'validation'];
+  const namespaces = [
+    'auth',
+    'common',
+    'email',
+    'pat',
+    'twoFactor',
+    'validation',
+  ];
 
   // Helper function to get all keys from a nested object
   function getAllKeys(obj: Record<string, unknown>, prefix = ''): string[] {

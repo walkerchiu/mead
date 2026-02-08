@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import Paper from '@mui/material/Paper';

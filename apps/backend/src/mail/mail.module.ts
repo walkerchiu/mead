@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
-import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/adapters/handlebars.adapter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
+import { PrismaModule } from '../prisma/prisma.module';
 import { MailService } from './mail.service';
+import { GraphMailService } from './graph-mail.service';
 
 @Module({
   imports: [
+    ConfigModule,
+    PrismaModule,
     MailerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -18,10 +22,14 @@ import { MailService } from './mail.service';
         const transportConfig: any = {
           host: config.get('MAIL_HOST'),
           port: config.get('MAIL_PORT'),
-          secure: false, // true for 465, false for other ports
+          secure: config.get('MAIL_SECURE') === 'true', // true for 465, false for 587 (STARTTLS)
+          tls: {
+            ciphers: 'SSLv3',
+            rejectUnauthorized: false,
+          },
         };
 
-        // 如果提供了使用者名稱和密碼，則添加認證
+        // 如果提供了用戶名稱和密碼，則添加認證
         if (mailUser && mailPassword) {
           transportConfig.auth = {
             user: mailUser,
@@ -50,7 +58,7 @@ import { MailService } from './mail.service';
       },
     }),
   ],
-  providers: [MailService],
+  providers: [MailService, GraphMailService],
   exports: [MailService],
 })
 export class MailModule {}

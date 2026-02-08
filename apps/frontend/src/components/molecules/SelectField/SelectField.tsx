@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import TextField from '@mui/material/TextField';
+import { TextField } from '@/components/atoms';
 import MenuItem from '@mui/material/MenuItem';
 import Checkbox from '@mui/material/Checkbox';
 import ListItemText from '@mui/material/ListItemText';
@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Autocomplete from '@mui/material/Autocomplete';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import { FieldError } from 'react-hook-form';
-import type { TextFieldProps } from '@mui/material/TextField';
+import type { TextFieldProps } from '@/components/atoms';
 
 /**
  * SelectField Component - Atomic Design: Molecule
@@ -94,7 +94,7 @@ export interface SelectOption {
 
 export interface SelectFieldProps extends Omit<
   TextFieldProps,
-  'error' | 'helperText' | 'select'
+  'error' | 'helperText' | 'select' | 'type' | 'variant'
 > {
   /**
    * Option items list
@@ -140,6 +140,11 @@ export interface SelectFieldProps extends Omit<
    * searchWhenno results messagetext
    */
   noOptionsText?: string;
+
+  /**
+   * Input variant (always 'outlined' for consistency)
+   */
+  variant?: 'outlined';
 }
 
 /**
@@ -213,12 +218,12 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
               helperText={errorMessage || helperText}
               required={props.required}
               disabled={props.disabled}
-              variant={props.variant}
+              variant="outlined"
               size={props.size}
               fullWidth={props.fullWidth}
               InputLabelProps={{
                 ...params.InputLabelProps,
-                ...props.InputLabelProps,
+                shrink: true,
               }}
             />
           )}
@@ -302,7 +307,11 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
                       {option.icon}
                     </ListItemIcon>
                   )}
-                  <ListItemText primary={option.label} />
+                  {option.icon || (multiple && showCheckbox) ? (
+                    <ListItemText primary={option.label} />
+                  ) : (
+                    option.label
+                  )}
                 </MenuItem>
               ));
             }
@@ -334,7 +343,11 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
                       {option.icon}
                     </ListItemIcon>
                   )}
-                  <ListItemText primary={option.label} />
+                  {option.icon || (multiple && showCheckbox) ? (
+                    <ListItemText primary={option.label} />
+                  ) : (
+                    option.label
+                  )}
                 </MenuItem>
               )),
             ];
@@ -357,7 +370,11 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
           {option.icon && (
             <ListItemIcon sx={{ minWidth: 36 }}>{option.icon}</ListItemIcon>
           )}
-          <ListItemText primary={option.label} />
+          {option.icon || (multiple && showCheckbox) ? (
+            <ListItemText primary={option.label} />
+          ) : (
+            option.label
+          )}
         </MenuItem>
       ));
     };
@@ -380,21 +397,40 @@ export const SelectField = forwardRef<HTMLDivElement, SelectFieldProps>(
           }
         : undefined;
 
+    // Check if there's an empty value option in options (like "All")
+    const hasEmptyValueOption = options.some((opt) => opt.value === '');
+    const hasValue = value !== undefined && value !== null;
+    // Should shrink if: has placeholder, or has a selected value/defaultValue (including empty string option)
+    const shouldShrink =
+      Boolean(placeholder) ||
+      Boolean(value) ||
+      Boolean(props.defaultValue) ||
+      hasEmptyValueOption;
+    // Should display empty if: has placeholder, or has an empty value option
+    const shouldDisplayEmpty = Boolean(placeholder) || hasEmptyValueOption;
+
+    // Only pass value prop when explicitly provided, otherwise let defaultValue work (uncontrolled)
+    const valueProps = hasValue
+      ? { value: multiple && !Array.isArray(value) ? [value] : value }
+      : {};
+
     return (
       <TextField
         ref={ref}
         select
         error={hasError}
         helperText={errorMessage || helperText}
-        value={value ?? (multiple ? [] : '')}
-        InputLabelProps={{
-          shrink: placeholder ? true : undefined,
-          ...props.InputLabelProps,
+        {...valueProps}
+        variant="outlined"
+        slotProps={{
+          inputLabel: () => ({
+            shrink: shouldShrink,
+          }),
         }}
         SelectProps={{
           multiple,
           renderValue,
-          displayEmpty: Boolean(placeholder),
+          displayEmpty: shouldDisplayEmpty,
           ...props.SelectProps,
         }}
         {...props}

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - db 命令
+# NPT CLI - db 命令
 # 資料庫管理工具（支援多環境）
 # ==========================================
 
@@ -13,34 +13,38 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # 載入共用函數
 source "$SCRIPT_DIR/../utils/common.sh"
 
+# 載入檔案儲存管理工具
+source "$SCRIPT_DIR/../utils/file-storage.sh"
+
 # 預設環境
-ENVIRONMENT="${WIND_ENV:-development}"
+ENVIRONMENT="${NPT_ENV:-development}"
 
 # 顯示幫助
 show_command_help() {
-  echo -e "\n${GREEN}./scripts/cli.sh db${NC} - 資料庫管理（支援多環境）\n"
+  echo -e "\n${GREEN}./scripts/cli.sh db${NC} - 資料管理（支援多環境）\n"
   echo -e "${YELLOW}描述:${NC}"
-  echo "  管理資料庫的各種操作，支援開發、測試、生產環境"
+  echo "  管理資料庫與檔案儲存，支援開發、測試、生產環境"
+  echo "  備份/還原包含: PostgreSQL 資料庫 + 檔案儲存 (local/SeaweedFS S3)"
   echo ""
   echo -e "${YELLOW}使用方式:${NC}"
   echo "  ./scripts/cli.sh db <subcommand> [options]"
   echo ""
   echo -e "${YELLOW}子命令:${NC}"
-  echo -e "  ${CYAN}migrate${NC}       建立並執行新的 migration"
+  echo -e "  ${CYAN}migrate create <name>${NC}  建立新的 migration（或 ${CYAN}migrate:create <name>${NC}）"
   echo -e "  ${CYAN}migrate:up${NC}    執行待處理的 migrations"
   echo -e "  ${CYAN}migrate:down${NC}  回滾最後一次 migration"
   echo -e "  ${CYAN}migrate:status${NC} 查看 migration 狀態"
-  echo -e "  ${CYAN}reset${NC}         重置資料庫（清空 + migrations + seed）"
+  echo -e "  ${CYAN}reset${NC}         重置資料（資料庫 + 可選檔案清理）"
   echo -e "  ${CYAN}seed${NC}          重新載入種子資料"
-  echo -e "  ${CYAN}backup${NC}        備份資料庫"
-  echo -e "  ${CYAN}restore${NC}       還原資料庫"
+  echo -e "  ${CYAN}backup${NC}        備份資料（資料庫 + 檔案儲存）"
+  echo -e "  ${CYAN}restore${NC}       還原資料（資料庫 + 檔案儲存）"
   echo -e "  ${CYAN}cleanup${NC}       清理舊備份"
   echo -e "  ${CYAN}studio${NC}        開啟 Prisma Studio"
   echo -e "  ${CYAN}generate${NC}      產生 Prisma Client"
   echo ""
   echo -e "${YELLOW}環境選項:${NC}"
   echo "  --env <env>    指定環境 (development, uat, production)"
-  echo "                 預設: development (或從 WIND_ENV 環境變數讀取)"
+  echo "                 預設: development (或從 NPT_ENV 環境變數讀取)"
   echo ""
   echo -e "${YELLOW}範例:${NC}"
   echo "  # 開發環境（預設）"
@@ -298,9 +302,28 @@ db_migrate_status() {
 # 子命令: reset
 # ==========================================
 db_reset() {
-  print_header "重置資料庫"
+  print_header "重置資料"
 
-  production_safety_check "重置資料庫（刪除所有資料）"
+  log_info "環境: ${CYAN}$ENVIRONMENT${NC}"
+
+  production_safety_check "重置資料（刪除所有資料）"
+
+  # ==========================================
+  # 檔案清理確認
+  # ==========================================
+  echo ""
+  log_warning "重置資料庫時，是否也要清理上傳的檔案？"
+  show_storage_status
+  echo ""
+
+  local clean_files_flag=false
+  if confirm "是否清理所有上傳的檔案？" "n"; then
+    clean_files_flag=true
+    log_info "將清理檔案儲存"
+  else
+    log_info "保留現有檔案（可能導致孤立檔案）"
+  fi
+
 
   log_warning "此操作將清空所有資料！"
   if ! confirm "確定要繼續嗎?" "n"; then
@@ -331,8 +354,8 @@ db_reset() {
   fi
 
   log_step "3/3 載入種子資料"
-  export WIND_ENV="$ENVIRONMENT"
-  log_info "Seed 環境: $WIND_ENV"
+  export NPT_ENV="$ENVIRONMENT"
+  log_info "Seed 環境: $NPT_ENV"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else
@@ -342,14 +365,21 @@ db_reset() {
 
   cd ../..
 
+  # 清理檔案儲存（如果用戶選擇）
+  if [[ "$clean_files_flag" == true ]]; then
+    echo ""
+    log_step "清理檔案儲存"
+    clean_files true
+  fi
+
   echo ""
   log_success "資料庫重置完成！"
 
   if [[ "$ENVIRONMENT" == "development" ]]; then
     echo ""
     echo "測試帳號："
-    echo "  Admin:    admin@example.com    / Password123!"
-    echo "  Customer: customer@example.com / Password123!"
+    echo "  HQ:     hq@example.com    / Password123!"
+    echo "  Public: public@example.com / Password123!"
     echo ""
   fi
 }
@@ -370,8 +400,8 @@ db_seed() {
   # 設置資料庫 URL
   export DATABASE_URL=$(get_database_url)
 
-  export WIND_ENV="$ENVIRONMENT"
-  log_info "載入種子資料...（環境: $WIND_ENV）"
+  export NPT_ENV="$ENVIRONMENT"
+  log_info "載入種子資料...（環境: $NPT_ENV）"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else
@@ -386,7 +416,10 @@ db_seed() {
 # 子命令: backup
 # ==========================================
 db_backup() {
-  print_header "備份資料庫"
+  print_header "備份資料（資料庫 + 檔案儲存）"
+
+  log_info "目標環境: ${CYAN}$ENVIRONMENT${NC}"
+  echo ""
 
   # 建立備份目錄
   BACKUP_DIR="$PROJECT_ROOT/backups/$ENVIRONMENT"
@@ -394,10 +427,10 @@ db_backup() {
 
   # 產生備份檔案名稱
   TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-  BACKUP_FILE="$BACKUP_DIR/wind_db_${ENVIRONMENT}_$TIMESTAMP.sql"
+  BACKUP_FILE="$BACKUP_DIR/npt_db_${ENVIRONMENT}_$TIMESTAMP.sql"
   BACKUP_FILE_GZ="$BACKUP_FILE.gz"
 
-  log_info "準備備份環境: $ENVIRONMENT"
+  log_step "備份資料庫"
 
   # 根據環境獲取連線資訊
   case "$ENVIRONMENT" in
@@ -406,9 +439,9 @@ db_backup() {
         source .env.docker
         export PGPASSWORD="$POSTGRES_PASSWORD"
         PG_HOST="localhost"
-        PG_PORT="5432"
-        PG_USER="postgres"
-        PG_DB="wind_db"
+        PG_PORT="${POSTGRES_PORT:-5432}"
+        PG_USER="${POSTGRES_USER:-postgres}"
+        PG_DB="${POSTGRES_DB:-npt_db}"
       else
         log_error ".env.docker 不存在"
         exit 1
@@ -490,18 +523,28 @@ db_backup() {
 
     # 列出此環境的所有備份
     log_info "環境 $ENVIRONMENT 的最近備份："
-    ls -lht "$BACKUP_DIR"/*.sql.gz "$BACKUP_DIR"/*.sql 2>/dev/null | head -5 | while read -r line; do
+    find "$BACKUP_DIR" -maxdepth 1 \( -name "*.sql.gz" -o -name "*.sql" \) -type f -exec ls -lht {} + 2>/dev/null | head -5 | while read -r line; do
       size=$(echo "$line" | awk '{print $5}')
       date=$(echo "$line" | awk '{print $6, $7, $8}')
       file=$(echo "$line" | awk '{print $9}')
       filename=$(basename "$file")
       echo -e "  • $filename  ${DIM}($size, $date)${NC}"
-    done
+    done || true
     echo ""
 
     # 顯示備份統計
-    local backup_count=$(ls -1 "$BACKUP_DIR"/*.sql.gz "$BACKUP_DIR"/*.sql 2>/dev/null | wc -l | tr -d ' ')
+    echo ""
+    local backup_count=$(find "$BACKUP_DIR" -maxdepth 1 \( -name "*.sql.gz" -o -name "*.sql" \) -type f 2>/dev/null | wc -l | tr -d ' ')
     log_info "共有 $backup_count 個備份"
+
+    # ==========================================
+    # 備份檔案儲存
+    # ==========================================
+    echo ""
+    log_info "開始檔案儲存備份..."
+    backup_files "$BACKUP_DIR" "$TIMESTAMP" || log_warning "檔案備份失敗，但資料庫備份成功"
+    echo ""
+    log_success "資料備份完成（資料庫 + 檔案儲存）"
 
   else
     log_error "備份失敗"
@@ -542,7 +585,10 @@ db_restore() {
     exit 1
   fi
 
-  print_header "還原資料庫"
+  print_header "還原資料（資料庫 + 檔案儲存）"
+
+  log_info "目標環境: ${CYAN}$ENVIRONMENT${NC}"
+  echo ""
 
   # 生產環境額外確認
   if [[ "$ENVIRONMENT" == "production" ]]; then
@@ -584,9 +630,9 @@ db_restore() {
         source .env.docker
         export PGPASSWORD="$POSTGRES_PASSWORD"
         PG_HOST="localhost"
-        PG_PORT="5432"
-        PG_USER="postgres"
-        PG_DB="wind_db"
+        PG_PORT="${POSTGRES_PORT:-5432}"
+        PG_USER="${POSTGRES_USER:-postgres}"
+        PG_DB="${POSTGRES_DB:-npt_db}"
       else
         log_error ".env.docker 不存在"
         exit 1
@@ -775,6 +821,32 @@ db_restore() {
     exit 1
   fi
 
+
+  # ==========================================
+  # 還原檔案儲存
+  # ==========================================
+  echo ""
+  log_info "檢查檔案備份..."
+
+  # 從備份檔名提取時間戳記
+  local backup_basename=$(basename "$backup_file")
+  local timestamp=""
+
+  if [[ "$backup_basename" =~ _([0-9]{8}_[0-9]{6}) ]]; then
+    timestamp="${BASH_REMATCH[1]}"
+    local backup_dir=$(dirname "$backup_file")
+
+    # 檢查是否有對應的檔案備份
+    if [[ -f "$backup_dir/files_${timestamp}.tar.gz" ]] || \
+       [[ -f "$backup_dir/files_s3_${timestamp}.tar.gz" ]] || \
+       [[ -f "$backup_dir/files_${timestamp}_empty.marker" ]]; then
+      log_info "發現檔案備份，開始還原..."
+      restore_files "$backup_dir" "$timestamp" || log_warning "檔案還原失敗，但資料庫已還原"
+    else
+      log_warning "未找到檔案備份（可能是舊版備份）"
+    fi
+  fi
+
   unset PGPASSWORD
 }
 
@@ -873,28 +945,30 @@ db_cleanup() {
     local files_to_delete=$(find "$env_dir" \( -name "*.sql" -o -name "*.sql.gz" \) -type f -print0 2>/dev/null | xargs -0 ls -t | tail -n +$((keep_count + 1)))
 
     if [ -n "$files_to_delete" ]; then
-      local files_deleted=0
-      local space_freed=0
+      # 先計算要刪除的檔案統計（在刪除前）
+      local deleted_count=$(echo "$files_to_delete" | wc -l | tr -d ' ')
+      local freed_bytes=0
 
-      echo "$files_to_delete" | while read -r backup; do
+      # 計算總大小
+      while IFS= read -r backup; do
         if [ -f "$backup" ]; then
-          local size=$(du -b "$backup" 2>/dev/null | cut -f1)
-          space_freed=$((space_freed + size))
-          files_deleted=$((files_deleted + 1))
+          local size=$(du -b "$backup" 2>/dev/null | cut -f1 || echo "0")
+          freed_bytes=$((freed_bytes + size))
+        fi
+      done <<< "$files_to_delete"
 
+      # 顯示並刪除檔案
+      while IFS= read -r backup; do
+        if [ -f "$backup" ]; then
           log_info "  刪除: $(basename "$backup")"
           rm "$backup"
         fi
-      done
-
-      # 重新計算（因為在子shell中）
-      local deleted_count=$(echo "$files_to_delete" | wc -l | tr -d ' ')
-      local freed_bytes=$(echo "$files_to_delete" | xargs du -bc 2>/dev/null | tail -1 | awk '{print $1}')
+      done <<< "$files_to_delete"
 
       total_deleted=$((total_deleted + deleted_count))
       total_freed=$((total_freed + freed_bytes))
 
-      log_success "環境 $env: 刪除了 $deleted_count 個備份"
+      log_success "環境 $env: 刪除了 $deleted_count 個備份，釋放 $((freed_bytes / 1024 / 1024))MB"
     fi
   done
 
@@ -968,6 +1042,10 @@ case "$SUBCOMMAND" in
     else
       show_command_help
     fi
+    ;;
+  migrate:create)
+    # 與 migrate:up / migrate:down / migrate:status 同風格
+    db_migrate_create "$@"
     ;;
   migrate:up)
     db_migrate_up "$@"

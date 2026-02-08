@@ -5,7 +5,7 @@ import { AccessScope } from '../enums/access-scope.enum';
 import { FieldMetadataCache } from '../services/field-metadata-cache.service';
 import {
   FIELD_SENSITIVE,
-  FIELD_ADMIN_ONLY,
+  FIELD_HQ_ONLY,
   FIELD_SELF_ACCESSIBLE,
 } from '../decorators/field-auth.decorator';
 
@@ -55,31 +55,51 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
           'RefreshToken',
           'registerCustomer',
           'RegisterCustomer',
-          'registerAdmin',
-          'RegisterAdmin',
+          'registerHQ',
+          'RegisterHQ',
           'verifyTwoFactorLogin',
           'VerifyTwoFactorLogin',
         ];
 
+        // 檢查是否是認證操作
+        // 1. 先檢查 operationName
+        let isAuthOperation = authOperations.includes(operationName || '');
+
+        // 2. 如果 operationName 為 undefined，檢查回應資料的根鍵
+        //    （例如 {login: {...}}, {refreshToken: {...}}）
+        if (!isAuthOperation && response.body.singleResult.data) {
+          const dataKeys = Object.keys(response.body.singleResult.data);
+          isAuthOperation = dataKeys.some((key) =>
+            authOperations.includes(key),
+          );
+        }
+
         logger.debug('[FieldAuthPlugin] Processing response', {
           operationName,
+          operationNameType: typeof operationName,
           hasUser: !!user,
-          isAuthOperation: authOperations.includes(operationName || ''),
+          userId: user?.userId,
+          isHQ: user?.accessScopes?.includes('HQ_SCOPE'),
+          isAuthOperation,
+          dataKeys: response.body.singleResult.data
+            ? Object.keys(response.body.singleResult.data)
+            : [],
         });
 
         // 效能監控
         const startTime = performance.now();
 
-        // 如果沒有使用者資訊
+        // 如果沒有用戶資訊
         if (!user) {
           const data = response.body.singleResult.data;
 
           // 對於認證操作，只移除永不暴露的欄位（password, refreshToken hash）
-          if (authOperations.includes(operationName || '')) {
+          if (isAuthOperation) {
             logger.debug(
               '[FieldAuthPlugin] Auth operation, removing never-exposed fields only',
               {
                 operationName,
+                isAuthOperation,
               },
             );
             removeNeverExposedFields(data);
@@ -88,9 +108,10 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
               '[FieldAuthPlugin] Non-auth operation without user, filtering all sensitive fields',
               {
                 operationName,
+                isAuthOperation,
               },
             );
-            // 移除所有敏感欄位和 Admin 欄位
+            // 移除所有敏感欄位和 HQ 欄位
             filterData(data, null);
           }
 
@@ -110,7 +131,7 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
           userId: user.userId,
           accessScopes: accessScopesSet,
           permissions: permissionsSet,
-          isAdmin: accessScopesSet.has(AccessScope.ADMIN_SCOPE),
+          isHQ: accessScopesSet.has(AccessScope.HQ_SCOPE),
         });
 
         // 效能日誌 - 總是輸出，不只警告
@@ -129,20 +150,30 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
   }
 
   /**
-   * 從使用者資訊中提取權限集合（O(n) 一次性處理）
+   * 從用戶資訊中提取權限集合（O(n) 一次性處理）
+   * 優先使用 JWT 中的 permissions 陣列
    */
   private extractPermissionsSet(user: any): Set<string> {
     const permissions = new Set<string>();
 
+    // 優先使用 JWT payload 中的 permissions 陣列
+    if (user.permissions && Array.isArray(user.permissions)) {
+      for (const permission of user.permissions) {
+        permissions.add(permission);
+      }
+      return permissions;
+    }
+
+    // Fallback: 從 roles 推斷權限（向後兼容）
     if (!user.roles || !Array.isArray(user.roles)) {
       return permissions;
     }
 
-    // 根據使用者的 scope 和 role 推斷權限
-    // 這裡簡化處理：假設 SUPER_ADMIN 有所有權限
+    // 根據用戶的 scope 和 role 推斷權限
+    // 這裡簡化處理：假設 SUPER_HQ 有所有權限
     for (const roleInfo of user.roles) {
-      if (roleInfo.roleNames?.includes('SUPER_ADMIN')) {
-        // SUPER_ADMIN 有所有權限
+      if (roleInfo.roleNames?.includes('SUPER_HQ')) {
+        // SUPER_HQ 有所有權限
         permissions.add('*');
       }
       if (roleInfo.roleNames?.includes('OWNER')) {
@@ -214,7 +245,7 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
       userId: string;
       accessScopes: Set<AccessScope>;
       permissions: Set<string>;
-      isAdmin: boolean;
+      isHQ: boolean;
     } | null,
   ): void {
     if (!data || typeof data !== 'object') {
@@ -222,14 +253,14 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
     }
 
     // 使用佇列進行廣度優先遍歷（避免深度遞迴）
-    // 佇列項目格式：{ obj: 當前對象, parent: 父對象 }
-    const queue: Array<{ obj: any; parent: any }> = [
-      { obj: data, parent: null },
+    // 佇列項目格式：{ obj: 當前對象, parent: 父對象, depth: 深度 }
+    const queue: Array<{ obj: any; parent: any; depth: number }> = [
+      { obj: data, parent: null, depth: 0 },
     ];
     const visited = new WeakSet();
 
     while (queue.length > 0) {
-      const { obj: current, parent } = queue.shift();
+      const { obj: current, parent, depth } = queue.shift();
 
       if (!current || typeof current !== 'object' || visited.has(current)) {
         continue;
@@ -241,18 +272,18 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
         // 處理陣列
         for (const item of current) {
           if (item && typeof item === 'object') {
-            queue.push({ obj: item, parent });
+            queue.push({ obj: item, parent, depth: depth + 1 });
           }
         }
       } else {
         // 處理物件
-        this.filterObject(current, userContext, parent);
+        this.filterObject(current, userContext, parent, depth);
 
         // 將子物件加入佇列
         for (const key of Object.keys(current)) {
           const value = current[key];
           if (value && typeof value === 'object') {
-            queue.push({ obj: value, parent: current });
+            queue.push({ obj: value, parent: current, depth: depth + 1 });
           }
         }
       }
@@ -268,16 +299,17 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
       userId: string;
       accessScopes: Set<AccessScope>;
       permissions: Set<string>;
-      isAdmin: boolean;
+      isHQ: boolean;
     } | null,
     parent: any = null,
+    depth: number = 0,
   ): void {
     // 取得物件的所有鍵（一次性）
     const keys = Object.keys(obj);
 
     for (const fieldName of keys) {
       // 檢查是否應該移除此欄位
-      if (this.shouldRemoveField(fieldName, userContext, obj, parent)) {
+      if (this.shouldRemoveField(fieldName, userContext, obj, parent, depth)) {
         delete obj[fieldName]; // 原地刪除（高效）
       }
     }
@@ -292,13 +324,24 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
       userId: string;
       accessScopes: Set<AccessScope>;
       permissions: Set<string>;
-      isAdmin: boolean;
+      isHQ: boolean;
     } | null,
     obj: any,
     parent: any = null,
+    depth: number = 0,
   ): boolean {
-    // 永不暴露的欄位
-    if (fieldName === 'password' || fieldName === 'refreshToken') {
+    // 永不暴露的欄位 - 但只在深度 > 0 時刪除（避免刪除頂層 mutation 名稱）
+    // 例如 refreshToken mutation 或其他需保護敏感欄位的 mutation
+    if (
+      depth > 0 &&
+      (fieldName === 'password' || fieldName === 'refreshToken')
+    ) {
+      // 檢查值是否已經被遮罩 (例如 '[REDACTED]')
+      const fieldValue = obj[fieldName];
+      if (fieldValue === '[REDACTED]' || fieldValue === '[MASKED]') {
+        // 已經被遮罩的敏感欄位可以保留(用於 audit log 等場景)
+        return false;
+      }
       return true;
     }
 
@@ -308,32 +351,55 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
       fieldName,
       FIELD_SENSITIVE,
     );
-    const isAdminOnly = this.checkFieldMetadata(
-      obj,
-      fieldName,
-      FIELD_ADMIN_ONLY,
-    );
+    const isHQOnly = this.checkFieldMetadata(obj, fieldName, FIELD_HQ_ONLY);
     const selfAccessibleConfig = this.checkFieldMetadata(
       obj,
       fieldName,
       FIELD_SELF_ACCESSIBLE,
     );
 
-    // 如果沒有使用者 context，移除所有敏感欄位和 Admin 欄位
+    // 如果沒有用戶 context，移除所有敏感欄位和 HQ 欄位
     if (!userContext) {
-      return isSensitive || isAdminOnly;
+      return isSensitive || isHQOnly;
     }
 
-    // 檢查 Admin-only 欄位（只有 Admin 可見）
-    if (isAdminOnly && !userContext.isAdmin) {
+    // 檢查 HQ-only 欄位（只有 HQ 可見）
+    if (isHQOnly) {
+      // HQ 可以看到
+      if (userContext.isHQ) {
+        return false;
+      }
+
+      // users:read 權限也可以查看 User 相關的 HQ-only 欄位（如 deletedAt）
+      if (userContext.permissions.has('users:read')) {
+        const userHQFields = new Set(['deletedAt']);
+        if (userHQFields.has(fieldName)) {
+          return false; // 允許存取
+        }
+      }
+
+      // 其他情況移除欄位
       return true;
     }
 
     // 檢查敏感欄位
     if (isSensitive) {
-      // Admin 可以看到所有敏感欄位
-      if (userContext.isAdmin) {
+      // HQ 可以看到所有敏感欄位
+      if (userContext.isHQ) {
         return false;
+      }
+
+      // 特殊處理: users:read 權限可以查看所有用戶的基本資訊欄位
+      // (email, lastLoginAt, deletedAt 等 User 相關欄位)
+      if (userContext.permissions.has('users:read')) {
+        const userRelatedFields = new Set([
+          'email',
+          'lastLoginAt',
+          'deletedAt',
+        ]);
+        if (userRelatedFields.has(fieldName)) {
+          return false; // 允許存取
+        }
       }
 
       // 檢查是否為 Self-Accessible 欄位
@@ -380,8 +446,8 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
         if (metadataKey === FIELD_SENSITIVE) {
           return rule.isSensitive;
         }
-        if (metadataKey === FIELD_ADMIN_ONLY) {
-          return rule.isAdminOnly;
+        if (metadataKey === FIELD_HQ_ONLY) {
+          return rule.isHQOnly;
         }
         // FIELD_SELF_ACCESSIBLE 需要從 metadata 讀取
       }
@@ -407,8 +473,8 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
     if (metadataKey === FIELD_SENSITIVE) {
       return this.isHardcodedSensitiveField(fieldName);
     }
-    if (metadataKey === FIELD_ADMIN_ONLY) {
-      return this.isHardcodedAdminOnlyField(fieldName);
+    if (metadataKey === FIELD_HQ_ONLY) {
+      return this.isHardcodedHQOnlyField(fieldName);
     }
     if (metadataKey === FIELD_SELF_ACCESSIBLE) {
       return this.isHardcodedSelfAccessibleField(fieldName)
@@ -433,11 +499,11 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
   }
 
   /**
-   * 硬編碼的 Admin-only 欄位（作為 fallback）
+   * 硬編碼的 HQ-only 欄位（作為 fallback）
    */
-  private isHardcodedAdminOnlyField(fieldName: string): boolean {
-    const adminOnlyFields = new Set(['deletedAt']);
-    return adminOnlyFields.has(fieldName);
+  private isHardcodedHQOnlyField(fieldName: string): boolean {
+    const hqOnlyFields = new Set(['deletedAt']);
+    return hqOnlyFields.has(fieldName);
   }
 
   /**

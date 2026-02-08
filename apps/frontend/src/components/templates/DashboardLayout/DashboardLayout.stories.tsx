@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { DashboardLayout } from './DashboardLayout';
 import { Box, Typography, Card, CardContent, Grid, Paper } from '@mui/material';
 import {
@@ -10,13 +10,13 @@ import {
   Assessment,
 } from '@mui/icons-material';
 import type { Notification } from '@/components/atoms';
-import type { SidebarMenuItem } from '@/components/molecules/Sidebar';
+import type { SidebarMenuItem } from '@/components/organisms';
 
 const mockUser = {
   name: 'John Doe',
   email: 'john.doe@example.com',
   avatar: 'https://i.pravatar.cc/150?img=1',
-  role: 'Admin',
+  role: 'HQ',
   status: 'online' as const,
 };
 
@@ -188,7 +188,7 @@ const SampleContent = () => (
  * - Content area automatically adjusts margin based on Sidebar state
  *
  * **Use Cases**:
- * - Admin dashboard interface
+ * - HQ dashboard interface
  * - Dashboard pages
  * - Applications requiring side navigation
  */
@@ -261,7 +261,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
   args: {
-    title: 'Wind Dashboard',
+    title: 'NPT Dashboard',
     logo: (
       <Box
         sx={{
@@ -301,7 +301,7 @@ export const Default: Story = {
  */
 export const FullFeatured: Story = {
   args: {
-    title: 'Wind Dashboard',
+    title: 'NPT Dashboard',
     logo: (
       <Box
         sx={{
@@ -320,7 +320,7 @@ export const FullFeatured: Story = {
     sidebarHeader: (
       <Box sx={{ p: 2, textAlign: 'center' }}>
         <Typography variant="subtitle2" color="text.secondary">
-          Wind Platform
+          Intelligent Cloud Plus, Inc.
         </Typography>
       </Box>
     ),
@@ -362,7 +362,7 @@ export const FullFeatured: Story = {
  */
 export const WithMiniSidebar: Story = {
   args: {
-    title: 'Wind Dashboard',
+    title: 'NPT Dashboard',
     logo: (
       <Box
         sx={{
@@ -402,7 +402,7 @@ export const WithMiniSidebar: Story = {
  */
 export const WithClosedSidebar: Story = {
   args: {
-    title: 'Wind Dashboard',
+    title: 'NPT Dashboard',
     logo: (
       <Box
         sx={{

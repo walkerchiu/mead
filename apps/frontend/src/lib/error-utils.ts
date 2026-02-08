@@ -18,11 +18,11 @@ export function getErrorTranslationKey(errorMessage: string): string | null {
     return 'cannotRevokeCurrent';
   }
   if (
-    lowerMessage.includes('cannot access administrator') ||
-    lowerMessage.includes('cannot revoke other administrator') ||
-    lowerMessage.includes('cannot revoke administrator')
+    lowerMessage.includes('cannot access hq') ||
+    lowerMessage.includes('cannot revoke other hq') ||
+    lowerMessage.includes('cannot revoke hq')
   ) {
-    return 'cannotRevokeAdmin';
+    return 'cannotRevokeHQ';
   }
   if (lowerMessage.includes('user not authenticated')) {
     return 'notAuthenticated';

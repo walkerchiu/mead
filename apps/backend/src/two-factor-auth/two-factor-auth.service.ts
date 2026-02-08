@@ -35,7 +35,7 @@ export class TwoFactorAuthService {
   ) {}
 
   /**
-   * 檢查使用者是否已啟用 2FA
+   * 檢查用戶是否已啟用 2FA
    */
   async isEnabled(userId: string): Promise<boolean> {
     const twoFactorAuth = await this.prisma.twoFactorAuth.findUnique({
@@ -46,7 +46,7 @@ export class TwoFactorAuthService {
   }
 
   /**
-   * 獲取使用者的 2FA 設定
+   * 獲取用戶的 2FA 設定
    */
   async getSettings(userId: string) {
     const twoFactorAuth = await this.prisma.twoFactorAuth.findUnique({
@@ -147,7 +147,7 @@ export class TwoFactorAuthService {
       },
     });
 
-    // 回傳明文給使用者（僅此一次）
+    // 回傳明文給用戶（僅此一次）
     return { backupCodes };
   }
 

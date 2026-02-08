@@ -9,9 +9,16 @@ import { QueueModule } from '../queue/queue.module';
 import { CacheModule } from '../cache/cache.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { PubSubModule } from '../common/services/pubsub.module';
+import { CronMonitoringModule } from '../cron-monitoring/cron-monitoring.module';
 
 @Module({
-  imports: [QueueModule, CacheModule, RbacModule, PubSubModule],
+  imports: [
+    QueueModule,
+    CacheModule,
+    RbacModule,
+    PubSubModule,
+    CronMonitoringModule,
+  ],
   controllers: [AuditLogConsumer],
   providers: [
     AuditLogService,

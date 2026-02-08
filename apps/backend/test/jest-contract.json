@@ -1,0 +1,14 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": "..",
+  "testEnvironment": "node",
+  "testRegex": "test/contract/.*\\.contract-spec\\.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "^@npt/typescript-config/(.*)$": "<rootDir>/../../packages/typescript-config/$1"
+  },
+  "maxWorkers": 1,
+  "testTimeout": 60000
+}

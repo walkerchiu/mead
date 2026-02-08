@@ -1,17 +1,17 @@
-# 資料庫備份與還原指南
+# 資料備份與還原指南
 
-完整的資料庫備份與還原操作指南，包含多環境安全機制與最佳實踐。
+完整的資料備份與還原操作指南（資料庫 + 檔案儲存），包含多環境安全機制與最佳實踐。
 
 ---
 
 ## 📋 目錄
 
-- [資料庫備份與還原指南](#資料庫備份與還原指南)
+- [資料備份與還原指南](#資料備份與還原指南)
   - [📋 目錄](#-目錄)
   - [📖 概述](#-概述)
   - [🚀 快速開始](#-快速開始)
-    - [備份資料庫](#備份資料庫)
-    - [還原資料庫](#還原資料庫)
+    - [備份資料](#備份資料)
+    - [還原資料](#還原資料)
     - [列出備份](#列出備份)
     - [清理舊備份](#清理舊備份)
   - [📂 備份檔案結構](#-備份檔案結構)
@@ -68,48 +68,111 @@
 
 ## 📖 概述
 
-本文檔介紹如何使用 Wind CLI 進行資料庫備份與還原操作，包含開發、UAT、生產環境的最佳實踐。
+本文檔介紹如何使用 NPT CLI 進行完整資料備份與還原操作，包含：
+
+- **PostgreSQL 資料庫** - 所有業務資料
+- **檔案儲存** - 用戶上傳的檔案（支援 `local` 和 `seaweedfs` 兩種模式）
+
+涵蓋開發、UAT、生產環境的最佳實踐與安全措施。
 
 ---
 
 ## 🚀 快速開始
 
-### 備份資料庫
+### 備份資料
 
 ```bash
 ./scripts/cli.sh
-# 選擇 10 → 1
+# 選擇「10) 資料管理」→「資料備份/還原」→「1) 備份資料」
+
+# 會顯示環境確認：
+# 將備份環境: development
+# ? 確定要繼續嗎? [Y/n]:
 ```
 
-**輸出**：
+**備份內容**：
+
+1. **PostgreSQL 資料庫** → `.sql.gz` 檔案
+2. **檔案儲存** → `.tar.gz` 檔案（根據 `STORAGE_TYPE` 設定）
+   - `local`: 打包 `apps/backend/uploads/` 目錄
+   - `seaweedfs`: 從 S3 下載所有檔案
+
+**輸出範例**：
 
 ```text
-✓ 備份完成（已壓縮）
+━━━ 備份資料（資料庫 + 檔案儲存）
+
+ℹ 目標環境: development
+
+▶  備份資料庫
+✓  備份完成（已壓縮）
+
   環境: development
-  檔案: wind_db_development_20260201_233215.sql.gz
-  路徑: /path/to/backups/development/wind_db_development_20260201_233215.sql.gz
-  大小: 8.0K
+  檔案: npt_db_development_20260316_143052.sql.gz
+  路徑: /path/to/backups/development/npt_db_development_20260316_143052.sql.gz
+  大小: 32K
+
+▶  備份檔案儲存
+ℹ  儲存類型: local
+ℹ  備份目錄: apps/backend/uploads
+✓  檔案已備份: npt_files_development_20260316_143052.tar.gz
+ℹ  檔案數量: 2 個
+ℹ  總大小: 8.0K
+
+✓  資料備份完成（資料庫 + 檔案儲存）
 ```
 
-### 還原資料庫
+### 還原資料
 
 ```bash
 ./scripts/cli.sh
-# 選擇 10 → 2 → 選擇備份檔案
+# 選擇「10) 資料管理」→「資料備份/還原」→「2) 還原資料」
+
+# 會顯示環境和可用備份：
+# 選擇要還原的備份 (環境: development):
+#
+#   1) 2026-03-16 14:30:52  [32K]  (development)
+#       npt_db_development_20260316_143052.sql.gz
+#   0) 取消
+#
+# 請選擇 [0-1]:
 ```
+
+**還原內容**：
+
+1. **PostgreSQL 資料庫** - 從 `.sql.gz` 檔案
+2. **檔案儲存** - 從 `.tar.gz` 檔案（如果存在）
 
 ### 列出備份
 
 ```bash
 ./scripts/cli.sh
-# 選擇 10 → 3
+# 選擇「10) 資料管理」→「資料備份/還原」→「3) 列出備份」
+
+# 輸出範例：
+# ━━━ 環境: development (2 個備份)
+#   • 2026-03-16 14:30:52  [32K]  npt_db_development_20260316_143052.sql.gz
+#   • 2026-03-16 09:03:59  [28K]  npt_db_development_20260316_090359.sql.gz
 ```
 
 ### 清理舊備份
 
 ```bash
 ./scripts/cli.sh
-# 選擇 10 → 4
+# 選擇「10) 資料管理」→「資料備份/還原」→「4) 刪除舊備份」
+
+# 會提示：
+# 選擇要清理的環境:
+#   1) development
+#   2) uat
+#   3) production
+#   4) 全部環境
+#   0) 取消
+#
+# 保留最近幾個備份？[預設: 5]: 3
+#
+# 將清理環境 development 的舊備份，保留最近 3 個
+# ? 確定要繼續嗎? [y/N]:
 ```
 
 ---
@@ -121,14 +184,14 @@
 ```text
 backups/                    # ⚠️ 不納入版控（已加入 .gitignore）
 ├── development/
-│   ├── wind_db_development_20260201_150530.sql.gz
-│   ├── wind_db_development_20260201_140215.sql.gz
+│   ├── npt_db_development_20260201_150530.sql.gz
+│   ├── npt_db_development_20260201_140215.sql.gz
 │   └── emergency_backup_development_20260201_120000.sql.gz
 ├── uat/
-│   ├── wind_db_uat_20260201_120000.sql.gz
-│   └── wind_db_uat_20260131_230000.sql.gz
+│   ├── npt_db_uat_20260201_120000.sql.gz
+│   └── npt_db_uat_20260131_230000.sql.gz
 └── production/
-    ├── wind_db_production_20260201_000000.sql.gz
+    ├── npt_db_production_20260201_000000.sql.gz
     └── emergency_backup_production_20260201_153000.sql.gz
 ```
 
@@ -143,7 +206,7 @@ backups/                    # ⚠️ 不納入版控（已加入 .gitignore）
 **一般備份**：
 
 ```text
-wind_db_{environment}_{timestamp}.sql.gz
+npt_db_{environment}_{timestamp}.sql.gz
 ```
 
 **緊急備份**：
@@ -164,7 +227,7 @@ emergency_backup_{environment}_{timestamp}.sql.gz
 
 ```bash
 # 簡單直接的備份
-docker exec wind-timescaledb pg_dump -U postgres -d wind_db > backup.sql
+docker exec npt-timescaledb pg_dump -U postgres -d npt_db > backup.sql
 gzip backup.sql
 ```
 
@@ -172,10 +235,10 @@ gzip backup.sql
 
 ```bash
 # 完全重建資料庫
-DROP DATABASE wind_db;
-CREATE DATABASE wind_db;
+DROP DATABASE npt_db;
+CREATE DATABASE npt_db;
 # 還原資料
-gunzip -c backup.sql.gz | psql -d wind_db -q
+gunzip -c backup.sql.gz | psql -d npt_db -q
 ```
 
 **特點**：
@@ -198,7 +261,7 @@ pg_dump \
   --if-exists \       # 使用 IF EXISTS
   --no-owner \        # 不還原擁有者
   --no-privileges \   # 不還原權限
-  -d wind_db \
+  -d npt_db \
   > backup.sql
 gzip backup.sql
 ```
@@ -237,7 +300,7 @@ gzip backup.sql
 
 ```text
 備份資訊：
-  檔案: wind_db_production_20260201_233215.sql.gz
+  檔案: npt_db_production_20260201_233215.sql.gz
   大小: 8.0K
   修改時間: 2026-02-01 23:32:15
 
@@ -281,10 +344,10 @@ gzip backup.sql
 
 ```bash
 # 原始備份
-wind_db_development_20260201.sql      # 40 MB
+npt_db_development_20260201.sql      # 40 MB
 
 # 壓縮後
-wind_db_development_20260201.sql.gz   # 8 MB (80% 減少)
+npt_db_development_20260201.sql.gz   # 8 MB (80% 減少)
 ```
 
 ### 保留策略
@@ -314,11 +377,11 @@ wind_db_development_20260201.sql.gz   # 8 MB (80% 減少)
 
 # 輸出
 環境 development: 發現 10 個備份
-  刪除: wind_db_development_20260125_120000.sql.gz
-  刪除: wind_db_development_20260126_120000.sql.gz
-  刪除: wind_db_development_20260127_120000.sql.gz
-  刪除: wind_db_development_20260128_120000.sql.gz
-  刪除: wind_db_development_20260129_120000.sql.gz
+  刪除: npt_db_development_20260125_120000.sql.gz
+  刪除: npt_db_development_20260126_120000.sql.gz
+  刪除: npt_db_development_20260127_120000.sql.gz
+  刪除: npt_db_development_20260128_120000.sql.gz
+  刪除: npt_db_development_20260129_120000.sql.gz
 ✓ 環境 development: 刪除了 5 個備份
 ✓ 清理完成：共刪除 5 個備份，釋放 40MB 空間
 ```
@@ -348,8 +411,8 @@ systemctl stop frontend-service
 
 ```bash
 # 檢查關鍵資料表
-psql -d wind_db -c "SELECT COUNT(*) FROM users;"
-psql -d wind_db -c "SELECT COUNT(*) FROM roles;"
+psql -d npt_db -c "SELECT COUNT(*) FROM users;"
+psql -d npt_db -c "SELECT COUNT(*) FROM roles;"
 ```
 
 #### 4. 測試應用
@@ -391,7 +454,7 @@ systemctl start frontend-service
 
 ```bash
 # 進入資料庫
-docker exec -it wind-timescaledb psql -U postgres -d wind_db
+docker exec -it npt-timescaledb psql -U postgres -d npt_db
 
 # 檢查資料表
 \dt
@@ -437,7 +500,7 @@ pg_dump \
   --jobs=4 \           # 使用 4 個並行工作
   --format=directory \ # 目錄格式
   --file=backup_dir \
-  -d wind_db
+  -d npt_db
 ```
 
 ### 還原效能
@@ -496,10 +559,8 @@ docker ps --format "{{.Names}}"
 
 # 設定正確名稱
 # 編輯 .env.docker
-POSTGRES_CONTAINER_NAME=wind-timescaledb
+POSTGRES_CONTAINER_NAME=npt-timescaledb
 ```
-
-**詳細說明**：參考 [Docker 容器命名指南](../DOCKER_CONTAINER_NAMING.md)
 
 ---
 
@@ -508,17 +569,17 @@ POSTGRES_CONTAINER_NAME=wind-timescaledb
 **症狀**：
 
 ```text
-ERROR: permission denied for database wind_db
+ERROR: permission denied for database npt_db
 ```
 
 **解決方案**：
 
 ```bash
-# 檢查使用者權限
+# 檢查用戶權限
 psql -d postgres -c "\du"
 
 # 授予權限
-psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE wind_db TO postgres;"
+psql -d postgres -c "GRANT ALL PRIVILEGES ON DATABASE npt_db TO postgres;"
 ```
 
 ---
@@ -555,10 +616,10 @@ docker volume prune
 
 ```bash
 # 備份時加密
-pg_dump -d wind_db | gzip | gpg --encrypt > backup.sql.gz.gpg
+pg_dump -d npt_db | gzip | gpg --encrypt > backup.sql.gz.gpg
 
 # 還原時解密
-gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d wind_db
+gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d npt_db
 ```
 
 2. **安全儲存**：
@@ -610,5 +671,4 @@ chown postgres:postgres backups/**/*.sql.gz
 ## 📚 相關資源
 
 - [Database Layer](./DATABASE_LAYER.md)
-- [Docker 容器命名指南](../infrastructure/DOCKER_CONTAINER_NAMING.md)
-- [環境設定](../infrastructure/ENVIRONMENT_SETUP.md)
+- [環境變數配置](../infrastructure/ENVIRONMENT_VARIABLES.md)

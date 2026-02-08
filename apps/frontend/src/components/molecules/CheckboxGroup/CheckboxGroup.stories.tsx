@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -80,7 +80,7 @@ const permissionOptions = [
   { value: 'read', label: 'Read' },
   { value: 'write', label: 'Write' },
   { value: 'delete', label: 'Delete' },
-  { value: 'admin', label: 'Admin Access' },
+  { value: 'hq', label: 'HQ Access' },
 ];
 
 /**
@@ -223,8 +223,8 @@ export const WithDisabledOptions: Story = {
               disabled: true,
             },
             {
-              value: 'admin',
-              label: 'Admin Access (requires higher permissions)',
+              value: 'hq',
+              label: 'HQ Access (requires higher permissions)',
               disabled: true,
             },
           ]}
@@ -292,6 +292,115 @@ export const WithSelectAll: Story = {
         <Alert severity="info">
           Selected: {value.length} / {allValues.length}
         </Alert>
+      </Stack>
+    );
+  },
+};
+
+/**
+ * Conditional Display Example
+ * Dynamically display content based on selection
+ */
+export const ConditionalDisplay: Story = {
+  render: function ConditionalDisplayComponent() {
+    const [features, setFeatures] = useState<(string | number)[]>([]);
+
+    return (
+      <Stack spacing={3}>
+        <CheckboxGroup
+          label="Enable Features"
+          options={[
+            { value: 'email', label: 'Email Notifications' },
+            { value: 'sms', label: 'SMS Notifications' },
+            { value: 'push', label: 'Push Notifications' },
+          ]}
+          value={features}
+          onChange={setFeatures}
+          helperText="Select notification features to enable"
+        />
+
+        {features.includes('email') && (
+          <Alert severity="info">
+            ✉️ Email notifications enabled, will be sent to your registered
+            email
+          </Alert>
+        )}
+
+        {features.includes('sms') && (
+          <Alert severity="warning">
+            📱 SMS notifications may incur additional charges
+          </Alert>
+        )}
+
+        {features.includes('push') && (
+          <Alert severity="success">
+            🔔 Push notifications enabled, please ensure browser allows
+            notifications
+          </Alert>
+        )}
+
+        {features.length === 0 && (
+          <Alert severity="error">
+            ⚠️ Please select at least one notification method
+          </Alert>
+        )}
+      </Stack>
+    );
+  },
+};
+
+/**
+ * Minimum / Maximum Selection Limits
+ * Limit selection quantity
+ */
+export const WithLimits: Story = {
+  render: function WithLimitsComponent() {
+    const MIN = 2;
+    const MAX = 3;
+    const [value, setValue] = useState<(string | number)[]>([]);
+
+    const handleChange = (newValues: (string | number)[]) => {
+      if (newValues.length <= MAX) {
+        setValue(newValues);
+      }
+    };
+
+    const isValid = value.length >= MIN && value.length <= MAX;
+
+    return (
+      <Stack spacing={2}>
+        <CheckboxGroup
+          label="Select your top three interests"
+          options={[
+            { value: 'reading', label: 'Reading' },
+            { value: 'music', label: 'Music' },
+            { value: 'sports', label: 'Sports' },
+            { value: 'travel', label: 'Travel' },
+            { value: 'cooking', label: 'Cooking' },
+            { value: 'gaming', label: 'Gaming' },
+          ]}
+          value={value}
+          onChange={handleChange}
+          helperText={`Please select ${MIN}-${MAX} items`}
+        />
+
+        <Alert
+          severity={
+            value.length < MIN
+              ? 'error'
+              : value.length > MAX
+                ? 'warning'
+                : 'success'
+          }
+        >
+          Selected {value.length} / {MAX} items
+          {value.length < MIN && ` (at least ${MIN} items needed)`}
+          {value.length === MAX && ' (limit reached)'}
+        </Alert>
+
+        <Button variant="contained" fullWidth disabled={!isValid}>
+          Continue
+        </Button>
       </Stack>
     );
   },
@@ -427,58 +536,6 @@ export const FormExample: Story = {
 };
 
 /**
- * Conditional Display Example
- * Dynamically display content based on selection
- */
-export const ConditionalDisplay: Story = {
-  render: function ConditionalDisplayComponent() {
-    const [features, setFeatures] = useState<(string | number)[]>([]);
-
-    return (
-      <Stack spacing={3}>
-        <CheckboxGroup
-          label="Enable Features"
-          options={[
-            { value: 'email', label: 'Email Notifications' },
-            { value: 'sms', label: 'SMS Notifications' },
-            { value: 'push', label: 'Push Notifications' },
-          ]}
-          value={features}
-          onChange={setFeatures}
-          helperText="Select notification features to enable"
-        />
-
-        {features.includes('email') && (
-          <Alert severity="info">
-            ✉️ Email notifications enabled, will be sent to your registered
-            email
-          </Alert>
-        )}
-
-        {features.includes('sms') && (
-          <Alert severity="warning">
-            📱 SMS notifications may incur additional charges
-          </Alert>
-        )}
-
-        {features.includes('push') && (
-          <Alert severity="success">
-            🔔 Push notifications enabled, please ensure browser allows
-            notifications
-          </Alert>
-        )}
-
-        {features.length === 0 && (
-          <Alert severity="error">
-            ⚠️ Please select at least one notification method
-          </Alert>
-        )}
-      </Stack>
-    );
-  },
-};
-
-/**
  * Survey Example
  * Multiple checkbox question groups
  */
@@ -591,63 +648,6 @@ export const SurveyExample: Story = {
           </Button>
         </Stack>
       </form>
-    );
-  },
-};
-
-/**
- * Minimum / Maximum Selection Limits
- * Limit selection quantity
- */
-export const WithLimits: Story = {
-  render: function WithLimitsComponent() {
-    const MIN = 2;
-    const MAX = 3;
-    const [value, setValue] = useState<(string | number)[]>([]);
-
-    const handleChange = (newValues: (string | number)[]) => {
-      if (newValues.length <= MAX) {
-        setValue(newValues);
-      }
-    };
-
-    const isValid = value.length >= MIN && value.length <= MAX;
-
-    return (
-      <Stack spacing={2}>
-        <CheckboxGroup
-          label="Select your top three interests"
-          options={[
-            { value: 'reading', label: 'Reading' },
-            { value: 'music', label: 'Music' },
-            { value: 'sports', label: 'Sports' },
-            { value: 'travel', label: 'Travel' },
-            { value: 'cooking', label: 'Cooking' },
-            { value: 'gaming', label: 'Gaming' },
-          ]}
-          value={value}
-          onChange={handleChange}
-          helperText={`Please select ${MIN}-${MAX} items`}
-        />
-
-        <Alert
-          severity={
-            value.length < MIN
-              ? 'error'
-              : value.length > MAX
-                ? 'warning'
-                : 'success'
-          }
-        >
-          Selected {value.length} / {MAX} items
-          {value.length < MIN && ` (at least ${MIN} items needed)`}
-          {value.length === MAX && ' (limit reached)'}
-        </Alert>
-
-        <Button variant="contained" fullWidth disabled={!isValid}>
-          Continue
-        </Button>
-      </Stack>
     );
   },
 };

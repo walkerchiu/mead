@@ -7,6 +7,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { ScrollControl } from '@/components/molecules';
 
 /**
  * AuthLayout Template - Atomic Design: Template
@@ -77,20 +78,21 @@ export function AuthLayout({
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // background style
+  // background style - Using CSS custom properties for theme-aware backgrounds
+  // This prevents hydration mismatch by relying on CSS instead of JS theme detection
   const getBackgroundStyle = () => {
     switch (background) {
       case 'gradient':
         return {
-          background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+          background: 'var(--auth-gradient-bg)',
         };
       case 'solid':
         return {
-          backgroundColor: theme.palette.grey[100],
+          backgroundColor: 'var(--auth-solid-bg)',
         };
       case 'image':
         return {
-          backgroundColor: theme.palette.grey[100],
+          backgroundColor: 'var(--auth-solid-bg)',
           backgroundImage: 'url(/auth-background.jpg)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -147,7 +149,7 @@ export function AuthLayout({
                   mb: 1,
                 }}
               >
-                🌊 Wind
+                🌊 NPT
               </Typography>
               {title && (
                 <Typography
@@ -193,10 +195,21 @@ export function AuthLayout({
           }}
         >
           <Typography variant="body2">
-            © 2026 Wind. All rights reserved.
+            © 2026 加雲聯網 Intelligent Cloud Plus, Inc. All rights reserved.
           </Typography>
         </Box>
       )}
+
+      {/* Scroll Control - Fixed position scroll buttons */}
+      <ScrollControl
+        position="right-bottom"
+        showScrollUp={true}
+        showScrollDown={true}
+        showScrollToTop={true}
+        showScrollToBottom={true}
+        offset={500}
+        visibilityThreshold={300}
+      />
     </Box>
   );
 }

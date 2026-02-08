@@ -7,14 +7,17 @@ import { MailModule } from '../mail/mail.module';
 import { RbacModule } from '../rbac/rbac.module';
 import { TwoFactorAuthModule } from '../two-factor-auth/two-factor-auth.module';
 import { AuditLogModule } from '../audit-log/audit-log.module';
+import { NotificationModule } from '../notification/notification.module';
+import { CronMonitoringModule } from '../cron-monitoring/cron-monitoring.module';
 import { AuthService } from './auth.service';
+import { AccountLockoutService } from './account-lockout.service';
 import { PasswordResetService } from './password-reset.service';
 import { SessionManagementService } from './session-management.service';
-import { AdminSessionService } from './admin-session.service';
+import { HQSessionService } from './hq-session.service';
 import { AuthResolver } from './auth.resolver';
-import { AdminSessionResolver } from './admin-session.resolver';
+import { HQSessionResolver } from './hq-session.resolver';
 import { JwtStrategy } from './jwt.strategy';
-import { AdminSessionGuard } from './admin-session.guard';
+import { HQSessionGuard } from './hq-session.guard';
 
 @Module({
   imports: [
@@ -24,6 +27,8 @@ import { AdminSessionGuard } from './admin-session.guard';
     RbacModule,
     TwoFactorAuthModule,
     AuditLogModule,
+    NotificationModule,
+    CronMonitoringModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -46,21 +51,23 @@ import { AdminSessionGuard } from './admin-session.guard';
   ],
   providers: [
     AuthService,
+    AccountLockoutService,
     PasswordResetService,
     SessionManagementService,
-    AdminSessionService,
+    HQSessionService,
     AuthResolver,
-    AdminSessionResolver,
+    HQSessionResolver,
     JwtStrategy,
-    AdminSessionGuard,
+    HQSessionGuard,
   ],
   exports: [
     AuthService,
+    AccountLockoutService,
     PasswordResetService,
     SessionManagementService,
-    AdminSessionService,
+    HQSessionService,
     JwtStrategy,
-    AdminSessionGuard,
+    HQSessionGuard,
   ],
 })
 export class AuthModule {}

@@ -1,0 +1,1 @@
+export { RevokeOtherDevicesModal } from './RevokeOtherDevicesModal';

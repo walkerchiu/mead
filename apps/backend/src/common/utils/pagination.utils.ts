@@ -26,7 +26,7 @@ export function createPaginationResult<T>(
   const totalPages = Math.ceil(totalCount / limit);
 
   return {
-    data,
+    data: data,
     pageInfo: {
       currentPage: page,
       totalPages,

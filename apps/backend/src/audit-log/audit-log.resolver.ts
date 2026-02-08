@@ -24,10 +24,10 @@ export class AuditLogResolver {
   ) {}
 
   @Query(() => PaginatedAuditLogs, {
-    description: '分頁查詢稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+    description: '分頁查詢稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogsPaginated(
     @Args('pagination', {
@@ -35,7 +35,7 @@ export class AuditLogResolver {
       defaultValue: { page: 1, limit: 50 },
     })
     pagination: PaginationInput,
-    @Args('userId', { nullable: true }) userId?: string,
+    @Args('userSearch', { nullable: true }) userSearch?: string,
     @Args('action', { nullable: true }) action?: string,
     @Args('entity', { nullable: true }) entity?: string,
     @Args('status', { nullable: true }) status?: string,
@@ -47,16 +47,16 @@ export class AuditLogResolver {
     return this.auditLogService.findAllPaginated(
       pagination.page,
       pagination.limit,
-      { userId, action, entity, status },
+      { userSearch, action, entity, status },
       currentUserId, // 傳遞當前用戶 ID
     );
   }
 
   @Query(() => [AuditLogType], {
-    description: '查詢稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+    description: '查詢稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogs(
     @Args('userId', { nullable: true }) userId?: string,
@@ -77,10 +77,10 @@ export class AuditLogResolver {
 
   @Query(() => [AuditLogType], {
     description:
-      '依 Request ID 查詢稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+      '依 Request ID 查詢稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogsByRequestId(
     @Args('requestId') requestId: string,
@@ -90,10 +90,10 @@ export class AuditLogResolver {
   }
 
   @Query(() => [AuditLogType], {
-    description: '依使用者查詢稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+    description: '依用戶查詢稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogsByUser(
     @Args('userId') userId: string,
@@ -104,10 +104,10 @@ export class AuditLogResolver {
   }
 
   @Query(() => [AuditLogType], {
-    description: '依實體查詢稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+    description: '依實體查詢稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogsByEntity(
     @Args('entity') entity: string,
@@ -117,11 +117,23 @@ export class AuditLogResolver {
     return result as AuditLogType[];
   }
 
-  @Query(() => AuditLogStatisticsType, {
-    description: '取得稽核日誌統計資料（需要 ADMIN_SCOPE + audit-logs:read）',
+  @Query(() => AuditLogType, {
+    description: '依 ID 查詢單一稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
+    nullable: true,
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('audit-logs:read')
+  async auditLogById(@Args('id') id: string): Promise<AuditLogType | null> {
+    const result = await this.auditLogService.findById(id);
+    return result as AuditLogType | null;
+  }
+
+  @Query(() => AuditLogStatisticsType, {
+    description: '取得稽核日誌統計資料（需要 HQ_SCOPE + audit-logs:read）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('audit-logs:read')
   async auditLogStatistics(): Promise<AuditLogStatisticsType> {
     const result = await this.auditLogService.getStatistics();
@@ -134,7 +146,7 @@ export class AuditLogResolver {
    */
   @Subscription(() => AuditLogType, {
     name: 'auditLogCreated',
-    description: '訂閱新稽核日誌（需要 ADMIN_SCOPE + audit-logs:read）',
+    description: '訂閱新稽核日誌（需要 HQ_SCOPE + audit-logs:read）',
     filter: (payload, variables, context) => {
       // 🔍 從 connectionParams 解析 JWT 獲取 user
       try {
@@ -164,10 +176,10 @@ export class AuditLogResolver {
           accessScopes: user.accessScopes,
         });
 
-        // 檢查是否有 ADMIN_SCOPE
-        const hasAdminScope = user.accessScopes.includes('ADMIN_SCOPE');
-        if (!hasAdminScope) {
-          logger.debug('[Subscription Filter] User lacks ADMIN_SCOPE');
+        // 檢查是否有 HQ_SCOPE
+        const hasHQScope = user.accessScopes.includes('HQ_SCOPE');
+        if (!hasHQScope) {
+          logger.debug('[Subscription Filter] User lacks HQ_SCOPE');
           return false;
         }
 

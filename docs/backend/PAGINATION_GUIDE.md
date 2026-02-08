@@ -50,7 +50,7 @@ Offset-based 分頁實作，適合管理系統和需要跳頁功能的列表查�
 
 ## 📖 概述
 
-Wind 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多數業務場景。
+NPT 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多數業務場景。
 
 ### 為什麼選擇 Offset-based？
 
@@ -228,10 +228,10 @@ import { PaginatedUsers } from './user.types';
 
 @Query(() => PaginatedUsers, {
   name: 'usersPaginated',
-  description: '分頁查詢使用者列表'
+  description: '分頁查詢用戶列表'
 })
 @UseGuards(PermissionGuard)
-@RequiresAnyScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+@RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
 @RequiresPermission('users:list')
 async usersPaginated(
   @Args('pagination', {
@@ -242,7 +242,7 @@ async usersPaginated(
 
   @Args('includeDeleted', {
     defaultValue: false,
-    description: '是否包含已刪除的使用者'
+    description: '是否包含已刪除的用戶'
   })
   includeDeleted: boolean,
 ): Promise<PaginatedUsers> {
@@ -320,9 +320,9 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { PageInfo } from '@/common/types/pagination.types';
 import { UserType } from './user.type';
 
-@ObjectType({ description: '分頁使用者列表' })
+@ObjectType({ description: '分頁用戶列表' })
 export class PaginatedUsers {
-  @Field(() => [UserType], { description: '使用者資料' })
+  @Field(() => [UserType], { description: '用戶資料' })
   data: UserType[];
 
   @Field(() => PageInfo, { description: '分頁資訊' })
@@ -403,7 +403,7 @@ function UserList() {
 
   return (
     <div>
-      {/* 使用者列表 */}
+      {/* 用戶列表 */}
       {users.map((user) => (
         <div key={user.id}>{user.name}</div>
       ))}

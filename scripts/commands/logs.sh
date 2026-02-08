@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# Wind CLI - logs 命令
+# NPT CLI - logs 命令
 # 查看服務日誌
 # ==========================================
 
@@ -31,6 +31,11 @@ show_command_help() {
   echo -e "  ${CYAN}rabbitmq${NC}        RabbitMQ 日誌"
   echo -e "  ${CYAN}redis${NC}           Dragonfly/Redis 日誌"
   echo -e "  ${CYAN}mailpit${NC}         Mailpit 日誌"
+  echo -e "  ${CYAN}seaweedfs${NC}       SeaweedFS 所有服務日誌"
+  echo -e "  ${CYAN}seaweedfs-master${NC}  SeaweedFS Master 日誌"
+  echo -e "  ${CYAN}seaweedfs-volume${NC}  SeaweedFS Volume 日誌"
+  echo -e "  ${CYAN}seaweedfs-filer${NC}   SeaweedFS Filer 日誌"
+  echo -e "  ${CYAN}seaweedfs-s3${NC}      SeaweedFS S3 日誌"
   echo -e "  ${CYAN}all${NC}             所有服務日誌"
   echo ""
   echo -e "${YELLOW}選項:${NC}"
@@ -167,7 +172,7 @@ view_docker_logs() {
   log_info "執行: $cmd"
   echo ""
 
-  eval "$cmd" 2>/dev/null || {
+  eval "$cmd" || {
     log_error "容器 $container_name 未運行"
     echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker up -d${NC}"
     exit 1
@@ -178,7 +183,7 @@ view_docker_logs() {
 view_all_docker_logs() {
   print_header "所有 Docker 服務日誌"
 
-  local cmd="docker-compose logs"
+  local cmd="docker-compose --env-file .env.docker logs"
 
   if [ "$FOLLOW" = true ]; then
     cmd="$cmd -f"
@@ -236,6 +241,44 @@ case "$SERVICE" in
     ;;
   mailpit|mail|smtp)
     view_docker_logs "$(get_container_name mailpit)" "Mailpit"
+    ;;
+  seaweedfs-master)
+    view_docker_logs "$(get_container_name seaweedfs-master)" "SeaweedFS Master"
+    ;;
+  seaweedfs-volume)
+    view_docker_logs "$(get_container_name seaweedfs-volume)" "SeaweedFS Volume"
+    ;;
+  seaweedfs-filer)
+    view_docker_logs "$(get_container_name seaweedfs-filer)" "SeaweedFS Filer"
+    ;;
+  seaweedfs-s3)
+    view_docker_logs "$(get_container_name seaweedfs-s3)" "SeaweedFS S3"
+    ;;
+  seaweedfs|weed)
+    print_header "SeaweedFS 所有服務日誌"
+
+    cmd="docker-compose --env-file .env.docker logs"
+
+    if [ "$FOLLOW" = true ]; then
+      cmd="$cmd -f"
+    fi
+
+    cmd="$cmd --tail $LINES"
+
+    if [ -n "$SINCE" ]; then
+      cmd="$cmd --since $SINCE"
+    fi
+
+    cmd="$cmd seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3"
+
+    log_info "執行: $cmd"
+    echo ""
+
+    eval "$cmd" || {
+      log_error "SeaweedFS 服務未運行"
+      echo -e "啟動服務: ${CYAN}./scripts/cli.sh storage start${NC}"
+      exit 1
+    }
     ;;
   all|everything)
     view_all_logs

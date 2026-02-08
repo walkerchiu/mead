@@ -1,47 +1,24 @@
 'use client';
-
-import { useState, useEffect } from 'react';
-import {
-  Container,
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  CircularProgress,
-  IconButton,
-} from '@mui/material';
-import { ArrowBack } from '@mui/icons-material';
+import { Container, Box, Card, CardContent } from '@mui/material';
+import { Person as PersonIcon } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/routing';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import ProtectedRoute, { useAuthReady } from '@/components/auth/ProtectedRoute';
-import { MainAppBar } from '@/components/layout';
-import { logout, getAccessToken, parseJwt } from '@/lib/auth';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { AppShell } from '@/components/layout';
 import { ME_QUERY, UPDATE_MY_PROFILE_DETAILS_MUTATION } from '@/lib/graphql';
 import { getErrorMessage } from '@/lib/error-utils';
-import { FormField, SelectField } from '@/components/molecules';
-import { Button } from '@/components/atoms';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { FormField, SelectField, PageHeader } from '@/components/molecules';
+import { Button, TextArea } from '@/components/atoms';
 
-export default function ProfileSettingsPage() {
-  const router = useRouter();
+function ProfileSettingsPageContent() {
   const { enqueueSnackbar } = useSnackbar();
   const t = useTranslations('pages.settings.profile');
   const tc = useTranslations('common');
-  const td = useTranslations('pages.dashboard');
   const tv = useTranslations('validation');
-  const authReady = useAuthReady();
-  const [userFromToken, setUserFromToken] = useState<{
-    name: string;
-    email: string;
-  } | null>(null);
-
-  // 取得當前使用者資訊
-  const { user: currentUser } = useCurrentUser({ skip: !authReady });
 
   type MeQueryData = {
     me?: {
@@ -63,39 +40,14 @@ export default function ProfileSettingsPage() {
     data,
     loading: queryLoading,
     refetch,
-  } = useQuery<MeQueryData>(ME_QUERY);
+  } = useQuery<MeQueryData>(ME_QUERY, {
+    fetchPolicy: 'cache-and-network', // 確保 profile 欄位是最新資料
+  });
   const [updateProfileDetails, { loading: updateDetailsLoading }] = useMutation(
     UPDATE_MY_PROFILE_DETAILS_MUTATION,
   );
 
   const user = data?.me;
-
-  useEffect(() => {
-    const token = getAccessToken();
-    if (token) {
-      const payload = parseJwt(token);
-      // 從 token 取得基本使用者資訊作為 fallback
-      if (payload?.email) {
-        setUserFromToken({
-          name: (payload.email as string).split('@')[0],
-          email: payload.email as string,
-        });
-      }
-    } else {
-      setUserFromToken(null);
-    }
-  }, [authReady]);
-
-  // 使用 GraphQL 查詢結果，如果失敗則使用 token 中的資訊
-  const displayUser = currentUser || userFromToken;
-
-  // Debug logging
-  useEffect(() => {
-    console.log('[ProfileSettings] authReady:', authReady);
-    console.log('[ProfileSettings] currentUser:', currentUser);
-    console.log('[ProfileSettings] userFromToken:', userFromToken);
-    console.log('[ProfileSettings] displayUser:', displayUser);
-  }, [authReady, currentUser, userFromToken, displayUser]);
 
   // Profile Details Form Schema
   const profileDetailsSchema = z.object({
@@ -130,33 +82,6 @@ export default function ProfileSettingsPage() {
     },
   });
 
-  const handleLogout = async () => {
-    await logout();
-    enqueueSnackbar(td('loggedOut'), { variant: 'info' });
-  };
-
-  const handleAccountClick = () => {
-    router.push('/settings/account');
-  };
-
-  const handleProfileClick = () => {
-    router.push('/settings/profile');
-  };
-
-  const handleSecurityClick = () => {
-    router.push('/settings/security');
-  };
-
-  const handleHelpClick = () => {
-    // TODO: Navigate to help page or open help dialog
-    console.log('Help clicked');
-  };
-
-  const handleAboutClick = () => {
-    // TODO: Navigate to about page or open about dialog
-    console.log('About clicked');
-  };
-
   const onSubmit = async (data: ProfileDetailsFormData) => {
     try {
       await updateProfileDetails({
@@ -181,90 +106,32 @@ export default function ProfileSettingsPage() {
     }
   };
 
-  if (queryLoading) {
-    return (
-      <ProtectedRoute>
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="100vh"
-        >
-          <CircularProgress />
-        </Box>
-      </ProtectedRoute>
-    );
-  }
-
   return (
-    <ProtectedRoute>
-      <MainAppBar
-        logo={
-          <Box
-            sx={{
-              fontSize: '1.75rem',
-              fontWeight: 'bold',
-              color: 'white',
-            }}
-          >
-            📊
-          </Box>
-        }
-        title={td('title')}
-        titleLink="/dashboard"
-        user={
-          displayUser
-            ? {
-                name: displayUser.name,
-                email: displayUser.email,
-                avatar: currentUser?.avatar,
-                status: 'online',
-              }
-            : undefined
-        }
-        accountUrl="/settings/account"
-        profileUrl="/settings/profile"
-        securityUrl="/settings/security"
-        onAccountClick={handleAccountClick}
-        onProfileClick={handleProfileClick}
-        onSecurityClick={handleSecurityClick}
-        onLogout={handleLogout}
-        onHelpClick={handleHelpClick}
-        onAboutClick={handleAboutClick}
-        userIconMode={true}
-      />
-
+    <AppShell>
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <IconButton
-            onClick={() => router.push('/dashboard')}
-            sx={{ mr: 1 }}
-            aria-label="back to dashboard"
-          >
-            <ArrowBack />
-          </IconButton>
-          <Box>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Box>
-        </Box>
-        <Typography variant="body2" color="text.secondary" paragraph>
-          {t('description')}
-        </Typography>
+        <PageHeader
+          breadcrumbs={[
+            { label: tc('breadcrumb.dashboard'), href: '/dashboard' },
+            { label: tc('breadcrumb.profile') },
+          ]}
+          title={t('title')}
+          description={t('description')}
+          icon={<PersonIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />}
+        />
 
         {/* Profile Details Card */}
-        <Card>
+        <Card elevation={2}>
           <CardContent>
             <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-              <FormField
+              <TextArea
                 {...register('bio')}
                 margin="normal"
                 fullWidth
                 label={t('bio')}
-                multiline
                 rows={4}
-                error={errors.bio}
+                error={!!errors.bio}
                 helperText={errors.bio?.message || t('bioHelper')}
-                disabled={updateDetailsLoading}
+                disabled={queryLoading || updateDetailsLoading}
               />
 
               <FormField
@@ -275,7 +142,7 @@ export default function ProfileSettingsPage() {
                 autoComplete="tel"
                 error={errors.phone}
                 helperText={errors.phone?.message || t('phoneHelper')}
-                disabled={updateDetailsLoading}
+                disabled={queryLoading || updateDetailsLoading}
               />
 
               <FormField
@@ -286,7 +153,7 @@ export default function ProfileSettingsPage() {
                 autoComplete="street-address"
                 error={errors.address}
                 helperText={errors.address?.message || t('addressHelper')}
-                disabled={updateDetailsLoading}
+                disabled={queryLoading || updateDetailsLoading}
               />
 
               <FormField
@@ -298,7 +165,7 @@ export default function ProfileSettingsPage() {
                 autoComplete="url"
                 error={errors.website}
                 helperText={errors.website?.message || t('websiteHelper')}
-                disabled={updateDetailsLoading}
+                disabled={queryLoading || updateDetailsLoading}
               />
 
               <Controller
@@ -316,7 +183,7 @@ export default function ProfileSettingsPage() {
                     ]}
                     error={errors.language}
                     helperText={errors.language?.message || t('languageHelper')}
-                    disabled={updateDetailsLoading}
+                    disabled={queryLoading || updateDetailsLoading}
                   />
                 )}
               />
@@ -325,6 +192,7 @@ export default function ProfileSettingsPage() {
                 type="submit"
                 variant="contained"
                 loading={updateDetailsLoading}
+                disabled={queryLoading}
                 sx={{ mt: 2 }}
               >
                 {tc('save')}
@@ -333,6 +201,14 @@ export default function ProfileSettingsPage() {
           </CardContent>
         </Card>
       </Container>
+    </AppShell>
+  );
+}
+
+export default function ProfileSettingsPage() {
+  return (
+    <ProtectedRoute>
+      <ProfileSettingsPageContent />
     </ProtectedRoute>
   );
 }

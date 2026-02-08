@@ -19,23 +19,23 @@ import { UserType } from '../modules/user/user.types';
 registerEnumType(AccessScope, {
   name: 'AccessScope',
   description:
-    '訪問範圍層級（PUBLIC_SCOPE: 公開訪問, CUSTOMER_SCOPE: 客戶層級, ADMIN_SCOPE: 管理員層級）',
+    '訪問範圍層級（PUBLIC_SCOPE: 公開訪問, CUSTOMER_SCOPE: 客戶層級, HQ_SCOPE: 管理員層級）',
 });
 
 /**
  * JWT Token Payload（內部使用，不暴露到 GraphQL）
  */
 export interface JwtPayload {
-  /** 使用者 ID（JWT sub claim） */
+  /** 用戶 ID（JWT sub claim） */
   sub: string;
 
-  /** 使用者電子郵件 */
+  /** 用戶電子郵件 */
   email: string;
 
-  /** 使用者可訪問的範圍陣列 */
+  /** 用戶可訪問的範圍陣列 */
   accessScopes: AccessScope[];
 
-  /** 使用者的角色資訊（按 scope 分組） */
+  /** 用戶的角色資訊（按 scope 分組） */
   roles?: {
     /** 角色所屬的訪問範圍 */
     scope: AccessScope;
@@ -43,20 +43,23 @@ export interface JwtPayload {
     /** 該 scope 下的角色名稱陣列 */
     roleNames: string[];
   }[];
+
+  /** 用戶的權限名稱陣列（扁平化所有 scope 的權限） */
+  permissions?: string[];
 }
 
 /**
  * Auth Response - 登入/註冊成功後的 GraphQL 回應
  * Refresh Token 透過 HttpOnly Cookie 傳遞，不在 GraphQL 回應中暴露
  */
-@ObjectType({ description: '認證響應（包含 Access Token 和使用者資訊）' })
+@ObjectType({ description: '認證響應（包含 Access Token 和用戶資訊）' })
 export class AuthResponse {
   @Field(() => String, {
     description: 'Access Token（JWT，有效期 15 分鐘，用於 API 請求認證）',
   })
   accessToken: string;
 
-  @Field(() => UserType, { description: '登入使用者的基本資訊' })
+  @Field(() => UserType, { description: '登入用戶的基本資訊' })
   user: UserType;
 }
 
@@ -71,7 +74,7 @@ export interface AuthTokenResult {
 }
 
 /**
- * Register Input（已棄用，請使用 registerCustomer 或 registerAdmin）
+ * Register Input（已棄用，請使用 registerCustomer 或 registerHQ）
  */
 @InputType({ description: '註冊輸入（已棄用）' })
 export class RegisterInput {

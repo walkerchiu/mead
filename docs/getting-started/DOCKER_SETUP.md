@@ -1,6 +1,8 @@
 # Docker 設置與安全指南
 
-> 完整的 Docker 服務配置、安全最佳實踐與故障排除指南
+完整的 Docker 服務配置、安全最佳實踐與故障排除指南。
+
+---
 
 ## 📋 目錄
 
@@ -9,13 +11,14 @@
   - [📖 概述](#-概述)
     - [服務列表](#服務列表)
   - [🚀 快速開始](#-快速開始)
-    - [使用 Wind CLI（推薦）](#使用-wind-cli推薦)
+    - [使用 NPT CLI（推薦）](#使用-npt-cli推薦)
     - [手動啟動](#手動啟動)
   - [✨ 服務說明](#-服務說明)
     - [1. TimescaleDB (PostgreSQL)](#1-timescaledb-postgresql)
     - [2. RabbitMQ](#2-rabbitmq)
     - [3. Dragonfly (Redis)](#3-dragonfly-redis)
     - [4. Mailpit](#4-mailpit)
+    - [5. SeaweedFS（選用）](#5-seaweedfs選用)
   - [🔧 環境變數配置](#-環境變數配置)
     - [.env.docker 檔案結構](#envdocker-檔案結構)
     - [重要事項](#重要事項)
@@ -45,16 +48,22 @@
 
 ### 服務列表
 
+**核心服務**（預設啟動）：
+
 - **TimescaleDB (PostgreSQL)** - 主資料庫，支援時序資料優化
 - **RabbitMQ** - 訊息佇列，用於異步任務處理
 - **Dragonfly (Redis)** - 快取和 Session 儲存
 - **Mailpit** - 郵件測試服務，捕獲開發環境郵件
 
+**選用服務**（需手動啟動）：
+
+- **SeaweedFS** - 分散式檔案系統，提供本地 S3 儲存（包含 Master、Volume、Filer、S3 API 四個組件）
+
 ---
 
 ## 🚀 快速開始
 
-### 使用 Wind CLI（推薦）
+### 使用 NPT CLI（推薦）
 
 ```bash
 # 一鍵啟動所有服務
@@ -134,6 +143,43 @@ docker-compose ps
 - Web UI 查看郵件內容
 - 支援 API 訪問
 
+### 5. SeaweedFS（選用）
+
+**用途**: 分散式檔案系統，本地 S3 儲存
+**Ports**:
+
+- 9333 (Master Server)
+- 8080 (Volume Server)
+- 8888 (Filer)
+- 8333 (S3 API)
+
+**Image**: `chrislusf/seaweedfs`
+
+**啟動方式**:
+
+```bash
+# 使用 CLI（推薦）
+./scripts/cli.sh storage start
+
+# 或手動啟動
+docker-compose --env-file .env.docker --profile storage up -d
+```
+
+**特色**:
+
+- S3 API 完全相容
+- 無需依賴 AWS 雲端服務
+- 高效能分散式儲存
+- 支援檔案系統語義
+
+**管理介面**:
+
+- Master UI: http://localhost:9333
+- Volume UI: http://localhost:8080
+- Filer UI: http://localhost:8888
+
+**詳細文檔**: 參考 [SeaweedFS Storage Guide](../infrastructure/SEAWEEDFS_STORAGE.md)
+
 ---
 
 ## 🔧 環境變數配置
@@ -144,14 +190,18 @@ docker-compose ps
 # PostgreSQL (TimescaleDB)
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your-strong-password-here  # ⚠️ 請修改
-POSTGRES_DB=wind_db
+POSTGRES_DB=npt_db
 
 # RabbitMQ
-RABBITMQ_DEFAULT_USER=admin
+RABBITMQ_DEFAULT_USER=hq
 RABBITMQ_DEFAULT_PASS=your-strong-password-here  # ⚠️ 請修改
 
 # Dragonfly (Redis 相容)
 DRAGONFLY_PASSWORD=your-strong-password-here  # ⚠️ 請修改
+
+# SeaweedFS（選用服務）
+SEAWEEDFS_S3_USER=admin
+SEAWEEDFS_S3_PASSWORD=your-strong-password-here  # ⚠️ 請修改
 ```
 
 ### 重要事項
@@ -169,7 +219,7 @@ DRAGONFLY_PASSWORD=your-strong-password-here  # ⚠️ 請修改
 # .env.docker.example（可提交）
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=CHANGE_THIS_IN_PRODUCTION
-POSTGRES_DB=wind_db
+POSTGRES_DB=npt_db
 ```
 
 ---
@@ -199,7 +249,7 @@ openssl rand -hex 64
 **DATABASE_URL 格式**：
 
 ```text
-postgresql://postgres:YOUR_PASSWORD@localhost:5432/wind_db
+postgresql://postgres:YOUR_PASSWORD@localhost:5432/npt_db
 ```
 
 ### 3. 環境隔離
@@ -228,7 +278,7 @@ services:
           memory: 512M
 ```
 
-**使用非 root 使用者**
+**使用非 root 用戶**
 
 ```yaml
 services:
@@ -268,7 +318,7 @@ docker-compose down -v
 ### 查看狀態
 
 ```bash
-# 使用 Wind CLI（推薦）
+# 使用 NPT CLI（推薦）
 ./scripts/cli.sh status
 
 # 或直接使用 Docker
@@ -279,7 +329,7 @@ docker-compose logs -f
 ### 查看日誌
 
 ```bash
-# 使用 Wind CLI（推薦）
+# 使用 NPT CLI（推薦）
 ./scripts/cli.sh logs postgres -f
 ./scripts/cli.sh logs rabbitmq -f
 ./scripts/cli.sh logs redis -f
@@ -293,7 +343,7 @@ docker-compose logs -f dragonfly
 ### 重啟服務
 
 ```bash
-# 使用 Wind CLI（推薦）
+# 使用 NPT CLI（推薦）
 ./scripts/cli.sh restart docker
 
 # 或重啟特定服務
@@ -306,7 +356,7 @@ docker-compose restart dragonfly
 
 ```bash
 # PostgreSQL
-docker-compose exec timescaledb psql -U postgres -d wind_db
+docker-compose exec timescaledb psql -U postgres -d npt_db
 
 # RabbitMQ
 docker-compose exec rabbitmq rabbitmqctl status
@@ -356,7 +406,7 @@ grep DATABASE_URL apps/backend/.env
 grep POSTGRES_PASSWORD .env.docker
 
 # 3. 測試連線
-docker-compose exec timescaledb psql -U postgres -d wind_db -c "SELECT 1"
+docker-compose exec timescaledb psql -U postgres -d npt_db -c "SELECT 1"
 ```
 
 ### 問題 3：RabbitMQ 管理介面無法訪問

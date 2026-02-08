@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { TwoFactorForm } from './TwoFactorForm';
 import { AlertMessage } from '@/components/molecules';
@@ -77,6 +77,63 @@ export const WithBackButton: Story = {
 };
 
 /**
+ * Backup code mode
+ * Use backup code for verification
+ */
+export const BackupCodeMode: Story = {
+  render: function BackupCodeExample() {
+    return (
+      <Box>
+        <TwoFactorForm
+          onSubmit={async (code, isBackupCode) => {
+            console.log('Code:', code, 'Is Backup:', isBackupCode);
+          }}
+        />
+        <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
+          <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
+            Tip: Check "Use backup code" to enter a backup code
+          </Box>
+        </Box>
+      </Box>
+    );
+  },
+};
+
+/**
+ * Various error states
+ * Demonstrates different error messages
+ */
+export const ErrorStates: Story = {
+  render: () => (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <TwoFactorForm
+          onSubmit={async (code) => console.log(code)}
+          error="Invalid verification code"
+        />
+      </Paper>
+
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <TwoFactorForm
+          onSubmit={async (code) => console.log(code)}
+          error="Verification code has expired, please log in again"
+        />
+      </Paper>
+
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <TwoFactorForm
+          onSubmit={async (code) => console.log(code)}
+          error="Too many attempts, account temporarily locked"
+        />
+      </Paper>
+    </Box>
+  ),
+  parameters: {
+    layout: 'padded',
+  },
+};
+
+/**
  * Interactive example
  * Simulates complete 2FA verification flow
  */
@@ -137,62 +194,5 @@ export const Interactive: Story = {
         )}
       </Box>
     );
-  },
-};
-
-/**
- * Backup code mode
- * Use backup code for verification
- */
-export const BackupCodeMode: Story = {
-  render: function BackupCodeExample() {
-    return (
-      <Box>
-        <TwoFactorForm
-          onSubmit={async (code, isBackupCode) => {
-            console.log('Code:', code, 'Is Backup:', isBackupCode);
-          }}
-        />
-        <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
-          <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
-            Tip: Check "Use backup code" to enter a backup code
-          </Box>
-        </Box>
-      </Box>
-    );
-  },
-};
-
-/**
- * Various error states
- * Demonstrates different error messages
- */
-export const ErrorStates: Story = {
-  render: () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <TwoFactorForm
-          onSubmit={async (code) => console.log(code)}
-          error="Invalid verification code"
-        />
-      </Paper>
-
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <TwoFactorForm
-          onSubmit={async (code) => console.log(code)}
-          error="Verification code has expired, please log in again"
-        />
-      </Paper>
-
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <TwoFactorForm
-          onSubmit={async (code) => console.log(code)}
-          error="Too many attempts, account temporarily locked"
-        />
-      </Paper>
-    </Box>
-  ),
-  parameters: {
-    layout: 'padded',
   },
 };

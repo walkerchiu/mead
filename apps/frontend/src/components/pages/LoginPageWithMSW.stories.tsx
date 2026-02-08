@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { graphql, HttpResponse } from 'msw';
 import { AuthLayout } from '@/components/templates';
@@ -136,7 +136,7 @@ export const SuccessLogin: Story = {
  * Requires 2FA verification
  *
  * Test account:
- * - Email: admin@example.com
+ * - Email: hq@example.com
  * - Password: password
  * - 2FA verification code: 123456
  */
@@ -155,10 +155,7 @@ export const Requires2FA: Story = {
 
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        if (
-          data.email === 'admin@example.com' &&
-          data.password === 'password'
-        ) {
+        if (data.email === 'hq@example.com' && data.password === 'password') {
           setTemporaryToken('temp-token-12345');
           setStep('2fa');
         } else {
@@ -230,7 +227,7 @@ export const Requires2FA: Story = {
             <Box sx={{ mt: 2, p: 2, bgcolor: 'info.lighter', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
                 Test account (requires 2FA):{'\n'}
-                Email: admin@example.com{'\n'}
+                Email: hq@example.com{'\n'}
                 Password: password{'\n'}
                 Verification code: 123456
               </Box>
@@ -251,7 +248,7 @@ export const Requires2FA: Story = {
             password: string;
           };
 
-          if (email === 'admin@example.com' && password === 'password') {
+          if (email === 'hq@example.com' && password === 'password') {
             return HttpResponse.json({
               data: {
                 login: {

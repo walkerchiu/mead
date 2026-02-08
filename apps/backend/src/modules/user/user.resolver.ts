@@ -1,6 +1,6 @@
 import { Query, Resolver, Args, Mutation, Context } from '@nestjs/graphql';
 import { UseGuards, ForbiddenException } from '@nestjs/common';
-import { UserType, PaginatedUsers } from './user.types';
+import { UserType, PaginatedUsers, RoleType, UserRoleType } from './user.types';
 import { ProfileType } from './user.types';
 import { UserService } from './user.service';
 import { PermissionGuard } from '../../common/guards/permission.guard';
@@ -18,45 +18,54 @@ import {
   UpdateUserInput,
   UpdateProfileInput,
   ChangePasswordInput,
+  CreateUserInput,
+  HQUpdateUserInput,
+  HQResetPasswordInput,
+  LockUserInput,
+  UserFilterInput,
+  AssignRoleInput,
+  RevokeRoleInput,
 } from './user.input';
 import { GraphQLContext } from '../../common/types/graphql-context.type';
+import { PermissionService } from '../../rbac/permission.service';
 
 @Resolver(() => UserType)
 export class UserResolver {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private permissionService: PermissionService,
+  ) {}
 
   // ==================== READ OPERATIONS ====================
 
   @Query(() => UserType, {
     nullable: true,
     description:
-      '依 ID 查詢單一使用者資料（需要 ADMIN_SCOPE 或 CUSTOMER_SCOPE 且擁有 users:read 權限）',
+      '依 ID 查詢單一用戶資料（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 users:read 權限）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresAnyScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
   @RequiresPermission('users:read')
   async user(
-    @Args('id', { description: '使用者唯一識別碼（UUID）' }) id: string,
+    @Args('id', { description: '用戶唯一識別碼（UUID）' }) id: string,
     @Args('includeDeleted', {
       defaultValue: false,
-      description: '是否包含已軟刪除的使用者（僅 ADMIN_SCOPE 可用）',
+      description: '是否包含已軟刪除的用戶（僅 HQ_SCOPE 可用）',
     })
     includeDeleted: boolean,
     @Context() context: GraphQLContext,
   ): Promise<UserType | null> {
-    // 檢查 includeDeleted 權限：只有 ADMIN_SCOPE 可以查詢已刪除的資料
+    // 檢查 includeDeleted 權限：只有 HQ_SCOPE 可以查詢已刪除的資料
     if (includeDeleted) {
       const user = context.req?.user;
-      const hasAdminScope = user?.accessScopes?.includes(
-        AccessScope.ADMIN_SCOPE,
-      );
+      const hasHQScope = user?.accessScopes?.includes(AccessScope.HQ_SCOPE);
 
-      if (!hasAdminScope) {
-        throw new ForbiddenException('只有管理員可以查詢已刪除的使用者資料');
+      if (!hasHQScope) {
+        throw new ForbiddenException('只有管理員可以查詢已刪除的用戶資料');
       }
     }
 
-    // 提取使用者權限上下文
+    // 提取用戶權限上下文
     const userContext = {
       accessScopes: context.req?.user?.accessScopes || [],
       userId: context.req?.user?.userId,
@@ -71,10 +80,11 @@ export class UserResolver {
 
   @Query(() => PaginatedUsers, {
     name: 'usersPaginated',
-    description: '分頁查詢使用者列表（支援排序、篩選，推薦使用此 API）',
+    description:
+      '分頁查詢用戶列表（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 users:list 權限）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresAnyScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
   @RequiresPermission('users:list')
   async usersPaginated(
     @Args('pagination', {
@@ -83,26 +93,29 @@ export class UserResolver {
       description: '分頁參數（頁碼和每頁數量）',
     })
     pagination: PaginationInput,
+    @Args('filter', {
+      nullable: true,
+      description: '篩選條件（搜尋、存取範圍、狀態）',
+    })
+    filter: UserFilterInput,
     @Args('includeDeleted', {
       defaultValue: false,
-      description: '是否包含已軟刪除的使用者（僅 ADMIN_SCOPE 可用）',
+      description: '是否包含已軟刪除的用戶（僅 HQ_SCOPE 可用）',
     })
     includeDeleted: boolean,
     @Context() context: GraphQLContext,
   ): Promise<PaginatedUsers> {
-    // 檢查 includeDeleted 權限：只有 ADMIN_SCOPE 可以查詢已刪除的資料
+    // 檢查 includeDeleted 權限：只有 HQ_SCOPE 可以查詢已刪除的資料
     if (includeDeleted) {
       const user = context.req?.user;
-      const hasAdminScope = user?.accessScopes?.includes(
-        AccessScope.ADMIN_SCOPE,
-      );
+      const hasHQScope = user?.accessScopes?.includes(AccessScope.HQ_SCOPE);
 
-      if (!hasAdminScope) {
-        throw new ForbiddenException('只有管理員可以查詢已刪除的使用者資料');
+      if (!hasHQScope) {
+        throw new ForbiddenException('只有管理員可以查詢已刪除的用戶資料');
       }
     }
 
-    // 提取使用者權限上下文
+    // 提取用戶權限上下文
     const userContext = {
       accessScopes: context.req?.user?.accessScopes || [],
       userId: context.req?.user?.userId,
@@ -111,6 +124,7 @@ export class UserResolver {
     return this.userService.findAllUsersPaginated(
       pagination.page,
       pagination.limit,
+      filter,
       includeDeleted,
       userContext,
     );
@@ -119,34 +133,32 @@ export class UserResolver {
   @Query(() => UserType, {
     nullable: true,
     description:
-      '依 Email 查詢使用者（需要 ADMIN_SCOPE 或 CUSTOMER_SCOPE 且擁有 users:read 權限）',
+      '依 Email 查詢用戶（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 users:read 權限）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresAnyScope([AccessScope.ADMIN_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
   @RequiresPermission('users:read')
   async userByEmail(
-    @Args('email', { description: '使用者電子郵件地址' })
+    @Args('email', { description: '用戶電子郵件地址' })
     email: string,
     @Args('includeDeleted', {
       defaultValue: false,
-      description: '是否包含已軟刪除的使用者（僅 ADMIN_SCOPE 可用）',
+      description: '是否包含已軟刪除的用戶（僅 HQ_SCOPE 可用）',
     })
     includeDeleted: boolean,
     @Context() context: GraphQLContext,
   ): Promise<UserType | null> {
-    // 檢查 includeDeleted 權限：只有 ADMIN_SCOPE 可以查詢已刪除的資料
+    // 檢查 includeDeleted 權限：只有 HQ_SCOPE 可以查詢已刪除的資料
     if (includeDeleted) {
       const user = context.req?.user;
-      const hasAdminScope = user?.accessScopes?.includes(
-        AccessScope.ADMIN_SCOPE,
-      );
+      const hasHQScope = user?.accessScopes?.includes(AccessScope.HQ_SCOPE);
 
-      if (!hasAdminScope) {
-        throw new ForbiddenException('只有管理員可以查詢已刪除的使用者資料');
+      if (!hasHQScope) {
+        throw new ForbiddenException('只有管理員可以查詢已刪除的用戶資料');
       }
     }
 
-    // 提取使用者權限上下文
+    // 提取用戶權限上下文
     const userContext = {
       accessScopes: context.req?.user?.accessScopes || [],
       userId: context.req?.user?.userId,
@@ -162,7 +174,7 @@ export class UserResolver {
   // ==================== SELF-SERVICE OPERATIONS ====================
 
   @Query(() => UserType, {
-    description: '查詢當前登入使用者的完整資料',
+    description: '查詢當前登入用戶的完整資料',
   })
   @UseGuards(JwtAuthGuard)
   async me(@Context() context: GraphQLContext): Promise<UserType> {
@@ -170,11 +182,21 @@ export class UserResolver {
     if (!userId) {
       throw new ForbiddenException('User ID not found in context');
     }
-    return this.userService.findUserById(userId, false) as Promise<UserType>;
+    // 查詢自己不受 accessScope 過濾，傳入完整 context 以繞過 PUBLIC_SCOPE 限制
+    const userContext = {
+      userId,
+      accessScopes: context.req.user?.accessScopes || [],
+      roles: context.req.user?.roles || [],
+    };
+    return this.userService.findUserById(
+      userId,
+      false,
+      userContext,
+    ) as Promise<UserType>;
   }
 
   @Mutation(() => UserType, {
-    description: '更新當前使用者的基本資料（email、name）',
+    description: '更新當前用戶的基本資料（email、name）',
   })
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
@@ -187,11 +209,12 @@ export class UserResolver {
     if (!userId) {
       throw new ForbiddenException('User ID not found in context');
     }
-    return this.userService.updateUserSelf(userId, input, lang);
+    const ipAddress = context.req.ip;
+    return this.userService.updateUserSelf(userId, input, ipAddress, lang);
   }
 
   @Mutation(() => ProfileType, {
-    description: '更新當前使用者的詳細資料（Profile）',
+    description: '更新當前用戶的詳細資料（Profile）',
   })
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
@@ -208,7 +231,7 @@ export class UserResolver {
   }
 
   @Mutation(() => Boolean, {
-    description: '修改當前使用者的密碼',
+    description: '修改當前用戶的密碼',
   })
   @UseGuards(JwtAuthGuard)
   @Throttle({ default: { limit: 5, ttl: 300000 } })
@@ -235,25 +258,363 @@ export class UserResolver {
     );
   }
 
-  // ==================== WRITE OPERATIONS (ADMIN ONLY) ====================
+  // ==================== WRITE OPERATIONS (HQ/MANAGER) ====================
 
   @Mutation(() => UserType, {
-    description: '軟刪除使用者（僅 ADMIN，需要 users:delete 權限）',
+    description: '創建新用戶（僅限 HQ_SCOPE，需要 users:create 權限）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
-  @RequiresPermission('users:delete')
-  async softDeleteUser(@Args('id') id: string): Promise<UserType | null> {
-    return this.userService.softDeleteUser(id) as Promise<UserType | null>;
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:create')
+  async createUser(
+    @Args('input') input: CreateUserInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<UserType> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.createUser(input, userContext, lang);
   }
 
   @Mutation(() => UserType, {
-    description: '恢復已刪除的使用者（僅 ADMIN，需要 users:restore 權限）',
+    description: '管理員更新用戶資料（僅限 HQ_SCOPE，需要 users:update 權限）',
   })
   @UseGuards(PermissionGuard)
-  @RequiresScope(AccessScope.ADMIN_SCOPE)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:update')
+  async hqUpdateUser(
+    @Args('id', { description: '用戶 ID' }) id: string,
+    @Args('input') input: HQUpdateUserInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<UserType> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.hqUpdateUser(id, input, userContext, lang);
+  }
+
+  @Mutation(() => Boolean, {
+    description:
+      '管理員重設用戶密碼（僅限 HQ_SCOPE，需要 users:reset_password 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:reset_password')
+  async hqResetPassword(
+    @Args('id', { description: '用戶 ID' }) id: string,
+    @Args('input') input: HQResetPasswordInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<boolean> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    const ipAddress = context.req.ip;
+    const userAgentHeader = context.req.headers?.['user-agent'];
+    const userAgent = Array.isArray(userAgentHeader)
+      ? userAgentHeader[0]
+      : userAgentHeader;
+
+    return this.userService.hqResetPassword(
+      id,
+      input,
+      userContext,
+      ipAddress,
+      userAgent,
+      lang,
+    );
+  }
+
+  @Mutation(() => UserType, {
+    description: '軟刪除用戶（僅限 HQ_SCOPE，需要 users:delete 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:delete')
+  async softDeleteUser(
+    @Args('id') id: string,
+    @Context() context: GraphQLContext,
+  ): Promise<UserType | null> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.softDeleteUser(
+      id,
+      userContext,
+    ) as Promise<UserType | null>;
+  }
+
+  @Mutation(() => UserType, {
+    description: '恢復已刪除的用戶（僅 HQ，需要 users:restore 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
   @RequiresPermission('users:restore')
   async restoreUser(@Args('id') id: string): Promise<UserType | null> {
     return this.userService.restoreUser(id) as Promise<UserType | null>;
+  }
+
+  @Mutation(() => UserType, {
+    description: '鎖定用戶（僅限 HQ_SCOPE，需要 users:update 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:update')
+  async lockUser(
+    @Args('id', { description: '用戶 ID' }) id: string,
+    @Args('input') input: LockUserInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<UserType> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.lockUser(
+      id,
+      input,
+      userContext,
+      lang,
+    ) as Promise<UserType>;
+  }
+
+  @Mutation(() => UserType, {
+    description: '解鎖用戶（僅限 HQ_SCOPE，需要 users:update 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresScope(AccessScope.HQ_SCOPE)
+  @RequiresPermission('users:update')
+  async unlockUser(
+    @Args('id', { description: '用戶 ID' }) id: string,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<UserType> {
+    const userContext = {
+      accessScopes: context.req?.user?.accessScopes || [],
+      userId: context.req?.user?.userId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.unlockUser(
+      id,
+      userContext,
+      lang,
+    ) as Promise<UserType>;
+  }
+
+  // ==================== ROLE ASSIGNMENT OPERATIONS ====================
+
+  @Query(() => [UserRoleType], {
+    description:
+      '查詢指定用戶的角色列表（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 roles:manage 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  async userRoles(
+    @Args('userId', { description: '用戶 ID' }) userId: string,
+    @Context() context: GraphQLContext,
+  ): Promise<UserRoleType[]> {
+    const callerUserId = context.req.user?.userId || context.req.user?.sub;
+    if (!callerUserId) {
+      throw new ForbiddenException('User ID not found in context');
+    }
+
+    // Manually check roles:manage permission
+    const accessScopes = context.req?.user?.accessScopes || [];
+    const isHQ = accessScopes.includes(AccessScope.HQ_SCOPE);
+    const hasHQPermission = isHQ
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.HQ_SCOPE,
+          'roles:manage',
+        )
+      : false;
+    const hasCustomerPermission = accessScopes.includes(
+      AccessScope.CUSTOMER_SCOPE,
+    )
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.CUSTOMER_SCOPE,
+          'roles:manage',
+        )
+      : false;
+
+    if (!hasHQPermission && !hasCustomerPermission) {
+      throw new ForbiddenException('沒有 roles:manage 權限');
+    }
+
+    const userContext = {
+      accessScopes,
+      userId: callerUserId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.getUserRolesForManagement(
+      userId,
+      userContext,
+    ) as Promise<UserRoleType[]>;
+  }
+
+  @Query(() => [RoleType], {
+    description:
+      '查詢當前用戶可分配的角色列表（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 roles:manage 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  async assignableRoles(
+    @Context() context: GraphQLContext,
+  ): Promise<RoleType[]> {
+    const callerUserId = context.req.user?.userId || context.req.user?.sub;
+    if (!callerUserId) {
+      throw new ForbiddenException('User ID not found in context');
+    }
+
+    // Manually check roles:manage permission
+    const accessScopes = context.req?.user?.accessScopes || [];
+    const isHQ = accessScopes.includes(AccessScope.HQ_SCOPE);
+    const hasHQPermission = isHQ
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.HQ_SCOPE,
+          'roles:manage',
+        )
+      : false;
+    const hasCustomerPermission = accessScopes.includes(
+      AccessScope.CUSTOMER_SCOPE,
+    )
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.CUSTOMER_SCOPE,
+          'roles:manage',
+        )
+      : false;
+
+    if (!hasHQPermission && !hasCustomerPermission) {
+      throw new ForbiddenException('沒有 roles:manage 權限');
+    }
+
+    const userContext = {
+      accessScopes,
+      userId: callerUserId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.getAssignableRoles(userContext) as Promise<
+      RoleType[]
+    >;
+  }
+
+  @Mutation(() => Boolean, {
+    description:
+      '分配角色給用戶（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 roles:manage 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  async assignRole(
+    @Args('input') input: AssignRoleInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<boolean> {
+    const callerUserId = context.req.user?.userId || context.req.user?.sub;
+    if (!callerUserId) {
+      throw new ForbiddenException('User ID not found in context');
+    }
+
+    // Manually check roles:manage permission
+    const accessScopes = context.req?.user?.accessScopes || [];
+    const isHQ = accessScopes.includes(AccessScope.HQ_SCOPE);
+    const hasHQPermission = isHQ
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.HQ_SCOPE,
+          'roles:manage',
+        )
+      : false;
+    const hasCustomerPermission = accessScopes.includes(
+      AccessScope.CUSTOMER_SCOPE,
+    )
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.CUSTOMER_SCOPE,
+          'roles:manage',
+        )
+      : false;
+
+    if (!hasHQPermission && !hasCustomerPermission) {
+      throw new ForbiddenException('沒有 roles:manage 權限');
+    }
+
+    const userContext = {
+      accessScopes,
+      userId: callerUserId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.assignRole(input, userContext, lang);
+  }
+
+  @Mutation(() => Boolean, {
+    description:
+      '撤銷用戶的角色（需要 HQ_SCOPE 或 CUSTOMER_SCOPE 且擁有 roles:manage 權限）',
+  })
+  @UseGuards(PermissionGuard)
+  @RequiresAnyScope([AccessScope.HQ_SCOPE, AccessScope.CUSTOMER_SCOPE])
+  async revokeRole(
+    @Args('input') input: RevokeRoleInput,
+    @Context() context: GraphQLContext,
+    @I18nLang() lang: string,
+  ): Promise<boolean> {
+    const callerUserId = context.req.user?.userId || context.req.user?.sub;
+    if (!callerUserId) {
+      throw new ForbiddenException('User ID not found in context');
+    }
+
+    // Manually check roles:manage permission
+    const accessScopes = context.req?.user?.accessScopes || [];
+    const isHQ = accessScopes.includes(AccessScope.HQ_SCOPE);
+    const hasHQPermission = isHQ
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.HQ_SCOPE,
+          'roles:manage',
+        )
+      : false;
+    const hasCustomerPermission = accessScopes.includes(
+      AccessScope.CUSTOMER_SCOPE,
+    )
+      ? await this.permissionService.checkPermission(
+          callerUserId,
+          AccessScope.CUSTOMER_SCOPE,
+          'roles:manage',
+        )
+      : false;
+
+    if (!hasHQPermission && !hasCustomerPermission) {
+      throw new ForbiddenException('沒有 roles:manage 權限');
+    }
+
+    const userContext = {
+      accessScopes,
+      userId: callerUserId,
+      permissions: context.req?.user?.permissions || [],
+    };
+
+    return this.userService.revokeRole(input, userContext, lang);
   }
 }

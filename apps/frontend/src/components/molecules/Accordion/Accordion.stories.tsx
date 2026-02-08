@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Accordion } from './Accordion';
 import { useState } from 'react';
 import { Typography, Box } from '@mui/material';
@@ -45,6 +45,30 @@ export const DefaultExpanded: Story = {
   },
 };
 
+export const WithDisabled: Story = {
+  args: {
+    items: [
+      { title: 'Available Item One', content: 'This item can be expanded' },
+      {
+        title: 'Disabled Item',
+        content: 'This item is disabled',
+        disabled: true,
+      },
+      {
+        title: 'Available Item Two',
+        content: 'This item can also be expanded',
+      },
+    ],
+  },
+};
+
+export const Multiple: Story = {
+  args: {
+    items: sampleItems,
+    multiple: true,
+  },
+};
+
 export const WithSubtitle: Story = {
   args: {
     items: [
@@ -87,30 +111,6 @@ export const WithSubtitle: Story = {
   },
 };
 
-export const WithDisabled: Story = {
-  args: {
-    items: [
-      { title: 'Available Item One', content: 'This item can be expanded' },
-      {
-        title: 'Disabled Item',
-        content: 'This item is disabled',
-        disabled: true,
-      },
-      {
-        title: 'Available Item Two',
-        content: 'This item can also be expanded',
-      },
-    ],
-  },
-};
-
-export const Multiple: Story = {
-  args: {
-    items: sampleItems,
-    multiple: true,
-  },
-};
-
 export const NoGutters: Story = {
   args: {
     items: sampleItems,
@@ -123,6 +123,67 @@ export const Square: Story = {
     items: sampleItems,
     square: true,
   },
+};
+
+export const RichContent: Story = {
+  render: () => (
+    <Box sx={{ width: '700px' }}>
+      <Accordion
+        items={[
+          {
+            title: (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: 'success.main',
+                  }}
+                />
+                <Typography>Completed</Typography>
+              </Box>
+            ),
+            content: (
+              <Box>
+                <Typography variant="body2" paragraph>
+                  This task has been completed.
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Completed at: 2026-02-06 10:30
+                </Typography>
+              </Box>
+            ),
+          },
+          {
+            title: (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: 'warning.main',
+                  }}
+                />
+                <Typography>In Progress</Typography>
+              </Box>
+            ),
+            content: (
+              <Box>
+                <Typography variant="body2" paragraph>
+                  This task is currently in progress.
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Expected completion: 2026-02-07
+                </Typography>
+              </Box>
+            ),
+          },
+        ]}
+      />
+    </Box>
+  ),
 };
 
 export const Controlled: Story = {
@@ -229,65 +290,4 @@ export const Documentation: Story = {
       },
     ],
   },
-};
-
-export const RichContent: Story = {
-  render: () => (
-    <Box sx={{ width: '700px' }}>
-      <Accordion
-        items={[
-          {
-            title: (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: 'success.main',
-                  }}
-                />
-                <Typography>Completed</Typography>
-              </Box>
-            ),
-            content: (
-              <Box>
-                <Typography variant="body2" paragraph>
-                  This task has been completed.
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Completed at: 2026-02-06 10:30
-                </Typography>
-              </Box>
-            ),
-          },
-          {
-            title: (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    borderRadius: '50%',
-                    bgcolor: 'warning.main',
-                  }}
-                />
-                <Typography>In Progress</Typography>
-              </Box>
-            ),
-            content: (
-              <Box>
-                <Typography variant="body2" paragraph>
-                  This task is currently in progress.
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Expected completion: 2026-02-07
-                </Typography>
-              </Box>
-            ),
-          },
-        ]}
-      />
-    </Box>
-  ),
 };

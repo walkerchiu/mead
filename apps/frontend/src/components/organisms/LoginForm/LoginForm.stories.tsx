@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { LoginForm } from './LoginForm';
 import { AlertMessage } from '@/components/molecules';
@@ -91,6 +91,40 @@ export const NoForgotPassword: Story = {
 };
 
 /**
+ * Various error states
+ * Demonstrates different error messages
+ */
+export const ErrorStates: Story = {
+  render: () => (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <LoginForm
+          onSubmit={async (data) => console.log(data)}
+          error="Invalid email or password"
+        />
+      </Paper>
+
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <LoginForm
+          onSubmit={async (data) => console.log(data)}
+          error="Account has been locked, please contact hq"
+        />
+      </Paper>
+
+      <Paper elevation={2} sx={{ p: 3 }}>
+        <LoginForm
+          onSubmit={async (data) => console.log(data)}
+          error="Server connection failed, please try again later"
+        />
+      </Paper>
+    </Box>
+  ),
+  parameters: {
+    layout: 'padded',
+  },
+};
+
+/**
  * Interactive example
  * Simulates complete login flow
  */
@@ -109,10 +143,7 @@ export const Interactive: Story = {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Simulate validation logic
-      if (
-        data.email === 'admin@example.com' &&
-        data.password === 'password123'
-      ) {
+      if (data.email === 'hq@example.com' && data.password === 'password123') {
         setSuccess(true);
       } else {
         setError('Invalid email or password');
@@ -141,7 +172,7 @@ export const Interactive: Story = {
             <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
               <Box component="pre" sx={{ fontSize: '0.75rem', m: 0 }}>
                 Test Account:
-                {'\n'}Email: admin@example.com
+                {'\n'}Email: hq@example.com
                 {'\n'}Password: password123
               </Box>
             </Box>
@@ -149,39 +180,5 @@ export const Interactive: Story = {
         )}
       </Box>
     );
-  },
-};
-
-/**
- * Various error states
- * Demonstrates different error messages
- */
-export const ErrorStates: Story = {
-  render: () => (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <LoginForm
-          onSubmit={async (data) => console.log(data)}
-          error="Invalid email or password"
-        />
-      </Paper>
-
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <LoginForm
-          onSubmit={async (data) => console.log(data)}
-          error="Account has been locked, please contact administrator"
-        />
-      </Paper>
-
-      <Paper elevation={2} sx={{ p: 3 }}>
-        <LoginForm
-          onSubmit={async (data) => console.log(data)}
-          error="Server connection failed, please try again later"
-        />
-      </Paper>
-    </Box>
-  ),
-  parameters: {
-    layout: 'padded',
   },
 };

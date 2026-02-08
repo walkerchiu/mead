@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import React from 'react';
 import { DashboardSkeleton } from './DashboardSkeleton';
 import Box from '@mui/material/Box';

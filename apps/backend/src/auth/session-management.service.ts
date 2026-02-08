@@ -1,9 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { GeoIPService } from '../common/services/geoip.service';
 import { AuditLogService } from '../audit-log/audit-log.service';
+import { DistributedLockService } from '../cache/distributed-lock.service';
+import { CronJobMonitorService } from '../cron-monitoring/cron-job-monitor.service';
+import { RequestContextService } from '../common/request-context/request-context.service';
+import { CronJobStatus } from '@prisma/client';
 import { logger } from '../common/services/logger.service';
-import { RevokedMethod } from './admin-session.types';
+import { RevokedMethod } from './hq-session.types';
 import * as crypto from 'crypto';
 import { UAParser } from 'ua-parser-js';
 
@@ -29,6 +34,10 @@ export class SessionManagementService {
     private prisma: PrismaService,
     private geoipService: GeoIPService,
     private auditLogService: AuditLogService,
+    private distributedLockService: DistributedLockService,
+    @Inject(forwardRef(() => CronJobMonitorService))
+    private cronMonitorService: CronJobMonitorService,
+    private requestContext: RequestContextService,
   ) {}
 
   /**
@@ -108,19 +117,30 @@ export class SessionManagementService {
 
   /**
    * 更新 session 最後使用時間
+   * @param oldRefreshToken 舊的 refresh token（用於找到 session）
+   * @param newRefreshToken 新的 refresh token（用於更新 session 的 hash）
    */
-  async updateSessionActivity(refreshToken: string): Promise<void> {
-    const refreshTokenHash = crypto
+  async updateSessionActivity(
+    oldRefreshToken: string,
+    newRefreshToken?: string,
+  ): Promise<void> {
+    const oldHash = crypto
       .createHash('sha256')
-      .update(refreshToken)
+      .update(oldRefreshToken)
       .digest('hex');
+
+    // 如果提供了新的 refresh token，則更新 hash；否則只更新 lastUsedAt
+    const newHash = newRefreshToken
+      ? crypto.createHash('sha256').update(newRefreshToken).digest('hex')
+      : undefined;
 
     await this.prisma.session.updateMany({
       where: {
-        refreshTokenHash,
+        refreshTokenHash: oldHash,
         revokedAt: null,
       },
       data: {
+        ...(newHash && { refreshTokenHash: newHash }),
         lastUsedAt: new Date(),
       },
     });
@@ -210,7 +230,7 @@ export class SessionManagementService {
         });
 
         await this.auditLogService.create({
-          requestId: crypto.randomUUID(), // 為系統操作生成唯一 ID
+          requestId: this.requestContext.getRequestIdOrGenerate(),
           userId,
           action: 'SESSION_REVOKED',
           entity: 'Session',
@@ -271,25 +291,7 @@ export class SessionManagementService {
         },
       });
 
-      // 同時清除 user 的 refresh token（如果是當前 session）
-      const user = await this.prisma.user.findUnique({
-        where: { id: userId },
-        select: { refreshToken: true },
-      });
-
-      if (user?.refreshToken) {
-        const userTokenHash = crypto
-          .createHash('sha256')
-          .update(user.refreshToken)
-          .digest('hex');
-
-        if (userTokenHash === session.refreshTokenHash) {
-          await this.prisma.user.update({
-            where: { id: userId },
-            data: { refreshToken: null },
-          });
-        }
-      }
+      // ✅ Refresh token 現在只存在 Session 表，不需要清除 User 表
 
       logger.info('[SessionManagement] Session revoked', {
         userId,
@@ -352,11 +354,7 @@ export class SessionManagementService {
       },
     });
 
-    // 同時清除 user 的 refresh token
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
-    });
+    // ✅ Refresh token 現在只存在 Session 表，不需要清除 User 表
 
     logger.info('[SessionManagement] All sessions revoked', {
       userId,
@@ -367,7 +365,7 @@ export class SessionManagementService {
   }
 
   /**
-   * 查詢使用者的活躍 sessions
+   * 查詢用戶的活躍 sessions
    */
   async getActiveSessions(
     userId: string,
@@ -430,13 +428,233 @@ export class SessionManagementService {
 
   /**
    * 清理過期的 sessions
+   * 根據 SESSION_TERMINOLOGY.md 規範：
+   * - 不刪除會話（保留作為審計記錄）
+   * - 標記過期會話為 AUTO_EXPIRE
+   * - 記錄 SESSION_EXPIRED audit log
    */
   private async cleanupExpiredSessions(userId: string): Promise<void> {
-    await this.prisma.session.deleteMany({
+    const now = new Date();
+
+    // 找出所有過期但尚未被標記的會話
+    const expiredSessions = await this.prisma.session.findMany({
       where: {
         userId,
-        OR: [{ expiresAt: { lt: new Date() } }, { revokedAt: { not: null } }],
+        expiresAt: { lt: now },
+        revokedAt: null, // 只處理尚未被標記的會話
       },
     });
+
+    // 標記過期會話並記錄審計日誌
+    for (const session of expiredSessions) {
+      // 更新會話狀態
+      await this.prisma.session.update({
+        where: { id: session.id },
+        data: {
+          revokedAt: now,
+          revokedMethod: RevokedMethod.AUTO_EXPIRE,
+          revokedReason: 'Session expired automatically',
+        },
+      });
+
+      // 記錄審計日誌
+      await this.auditLogService.create({
+        requestId: this.requestContext.getRequestIdOrGenerate(),
+        userId: session.userId,
+        action: 'SESSION_EXPIRED',
+        entity: 'Session',
+        entityId: session.id,
+        status: 'SUCCESS',
+        details: {
+          reason: 'Session expired automatically',
+          revokedMethod: RevokedMethod.AUTO_EXPIRE,
+          expiresAt: session.expiresAt,
+          deviceInfo: session.deviceInfo,
+          ipAddress: session.ipAddress,
+        },
+      });
+
+      logger.debug('[SessionManagement] Session expired and marked', {
+        sessionId: session.id,
+        userId: session.userId,
+        expiresAt: session.expiresAt,
+      });
+    }
+
+    if (expiredSessions.length > 0) {
+      logger.info('[SessionManagement] Cleaned up expired sessions', {
+        userId,
+        count: expiredSessions.length,
+      });
+    }
+  }
+
+  /**
+   * Cron Job: 定期掃描並標記所有過期會話
+   * 執行頻率: 每 6 小時
+   * 根據 SESSION_TERMINOLOGY.md 規範
+   *
+   * 使用分散式鎖防止多實例重複執行
+   */
+  @Cron('0 */6 * * *', {
+    name: 'cleanup-expired-sessions',
+    timeZone: 'Asia/Taipei',
+  })
+  async handleExpiredSessionsCleanup(): Promise<void> {
+    const jobName = 'cleanup-expired-sessions';
+    const jobType = 'cleanup';
+    const instanceId = process.env.INSTANCE_ID || 'default';
+
+    // 記錄執行開始
+    const executionId = await this.cronMonitorService.startExecution({
+      jobName,
+      jobType,
+      instanceId,
+    });
+
+    try {
+      // 使用分散式鎖執行任務
+      // TTL: 600 秒（10 分鐘），足夠執行整個清理任務
+      const lockAcquired = await this.distributedLockService.executeWithLock(
+        'cron:cleanup-expired-sessions',
+        async () => {
+          const now = new Date();
+
+          logger.info('[Cron] Starting expired sessions cleanup job', {
+            timestamp: now.toISOString(),
+            executionId,
+          });
+
+          // 找出所有過期但尚未被標記的會話
+          const expiredSessions = await this.prisma.session.findMany({
+            where: {
+              expiresAt: { lt: now },
+              revokedAt: null, // 只處理尚未被標記的會話
+            },
+            // 批量處理，避免記憶體問題
+            take: 1000,
+          });
+
+          logger.info('[Cron] Found expired sessions to process', {
+            count: expiredSessions.length,
+          });
+
+          let successCount = 0;
+          let errorCount = 0;
+
+          // 批量處理：使用 transaction 提升效能
+          const batchSize = 100;
+          for (let i = 0; i < expiredSessions.length; i += batchSize) {
+            const batch = expiredSessions.slice(i, i + batchSize);
+
+            try {
+              await this.prisma.$transaction(
+                async (tx) => {
+                  for (const session of batch) {
+                    // 更新會話狀態
+                    await tx.session.update({
+                      where: { id: session.id },
+                      data: {
+                        revokedAt: now,
+                        revokedMethod: RevokedMethod.AUTO_EXPIRE,
+                        revokedReason: 'Session expired automatically',
+                      },
+                    });
+
+                    // 記錄審計日誌
+                    await this.auditLogService.create({
+                      requestId: this.requestContext.getRequestIdOrGenerate(),
+                      userId: session.userId,
+                      action: 'SESSION_EXPIRED',
+                      entity: 'Session',
+                      entityId: session.id,
+                      status: 'SUCCESS',
+                      details: {
+                        reason: 'Session expired automatically',
+                        revokedMethod: RevokedMethod.AUTO_EXPIRE,
+                        expiresAt: session.expiresAt,
+                        deviceInfo: session.deviceInfo,
+                        ipAddress: session.ipAddress,
+                      },
+                    });
+
+                    successCount++;
+                  }
+                },
+                {
+                  maxWait: 5000, // 最多等待 5 秒獲取鎖
+                  timeout: 30000, // 30 秒超時
+                },
+              );
+
+              logger.debug('[Cron] Processed batch successfully', {
+                batchStart: i,
+                batchSize: batch.length,
+              });
+            } catch (error) {
+              errorCount += batch.length;
+              logger.error('[Cron] Failed to process batch', {
+                batchStart: i,
+                batchSize: batch.length,
+                error: error instanceof Error ? error.message : 'Unknown error',
+              });
+            }
+          }
+
+          logger.info('[Cron] Expired sessions cleanup job completed', {
+            totalProcessed: expiredSessions.length,
+            successCount,
+            errorCount,
+            timestamp: new Date().toISOString(),
+          });
+
+          // 記錄執行成功
+          await this.cronMonitorService.completeExecution({
+            executionId,
+            status: CronJobStatus.SUCCESS,
+            processedCount: expiredSessions.length,
+            successCount,
+            errorCount,
+            details: {
+              batchSize: 100,
+              maxRecords: 1000,
+            },
+          });
+
+          return true;
+        },
+        600, // TTL: 10 分鐘
+      );
+
+      // 如果無法獲取鎖，記錄為 SKIPPED
+      if (!lockAcquired) {
+        await this.cronMonitorService.recordSkipped({
+          jobName,
+          jobType,
+          instanceId,
+          reason:
+            'Could not acquire distributed lock (another instance is running)',
+        });
+      }
+    } catch (error) {
+      logger.error('[Cron] Expired sessions cleanup job failed', {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        executionId,
+      });
+
+      // 記錄執行失敗
+      await this.cronMonitorService.completeExecution({
+        executionId,
+        status: CronJobStatus.FAILED,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorStack: error instanceof Error ? error.stack : undefined,
+      });
+
+      // 檢查告警
+      await this.cronMonitorService.checkAndAlert(executionId);
+
+      // 不拋出錯誤，讓下次 Cron 繼續執行
+    }
   }
 }
