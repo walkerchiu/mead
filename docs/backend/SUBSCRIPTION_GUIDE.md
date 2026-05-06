@@ -4,15 +4,15 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [GraphQL Subscription 實現指南 (Subscription Guide)](#graphql-subscription-實現指南-subscription-guide)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [✨ 為什麼需要 Subscription？](#-為什麼需要-subscription)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [為什麼需要 Subscription？](#為什麼需要-subscription)
     - [適合使用 Subscription](#適合使用-subscription)
     - [不適合使用 Subscription](#不適合使用-subscription)
-  - [🎯 已實現範例：審計日誌實時訂閱](#-已實現範例審計日誌實時訂閱)
+  - [已實現範例：審計日誌實時訂閱](#已實現範例審計日誌實時訂閱)
     - [功能描述](#功能描述)
     - [架構圖](#架構圖)
     - [後端實現](#後端實現)
@@ -23,37 +23,37 @@
       - [1. Apollo Client 配置](#1-apollo-client-配置)
       - [2. Subscription Hook](#2-subscription-hook)
       - [3. GraphQL Query](#3-graphql-query)
-  - [🔒 安全機制](#-安全機制)
+  - [安全機制](#安全機制)
     - [1. WebSocket JWT 驗證](#1-websocket-jwt-驗證)
     - [2. Filter-based 權限檢查](#2-filter-based-權限檢查)
     - [3. 字段級權限過濾](#3-字段級權限過濾)
-  - [🔄 替代方案（若不使用 Subscription）](#-替代方案若不使用-subscription)
+  - [替代方案（若不使用 Subscription）](#替代方案若不使用-subscription)
     - [1. 輪詢 (Polling)](#1-輪詢-polling)
     - [2. Server-Sent Events (SSE)](#2-server-sent-events-sse)
-  - [🚀 實現步驟（擴展到其他功能）](#-實現步驟擴展到其他功能)
-    - [階段 1：依賴已安裝 ✅](#階段-1依賴已安裝-)
-    - [階段 2：GraphQL Module 已配置 ✅](#階段-2graphql-module-已配置-)
+  - [實現步驟（擴展到其他功能）](#實現步驟擴展到其他功能)
+    - [階段 1：依賴已安裝](#階段-1依賴已安裝-)
+    - [階段 2：GraphQL Module 已配置](#階段-2graphql-module-已配置-)
     - [階段 3：創建新的 PubSub Service](#階段-3創建新的-pubsub-service)
     - [階段 4：創建 Subscription Resolver](#階段-4創建-subscription-resolver)
     - [階段 5：前端使用](#階段-5前端使用)
-  - [🚀 生產環境建議](#-生產環境建議)
+  - [生產環境建議](#生產環境建議)
     - [1. 使用 Redis PubSub](#1-使用-redis-pubsub)
     - [2. 連接數限制](#2-連接數限制)
     - [3. 監控指標](#3-監控指標)
-  - [🧪 測試](#-測試)
+  - [測試](#測試)
     - [後端單元測試](#後端單元測試)
     - [前端整合測試](#前端整合測試)
     - [E2E 測試](#e2e-測試)
-  - [🚨 常見問題與除錯](#-常見問題與除錯)
+  - [常見問題與除錯](#常見問題與除錯)
     - [1. WebSocket 連接失敗](#1-websocket-連接失敗)
     - [2. Subscription 未收到資料](#2-subscription-未收到資料)
     - [3. "Unauthorized" 錯誤](#3-unauthorized-錯誤)
     - [4. 記憶體洩漏](#4-記憶體洩漏)
-  - [📚 參考資源](#-參考資源)
+  - [參考資源](#參考資源)
     - [官方文檔](#官方文檔)
     - [進階主題](#進階主題)
     - [相關文檔](#相關文檔)
-  - [🎯 下一步](#-下一步)
+  - [下一步](#下一步)
     - [立即可做](#立即可做)
     - [短期規劃（1-2 週）](#短期規劃1-2-週)
     - [中期規劃（1-2 月）](#中期規劃1-2-月)
@@ -61,33 +61,33 @@
 
 ---
 
-## 📖 概述
+## 概述
 
 本文檔說明專案中已實現的 GraphQL Subscription（實時訂閱）功能，以及如何擴展到其他使用場景。
 
 ---
 
-## ✨ 為什麼需要 Subscription？
+## 為什麼需要 Subscription？
 
 GraphQL Subscription 適用於需要**實時推送**的場景：
 
 ### 適合使用 Subscription
 
-- 📱 **即時通訊** - 聊天消息、群組通知
-- 🔔 **系統通知** - 用戶狀態變更、訂單更新
-- 🎮 **協作編輯** - 多人同時編輯文檔
-- 📊 **實時數據** - 股票價格、儀表板數據
-- 👥 **在線狀態** - 用戶上線/離線通知
+- **即時通訊** - 聊天消息、群組通知
+- **系統通知** - 用戶狀態變更、訂單更新
+- **協作編輯** - 多人同時編輯文檔
+- **實時數據** - 股票價格、儀表板數據
+- **在線狀態** - 用戶上線/離線通知
 
 ### 不適合使用 Subscription
 
-- 📄 **靜態內容** - 使用 Query 即可
-- 🔄 **低頻更新** - 使用輪詢更簡單
-- 📦 **批量數據** - Subscription 會產生大量連接
+- **靜態內容** - 使用 Query 即可
+- **低頻更新** - 使用輪詢更簡單
+- **批量數據** - Subscription 會產生大量連接
 
 ---
 
-## 🎯 已實現範例：審計日誌實時訂閱
+## 已實現範例：審計日誌實時訂閱
 
 ### 功能描述
 
@@ -290,7 +290,7 @@ export const AUDIT_LOG_CREATED_SUBSCRIPTION = gql`
 
 ---
 
-## 🔒 安全機制
+## 安全機制
 
 ### 1. WebSocket JWT 驗證
 
@@ -362,7 +362,7 @@ filter: (payload, variables, context) => {
 
 ---
 
-## 🔄 替代方案（若不使用 Subscription）
+## 替代方案（若不使用 Subscription）
 
 ### 1. 輪詢 (Polling)
 
@@ -387,9 +387,9 @@ auditLogs(@Request() req): Observable<MessageEvent> {
 
 ---
 
-## 🚀 實現步驟（擴展到其他功能）
+## 實現步驟（擴展到其他功能）
 
-### 階段 1：依賴已安裝 ✅
+### 階段 1：依賴已安裝
 
 ```bash
 # 已安裝的套件
@@ -399,7 +399,7 @@ auditLogs(@Request() req): Observable<MessageEvent> {
 ✅ @types/ws
 ```
 
-### 階段 2：GraphQL Module 已配置 ✅
+### 階段 2：GraphQL Module 已配置
 
 **位置**: `apps/backend/src/app.module.ts`
 
@@ -516,7 +516,7 @@ export const useNotificationSubscription = () => {
 
 ---
 
-## 🚀 生產環境建議
+## 生產環境建議
 
 ### 1. 使用 Redis PubSub
 
@@ -644,7 +644,7 @@ emitAuditLogCreated(log: any) {
 
 ---
 
-## 🧪 測試
+## 測試
 
 ### 後端單元測試
 
@@ -730,7 +730,7 @@ describe('Audit Log Subscription E2E', () => {
 
 ---
 
-## 🚨 常見問題與除錯
+## 常見問題與除錯
 
 ### 1. WebSocket 連接失敗
 
@@ -851,7 +851,7 @@ subscriptions: {
 
 ---
 
-## 📚 參考資源
+## 參考資源
 
 ### 官方文檔
 
@@ -874,7 +874,7 @@ subscriptions: {
 
 ---
 
-## 🎯 下一步
+## 下一步
 
 ### 立即可做
 

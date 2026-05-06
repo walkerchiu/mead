@@ -4,55 +4,55 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [用戶註冊系統](#用戶註冊系統)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🔧 註冊端點](#-註冊端點)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [註冊端點](#註冊端點)
     - [1. `registerCustomer` - 註冊客戶用戶](#1-registercustomer---註冊客戶用戶)
     - [2. `registerHQ` - 註冊管理員用戶](#2-registerhq---註冊管理員用戶)
-  - [🔒 密碼要求](#-密碼要求)
-  - [🎯 訪問層級說明](#-訪問層級說明)
+  - [密碼要求](#密碼要求)
+  - [訪問層級說明](#訪問層級說明)
     - [CUSTOMER_SCOPE 客戶層級](#customer_scope-客戶層級)
     - [HQ_SCOPE 管理員層級](#hq_scope-管理員層級)
-  - [🚀 初始化系統](#-初始化系統)
+  - [初始化系統](#初始化系統)
     - [方法 1：使用 Seed 腳本（推薦）](#方法-1使用-seed-腳本推薦)
     - [方法 2：直接在數據庫創建](#方法-2直接在數據庫創建)
-  - [📝 完整使用流程](#-完整使用流程)
+  - [完整使用流程](#完整使用流程)
     - [步驟 1：使用 Seed 創建初始管理員](#步驟-1使用-seed-創建初始管理員)
     - [步驟 2：管理員登入](#步驟-2管理員登入)
     - [步驟 3：管理員創建新客戶](#步驟-3管理員創建新客戶)
     - [步驟 4：客戶邀請團隊成員](#步驟-4客戶邀請團隊成員)
-  - [🔐 HTTP Headers 設置](#-http-headers-設置)
-  - [🚨 錯誤處理](#-錯誤處理)
+  - [HTTP Headers 設置](#http-headers-設置)
+  - [錯誤處理](#錯誤處理)
     - [常見錯誤](#常見錯誤)
       - [1. `UNAUTHENTICATED` - 未登入](#1-unauthenticated---未登入)
       - [2. `FORBIDDEN` - 權限不足](#2-forbidden---權限不足)
       - [3. `CONFLICT` - Email 已存在](#3-conflict---email-已存在)
       - [4. `BAD_USER_INPUT` - 密碼強度不足](#4-bad_user_input---密碼強度不足)
-  - [🔒 安全考量](#-安全考量)
+  - [安全考量](#安全考量)
     - [1. **不提供公開註冊**](#1-不提供公開註冊)
     - [2. **層級權限分離**](#2-層級權限分離)
     - [3. **密碼強度驗證**](#3-密碼強度驗證)
     - [4. **JWT Token 管理**](#4-jwt-token-管理)
-  - [❓ 常見問題 (FAQ)](#-常見問題-faq)
+  - [常見問題 (FAQ)](#常見問題-faq)
     - [Q: 如果沒有任何用戶，如何創建第一個管理員？](#q-如果沒有任何用戶如何創建第一個管理員)
     - [Q: 客戶可以邀請無限多的用戶嗎？](#q-客戶可以邀請無限多的用戶嗎)
     - [Q: 創建的用戶會自動分配角色嗎？](#q-創建的用戶會自動分配角色嗎)
     - [Q: 可以將 Customer 升級為 HQ 嗎？](#q-可以將-customer-升級為-hq-嗎)
     - [Q: 密碼可以在註冊後修改嗎？](#q-密碼可以在註冊後修改嗎)
-  - [📖 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 本系統採用**受邀請制註冊**，不提供公開註冊端點。新用戶需要由現有的 Customer 或 HQ 用戶創建。
 
 ---
 
-## 🔧 註冊端點
+## 註冊端點
 
 ### 1. `registerCustomer` - 註冊客戶用戶
 
@@ -139,16 +139,16 @@ mutation RegisterHQ($email: String!, $password: String!, $name: String) {
 
 ---
 
-## 🔒 密碼要求
+## 密碼要求
 
 **適用於**：終端用戶註冊/登入的帳號密碼
 
 所有註冊都需要符合密碼強度要求：
 
-✅ **最少 8 個字符**  
-✅ **至少一個大寫字母** (A-Z)  
-✅ **至少一個小寫字母** (a-z)  
-✅ **至少一個數字** (0-9)  
+✅ **最少 8 個字符**
+✅ **至少一個大寫字母** (A-Z)
+✅ **至少一個小寫字母** (a-z)
+✅ **至少一個數字** (0-9)
 ✅ **至少一個特殊符號** (!@#$%^&\* 等)
 
 > **注意**：這是用戶帳號密碼的要求。
@@ -170,7 +170,7 @@ mutation RegisterHQ($email: String!, $password: String!, $name: String) {
 
 ---
 
-## 🎯 訪問層級說明
+## 訪問層級說明
 
 ### CUSTOMER_SCOPE 客戶層級
 
@@ -203,7 +203,7 @@ mutation RegisterHQ($email: String!, $password: String!, $name: String) {
 
 ---
 
-## 🚀 初始化系統
+## 初始化系統
 
 ### 方法 1：使用 Seed 腳本（推薦）
 
@@ -216,7 +216,8 @@ pnpm db:seed
 
 這將創建：
 
-- ✅ `hq@example.com` (HQ_SCOPE, 密碼: `Password123!`)
+- ✅ `hq@example.com` (HQ_SCOPE + CUSTOMER_SCOPE, 密碼: `Password123!`)
+- ✅ `admin@example.com` (CUSTOMER_SCOPE / OWNER, 密碼: `Password123!`)
 - ✅ `public@example.com` (PUBLIC_SCOPE, 密碼: `Password123!`)
 
 ### 方法 2：直接在數據庫創建
@@ -232,7 +233,7 @@ npx prisma studio
 
 ---
 
-## 📝 完整使用流程
+## 完整使用流程
 
 ### 步驟 1：使用 Seed 創建初始管理員
 
@@ -293,7 +294,7 @@ mutation InviteTeamMember {
 
 ---
 
-## 🔐 HTTP Headers 設置
+## HTTP Headers 設置
 
 所有需要認證的請求都需要包含 JWT Token：
 
@@ -314,7 +315,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## 🚨 錯誤處理
+## 錯誤處理
 
 ### 常見錯誤
 
@@ -352,8 +353,7 @@ curl -X POST http://localhost:4000/graphql \
 
 **原因**：
 
-- 客戶用戶嘗試調用 `registerHQ` ❌
-- PUBLIC_SCOPE 用戶嘗試註冊新用戶 ❌
+- 客戶用戶嘗試調用 `registerHQ` ❌ - PUBLIC_SCOPE 用戶嘗試註冊新用戶 ❌
 
 #### 3. `CONFLICT` - Email 已存在
 
@@ -391,7 +391,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## 🔒 安全考量
+## 安全考量
 
 ### 1. **不提供公開註冊**
 
@@ -419,7 +419,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## ❓ 常見問題 (FAQ)
+## 常見問題 (FAQ)
 
 ### Q: 如果沒有任何用戶，如何創建第一個管理員？
 
@@ -443,7 +443,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 - [RBAC Architecture](./RBAC_ARCHITECTURE.md) - 角色權限系統架構
 - [Token Configuration](./TOKEN-CONFIGURATION.md) - JWT Token 配置

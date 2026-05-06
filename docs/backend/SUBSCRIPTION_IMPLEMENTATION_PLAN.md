@@ -2,59 +2,59 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [GraphQL Subscriptions 擴展實作計劃](#graphql-subscriptions-擴展實作計劃)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🏗️ 現有基礎](#️-現有基礎)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [現有基礎](#現有基礎)
     - [已實現的架構](#已實現的架構)
     - [已安裝的套件](#已安裝的套件)
     - [現有程式碼參考](#現有程式碼參考)
-  - [✅ 已實現功能](#-已實現功能)
-    - [1. 資料模型 ✅](#1-資料模型-)
+  - [已實現功能](#已實現功能)
+    - [1. 資料模型](#1-資料模型-)
       - [Notification Model](#notification-model)
       - [NotificationPreferences Model](#notificationpreferences-model)
-    - [2. 後端 API ✅](#2-後端-api-)
+    - [2. 後端 API](#2-後端-api-)
       - [NotificationService](#notificationservice)
       - [NotificationPubSubService](#notificationpubsubservice)
       - [GraphQL Resolver](#graphql-resolver)
-    - [3. 前端整合 ✅](#3-前端整合-)
+    - [3. 前端整合](#3-前端整合-)
       - [UI 組件（Atomic Design）](#ui-組件atomic-design)
       - [Hooks](#hooks)
       - [頁面](#頁面)
       - [GraphQL Operations](#graphql-operations)
-    - [4. 文檔與測試 ⚠️](#4-文檔與測試-️)
-  - [📝 實作摘要](#-實作摘要)
+    - [4. 文檔與測試](#4-文檔與測試-️)
+  - [實作摘要](#實作摘要)
     - [完成的 Commits](#完成的-commits)
     - [關鍵技術決策](#關鍵技術決策)
-  - [🎯 原計劃場景對照](#-原計劃場景對照)
-    - [場景 1: 用戶通知訂閱 ✅ **已完成**](#場景-1-用戶通知訂閱--已完成)
-  - [🔮 未來擴展（選擇性）](#-未來擴展選擇性)
-    - [場景 2: 系統狀態訂閱 🔧 **未實作**](#場景-2-系統狀態訂閱--未實作)
-    - [場景 3: 協作功能訂閱 🤝 **未實作**](#場景-3-協作功能訂閱--未實作)
-  - [📚 實作參考（已完成）](#-實作參考已完成)
-    - [資料模型設計 ✅](#資料模型設計-)
-    - [後端實作 ✅](#後端實作-)
-    - [前端實作 ✅](#前端實作-)
-  - [🧪 測試狀態](#-測試狀態)
-    - [已完成 ✅](#已完成-)
-    - [待補充 ⚠️](#待補充-️)
+  - [原計劃場景對照](#原計劃場景對照)
+    - [場景 1: 用戶通知訂閱 **已完成**](#場景-1-用戶通知訂閱--已完成)
+  - [未來擴展（選擇性）](#未來擴展選擇性)
+    - [場景 2: 系統狀態訂閱 **未實作**](#場景-2-系統狀態訂閱--未實作)
+    - [場景 3: 協作功能訂閱 **未實作**](#場景-3-協作功能訂閱--未實作)
+  - [實作參考（已完成）](#實作參考已完成)
+    - [資料模型設計](#資料模型設計-)
+    - [後端實作](#後端實作-)
+    - [前端實作](#前端實作-)
+  - [測試狀態](#測試狀態)
+    - [已完成](#已完成-)
+    - [待補充](#待補充-️)
     - [測試建議](#測試建議)
-  - [🚀 部署狀態](#-部署狀態)
-    - [開發環境 ✅](#開發環境-)
-    - [Staging 環境 ⚠️](#staging-環境-️)
-    - [Production 環境 🔴](#production-環境-)
-  - [📊 效能與監控](#-效能與監控)
-    - [已配置 ✅](#已配置-)
+  - [部署狀態](#部署狀態)
+    - [開發環境](#開發環境-)
+    - [Staging 環境](#staging-環境-️)
+    - [Production 環境](#production-環境-)
+  - [效能與監控](#效能與監控)
+    - [已配置](#已配置-)
     - [建議監控指標](#建議監控指標)
     - [效能優化建議](#效能優化建議)
-  - [📚 相關文檔](#-相關文檔)
-  - [🎉 完成總結](#-完成總結)
+  - [相關文檔](#相關文檔)
+  - [完成總結](#完成總結)
 
 ---
 
-## 📖 概述
+## 概述
 
 **目標**: 基於現有的審計日誌訂閱實現，擴展 GraphQL Subscriptions 到更多業務場景。✅ **已完成**
 
@@ -70,12 +70,12 @@
 - ✅ 用戶通知訂閱（完整實現）
 - ✅ 通知偏好設定系統
 - ✅ 系統廣播通知
-- ⏭️ 系統狀態訂閱（選擇性，未實作）
-- ⏭️ 協作功能訂閱（選擇性，未實作）
+- 系統狀態訂閱（選擇性，未實作）
+- 協作功能訂閱（選擇性，未實作）
 
 ---
 
-## 🏗️ 現有基礎
+## 現有基礎
 
 ### 已實現的架構
 
@@ -110,9 +110,9 @@ Subscription Resolvers
 
 ---
 
-## ✅ 已實現功能
+## 已實現功能
 
-### 1. 資料模型 ✅
+### 1. 資料模型
 
 #### Notification Model
 
@@ -174,7 +174,7 @@ model NotificationPreferences {
 }
 ```
 
-### 2. 後端 API ✅
+### 2. 後端 API
 
 #### NotificationService
 
@@ -220,7 +220,7 @@ model NotificationPreferences {
 - ✅ `notificationCreated` - 訂閱用戶通知（含權限過濾）
 - ✅ `notificationBroadcast` - 訂閱系統廣播
 
-### 3. 前端整合 ✅
+### 3. 前端整合
 
 #### UI 組件（Atomic Design）
 
@@ -243,7 +243,7 @@ model NotificationPreferences {
 - ✅ TypeScript 介面定義
 - ✅ Fragment 優化
 
-### 4. 文檔與測試 ⚠️
+### 4. 文檔與測試
 
 - ✅ TypeScript 型別檢查通過
 - ✅ ESLint 檢查通過
@@ -254,7 +254,7 @@ model NotificationPreferences {
 
 ---
 
-## 📝 實作摘要
+## 實作摘要
 
 ### 完成的 Commits
 
@@ -274,9 +274,9 @@ model NotificationPreferences {
 
 ---
 
-## 🎯 原計劃場景對照
+## 原計劃場景對照
 
-### 場景 1: 用戶通知訂閱 ✅ **已完成**
+### 場景 1: 用戶通知訂閱 **已完成**
 
 **使用情境**:
 
@@ -319,9 +319,9 @@ useEffect(() => {
 
 ---
 
-## 🔮 未來擴展（選擇性）
+## 未來擴展（選擇性）
 
-### 場景 2: 系統狀態訂閱 🔧 **未實作**
+### 場景 2: 系統狀態訂閱 **未實作**
 
 **使用情境**:
 
@@ -348,7 +348,7 @@ subscription OnSystemStatusChanged {
 
 ---
 
-### 場景 3: 協作功能訂閱 🤝 **未實作**
+### 場景 3: 協作功能訂閱 **未實作**
 
 **使用情境**:
 
@@ -373,9 +373,9 @@ subscription OnUserPresenceChanged($documentId: ID!) {
 
 ---
 
-## 📚 實作參考（已完成）
+## 實作參考（已完成）
 
-### 資料模型設計 ✅
+### 資料模型設計
 
 **檔案位置**:
 
@@ -397,7 +397,7 @@ pnpm --filter @npt/backend db:generate
 
 ---
 
-### 後端實作 ✅
+### 後端實作
 
 **檔案位置**:
 
@@ -418,7 +418,7 @@ pnpm --filter @npt/backend db:generate
 
 ---
 
-### 前端實作 ✅
+### 前端實作
 
 **檔案位置**:
 
@@ -440,9 +440,9 @@ pnpm --filter @npt/backend db:generate
 
 ---
 
-## 🧪 測試狀態
+## 測試狀態
 
-### 已完成 ✅
+### 已完成
 
 - [x] TypeScript 型別檢查
 - [x] ESLint 程式碼檢查
@@ -450,7 +450,7 @@ pnpm --filter @npt/backend db:generate
 - [x] 手動功能測試
 - [x] 即時訂閱測試
 
-### 待補充 ⚠️
+### 待補充
 
 - [ ] 後端單元測試
   - [ ] NotificationService 測試
@@ -493,9 +493,9 @@ describe('Notification Subscription (e2e)', () => {
 
 ---
 
-## 🚀 部署狀態
+## 部署狀態
 
-### 開發環境 ✅
+### 開發環境
 
 - [x] 執行 TypeScript 檢查 `pnpm type-check`
 - [x] 執行 Linter `pnpm lint`
@@ -504,7 +504,7 @@ describe('Notification Subscription (e2e)', () => {
 - [x] 資料庫 Migration
 - [ ] 執行單元測試 `pnpm test`（待補充）
 
-### Staging 環境 ⚠️
+### Staging 環境
 
 - [x] 確認 Redis 已啟用
 - [ ] 測試 WebSocket 連線
@@ -513,7 +513,7 @@ describe('Notification Subscription (e2e)', () => {
 - [ ] 監控連線數
 - [ ] 負載測試
 
-### Production 環境 🔴
+### Production 環境
 
 - [ ] 設定連線數限制
 - [ ] 設定監控警報
@@ -523,9 +523,9 @@ describe('Notification Subscription (e2e)', () => {
 
 ---
 
-## 📊 效能與監控
+## 效能與監控
 
-### 已配置 ✅
+### 已配置
 
 **WebSocket 配置** (in `app.module.ts`):
 
@@ -564,20 +564,17 @@ subscriptions: {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [GraphQL Subscriptions 實現指南](./SUBSCRIPTION_GUIDE.md) - 完整的實作說明
-- [專案路線圖](../PROJECT_ROADMAP.md) - 整體規劃
 - [Redis 配置](../infrastructure/RABBITMQ_DRAGONFLY.md) - Redis PubSub 設定
 - [通知系統 README](../../apps/frontend/src/components/organisms/NotificationCenter/README.md) - 前端組件文檔
 
 ---
 
-## 🎉 完成總結
+## 完成總結
 
-**實作已完成！** ✅
-
-本專案成功實現了完整的通知系統，包含：
+**實作已完成！** ✅本專案成功實現了完整的通知系統，包含：
 
 1. ✅ **完整的資料模型** - Notification + NotificationPreferences
 2. ✅ **強大的後端 API** - 14 個 API 端點（查詢、變更、訂閱）

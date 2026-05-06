@@ -2,13 +2,19 @@
 
 > 本文件是 [組件庫總覽](../COMPONENT_LIBRARY.md) 的一部分，專注於 Atomic Design 的第二層 — Molecules（分子組件）。
 
-## 📋 本文件涵蓋
+## 本文件涵蓋
 
 由多個 Atoms 組合而成的功能性 UI 單元，例如表單欄位（Label + Input + Helper Text）、導航項、通知卡片等。
 
 ---
 
-### 🟢 Molecules（分子組件）
+## 目錄
+
+- [本文件涵蓋](#本文件涵蓋)
+  - [Molecules（分子組件）](#molecules分子組件)
+  - [Toast 通知配置](#toast-通知配置)
+
+### Molecules（分子組件）
 
 由 2-3 個原子組件組合而成，具有簡單的業務邏輯。
 
@@ -226,14 +232,14 @@ interface DetailRowProps {
 
 **特性**:
 
-- 📐 三種靈活的佈局模式
-- 🤖 智能自動佈局選擇
-- 📋 一鍵複製功能（帶視覺反饋）
-- 🎨 統一的樣式和間距
-- 🖼️ 可選圖示支援
-- 🔤 支援 ReactNode 自訂渲染
-- ⏱️ 複製成功提示（2 秒自動消失）
-- 🌐 國際化支援（複製/已複製文字）
+- 三種靈活的佈局模式
+- 智能自動佈局選擇
+- 一鍵複製功能（帶視覺反饋）
+- 統一的樣式和間距
+- 可選圖示支援
+- 支援 ReactNode 自訂渲染
+- 複製成功提示（2 秒自動消失）
+- 國際化支援（複製/已複製文字）
 
 **複製功能細節**:
 
@@ -395,12 +401,12 @@ const {
 
 **特性**:
 
-- ♾️ 無限滾動自動載入
-- 👁️ Intersection Observer API（性能優化）
-- 📏 提前 100px 開始載入（rootMargin）
-- 🎯 智能載入控制（避免重複請求）
-- 💬 結束提示訊息
-- 🔄 完整的 CRUD 操作支援
+- 無限滾動自動載入
+- Intersection Observer API（性能優化）
+- 提前 100px 開始載入（rootMargin）
+- 智能載入控制（避免重複請求）
+- 結束提示訊息
+- 完整的 CRUD 操作支援
 
 **技術細節**:
 
@@ -507,10 +513,8 @@ interface LanguageSwitcherProps {
 
 **支援語言**:
 
-- English (en) 🇺🇸
-- Traditional Chinese (zh-TW) 🇹🇼
-
-**使用場景**:
+- English (en)- Traditional Chinese (zh-TW)
+  **使用場景**:
 
 - 應用程式頂部導航列
 - 用戶偏好設定
@@ -599,11 +603,11 @@ const [readStatus, setReadStatus] = useState<ReadStatusFilter>('all');
 
 **特性**:
 
-- 🔍 搜尋框支援 debounce（避免頻繁 API 請求）
-- 📋 類型下拉選單（全部/資訊/成功/警告/錯誤）
+- 搜尋框支援 debounce（避免頻繁 API 請求）
+- 類型下拉選單（全部/資訊/成功/警告/錯誤）
 - ✅ 已讀狀態 Chips（全部/未讀/已讀）
-- 📱 響應式設計（手機版垂直排列，桌面版水平排列）
-- 🌐 完整國際化支援
+- 響應式設計（手機版垂直排列，桌面版水平排列）
+- 完整國際化支援
 
 **使用場景**:
 
@@ -733,14 +737,14 @@ interface BreadcrumbItem {
 
 **特性**:
 
-- 📐 響應式設計（標題和字體大小自動調整）
-- 🔙 可選的返回按鈕
-- 🍞 麵包屑導航支援
-- 🎨 支援 emoji 或 React 元素作為圖示
-- 📝 可選的描述文字
-- ⚡ 右側操作按鈕區域
-- 🎭 兩種樣式（elevated 卡片 / flat 平面）
-- ♿ 完整的無障礙支援
+- 響應式設計（標題和字體大小自動調整）
+- 可選的返回按鈕
+- 麵包屑導航支援
+- 支援 emoji 或 React 元素作為圖示
+- 可選的描述文字
+- 右側操作按鈕區域
+- 兩種樣式（elevated 卡片 / flat 平面）
+- 完整的無障礙支援
 
 **使用場景**:
 
@@ -778,9 +782,9 @@ interface BreadcrumbItem {
 
 **特性**:
 
-- 👁️ 顯示/隱藏密碼
+- 顯示/隱藏密碼
 - ✅ 表單驗證支援
-- 🔒 自動完成處理
+- 自動完成處理
 
 **Storybook**: ✅ `PasswordField.stories.tsx`
 
@@ -1171,4 +1175,4 @@ function MyComponent() {
 
 ---
 
-📚 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)
+**相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)

@@ -2,7 +2,7 @@
 
 基於 RBAC 的細粒度欄位級別訪問控制，動態控制 GraphQL 響應中的欄位可見性。
 
-> **🔗 相關文檔**
+> **相關文檔**
 >
 > - [RBAC 架構](./RBAC_ARCHITECTURE.md) - 角色權限基礎架構
 > - [Row-Level Security](./ROW_LEVEL_SECURITY.md) - 資料行級別過濾（RLS）
@@ -11,61 +11,61 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Field-Level Authorization 欄位級別授權](#field-level-authorization-欄位級別授權)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [核心特性](#核心特性)
     - [與相關系統的關係](#與相關系統的關係)
-  - [🏗️ 架構設計](#️-架構設計)
+  - [架構設計](#架構設計)
     - [1. 裝飾器層 (Decorator Layer)](#1-裝飾器層-decorator-layer)
     - [2. Plugin 層 (Plugin Layer)](#2-plugin-層-plugin-layer)
     - [3. Metadata Cache](#3-metadata-cache)
-  - [📝 使用方式](#-使用方式)
+  - [使用方式](#使用方式)
     - [標記敏感欄位](#標記敏感欄位)
     - [測試結果示例](#測試結果示例)
       - [HQ 查詢 (HQ_SCOPE)](#hq-查詢-hq_scope)
       - [Customer 查詢 (CUSTOMER_SCOPE)](#customer-查詢-customer_scope)
       - [Public 查詢 (無 Token)](#public-查詢-無-token)
-  - [📊 權限矩陣](#-權限矩陣)
-  - [⚡ 效能優化](#-效能優化)
+  - [權限矩陣](#權限矩陣)
+  - [效能優化](#效能優化)
     - [設計原則](#設計原則)
     - [效能指標](#效能指標)
-  - [🔗 與 RBAC 的關係](#-與-rbac-的關係)
-  - [🔧 擴展指南](#-擴展指南)
+  - [與 RBAC 的關係](#與-rbac-的關係)
+  - [擴展指南](#擴展指南)
     - [添加新的裝飾器](#添加新的裝飾器)
     - [在 Plugin 中實作邏輯](#在-plugin-中實作邏輯)
     - [動態規則 (未來擴展)](#動態規則-未來擴展)
-  - [⚠️ 已知限制](#️-已知限制)
-  - [🧪 測試](#-測試)
+  - [已知限制](#已知限制)
+  - [測試](#測試)
     - [單元測試](#單元測試)
-  - [🔒 安全性考量](#-安全性考量)
-    - [✅ 已實作的保護](#-已實作的保護)
-    - [⚠️ 注意事項](#️-注意事項)
-  - [🚨 故障排除](#-故障排除)
+  - [安全性考量](#安全性考量)
+    - [已實作的保護](#已實作的保護)
+    - [注意事項](#注意事項)
+  - [故障排除](#故障排除)
     - [欄位沒有被過濾](#欄位沒有被過濾)
     - [效能問題](#效能問題)
     - [Debug 模式](#debug-模式)
-  - [📖 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 Field-Level Authorization 是基於 RBAC 系統的擴展，提供**細粒度的欄位級別訪問控制**。它允許根據用戶的 AccessScope 和 Permissions 動態控制 GraphQL 響應中的欄位可見性。
 
 ### 核心特性
 
-- 🔒 **欄位級別控制** - 精確控制每個欄位的可見性
-- 🚀 **零資料庫查詢** - 所有權限從 JWT Token 讀取
-- ⚡ **O(1) 效能** - 使用 Set 實現常數時間權限檢查
-- 🎯 **裝飾器驅動** - 使用 TypeScript 裝飾器標記敏感欄位
-- 🔄 **自動過濾** - GraphQL Plugin 自動過濾不符合權限的欄位
+- **欄位級別控制** - 精確控制每個欄位的可見性
+- **零資料庫查詢** - 所有權限從 JWT Token 讀取
+- **O(1) 效能** - 使用 Set 實現常數時間權限檢查
+- **裝飾器驅動** - 使用 TypeScript 裝飾器標記敏感欄位
+- **自動過濾** - GraphQL Plugin 自動過濾不符合權限的欄位
 
 ### 與相關系統的關係
 
-> **🔗 相關文檔**
+> **相關文檔**
 >
 > - [RBAC 架構](./RBAC_ARCHITECTURE.md) - 角色權限基礎架構
 > - [Row-Level Security](./ROW_LEVEL_SECURITY.md) - 資料行級別過濾（RLS）
@@ -74,7 +74,7 @@ Field-Level Authorization 是基於 RBAC 系統的擴展，提供**細粒度的�
 
 ---
 
-## 🏗️ 架構設計
+## 架構設計
 
 ### 1. 裝飾器層 (Decorator Layer)
 
@@ -186,7 +186,7 @@ export class UserModule implements OnModuleInit {
 
 ---
 
-## 📝 使用方式
+## 使用方式
 
 ### 標記敏感欄位
 
@@ -276,7 +276,7 @@ query {
 
 ---
 
-## 📊 權限矩陣
+## 權限矩陣
 
 | 欄位         | PUBLIC | CUSTOMER (他人) | CUSTOMER (自己) | HQ  | 裝飾器                                |
 | ------------ | ------ | --------------- | --------------- | --- | ------------------------------------- |
@@ -292,7 +292,7 @@ query {
 
 ---
 
-## ⚡ 效能優化
+## 效能優化
 
 ### 設計原則
 
@@ -344,12 +344,11 @@ query {
 - **單個請求 overhead**: < 5ms（實測）
 - **1000 物件過濾**: < 50ms
 - **記憶體增長**: < 1MB
-- **額外 DB 查詢**: 0 次 ✅
-- **測試覆蓋率**: 100% (9/9 測試通過) ✅
+- **額外 DB 查詢**: 0 次 ✅ - **測試覆蓋率**: 100% (9/9 測試通過) ✅
 
 ---
 
-## 🔗 與 RBAC 的關係
+## 與 RBAC 的關係
 
 Field-Level Authorization 是 RBAC 系統的**補充而非替代**：
 
@@ -378,7 +377,7 @@ FieldAuthPlugin (過濾欄位)
 
 ---
 
-## 🔧 擴展指南
+## 擴展指南
 
 ### 添加新的裝飾器
 
@@ -426,7 +425,7 @@ const rules = fieldMetadataCache.getFieldRules(UserType);
 
 ---
 
-## ⚠️ 已知限制
+## 已知限制
 
 1. ~~**"Self" 訪問未實作**~~ ✅ **已實作 (2026-01-27)**
    - Customer 可以查看自己的敏感資料
@@ -457,7 +456,7 @@ const rules = fieldMetadataCache.getFieldRules(UserType);
 
 ---
 
-## 🧪 測試
+## 測試
 
 ### 單元測試
 
@@ -480,20 +479,18 @@ pnpm --filter backend test -- field-auth.plugin.spec.ts
 - ✅ 陣列中的多個物件
 - ✅ 認證響應特殊處理
 
-**測試結果**: 9/9 通過 ✅
+## **測試結果**: 9/9 通過
 
----
+## 安全性考量
 
-## 🔒 安全性考量
-
-### ✅ 已實作的保護
+### 已實作的保護
 
 - **永不暴露欄位** - `password` 無條件移除
 - **JWT 驗證** - 所有權限資訊從已驗證的 JWT 讀取
 - **Server-Side 過濾** - 所有過濾在後端執行，客戶端無法繞過
 - **循環引用保護** - WeakSet 防止無限迴圈
 
-### ⚠️ 注意事項
+### 注意事項
 
 1. **不要依賴 GraphQL Schema**
    - Schema 只控制客戶端可以"請求"什麼
@@ -509,7 +506,7 @@ pnpm --filter backend test -- field-auth.plugin.spec.ts
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### 欄位沒有被過濾
 
@@ -540,7 +537,7 @@ console.log('[FieldAuthPlugin] Rule matched:', ruleName);
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 - [RBAC Architecture](./RBAC_ARCHITECTURE.md) - 整體 RBAC 架構
 - [Registration](./REGISTRATION.md) - 用戶註冊與認證流程

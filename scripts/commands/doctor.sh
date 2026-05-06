@@ -270,8 +270,8 @@ if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
     seaweedfs_healthy=false
   fi
 
-  # 檢查 S3 端點
-  if lsof -ti:${SEAWEEDFS_S3_PORT:-8333} >/dev/null 2>&1; then
+  # 檢查 S3 端點（只看 LISTEN 過濾，避免被 client connection 誤觸）
+  if lsof -ti:"${SEAWEEDFS_S3_PORT:-8333}" -sTCP:LISTEN >/dev/null 2>&1; then
     log_success "SeaweedFS S3 API 端口可連接"
     echo "      註: S3 API 需要 AWS 簽名認證"
   else

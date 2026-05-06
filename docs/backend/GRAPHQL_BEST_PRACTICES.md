@@ -4,53 +4,53 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [GraphQL 最佳實踐 (GraphQL Best Practices)](#graphql-最佳實踐-graphql-best-practices)
-  - [📋 目錄](#-目錄)
-  - [🏗️ Schema 設計](#️-schema-設計)
+  - [目錄](#目錄)
+  - [Schema 設計](#schema-設計)
     - [命名規範](#命名規範)
-      - [✅ 使用 camelCase](#-使用-camelcase)
-      - [✅ 型別名稱使用 PascalCase](#-型別名稱使用-pascalcase)
+      - [使用 camelCase](#使用-camelcase)
+      - [型別名稱使用 PascalCase](#型別名稱使用-pascalcase)
     - [使用明確的型別](#使用明確的型別)
-      - [✅ 明確標示必填欄位](#-明確標示必填欄位)
-      - [✅ 使用 Enum 而非字串](#-使用-enum-而非字串)
+      - [明確標示必填欄位](#明確標示必填欄位)
+      - [使用 Enum 而非字串](#使用-enum-而非字串)
     - [Input Types vs Args](#input-types-vs-args)
-      - [✅ 複雜輸入使用 Input Type](#-複雜輸入使用-input-type)
+      - [複雜輸入使用 Input Type](#複雜輸入使用-input-type)
     - [分頁設計](#分頁設計)
-      - [✅ 統一的分頁格式](#-統一的分頁格式)
-  - [⚡ Query 最佳化](#-query-最佳化)
+      - [統一的分頁格式](#統一的分頁格式)
+  - [Query 最佳化](#query-最佳化)
     - [避免過度查詢（Over-fetching）](#避免過度查詢over-fetching)
-      - [✅ 只回傳需要的欄位](#-只回傳需要的欄位)
+      - [只回傳需要的欄位](#只回傳需要的欄位)
     - [解決 N+1 查詢問題](#解決-n1-查詢問題)
-      - [❌ N+1 問題範例](#-n1-問題範例)
-      - [✅ 使用 Prisma include](#-使用-prisma-include)
-      - [✅ 使用 DataLoader（可選）](#-使用-dataloader可選)
+      - [N+1 問題範例](#n1-問題範例)
+      - [使用 Prisma include](#使用-prisma-include)
+      - [使用 DataLoader（可選）](#使用-dataloader可選)
     - [使用 Fragment 減少重複](#使用-fragment-減少重複)
-  - [🚨 錯誤處理](#-錯誤處理)
+  - [錯誤處理](#錯誤處理)
     - [使用明確的錯誤代碼](#使用明確的錯誤代碼)
     - [驗證輸入](#驗證輸入)
-  - [🔒 安全性](#-安全性)
+  - [安全性](#安全性)
     - [查詢深度限制](#查詢深度限制)
     - [查詢複雜度限制](#查詢複雜度限制)
     - [速率限制](#速率限制)
     - [欄位級別授權](#欄位級別授權)
-  - [⚡ 效能優化](#-效能優化)
+  - [效能優化](#效能優化)
     - [使用快取](#使用快取)
     - [批次查詢](#批次查詢)
     - [選擇性查詢欄位](#選擇性查詢欄位)
-  - [🧪 測試策略](#-測試策略)
+  - [測試策略](#測試策略)
     - [單元測試](#單元測試)
     - [E2E 測試](#e2e-測試)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 🏗️ Schema 設計
+## Schema 設計
 
 ### 命名規範
 
-#### ✅ 使用 camelCase
+#### 使用 camelCase
 
 ```graphql
 # ✅ 好
@@ -68,7 +68,7 @@ type User {
 }
 ```
 
-#### ✅ 型別名稱使用 PascalCase
+#### 型別名稱使用 PascalCase
 
 ```graphql
 # ✅ 好
@@ -90,7 +90,7 @@ type userProfile {
 
 ### 使用明確的型別
 
-#### ✅ 明確標示必填欄位
+#### 明確標示必填欄位
 
 ```graphql
 # ✅ 好：清楚標示必填與可選
@@ -110,7 +110,7 @@ type User {
 }
 ```
 
-#### ✅ 使用 Enum 而非字串
+#### 使用 Enum 而非字串
 
 ```typescript
 // ✅ 好：使用 Enum
@@ -138,7 +138,7 @@ role: string;  // 'hq' | 'customer' | ???
 
 ### Input Types vs Args
 
-#### ✅ 複雜輸入使用 Input Type
+#### 複雜輸入使用 Input Type
 
 ```typescript
 // ✅ 好：使用 Input Type
@@ -178,7 +178,7 @@ createUser(
 
 ### 分頁設計
 
-#### ✅ 統一的分頁格式
+#### 統一的分頁格式
 
 ```typescript
 // ✅ 好：統一的分頁結構
@@ -208,11 +208,11 @@ users(@Args('pagination') pagination: PaginationInput) {
 
 ---
 
-## ⚡ Query 最佳化
+## Query 最佳化
 
 ### 避免過度查詢（Over-fetching）
 
-#### ✅ 只回傳需要的欄位
+#### 只回傳需要的欄位
 
 ```graphql
 # ✅ 好：只查詢需要的欄位
@@ -245,7 +245,7 @@ query {
 
 ### 解決 N+1 查詢問題
 
-#### ❌ N+1 問題範例
+#### N+1 問題範例
 
 ```typescript
 // ❌ 差：每個 user 都會觸發一次資料庫查詢
@@ -261,7 +261,7 @@ export class UserResolver {
 }
 ```
 
-#### ✅ 使用 Prisma include
+#### 使用 Prisma include
 
 ```typescript
 // ✅ 好：使用 Prisma include 一次查詢
@@ -275,7 +275,7 @@ async users() {
 }
 ```
 
-#### ✅ 使用 DataLoader（可選）
+#### 使用 DataLoader（可選）
 
 ```typescript
 // ✅ 更好：使用 DataLoader 批次查詢
@@ -359,7 +359,7 @@ query {
 
 ---
 
-## 🚨 錯誤處理
+## 錯誤處理
 
 ### 使用明確的錯誤代碼
 
@@ -425,7 +425,7 @@ export class CreateUserInput {
 
 ---
 
-## 🔒 安全性
+## 安全性
 
 ### 查詢深度限制
 
@@ -508,7 +508,7 @@ export class UserResolver {
 
 ---
 
-## ⚡ 效能優化
+## 效能優化
 
 ### 使用快取
 
@@ -586,7 +586,7 @@ async findOne(id: string) {
 
 ---
 
-## 🧪 測試策略
+## 測試策略
 
 ### 單元測試
 
@@ -667,7 +667,7 @@ describe('GraphQL (e2e)', () => {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [FIELD_AUTHORIZATION.md](../authentication/FIELD_AUTHORIZATION.md) - 欄位權限控制
 - [API_RESPONSE_FORMAT.md](./API_RESPONSE_FORMAT.md) - API 回應格式

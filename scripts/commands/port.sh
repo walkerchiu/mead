@@ -126,8 +126,14 @@ port_free() {
     exit 1
   fi
 
+  if ! [[ "$port" =~ ^[0-9]+$ ]] || [ "$port" -lt 1 ] || [ "$port" -gt 65535 ]; then
+    log_error "無效的 Port 號碼: ${port}（必須為 1-65535 的整數）"
+    exit 1
+  fi
+
   local pids
-  pids=$(lsof -ti:"$port" 2>/dev/null || true)
+  # 只 kill 真正在 LISTEN 的 server，client connection（CLOSE_WAIT/ESTABLISHED）會在 server 死後自動關閉
+  pids=$(lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null || true)
 
   if [ -z "$pids" ]; then
     log_info "Port $port 目前沒有被佔用"
@@ -141,9 +147,9 @@ port_free() {
   echo "$pids" | xargs kill 2>/dev/null || true
   sleep 1
 
-  if lsof -ti:"$port" >/dev/null 2>&1; then
+  if lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
     log_warning "進程未正常終止，使用強制終止"
-    lsof -ti:"$port" 2>/dev/null | xargs kill -9 2>/dev/null || true
+    lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null | xargs kill -9 2>/dev/null || true
   fi
 
   log_success "Port $port 已釋放"
@@ -157,7 +163,8 @@ port_free_all() {
 
   for port in "${PROJECT_PORTS[@]}"; do
     local pids
-    pids=$(lsof -ti:"$port" 2>/dev/null || true)
+    # 只 kill LISTEN server，client connection 會在 server 死後自動關閉
+    pids=$(lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null || true)
     if [ -n "$pids" ]; then
       local service
     service=$(get_service_name "$port")
@@ -176,9 +183,9 @@ port_free_all() {
 
   # 檢查是否還有未終止的進程
   for port in "${PROJECT_PORTS[@]}"; do
-    if lsof -ti:"$port" >/dev/null 2>&1; then
+    if lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
       log_warning "Port $port 未正常終止，強制終止"
-      lsof -ti:"$port" 2>/dev/null | xargs kill -9 2>/dev/null || true
+      lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null | xargs kill -9 2>/dev/null || true
     fi
   done
 

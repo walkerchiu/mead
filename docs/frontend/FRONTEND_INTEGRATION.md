@@ -4,56 +4,56 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [前端認證系統集成指南](#前端認證系統集成指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [技術棧](#技術棧)
     - [功能特性](#功能特性)
-  - [🔧 套件清單](#-套件清單)
-  - [🏗️ 檔案結構](#️-檔案結構)
-  - [🚀 快速開始](#-快速開始)
+  - [套件清單](#套件清單)
+  - [檔案結構](#檔案結構)
+  - [快速開始](#快速開始)
     - [1. 環境變數配置](#1-環境變數配置)
     - [2. 啟動開發伺服器](#2-啟動開發伺服器)
     - [3. 訪問頁面](#3-訪問頁面)
-  - [⚙️ 核心組件說明](#️-核心組件說明)
+  - [核心組件說明](#核心組件說明)
     - [1. Apollo Client 配置 (`lib/apollo-client.ts`)](#1-apollo-client-配置-libapollo-clientts)
     - [2. 認證輔助函數 (`lib/auth.ts`)](#2-認證輔助函數-libauthts)
     - [3. GraphQL Queries 和 Mutations (`lib/graphql.ts`)](#3-graphql-queries-和-mutations-libgraphqlts)
-  - [📝 使用流程](#-使用流程)
+  - [使用流程](#使用流程)
     - [登入流程](#登入流程)
     - [頁面重新整理後的 Session 恢復](#頁面重新整理後的-session-恢復)
     - [密碼重設流程](#密碼重設流程)
     - [2FA 設定流程](#2fa-設定流程)
-  - [🧩 UI 組件說明](#-ui-組件說明)
+  - [UI 組件說明](#ui-組件說明)
     - [登入表單 (LoginForm.tsx)](#登入表單-loginformtsx)
     - [2FA 驗證表單 (TwoFactorForm.tsx)](#2fa-驗證表單-twofactorformtsx)
     - [受保護路由 (ProtectedRoute.tsx)](#受保護路由-protectedroutetsx)
     - [密碼重設表單 (ResetPasswordForm.tsx)](#密碼重設表單-resetpasswordformtsx)
     - [2FA 設定組件 (TwoFactorSettings.tsx)](#2fa-設定組件-twofactorsettingstsx)
-  - [🔐 安全考量](#-安全考量)
+  - [安全考量](#安全考量)
     - [Token 管理架構](#token-管理架構)
     - [後端 Cookie 設定](#後端-cookie-設定)
     - [密碼驗證](#密碼驗證)
     - [2FA 驗證](#2fa-驗證)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [問題 1：Apollo Client 導入錯誤](#問題-1apollo-client-導入錯誤)
     - [問題 2：Token 無法自動帶入 header](#問題-2token-無法自動帶入-header)
     - [問題 3：CORS 錯誤](#問題-3cors-錯誤)
     - [問題 4：頁面重新整理後被踢回登入頁](#問題-4頁面重新整理後被踢回登入頁)
     - [問題 5：GraphQL Schema 類型不匹配](#問題-5graphql-schema-類型不匹配)
-  - [📚 參考資源](#-參考資源)
+  - [參考資源](#參考資源)
     - [官方文檔](#官方文檔)
     - [專案文檔](#專案文檔)
-  - [📝 TODO](#-todo)
+  - [TODO](#todo)
     - [短期](#短期)
     - [長期](#長期)
-  - [🎯 總結](#-總結)
+  - [總結](#總結)
 
 ---
 
-## 📖 概述
+## 概述
 
 本文檔提供完整的前端認證系統實現指南，包括登入、密碼重設和雙因素認證 (2FA) 功能。
 
@@ -80,7 +80,7 @@
 
 ---
 
-## 🔧 套件清單
+## 套件清單
 
 ```json
 {
@@ -102,7 +102,7 @@
 
 ---
 
-## 🏗️ 檔案結構
+## 檔案結構
 
 ```text
 apps/frontend/
@@ -140,7 +140,7 @@ apps/frontend/
 
 ---
 
-## 🚀 快速開始
+## 快速開始
 
 ### 1. 環境變數配置
 
@@ -176,7 +176,7 @@ pnpm --filter web dev
 
 ---
 
-## ⚙️ 核心組件說明
+## 核心組件說明
 
 ### 1. Apollo Client 配置 (`lib/apollo-client.ts`)
 
@@ -379,7 +379,7 @@ export const REFRESH_TOKEN_MUTATION = gql`
 
 ---
 
-## 📝 使用流程
+## 使用流程
 
 ### 登入流程
 
@@ -435,7 +435,7 @@ export const REFRESH_TOKEN_MUTATION = gql`
 
 ---
 
-## 🧩 UI 組件說明
+## UI 組件說明
 
 ### 登入表單 (LoginForm.tsx)
 
@@ -563,7 +563,7 @@ const resetPasswordSchema = z
 
 ---
 
-## 🔐 安全考量
+## 安全考量
 
 ### Token 管理架構
 
@@ -623,7 +623,7 @@ const passwordRegex = {
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### 問題 1：Apollo Client 導入錯誤
 
@@ -689,7 +689,7 @@ cat apps/backend/schema.gql
 
 ---
 
-## 📚 參考資源
+## 參考資源
 
 ### 官方文檔
 
@@ -708,7 +708,7 @@ cat apps/backend/schema.gql
 
 ---
 
-## 📝 TODO
+## TODO
 
 ### 短期
 
@@ -724,7 +724,7 @@ cat apps/backend/schema.gql
 
 ---
 
-## 🎯 總結
+## 總結
 
 本專案已完成：
 

@@ -177,7 +177,7 @@ function SessionsContent() {
 
 export default function SessionsPage() {
   return (
-    <ProtectedRoute requiredPermission="HQ_SCOPE">
+    <ProtectedRoute requiredScopes={['HQ_SCOPE']}>
       <SessionsContent />
     </ProtectedRoute>
   );

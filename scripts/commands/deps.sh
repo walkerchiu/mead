@@ -111,24 +111,39 @@ deps_outdated() {
 }
 
 # 安全性審計
+#
+# 注意：`pnpm audit` 不支援 `--recursive` / `--filter`，所以不能用
+# `pnpm --filter <ws> audit`（會報 `Unknown option: 'recursive'`）。
+# 改為切到子 workspace 目錄（monorepo 子 package 的 lockfile 其實
+# 共用 root 的 pnpm-lock.yaml，所以 root 跑也能涵蓋 sub-workspace，
+# 但語意上該 workspace 聚焦時改用 `--dir`）。
 deps_audit() {
   local workspace="${1:-all}"
-  local filter
   local label
-
-  filter=$(get_filter "$workspace")
   label=$(get_ws_label "$workspace")
 
   print_header "安全性審計 ($label)"
-
-  echo -e "${DIM}正在執行: pnpm $filter audit${NC}"
-  echo -e "${DIM}────────────────────────────────────────${NC}\n"
   echo -e "${CYAN}🔍 正在掃描安全漏洞...${NC}\n"
 
   cd "$PROJECT_ROOT"
 
-  # 顯示即時輸出 - 不重定向，讓用戶看到進度
-  pnpm $filter audit || true
+  case "$workspace" in
+    backend)
+      echo -e "${DIM}正在執行: pnpm --dir apps/backend audit${NC}"
+      echo -e "${DIM}────────────────────────────────────────${NC}\n"
+      pnpm --dir apps/backend audit || true
+      ;;
+    frontend)
+      echo -e "${DIM}正在執行: pnpm --dir apps/frontend audit${NC}"
+      echo -e "${DIM}────────────────────────────────────────${NC}\n"
+      pnpm --dir apps/frontend audit || true
+      ;;
+    *)
+      echo -e "${DIM}正在執行: pnpm audit${NC}"
+      echo -e "${DIM}────────────────────────────────────────${NC}\n"
+      pnpm audit || true
+      ;;
+  esac
 
   echo ""
   log_success "審計完成"

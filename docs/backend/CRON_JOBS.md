@@ -4,17 +4,17 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [排程任務系統 (Cron Jobs System)](#排程任務系統-cron-jobs-system)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [核心特性](#核心特性)
     - [技術架構](#技術架構)
-  - [🔧 系統配置](#-系統配置)
+  - [系統配置](#系統配置)
     - [安裝依賴](#安裝依賴)
     - [啟用排程模組](#啟用排程模組)
-  - [📅 現有排程任務](#-現有排程任務)
+  - [現有排程任務](#現有排程任務)
     - [1. 過期會話清理 (Expired Sessions Cleanup)](#1-過期會話清理-expired-sessions-cleanup)
       - [功能說明](#功能說明)
       - [效能優化](#效能優化)
@@ -28,34 +28,34 @@
       - [功能說明](#功能說明-2)
       - [執行時間表](#執行時間表-2)
       - [日誌範例](#日誌範例-2)
-  - [🔐 分散式鎖機制](#-分散式鎖機制)
+  - [分散式鎖機制](#分散式鎖機制)
     - [DistributedLockService](#distributedlockservice)
     - [Redis 實作細節](#redis-實作細節)
     - [使用範例](#使用範例)
-  - [🧪 測試與驗證](#-測試與驗證)
+  - [測試與驗證](#測試與驗證)
     - [測試腳本](#測試腳本)
       - [1. 測試過期會話清理](#1-測試過期會話清理)
       - [2. 測試審計日誌歸檔](#2-測試審計日誌歸檔)
       - [3. 測試通知清理](#3-測試通知清理)
     - [啟用實際執行](#啟用實際執行)
-  - [📊 監控與維護](#-監控與維護)
+  - [監控與維護](#監控與維護)
     - [查看執行狀態](#查看執行狀態)
     - [健康檢查指標](#健康檢查指標)
     - [Redis 鎖監控](#redis-鎖監控)
-  - [🛠️ 開發指南](#️-開發指南)
+  - [開發指南](#開發指南)
     - [創建新的 Cron Job](#創建新的-cron-job)
     - [Cron 表達式格式](#cron-表達式格式)
     - [預定義表達式](#預定義表達式)
-  - [⚠️ 注意事項](#️-注意事項)
+  - [注意事項](#注意事項)
     - [1. 分散式環境](#1-分散式環境)
     - [2. 長時間運行任務](#2-長時間運行任務)
     - [3. 錯誤處理](#3-錯誤處理)
     - [4. 資料庫連線](#4-資料庫連線)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 專案使用 `@nestjs/schedule` 模組實作排程任務系統，用於自動化維護、清理和監控工作。
 
@@ -88,7 +88,7 @@ Cron Trigger
 
 ---
 
-## 🔧 系統配置
+## 系統配置
 
 ### 安裝依賴
 
@@ -114,7 +114,7 @@ export class AppModule {}
 
 ---
 
-## 📅 現有排程任務
+## 現有排程任務
 
 ### 1. 過期會話清理 (Expired Sessions Cleanup)
 
@@ -324,7 +324,7 @@ export class AppModule {}
 
 ---
 
-## 🔐 分散式鎖機制
+## 分散式鎖機制
 
 ### DistributedLockService
 
@@ -420,7 +420,7 @@ async handleManualLock(): Promise<void> {
 
 ---
 
-## 🧪 測試與驗證
+## 測試與驗證
 
 ### 測試腳本
 
@@ -494,7 +494,7 @@ for (let i = 0; i < expiredSessions.length; i += batchSize) {
 
 ---
 
-## 📊 監控與維護
+## 監控與維護
 
 ### 查看執行狀態
 
@@ -550,7 +550,7 @@ redis-cli del "lock:cron:cleanup-expired-sessions"
 
 ---
 
-## 🖥️ 前端監控頁面
+## 前端監控頁面
 
 系統提供完整的圖形化監控介面，方便管理員即時監控和管理所有 Cron Jobs。
 
@@ -623,8 +623,8 @@ redis-cli del "lock:cron:cleanup-expired-sessions"
 - 執行狀態 (Status)
   - ✅ SUCCESS（成功）
   - ❌ FAILED（失敗）
-  - ⏱️ TIMEOUT（超時）
-  - ▶️ RUNNING（執行中）
+  - TIMEOUT（超時）
+  - RUNNING（執行中）
   - ⊘ SKIPPED（跳過）
 - 處理數量 (Processed Count)
 - 成功數量 (Success Count)
@@ -1050,7 +1050,7 @@ enum CronJobStatus {
 
 ---
 
-## 🛠️ 開發指南
+## 開發指南
 
 ### 創建新的 Cron Job
 
@@ -1159,7 +1159,7 @@ import { CronExpression } from '@nestjs/schedule';
 
 ---
 
-## ⚠️ 注意事項
+## 注意事項
 
 ### 1. 分散式環境
 
@@ -1266,7 +1266,7 @@ async handleCronJob() {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - **外部資源**：
   - [NestJS Schedule Documentation](https://docs.nestjs.com/techniques/task-scheduling)

@@ -401,7 +401,7 @@ db_seed() {
   export DATABASE_URL=$(get_database_url)
 
   export NPT_ENV="$ENVIRONMENT"
-  log_info "載入種子資料...（環境: $NPT_ENV）"
+  log_info "載入種子資料...（環境: ${NPT_ENV}）"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else

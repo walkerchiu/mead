@@ -2,53 +2,53 @@
 
 完整的後端國際化實作，支援錯誤訊息、Email 模板和 API 回應多語系。
 
-> 📚 **閱讀導覽**：本文件專注於**後端（NestJS）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或前端實作，請參考：
+> **閱讀導覽**：本文件專注於**後端（NestJS）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或前端實作，請參考：
 >
 > - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) — 整合流程、CLI 工具、測試
 > - [前端 i18n 設置指南](../frontend/I18N_SETUP.md) — Next.js 端實作
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [後端 i18n 設置指南 (Backend i18n Setup)](#後端-i18n-設置指南-backend-i18n-setup)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [技術棧](#技術棧)
-  - [🔧 I18nModule 配置](#-i18nmodule-配置)
-  - [📐 翻譯檔案結構](#-翻譯檔案結構)
+  - [I18nModule 配置](#i18nmodule-配置)
+  - [翻譯檔案結構](#翻譯檔案結構)
     - [範例（`en/auth.json` 節錄）](#範例enauthjson-節錄)
     - [範例（`zh-TW/auth.json` 節錄）](#範例zh-twauthjson-節錄)
-  - [🔒 TypeScript 類型安全](#-typescript-類型安全)
+  - [TypeScript 類型安全](#typescript-類型安全)
     - [類型生成腳本](#類型生成腳本)
     - [執行類型生成](#執行類型生成)
     - [自動生成的類型](#自動生成的類型)
     - [類型安全使用](#類型安全使用)
     - [更新類型工作流程](#更新類型工作流程)
-  - [🧪 翻譯完整性測試](#-翻譯完整性測試)
+  - [翻譯完整性測試](#翻譯完整性測試)
     - [測試內容](#測試內容)
     - [執行測試](#執行測試)
     - [測試失敗範例](#測試失敗範例)
-  - [🔍 語言偵測順序](#-語言偵測順序)
-  - [📝 I18nLang Decorator](#-i18nlang-decorator)
-  - [🔧 Service 中使用 I18nService](#-service-中使用-i18nservice)
-  - [📝 Resolver 中傳遞語言參數](#-resolver-中傳遞語言參數)
-  - [📧 Email 模板多語系](#-email-模板多語系)
+  - [語言偵測順序](#語言偵測順序)
+  - [I18nLang Decorator](#i18nlang-decorator)
+  - [Service 中使用 I18nService](#service-中使用-i18nservice)
+  - [Resolver 中傳遞語言參數](#resolver-中傳遞語言參數)
+  - [Email 模板多語系](#email-模板多語系)
     - [模板結構](#模板結構)
     - [Mail Service 語言選擇](#mail-service-語言選擇)
-  - [✨ 新增語言](#-新增語言)
+  - [新增語言](#新增語言)
     - [步驟 1：建立翻譯檔案](#步驟-1建立翻譯檔案)
     - [步驟 2：建立 Email 模板](#步驟-2建立-email-模板)
     - [步驟 3：更新 Mail Service](#步驟-3更新-mail-service)
     - [步驟 4：驗證](#步驟-4驗證)
-  - [🛠️ CLI 工具支援](#️-cli-工具支援)
+  - [CLI 工具支援](#cli-工具支援)
     - [翻譯測試與類型生成](#翻譯測試與類型生成)
     - [手動執行命令](#手動執行命令)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 本專案使用 [nestjs-i18n](https://nestjs-i18n.com/) 實現後端國際化，支援錯誤訊息、Email 內容的多語系翻譯。
 
@@ -61,7 +61,7 @@
 
 ---
 
-## 🔧 I18nModule 配置
+## I18nModule 配置
 
 在 `src/app.module.ts` 中配置 `I18nModule`：
 
@@ -96,7 +96,7 @@ export class AppModule {}
 
 ---
 
-## 📐 翻譯檔案結構
+## 翻譯檔案結構
 
 ```text
 apps/backend/src/i18n/
@@ -140,7 +140,7 @@ apps/backend/src/i18n/
 
 ---
 
-## 🔒 TypeScript 類型安全
+## TypeScript 類型安全
 
 本專案使用自動生成的類型定義，提供編譯時的翻譯 key 驗證。
 
@@ -241,7 +241,7 @@ export class AuthService {
 
 ---
 
-## 🧪 翻譯完整性測試
+## 翻譯完整性測試
 
 **檔案**: `src/i18n/i18n-completeness.spec.ts`
 
@@ -301,7 +301,7 @@ pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
 
 ---
 
-## 🔍 語言偵測順序
+## 語言偵測順序
 
 | 優先順序 | 來源                     | 說明                            |
 | -------- | ------------------------ | ------------------------------- |
@@ -321,7 +321,7 @@ fetch('/api/users', {
 
 ---
 
-## 📝 I18nLang Decorator
+## I18nLang Decorator
 
 自訂的 `@I18nLang()` 裝飾器（`src/common/decorators/i18n-lang.decorator.ts`）從 request 中提取語言參數，同時支援 HTTP 和 GraphQL 請求。
 
@@ -358,7 +358,7 @@ export const I18nLang = createParamDecorator(
 
 ---
 
-## 🔧 Service 中使用 I18nService
+## Service 中使用 I18nService
 
 注入 `I18nService` 並使用 `translate()` 翻譯訊息：
 
@@ -389,7 +389,7 @@ export class AuthService {
 
 ---
 
-## 📝 Resolver 中傳遞語言參數
+## Resolver 中傳遞語言參數
 
 在 GraphQL resolver 中使用 `@I18nLang()` 取得語言，並傳遞給 service：
 
@@ -425,7 +425,7 @@ export class AuthResolver {
 
 ---
 
-## 📧 Email 模板多語系
+## Email 模板多語系
 
 Email 模板按語言分目錄存放，Mail Service 根據 `lang` 參數選擇對應的模板。
 
@@ -491,7 +491,7 @@ export class MailService {
 
 ---
 
-## ✨ 新增語言
+## 新增語言
 
 以新增日文（`ja`）為例：
 
@@ -546,13 +546,13 @@ pnpm --filter @npt/backend generate-i18n-types
 
 ---
 
-## 🛠️ CLI 工具支援
+## CLI 工具支援
 
-> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#️-cli-工具支援)，以避免文件重複。
+> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#cli-工具支援)，以避免文件重複。
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) - 整合流程與 CLI 工具
 - [前端 i18n 設置](../frontend/I18N_SETUP.md) - 前端國際化配置

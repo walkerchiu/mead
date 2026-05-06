@@ -2,58 +2,58 @@
 
 Next.js 多語系國際化完整設置與使用指南。
 
-> 📚 **閱讀導覽**：本文件專注於**前端（Next.js）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或後端實作，請參考：
+> **閱讀導覽**：本文件專注於**前端（Next.js）**的 i18n 實作細節。若需了解整體協作流程、CLI 工具使用或後端實作，請參考：
 >
 > - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) — 整合流程、CLI 工具、測試
 > - [後端 i18n 設置指南](../backend/I18N_SETUP.md) — NestJS 端實作
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [前端 i18n 設置指南](#前端-i18n-設置指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [技術棧](#技術棧)
-  - [🏗️ 檔案結構](#️-檔案結構)
-  - [🔧 Routing 配置](#-routing-配置)
-  - [⚙️ Request 配置](#️-request-配置)
-  - [🔀 Middleware](#-middleware)
-  - [🎨 Layout 架構](#-layout-架構)
+  - [檔案結構](#檔案結構)
+  - [Routing 配置](#routing-配置)
+  - [Request 配置](#request-配置)
+  - [Middleware](#middleware)
+  - [Layout 架構](#layout-架構)
     - [Root Layout（`app/layout.tsx`）](#root-layoutapplayouttsx)
     - [Locale Layout（`app/[locale]/layout.tsx`）](#locale-layoutapplocalelayouttsx)
     - [Providers（`app/[locale]/providers.tsx`）](#providersapplocaleproviderstsx)
-  - [📝 翻譯檔案](#-翻譯檔案)
+  - [翻譯檔案](#翻譯檔案)
     - [Namespace 設計](#namespace-設計)
     - [範例（`messages/en.json` 節錄）](#範例messagesenjson-節錄)
-  - [🔒 TypeScript 類型安全](#-typescript-類型安全)
+  - [TypeScript 類型安全](#typescript-類型安全)
     - [類型生成腳本](#類型生成腳本)
     - [執行類型生成](#執行類型生成)
     - [自動生成的類型](#自動生成的類型)
     - [類型安全使用](#類型安全使用)
     - [更新類型工作流程](#更新類型工作流程)
-  - [📝 在元件中使用翻譯](#-在元件中使用翻譯)
+  - [在元件中使用翻譯](#在元件中使用翻譯)
     - [Client Component](#client-component)
     - [Server Component](#server-component)
-  - [🧭 路由導航](#-路由導航)
+  - [路由導航](#路由導航)
     - [Link 元件](#link-元件)
     - [useRouter](#userouter)
     - [usePathname](#usepathname)
-  - [🔗 語言偏好聯動](#-語言偏好聯動)
+  - [語言偏好聯動](#語言偏好聯動)
     - [聯動機制](#聯動機制)
     - [相關元件](#相關元件)
-  - [📚 Storybook 整合](#-storybook-整合)
-  - [➕ 新增語言](#-新增語言)
+  - [Storybook 整合](#storybook-整合)
+  - [新增語言](#新增語言)
     - [步驟 1：更新 routing 配置](#步驟-1更新-routing-配置)
     - [步驟 2：建立翻譯檔案](#步驟-2建立翻譯檔案)
     - [步驟 3：驗證](#步驟-3驗證)
     - [步驟 4：生成類型](#步驟-4生成類型)
-  - [🛠️ CLI 工具支援](#️-cli-工具支援)
-  - [📚 相關文檔](#-相關文檔)
+  - [CLI 工具支援](#cli-工具支援)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 本專案使用 [next-intl](https://next-intl.dev/) 實現前端國際化，支援 URL 前綴式路由和 Server/Client Component 翻譯。
 
@@ -66,7 +66,7 @@ Next.js 多語系國際化完整設置與使用指南。
 
 ---
 
-## 🏗️ 檔案結構
+## 檔案結構
 
 ```text
 apps/frontend/
@@ -101,7 +101,7 @@ apps/frontend/
 
 ---
 
-## 🔧 Routing 配置
+## Routing 配置
 
 `src/i18n/routing.ts` 定義支援的語言和路由行為。
 
@@ -128,7 +128,7 @@ export const { Link, redirect, usePathname, useRouter, getPathname } =
 
 ---
 
-## ⚙️ Request 配置
+## Request 配置
 
 `src/i18n/request.ts` 處理 Server Component 的訊息載入。
 
@@ -155,7 +155,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
 ---
 
-## 🔀 Middleware
+## Middleware
 
 `src/middleware.ts` 負責 locale 偵測和路由重定向。
 
@@ -166,7 +166,7 @@ import { routing } from './i18n/routing';
 export default createMiddleware(routing);
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)'],
+  matcher: ['/((?!api|_next|.*\..*).*)'],
 };
 ```
 
@@ -177,7 +177,7 @@ export const config = {
 
 ---
 
-## 🎨 Layout 架構
+## Layout 架構
 
 採用兩層 Layout 設計：
 
@@ -242,7 +242,7 @@ Client Component，包裹 Theme、Apollo Client、Snackbar 等 Provider。
 
 ---
 
-## 📝 翻譯檔案
+## 翻譯檔案
 
 翻譯檔案位於 `messages/` 目錄，使用 JSON 格式，以 namespace 分類。
 
@@ -289,7 +289,7 @@ Client Component，包裹 Theme、Apollo Client、Snackbar 等 Provider。
 
 ---
 
-## 🔒 TypeScript 類型安全
+## TypeScript 類型安全
 
 本專案使用自動生成的類型定義，提供編譯時的翻譯 key 驗證。
 
@@ -417,7 +417,7 @@ export function LoginForm() {
 
 ---
 
-## 📝 在元件中使用翻譯
+## 在元件中使用翻譯
 
 ### Client Component
 
@@ -453,7 +453,7 @@ export default function HomePage() {
 
 ---
 
-## 🧭 路由導航
+## 路由導航
 
 使用從 `@/i18n/routing` 匯出的 locale-aware 導航工具，而非 Next.js 原生版本。
 
@@ -502,7 +502,7 @@ const pathname = usePathname(); // "/dashboard" 而非 "/en/dashboard"
 
 ---
 
-## 🔗 語言偏好聯動
+## 語言偏好聯動
 
 前端介面語言與後端 `profile.language` 自動同步，確保 Email 通知語言與介面一致。
 
@@ -525,7 +525,7 @@ const pathname = usePathname(); // "/dashboard" 而非 "/en/dashboard"
 
 ---
 
-## 📚 Storybook 整合
+## Storybook 整合
 
 `.storybook/preview.tsx` 中加入 `NextIntlClientProvider`，使 Storybook 中的元件可以正常使用 `useTranslations`。
 
@@ -548,7 +548,7 @@ const preview: Preview = {
 
 ---
 
-## ➕ 新增語言
+## 新增語言
 
 以新增日文（`ja`）為例：
 
@@ -593,13 +593,13 @@ pnpm --filter @npt/frontend generate-i18n-types
 
 ---
 
-## 🛠️ CLI 工具支援
+## CLI 工具支援
 
-> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#️-cli-工具支援)，以避免文件重複。
+> 詳細的 CLI 工具說明（互動式選單、手動命令、類型生成、翻譯統計）集中在 [前後端 i18n 協調機制 — CLI 工具支援](../getting-started/I18N_COORDINATION.md#cli-工具支援)，以避免文件重複。
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [前後端 i18n 協調機制](../getting-started/I18N_COORDINATION.md) - 整合流程與 CLI 工具
 - [後端 i18n 設置](../backend/I18N_SETUP.md) - 後端國際化配置

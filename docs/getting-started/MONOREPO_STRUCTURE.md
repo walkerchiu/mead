@@ -4,44 +4,44 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Monorepo 專案結構說明](#monorepo-專案結構說明)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [為什麼選擇 Monorepo？](#為什麼選擇-monorepo)
     - [技術棧](#技術棧)
-  - [📐 目錄結構](#-目錄結構)
-  - [✨ 應用程式 (Apps)](#-應用程式-apps)
+  - [目錄結構](#目錄結構)
+  - [應用程式 (Apps)](#應用程式-apps)
     - [Frontend (@npt/frontend)](#frontend-nptfrontend)
     - [Backend (@npt/backend)](#backend-nptbackend)
-  - [📦 共用套件 (Packages)](#-共用套件-packages)
+  - [共用套件 (Packages)](#共用套件-packages)
     - [@npt/typescript-config](#npttypescript-config)
     - [@repo/eslint-config](#repoeslint-config)
-  - [🔧 工作區配置](#-工作區配置)
+  - [工作區配置](#工作區配置)
     - [pnpm-workspace.yaml](#pnpm-workspaceyaml)
     - [套件依賴關係](#套件依賴關係)
     - [turbo.json（任務編排）](#turbojson任務編排)
-  - [📝 開發流程](#-開發流程)
+  - [開發流程](#開發流程)
     - [1. 安裝依賴](#1-安裝依賴)
     - [2. 啟動開發環境](#2-啟動開發環境)
     - [3. 建置專案](#3-建置專案)
     - [4. 執行測試](#4-執行測試)
     - [5. 型別檢查](#5-型別檢查)
     - [6. Lint 檢查](#6-lint-檢查)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO - 應該這樣做](#-do---應該這樣做)
-    - [❌ DON'T - 不要這樣做](#-dont---不要這樣做)
-  - [❓ 常見問題](#-常見問題)
+  - [最佳實踐](#最佳實踐)
+    - [DO - 應該這樣做](#do---應該這樣做)
+    - [DON'T - 不要這樣做](#dont---不要這樣做)
+  - [常見問題](#常見問題)
     - [Q1: 如何新增一個應用？](#q1-如何新增一個應用)
     - [Q2: 如何新增一個共用套件？](#q2-如何新增一個共用套件)
     - [Q3: 為什麼有些依賴要放在 root？](#q3-為什麼有些依賴要放在-root)
     - [Q4: Turborepo 快取在哪裡？](#q4-turborepo-快取在哪裡)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo** 管理多個應用程式和共用套件。
 
@@ -66,7 +66,7 @@ NPT 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo
 
 ---
 
-## 📐 目錄結構
+## 目錄結構
 
 ```text
 npt/
@@ -114,7 +114,7 @@ npt/
 
 ---
 
-## ✨ 應用程式 (Apps)
+## 應用程式 (Apps)
 
 ### Frontend (@npt/frontend)
 
@@ -214,7 +214,7 @@ pnpm test       # 執行測試
 
 ---
 
-## 📦 共用套件 (Packages)
+## 共用套件 (Packages)
 
 NPT 專案只保留真正需要跨應用共用的配置套件。
 
@@ -256,7 +256,7 @@ export default eslintConfig;
 
 ---
 
-## 🔧 工作區配置
+## 工作區配置
 
 ### pnpm-workspace.yaml
 
@@ -318,7 +318,7 @@ packages:
 
 ---
 
-## 📝 開發流程
+## 開發流程
 
 ### 1. 安裝依賴
 
@@ -385,9 +385,9 @@ pnpm lint --fix
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO - 應該這樣做
+### DO - 應該這樣做
 
 **1. 使用 workspace 協議**
 
@@ -433,7 +433,7 @@ git commit -m "feat: add user profile feature"
 # 不需要分開提交
 ```
 
-### ❌ DON'T - 不要這樣做
+### DON'T - 不要這樣做
 
 **1. 不要重複安裝相同依賴**
 
@@ -478,7 +478,7 @@ pnpm build
 
 ---
 
-## ❓ 常見問題
+## 常見問題
 
 ### Q1: 如何新增一個應用？
 
@@ -542,7 +542,7 @@ rm -rf node_modules/.cache/turbo
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [CLI Guide](./CLI_GUIDE.md) - 開發者 CLI 工具
 - [Docker Setup](./DOCKER_SETUP.md) - Docker 環境設置

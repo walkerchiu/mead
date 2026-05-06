@@ -4,41 +4,41 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Request ID 追蹤系統 (Request ID System)](#request-id-追蹤系統-request-id-system)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [📐 Request ID 格式（UUID v7）](#-request-id-格式uuid-v7)
-  - [🏗️ 系統架構](#️-系統架構)
-  - [🔧 核心組件](#-核心組件)
-  - [🛡️ 安全：嚴格 UUID 驗證](#️-安全嚴格-uuid-驗證)
-  - [🔁 AsyncLocalStorage 整合（per-request 上下文）](#-asynclocalstorage-整合per-request-上下文)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [Request ID 格式（UUID v7）](#request-id-格式uuid-v7)
+  - [系統架構](#系統架構)
+  - [核心組件](#核心組件)
+  - [安全：嚴格 UUID 驗證](#安全嚴格-uuid-驗證)
+  - [AsyncLocalStorage 整合（per-request 上下文）](#asynclocalstorage-整合per-request-上下文)
     - [為什麼需要](#為什麼需要)
     - [解法：AsyncLocalStorage](#解法asynclocalstorage)
     - [Service 層使用模式](#service-層使用模式)
-  - [🚨 異常與 fallback](#-異常與-fallback)
+  - [異常與 fallback](#異常與-fallback)
     - [`AllExceptionsFilter`](#allexceptionsfilter)
     - [`AuditLogInterceptor`：missing-id fallback](#auditloginterceptormissing-id-fallback)
-  - [📝 使用方式](#-使用方式)
+  - [使用方式](#使用方式)
     - [前端發送請求](#前端發送請求)
     - [Controller 層（HTTP）](#controller-層http)
     - [GraphQL Resolver](#graphql-resolver)
     - [Service 層（用 RequestContextService）](#service-層用-requestcontextservice)
-  - [🔗 與審計日誌整合](#-與審計日誌整合)
+  - [與審計日誌整合](#與審計日誌整合)
     - [自動關聯](#自動關聯)
     - [`details.requestIdMissing` 標記](#detailsrequestidmissing-標記)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO](#-do)
-    - [❌ DON'T](#-dont)
-  - [📜 變更紀錄](#-變更紀錄)
+  - [最佳實踐](#最佳實踐)
+    - [DO](#do)
+    - [DON'T](#dont)
+  - [變更紀錄](#變更紀錄)
     - [2026-05-04](#2026-05-04)
     - [早期版本](#早期版本)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 Request ID 是一個唯一識別符，用來把「同一個請求」在系統中各層的事件串起來：HTTP/GraphQL 進入點、resolver、service、audit_log、log 行。失誤排查、客戶支援、效能追蹤都靠它。
 
@@ -62,7 +62,7 @@ Request ID 是一個唯一識別符，用來把「同一個請求」在系統中
 
 ---
 
-## 📐 Request ID 格式（UUID v7）
+## Request ID 格式（UUID v7）
 
 ```text
 01930f8e-4b2e-7890-a123-456789abcdef
@@ -86,7 +86,7 @@ Request ID 是一個唯一識別符，用來把「同一個請求」在系統中
 
 ---
 
-## 🏗️ 系統架構
+## 系統架構
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
@@ -135,7 +135,7 @@ Request ID 是一個唯一識別符，用來把「同一個請求」在系統中
 
 ---
 
-## 🔧 核心組件
+## 核心組件
 
 | 組件                         | 位置                                                   | 職責                                                                        |
 | ---------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -150,11 +150,14 @@ Request ID 是一個唯一識別符，用來把「同一個請求」在系統中
 
 ---
 
-## 🛡️ 安全：嚴格 UUID 驗證
+## 安全：嚴格 UUID 驗證
 
 `audit_log.request_id` 是 PostgreSQL `uuid` 型別。如果直接信任 client 帶來的 `x-request-id` header：
 
-- **HTTP response splitting**：`\r\n\r\n` 注入
+- **HTTP response splitting**：`
+
+` 注入
+
 - **巨大 payload**：撐爆 audit_log 欄位
 - **Cache key 污染**：`audit_logs:request:${requestId}` 鍵被異常字符破壞
 - **DB 寫入錯誤**：非 UUID 字串會讓 `INSERT` 整個 failed
@@ -174,7 +177,7 @@ function pickValidHeaderId(raw: unknown): string | undefined {
 
 ---
 
-## 🔁 AsyncLocalStorage 整合（per-request 上下文）
+## AsyncLocalStorage 整合（per-request 上下文）
 
 ### 為什麼需要
 
@@ -246,7 +249,7 @@ export class HQSessionService {
 
 ---
 
-## 🚨 異常與 fallback
+## 異常與 fallback
 
 ### `AllExceptionsFilter`
 
@@ -308,7 +311,7 @@ WHERE details->>'requestIdMissing' = 'true';
 
 ---
 
-## 📝 使用方式
+## 使用方式
 
 ### 前端發送請求
 
@@ -395,7 +398,7 @@ export class UserService {
 
 ---
 
-## 🔗 與審計日誌整合
+## 與審計日誌整合
 
 ### 自動關聯
 
@@ -425,9 +428,9 @@ ORDER BY COUNT(*) DESC;
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO
+### DO
 
 - **service 層用 `RequestContextService`**，不用參數傳遞
 
@@ -452,7 +455,7 @@ ORDER BY COUNT(*) DESC;
   throw new BadRequestException({ message, requestId });
   ```
 
-### ❌ DON'T
+### DON'T
 
 - **不要自己 `crypto.randomUUID()`** 給 audit_log.requestId — 用 `requestContext.getRequestIdOrGenerate()`，cron 場景仍會自動 fallback
 
@@ -462,17 +465,17 @@ ORDER BY COUNT(*) DESC;
 
 ---
 
-## 📜 變更紀錄
+## 變更紀錄
 
 ### 2026-05-04
 
-- 🔴 **修正 P0 bug**：HTTP 異常的 `requestId` 永遠是 `'unknown'`（filter 改為 type 分流）
-- 🔴 **修正 P0 bug**：Plugin 與 Interceptor 在沒帶 header 時雙重生成不同 ID（interceptor 改為優先沿用 `req.requestId`）
-- 🟠 **導入 AsyncLocalStorage**：新增 `RequestContextModule` / `RequestContextService` / `RequestContextMiddleware`；service 層 `crypto.randomUUID()` 全面改用 `getRequestIdOrGenerate()`
-- 🟠 **AuditLogInterceptor missing-id fallback**：取不到 requestId 時用 `uuidv7()` 並標記 `details.requestIdMissing = true`，不再靜默丟棄
-- 🟡 **嚴格 UUID 格式驗證**：middleware / plugin / interceptor 都過 regex 檢查，非合法 UUID 一律 fallback
-- 🟡 **Plugin Subscription early-return**：與 Interceptor 行為對齊
-- 🟡 **Plugin optional chaining**：`req?.headers?.['x-request-id']` 防 edge case throw
+- **修正 P0 bug**：HTTP 異常的 `requestId` 永遠是 `'unknown'`（filter 改為 type 分流）
+- **修正 P0 bug**：Plugin 與 Interceptor 在沒帶 header 時雙重生成不同 ID（interceptor 改為優先沿用 `req.requestId`）
+- **導入 AsyncLocalStorage**：新增 `RequestContextModule` / `RequestContextService` / `RequestContextMiddleware`；service 層 `crypto.randomUUID()` 全面改用 `getRequestIdOrGenerate()`
+- **AuditLogInterceptor missing-id fallback**：取不到 requestId 時用 `uuidv7()` 並標記 `details.requestIdMissing = true`，不再靜默丟棄
+- **嚴格 UUID 格式驗證**：middleware / plugin / interceptor 都過 regex 檢查，非合法 UUID 一律 fallback
+- **Plugin Subscription early-return**：與 Interceptor 行為對齊
+- **Plugin optional chaining**：`req?.headers?.['x-request-id']` 防 edge case throw
 
 ### 早期版本
 
@@ -480,7 +483,7 @@ ORDER BY COUNT(*) DESC;
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [AUDIT_LOG_SYSTEM.md](./AUDIT_LOG_SYSTEM.md) — 審計日誌系統
 - [API_RESPONSE_FORMAT.md](./API_RESPONSE_FORMAT.md) — API 回應格式

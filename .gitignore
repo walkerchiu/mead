@@ -27,7 +27,7 @@ storybook-static/
 # SeaweedFS generated config (generated from infra/seaweedfs/s3.json.template)
 infra/seaweedfs/s3.json
 
-# IDE
+# IDE / 開發者個人設定
 .idea/
 .vscode/
 .cursor/
@@ -36,6 +36,14 @@ infra/seaweedfs/s3.json
 *.swp
 *.swo
 *~
+
+# Husky 內部 wrapper（auto-generated；.husky/ 本身要追蹤 hooks）
+.husky/_/
+
+# Playwright 產物
+test-results/
+playwright-report/
+playwright/.cache/
 
 # OS
 .DS_Store

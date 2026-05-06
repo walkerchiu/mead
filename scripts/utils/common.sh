@@ -25,6 +25,17 @@ log_success() {
   echo -e "${GREEN}✓${NC}  $1"
 }
 
+# 判斷 SEAWEEDFS_S3_PASSWORD 是否為不安全的預設／佔位值。
+# 規則：未設、空字串、admin123、或以 CHANGEME / please-change / please-set 開頭都視為不安全。
+# 用法：if _is_insecure_s3_password; then ...; fi
+_is_insecure_s3_password() {
+  local pw="${SEAWEEDFS_S3_PASSWORD:-}"
+  [[ -z "$pw" ]] && return 0
+  [[ "$pw" == "admin123" ]] && return 0
+  [[ "$pw" == CHANGEME* || "$pw" == please-change* || "$pw" == please-set* ]] && return 0
+  return 1
+}
+
 log_warning() {
   echo -e "${YELLOW}⚠${NC}  $1"
 }

@@ -2,13 +2,13 @@
 
 > 本文件是 [組件庫總覽](../COMPONENT_LIBRARY.md) 的一部分，專注於 Atomic Design 的最底層 — Atoms（原子組件）。
 
-## 📋 本文件涵蓋
+## 本文件涵蓋
 
 最小不可分割的 UI 元素，如按鈕、輸入框、圖示、徽章等。這些是所有更高層級組件的基礎。
 
 ---
 
-### 🔹 Atoms（原子組件）
+### Atoms（原子組件）
 
 基礎組件，不可再分割，通常是對 MUI 組件的輕量封裝。
 
@@ -459,10 +459,10 @@ interface TextAreaProps {
 
 **適用場景**:
 
-- 📝 留言和評論輸入
-- 📄 描述和備註欄位
-- ✉️ 訊息內容編輯
-- 📋 表單的多行文字欄位
+- 留言和評論輸入
+- 描述和備註欄位
+- 訊息內容編輯
+- 表單的多行文字欄位
 
 **Storybook**: ✅ `TextArea.stories.tsx`
 
@@ -591,4 +591,4 @@ interface TextFieldProps {
 
 ---
 
-📚 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Molecules](./MOLECULES.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)
+**相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Molecules](./MOLECULES.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)

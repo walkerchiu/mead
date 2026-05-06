@@ -4,19 +4,19 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
-- [📖 概述](#-概述)
-- [🔑 權限動作類型](#-權限動作類型)
-- [📊 權限清單](#-權限清單)
-- [👤 角色定義](#-角色定義)
-- [🏗️ 架構設計](#-架構設計)
-- [⚙️ 權限隱含規則](#-權限隱含規則)
-- [📁 相關檔案](#-相關檔案)
+- [概述](#概述)
+- [權限動作類型](#權限動作類型)
+- [權限清單](#權限清單)
+- [角色定義](#角色定義)
+- [架構設計](#架構設計)
+- [權限隱含規則](#權限隱含規則)
+- [相關檔案](#相關檔案)
 
 ---
 
-## 📖 概述
+## 概述
 
 ### 核心架構
 
@@ -43,7 +43,7 @@ Scope（存取範圍）
 
 ---
 
-## 🔑 權限動作類型
+## 權限動作類型
 
 ### 基本 CRUD 動作
 
@@ -86,7 +86,7 @@ Scope（存取範圍）
 
 ---
 
-## 📊 權限清單
+## 權限清單
 
 ### HQ_SCOPE 權限（系統管理層）
 
@@ -164,7 +164,7 @@ Scope（存取範圍）
 
 ---
 
-## 👤 角色定義
+## 角色定義
 
 ### HQ Scope 角色
 
@@ -187,32 +187,32 @@ Scope（存取範圍）
 
 | 權限                   | OWNER | MANAGER | MEMBER | GUEST |
 | ---------------------- | :---: | :-----: | :----: | :---: |
-| `users:read`           |   ●   |    ●    |   ●    |   -   |
-| `users:list`           |   ●   |    ●    |   ●    |   -   |
-| `users:create`         |   ●   |    ●    |   -    |   -   |
-| `users:update`         |   ●   |    ●    |   -    |   -   |
-| `users:delete`         |   ●   |    ●    |   -    |   -   |
-| `users:reset_password` |   ●   |    ●    |   -    |   -   |
-| `roles:manage`         |   ●   |    -    |   -    |   -   |
+| `users:read`           |       |         |        |   -   |
+| `users:list`           |       |         |        |   -   |
+| `users:create`         |       |         |   -    |   -   |
+| `users:update`         |       |         |   -    |   -   |
+| `users:delete`         |       |         |   -    |   -   |
+| `users:reset_password` |       |         |   -    |   -   |
+| `roles:manage`         |       |    -    |   -    |   -   |
 
 ### 角色權限對照表（HQ Scope，SUPER_HQ 略）
 
 | 權限                   | CONTENT_EDITOR | VIEWER |
 | ---------------------- | :------------: | :----: |
-| `users:read`           |       ●        |   ●    |
-| `users:list`           |       ●        |   ●    |
-| `users:create`         |       ●        |   -    |
-| `users:update`         |       ●        |   -    |
-| `users:delete`         |       ●        |   -    |
-| `users:restore`        |       ●        |   -    |
-| `users:reset_password` |       ●        |   -    |
-| `audit-logs:read`      |       -        |   ●    |
-| `roles:read`           |       -        |   ●    |
-| `roles:manage`         |       ●        |   -    |
+| `users:read`           |                |        |
+| `users:list`           |                |        |
+| `users:create`         |                |   -    |
+| `users:update`         |                |   -    |
+| `users:delete`         |                |   -    |
+| `users:restore`        |                |   -    |
+| `users:reset_password` |                |   -    |
+| `audit-logs:read`      |       -        |        |
+| `roles:read`           |       -        |        |
+| `roles:manage`         |                |   -    |
 
 ---
 
-## 🏗️ 架構設計
+## 架構設計
 
 ### 後端權限檢查流程
 
@@ -273,7 +273,7 @@ if (hasScope('HQ_SCOPE')) {
 
 ---
 
-## ⚙️ 權限隱含規則
+## 權限隱含規則
 
 1. **`manage` 包含所有動作**
    - 擁有 `resource:manage` → 自動擁有該資源的 `create`、`read`、`update`、`delete`、`list` 等所有動作
@@ -293,7 +293,7 @@ if (hasScope('HQ_SCOPE')) {
 
 ---
 
-## 📁 相關檔案
+## 相關檔案
 
 | 檔案                                                                  | 說明                                 |
 | --------------------------------------------------------------------- | ------------------------------------ |

@@ -4,17 +4,17 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [稽核日誌系統 (Audit Log System)](#稽核日誌系統-audit-log-system)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [核心特性](#核心特性)
     - [技術架構](#技術架構)
-  - [📊 記錄內容](#-記錄內容)
+  - [記錄內容](#記錄內容)
     - [資料庫結構](#資料庫結構)
     - [記錄範例](#記錄範例)
-  - [🏗️ 架構設計](#️-架構設計)
+  - [架構設計](#架構設計)
     - [流程圖](#流程圖)
     - [關鍵組件](#關鍵組件)
       - [1. AuditLogInterceptor（攔截器）](#1-auditloginterceptor攔截器)
@@ -23,45 +23,45 @@
     - [RabbitMQ 配置](#rabbitmq-配置)
     - [批次處理機制](#批次處理機制)
     - [錯誤處理與重試](#錯誤處理與重試)
-  - [⚡ 性能優化](#-性能優化)
+  - [性能優化](#性能優化)
     - [TimescaleDB 優化](#timescaledb-優化)
     - [查詢優化](#查詢優化)
     - [快取策略](#快取策略)
-  - [📈 效能監控](#-效能監控)
+  - [效能監控](#效能監控)
     - [查詢最近的請求耗時](#查詢最近的請求耗時)
     - [分析平均效能](#分析平均效能)
     - [找出慢查詢](#找出慢查詢)
     - [分析失敗率](#分析失敗率)
     - [監控批次處理](#監控批次處理)
-  - [🔍 GraphQL 查詢](#-graphql-查詢)
+  - [GraphQL 查詢](#graphql-查詢)
     - [查詢稽核日誌（分頁）](#查詢稽核日誌分頁)
     - [依 Request ID 查詢](#依-request-id-查詢)
     - [依用戶查詢](#依用戶查詢)
     - [統計分析](#統計分析)
-  - [🔒 安全性](#-安全性)
+  - [安全性](#安全性)
     - [敏感資料過濾](#敏感資料過濾)
     - [權限控制](#權限控制)
-  - [📊 Console Log 解析](#-console-log-解析)
+  - [Console Log 解析](#console-log-解析)
     - [Frontend 耗時（Next.js SSR）](#frontend-耗時nextjs-ssr)
     - [Backend 耗時（批次處理）](#backend-耗時批次處理)
     - [實際請求耗時](#實際請求耗時)
-  - [🛠️ 維護操作](#️-維護操作)
+  - [維護操作](#維護操作)
     - [清理舊日誌](#清理舊日誌)
     - [手動觸發批次處理](#手動觸發批次處理)
     - [清除快取](#清除快取)
     - [效能監控](#效能監控)
-  - [📝 最佳實踐](#-最佳實踐)
+  - [最佳實踐](#最佳實踐)
     - [1. 定期清理舊日誌](#1-定期清理舊日誌)
     - [2. 監控批次處理效能](#2-監控批次處理效能)
     - [3. 分析慢查詢](#3-分析慢查詢)
     - [4. 安全審計](#4-安全審計)
     - [5. 異常檢測](#5-異常檢測)
     - [6. 容量規劃](#6-容量規劃)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 稽核日誌系統自動記錄所有 HTTP 和 GraphQL 請求，提供完整的審計追蹤、效能監控和安全分析功能。
 
@@ -98,7 +98,7 @@ HTTP/GraphQL Request
 
 ---
 
-## 📊 記錄內容
+## 記錄內容
 
 ### 資料庫結構
 
@@ -198,11 +198,11 @@ GROUP BY path, method
 ORDER BY COUNT(*) DESC;
 ```
 
-詳見 [REQUEST_ID_SYSTEM.md](./REQUEST_ID_SYSTEM.md#-異常與-fallback)。
+詳見 [REQUEST_ID_SYSTEM.md](./REQUEST_ID_SYSTEM.md#異常與-fallback)。
 
 ---
 
-## 🏗️ 架構設計
+## 架構設計
 
 ### 流程圖
 
@@ -434,7 +434,7 @@ try {
 
 ---
 
-## ⚡ 性能優化
+## 性能優化
 
 ### TimescaleDB 優化
 
@@ -595,7 +595,7 @@ return data;
 
 ---
 
-## 📈 效能監控
+## 效能監控
 
 ### 查詢最近的請求耗時
 
@@ -719,7 +719,7 @@ if (batchDuration > BATCH_ERROR_THRESHOLD) {
 
 ---
 
-## 🔍 GraphQL 查詢
+## GraphQL 查詢
 
 ### 查詢稽核日誌（分頁）
 
@@ -837,7 +837,7 @@ query GetAuditStatistics {
 
 ---
 
-## 🔒 安全性
+## 安全性
 
 ### 敏感資料過濾
 
@@ -899,7 +899,7 @@ async auditLogs(@Args('filters') filters: AuditLogFiltersInput) {
 
 ---
 
-## 📊 Console Log 解析
+## Console Log 解析
 
 ### Frontend 耗時（Next.js SSR）
 
@@ -941,7 +941,7 @@ QUERY_USERS...    | users   |       32 | /graphql/users...
 
 ---
 
-## 🛠️ 維護操作
+## 維護操作
 
 ### 清理舊日誌
 
@@ -1038,7 +1038,7 @@ curl -u guest:guest http://localhost:15672/api/queues/%2F/audit_log.create
 
 ---
 
-## 📝 最佳實踐
+## 最佳實踐
 
 ### 1. 定期清理舊日誌
 
@@ -1155,7 +1155,7 @@ LIMIT 12;  -- 最近 12 週
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [Request ID System](../backend/REQUEST_ID_SYSTEM.md) - 請求追蹤系統
 - [GraphQL Best Practices](../backend/GRAPHQL_BEST_PRACTICES.md) - GraphQL 最佳實踐

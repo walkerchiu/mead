@@ -159,7 +159,7 @@ function AuditLogsContent() {
 
 export default function AuditLogsPage() {
   return (
-    <ProtectedRoute requiredPermission="HQ_SCOPE">
+    <ProtectedRoute requiredScopes={['HQ_SCOPE']}>
       <AuditLogsContent />
     </ProtectedRoute>
   );

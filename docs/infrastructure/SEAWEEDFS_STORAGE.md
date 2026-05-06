@@ -4,52 +4,52 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [SeaweedFS 儲存系統指南](#seaweedfs-儲存系統指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [什麼是 SeaweedFS？](#什麼是-seaweedfs)
     - [為什麼選擇 SeaweedFS？](#為什麼選擇-seaweedfs)
     - [系統架構](#系統架構)
-  - [🚀 快速開始](#-快速開始)
+  - [快速開始](#快速開始)
     - [使用 CLI（推薦）](#使用-cli推薦)
     - [手動啟動](#手動啟動)
-  - [🔧 服務組件](#-服務組件)
+  - [服務組件](#服務組件)
     - [1. Master Server (Port 9333)](#1-master-server-port-9333)
     - [2. Volume Server (Port 8080)](#2-volume-server-port-8080)
     - [3. Filer (Port 8888)](#3-filer-port-8888)
     - [4. S3 API (Port 8333)](#4-s3-api-port-8333)
-  - [📝 常用操作](#-常用操作)
+  - [常用操作](#常用操作)
     - [啟動與停止](#啟動與停止)
     - [查看狀態](#查看狀態)
     - [健康診斷](#健康診斷)
     - [連接資訊](#連接資訊)
     - [重置資料](#重置資料)
-  - [🔌 S3 API 使用](#-s3-api-使用)
+  - [S3 API 使用](#s3-api-使用)
     - [環境變數配置](#環境變數配置)
     - [AWS CLI 配置](#aws-cli-配置)
     - [基本操作](#基本操作)
-  - [💾 備份與還原整合](#-備份與還原整合)
+  - [備份與還原整合](#備份與還原整合)
     - [備份資料](#備份資料)
     - [還原資料](#還原資料)
     - [重置資料時清理檔案](#重置資料時清理檔案)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [問題 1：S3 API 連接失敗](#問題-1s3-api-連接失敗)
     - [問題 2：Master 無法訪問](#問題-2master-無法訪問)
     - [問題 3：Volume 磁碟空間不足](#問題-3volume-磁碟空間不足)
     - [問題 4：Filer 元數據錯誤](#問題-4filer-元數據錯誤)
-  - [📊 效能優化](#-效能優化)
+  - [效能優化](#效能優化)
     - [Volume 配置](#volume-配置)
     - [Replication 策略](#replication-策略)
-  - [🔒 安全性](#-安全性)
+  - [安全性](#安全性)
     - [S3 認證](#s3-認證)
     - [網路隔離](#網路隔離)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 ### 什麼是 SeaweedFS？
 
@@ -89,7 +89,7 @@ SeaweedFS 是一個簡單且高度可擴展的分散式檔案系統，為數十�
 
 ---
 
-## 🚀 快速開始
+## 快速開始
 
 ### 使用 CLI（推薦）
 
@@ -116,7 +116,7 @@ docker-compose ps
 
 ---
 
-## 🔧 服務組件
+## 服務組件
 
 ### 1. Master Server (Port 9333)
 
@@ -184,7 +184,7 @@ curl http://localhost:8080/status
 
 ---
 
-## 📝 常用操作
+## 常用操作
 
 ### 啟動與停止
 
@@ -250,7 +250,7 @@ curl http://localhost:8080/status
 
 ---
 
-## 🔌 S3 API 使用
+## S3 API 使用
 
 ### 環境變數配置
 
@@ -314,7 +314,7 @@ aws --endpoint-url=http://localhost:8333 s3 rm s3://uploads/file.txt
 
 ---
 
-## 💾 備份與還原整合
+## 備份與還原整合
 
 SeaweedFS 已整合到資料管理流程中。
 
@@ -372,7 +372,7 @@ SeaweedFS 已整合到資料管理流程中。
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### 問題 1：S3 API 連接失敗
 
@@ -477,7 +477,7 @@ docker exec npt-timescaledb psql -U postgres -d npt_db -c "DROP SCHEMA IF EXISTS
 
 ---
 
-## 📊 效能優化
+## 效能優化
 
 ### Volume 配置
 
@@ -509,7 +509,7 @@ curl "http://localhost:9333/vol/grow?replication=001&count=3"
 
 ---
 
-## 🔒 安全性
+## 安全性
 
 ### S3 認證
 
@@ -537,7 +537,7 @@ services:
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [SeaweedFS 官方文件](https://github.com/seaweedfs/seaweedfs/wiki)
 - [S3 API 相容性](https://github.com/seaweedfs/seaweedfs/wiki/Amazon-S3-API)

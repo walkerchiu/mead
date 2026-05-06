@@ -4,46 +4,46 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [軟刪除 (Soft Delete) 功能說明](#軟刪除-soft-delete-功能說明)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [📐 Schema 結構](#-schema-結構)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [Schema 結構](#schema-結構)
     - [User 表](#user-表)
     - [Profile 表](#profile-表)
-  - [✨ 功能特性](#-功能特性)
+  - [功能特性](#功能特性)
     - [硬刪除 vs 軟刪除](#硬刪除-vs-軟刪除)
     - [Cascade 刪除](#cascade-刪除)
-  - [📝 使用範例](#-使用範例)
+  - [使用範例](#使用範例)
     - [1. 建立 User 和 Profile](#1-建立-user-和-profile)
     - [2. 查詢（排除已刪除）](#2-查詢排除已刪除)
     - [3. 軟刪除](#3-軟刪除)
     - [4. 恢復已刪除的資料](#4-恢復已刪除的資料)
     - [5. 永久刪除（Hard Delete）](#5-永久刪除hard-delete)
-  - [🔧 Prisma Middleware（推薦）](#-prisma-middleware推薦)
-  - [🔧 GraphQL 範例](#-graphql-範例)
+  - [Prisma Middleware（推薦）](#prisma-middleware推薦)
+  - [GraphQL 範例](#graphql-範例)
     - [Schema 定義](#schema-定義)
     - [Resolver](#resolver)
-  - [🎯 最佳實踐](#-最佳實踐)
+  - [最佳實踐](#最佳實踐)
     - [1. 查詢時永遠過濾 deletedAt](#1-查詢時永遠過濾-deletedat)
     - [2. 使用 Middleware 自動化](#2-使用-middleware-自動化)
     - [3. 定期清理](#3-定期清理)
     - [4. 稽核日誌](#4-稽核日誌)
-  - [⚠️ 注意事項](#️-注意事項)
+  - [注意事項](#注意事項)
     - [Cascade 限制](#cascade-限制)
     - [唯一索引衝突](#唯一索引衝突)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 User 和 Profile 資料表已實作軟刪除功能。資料不會被實際刪除，而是標記 `deletedAt` 欄位。提供完整的軟刪除、恢復與清理機制，確保資料安全與審計追蹤。
 
 ---
 
-## 📐 Schema 結構
+## Schema 結構
 
 ### User 表
 
@@ -71,7 +71,7 @@ User 和 Profile 資料表已實作軟刪除功能。資料不會被實際刪除
 
 ---
 
-## ✨ 功能特性
+## 功能特性
 
 ### 硬刪除 vs 軟刪除
 
@@ -88,7 +88,7 @@ User 和 Profile 資料表已實作軟刪除功能。資料不會被實際刪除
 
 ---
 
-## 📝 使用範例
+## 使用範例
 
 ### 1. 建立 User 和 Profile
 
@@ -209,7 +209,7 @@ await prisma.user.delete({
 
 ---
 
-## 🔧 Prisma Middleware（推薦）
+## Prisma Middleware（推薦）
 
 為了自動化軟刪除，建議使用 Prisma Middleware：
 
@@ -265,7 +265,7 @@ applySoftDeleteMiddleware(prisma);
 
 ---
 
-## 🔧 GraphQL 範例
+## GraphQL 範例
 
 ### Schema 定義
 
@@ -381,7 +381,7 @@ export class UserResolver {
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
 ### 1. 查詢時永遠過濾 deletedAt
 
@@ -459,7 +459,7 @@ async function softDeleteUser(userId: string, deletedBy: string) {
 
 ---
 
-## ⚠️ 注意事項
+## 注意事項
 
 ### Cascade 限制
 
@@ -511,7 +511,7 @@ await prisma.user.update({
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [Database Layer](./DATABASE_LAYER.md)
 - [Prisma Schema 組織](./PRISMA_SCHEMA_ORGANIZATION.md)

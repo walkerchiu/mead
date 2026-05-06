@@ -4,45 +4,45 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [UUID v7 遷移文件](#uuid-v7-遷移文件)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [✨ 為什麼使用 UUID v7？](#-為什麼使用-uuid-v7)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [為什麼使用 UUID v7？](#為什麼使用-uuid-v7)
     - [UUID v7 的優勢](#uuid-v7-的優勢)
     - [與 UUID v4 的比較](#與-uuid-v4-的比較)
-  - [📐 UUID v7 格式](#-uuid-v7-格式)
-  - [🔧 實施細節](#-實施細節)
+  - [UUID v7 格式](#uuid-v7-格式)
+  - [實施細節](#實施細節)
     - [1. PostgreSQL 函數](#1-postgresql-函數)
     - [2. Prisma Schema 更新](#2-prisma-schema-更新)
     - [3. NestJS Request ID](#3-nestjs-request-id)
-  - [🔄 Migration 遷移](#-migration-遷移)
+  - [Migration 遷移](#migration-遷移)
     - [已完成的步驟](#已完成的步驟)
     - [執行的命令](#執行的命令)
-  - [📝 使用範例](#-使用範例)
+  - [使用範例](#使用範例)
     - [TypeScript/NestJS 中生成 UUID v7](#typescriptnestjs-中生成-uuid-v7)
     - [PostgreSQL 中生成 UUID v7](#postgresql-中生成-uuid-v7)
     - [GraphQL 查詢中的 Request ID](#graphql-查詢中的-request-id)
-  - [🧪 測試驗證](#-測試驗證)
+  - [測試驗證](#測試驗證)
     - [檢查 UUID v7 格式](#檢查-uuid-v7-格式)
     - [測試排序性](#測試排序性)
-  - [⚠️ 注意事項](#️-注意事項)
+  - [注意事項](#注意事項)
     - [相容性](#相容性)
     - [效能影響](#效能影響)
     - [安全性](#安全性)
-  - [🎯 最佳實踐](#-最佳實踐)
-  - [📚 相關資源](#-相關資源)
+  - [最佳實踐](#最佳實踐)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 本專案已從 UUID v4 遷移至 UUID v7，以獲得更好的效能和可排序性。包含時間戳資訊的 UUID v7 提供自然排序能力，大幅改善資料庫索引效能。
 
 ---
 
-## ✨ 為什麼使用 UUID v7？
+## 為什麼使用 UUID v7？
 
 ### UUID v7 的優勢
 
@@ -64,7 +64,7 @@
 
 ---
 
-## 📐 UUID v7 格式
+## UUID v7 格式
 
 ```text
 019bfed6-edc7-7381-9c32-e8b66ab013e6
@@ -78,7 +78,7 @@
 
 ---
 
-## 🔧 實施細節
+## 實施細節
 
 ### 1. PostgreSQL 函數
 
@@ -93,7 +93,7 @@ DECLARE
   uuid_bytes BYTEA;
 BEGIN
   unix_ts_ms = (EXTRACT(EPOCH FROM NOW()) * 1000)::BIGINT;
-  uuid_bytes = E'\\x' ||
+  uuid_bytes = E'' ||
                LPAD(TO_HEX(unix_ts_ms), 12, '0') ||
                LPAD(TO_HEX((RANDOM() * 65535)::INT), 4, '0') ||
                '7' ||
@@ -128,7 +128,7 @@ const requestId = req.headers['x-request-id'] || uuidv7();
 
 ---
 
-## 🔄 Migration 遷移
+## Migration 遷移
 
 ### 已完成的步驟
 
@@ -162,7 +162,7 @@ pnpm --filter @npt/backend build
 
 ---
 
-## 📝 使用範例
+## 使用範例
 
 ### TypeScript/NestJS 中生成 UUID v7
 
@@ -220,7 +220,7 @@ query {
 
 ---
 
-## 🧪 測試驗證
+## 測試驗證
 
 ### 檢查 UUID v7 格式
 
@@ -251,7 +251,7 @@ SELECT id, created_at FROM test_uuids ORDER BY id;
 
 ---
 
-## ⚠️ 注意事項
+## 注意事項
 
 ### 相容性
 
@@ -274,7 +274,7 @@ SELECT id, created_at FROM test_uuids ORDER BY id;
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
 1. **新專案**: 直接使用 UUID v7
 2. **舊專案遷移**:
@@ -286,7 +286,7 @@ SELECT id, created_at FROM test_uuids ORDER BY id;
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [Database Layer](./DATABASE_LAYER.md)
 - [Prisma Schema 組織](./PRISMA_SCHEMA_ORGANIZATION.md)

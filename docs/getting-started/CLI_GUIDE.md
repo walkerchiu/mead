@@ -4,13 +4,13 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [NPT CLI 完整指南](#npt-cli-完整指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [核心特色](#核心特色)
-  - [🚀 快速開始](#-快速開始)
+  - [快速開始](#快速開始)
     - [第一次使用](#第一次使用)
     - [方式 1：互動式（推薦）](#方式-1互動式推薦)
     - [方式 2：命令列](#方式-2命令列)
@@ -35,7 +35,7 @@
     - [場景 7：翻譯改完要確認](#場景-7翻譯改完要確認)
     - [場景 8：切換到測試環境](#場景-8切換到測試環境)
     - [場景 9：查看或編輯資料庫數據](#場景-9查看或編輯資料庫數據)
-  - [📝 使用方式](#-使用方式)
+  - [使用方式](#使用方式)
     - [三種使用方式](#三種使用方式)
     - [方式 1：互動式選單（推薦新手）](#方式-1互動式選單推薦新手)
     - [方式 2：命令列（推薦熟練者）](#方式-2命令列推薦熟練者)
@@ -43,7 +43,7 @@
     - [互動式選單詳解](#互動式選單詳解)
     - [選單結構](#選單結構)
     - [資料安全性總覽](#資料安全性總覽)
-  - [🔧 核心命令](#-核心命令)
+  - [核心命令](#核心命令)
     - [./scripts/cli.sh init - 初始化環境](#scriptsclish-init---初始化環境)
     - [./scripts/cli.sh dev - 啟動開發](#scriptsclish-dev---啟動開發)
     - [./scripts/cli.sh status - 查看服務狀態](#scriptsclish-status---查看服務狀態)
@@ -60,11 +60,11 @@
     - [./scripts/cli.sh doctor - 環境診斷](#scriptsclish-doctor---環境診斷)
     - [./scripts/cli.sh deps - 依賴管理](#scriptsclish-deps---依賴管理)
     - [./scripts/cli.sh drift - 跨 repo convention drift 檢查](#scriptsclish-drift---跨-repo-convention-drift-檢查)
-  - [🎯 最佳實踐](#-最佳實踐)
+  - [最佳實踐](#最佳實踐)
     - [新開發者學習路徑](#新開發者學習路徑)
     - [開發工作流程](#開發工作流程)
     - [效率提升技巧](#效率提升技巧)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [Q1: 我不知道要用什麼命令？](#q1-我不知道要用什麼命令)
     - [Q2: 服務起不來？](#q2-服務起不來)
     - [Q3: Port 被占用？](#q3-port-被占用)
@@ -73,31 +73,31 @@
     - [Q6: Port 被占用怎麼辦？](#q6-port-被占用怎麼辦)
     - [Q7: 翻譯鍵不知道有沒有用到？](#q7-翻譯鍵不知道有沒有用到)
     - [Q8: 怎麼切換到不同環境？](#q8-怎麼切換到不同環境)
-  - [🏗️ 技術架構](#️-技術架構)
+  - [技術架構](#技術架構)
     - [Scripts 目錄結構](#scripts-目錄結構)
     - [命令實作詳解](#命令實作詳解)
     - [共用函數庫](#共用函數庫)
     - [貢獻指南](#貢獻指南)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT CLI 是一個**直覺的互動式命令列工具**，讓你無需記憶任何命令就能管理整個開發工作流程。
 
 ### 核心特色
 
-- 🎯 **互動式選單** - 直接輸入 `./scripts/cli.sh` 進入選單
-- 🚀 **一鍵初始化** - 3 分鐘完成環境設置
-- 🔧 **服務管理** - 快速啟動、重啟、查看狀態
-- 💾 **資料庫管理** - Migration、備份、還原
-- 🏥 **智能診斷** - 自動偵測並修復問題
-- ⚡ **Tab 自動完成** - Shell 補全支援
+- **互動式選單** - 直接輸入 `./scripts/cli.sh` 進入選單
+- **一鍵初始化** - 3 分鐘完成環境設置
+- **服務管理** - 快速啟動、重啟、查看狀態
+- **資料庫管理** - Migration、備份、還原
+- **智能診斷** - 自動偵測並修復問題
+- **Tab 自動完成** - Shell 補全支援
 
 ---
 
-## 🚀 快速開始
+## 快速開始
 
 ### 第一次使用
 
@@ -330,7 +330,7 @@ open http://localhost:8025
 
 ---
 
-## 📝 使用方式
+## 使用方式
 
 ### 三種使用方式
 
@@ -355,9 +355,9 @@ open http://localhost:8025
 
 **優點**：
 
-- ⚡ 快速執行
-- 🔄 可組合使用
-- 🤖 適合腳本化
+- 快速執行
+- 可組合使用
+- 適合腳本化
 
 ### 方式 3：Tab 自動完成（推薦專家）
 
@@ -383,8 +383,8 @@ open http://localhost:8025
 ```text
 ╔═══════════════════════════════════════════════╗
 ║                                               ║
-║               NPT CLI v1.1.0                 ║
-║         開發工作流程管理工具 - 互動式選單          ║
+║               NPT CLI v1.0.0                  ║
+║         給軟體專案的開發樣板 - 互動式選單          ║
 ║                                               ║
 ╚═══════════════════════════════════════════════╝
 
@@ -446,7 +446,7 @@ open http://localhost:8025
 
 ---
 
-## 🔧 核心命令
+## 核心命令
 
 ### ./scripts/cli.sh init - 初始化環境
 
@@ -550,9 +550,33 @@ open http://localhost:8025
 
 ```bash
 ./scripts/cli.sh status              # 快速狀態
-./scripts/cli.sh status --health     # 完整檢查
-./scripts/cli.sh status --watch      # 持續監控
+./scripts/cli.sh status --health     # 完整檢查（含 HTTP / GraphQL 連線測試）
+./scripts/cli.sh status --watch      # 持續監控（每 2 秒更新）
+./scripts/cli.sh status --json       # 純 JSON 輸出（給其他工具 parse）
 ```
+
+`--json` 輸出範例（jq 已安裝）：
+
+```json
+{
+  "status": "healthy",
+  "total": 12,
+  "running": 12,
+  "app": ["Frontend", "Backend", "Storybook", "Prisma Studio"],
+  "docker": [
+    "PostgreSQL",
+    "RabbitMQ",
+    "Dragonfly",
+    "Mailpit",
+    "SeaweedFS Master",
+    "SeaweedFS Volume",
+    "SeaweedFS Filer",
+    "SeaweedFS S3"
+  ]
+}
+```
+
+未安裝 jq 時會 fallback 為簡化版（僅 status / total / running）。
 
 **顯示內容**
 
@@ -795,11 +819,11 @@ open http://localhost:8025
 
 | 項目               | 位置                | 大小影響 |
 | ------------------ | ------------------- | -------- |
-| node_modules       | 所有 workspace      | 🔴 大    |
-| .next              | apps/frontend       | 🟡 中    |
-| dist               | apps/backend        | 🟢 小    |
-| Docker volumes     | Docker              | 🔴 大    |
-| .env / .env.docker | 根目錄、各 app 目錄 | 🟢 小    |
+| node_modules       | 所有 workspace      | 大       |
+| .next              | apps/frontend       | 中       |
+| dist               | apps/backend        | 小       |
+| Docker volumes     | Docker              | 大       |
+| .env / .env.docker | 根目錄、各 app 目錄 | 小       |
 
 **範例**
 
@@ -891,10 +915,10 @@ open http://localhost:8025
 
 **功能**
 
-- 🗄️ **本地 S3 儲存** - 無需依賴 AWS 雲端服務
-- 📦 **分散式架構** - Master、Volume、Filer、S3 API
-- 🔌 **S3 相容** - 完整支援 AWS S3 API
-- 💾 **備份整合** - 自動包含在資料備份/還原中
+- **本地 S3 儲存** - 無需依賴 AWS 雲端服務
+- **分散式架構** - Master、Volume、Filer、S3 API
+- **S3 相容** - 完整支援 AWS S3 API
+- **備份整合** - 自動包含在資料備份/還原中
 
 **服務組件**
 
@@ -1493,7 +1517,7 @@ No unused dependencies
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
 ### 新開發者學習路徑
 
@@ -1580,7 +1604,7 @@ we current      # = ./scripts/cli.sh env current
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### Q1: 我不知道要用什麼命令？
 
@@ -1678,7 +1702,7 @@ node cleanup-unused-i18n-keys.js --confirm
 
 ---
 
-## 🏗️ 技術架構
+## 技術架構
 
 ### Scripts 目錄結構
 
@@ -1845,7 +1869,7 @@ your-command)
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [Docker Setup](./DOCKER_SETUP.md) - Docker 配置與安全
 - [Monorepo Structure](./MONOREPO_STRUCTURE.md) - 專案結構說明

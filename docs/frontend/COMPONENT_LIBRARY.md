@@ -4,61 +4,61 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [組件庫開發指南](#組件庫開發指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [技術棧](#技術棧)
     - [為什麼使用 Atomic Design？](#為什麼使用-atomic-design)
-  - [🏗️ Atomic Design 架構](#️-atomic-design-架構)
+  - [Atomic Design 架構](#atomic-design-架構)
     - [組件層級](#組件層級)
-    - [📌 組件分類說明（重要）](#-組件分類說明重要)
+    - [組件分類說明（重要）](#組件分類說明重要)
       - [為何某些組件不在「理論上正確」的位置？](#為何某些組件不在理論上正確的位置)
       - [實際分類決策](#實際分類決策)
-      - [💡 對開發者的建議](#-對開發者的建議)
-      - [🔄 何時考慮重新分類？](#-何時考慮重新分類)
+      - [對開發者的建議](#對開發者的建議)
+      - [何時考慮重新分類？](#何時考慮重新分類)
     - [目錄結構](#目錄結構)
-  - [🎨 Design System（設計系統）](#-design-system設計系統)
+  - [Design System（設計系統）](#design-system設計系統)
     - [Colors（顏色系統）](#colors顏色系統)
     - [Typography（字體排版系統）](#typography字體排版系統)
-  - [📝 組件清單](#-組件清單)
-    - [🔹 Atoms — 原子組件](./component-library/ATOMS.md)
-    - [🟢 Molecules — 分子組件](./component-library/MOLECULES.md)
-    - [🟠 Organisms — 有機體組件](./component-library/ORGANISMS.md)
-    - [🟣 Layout / Templates / Pages](./component-library/TEMPLATES.md)
-  - [🚀 開發指南](#-開發指南)
+  - [組件清單](#組件清單)
+    - [Atoms — 原子組件](./component-library/ATOMS.md)
+    - [Molecules — 分子組件](./component-library/MOLECULES.md)
+    - [Organisms — 有機體組件](./component-library/ORGANISMS.md)
+    - [Layout / Templates / Pages](./component-library/TEMPLATES.md)
+  - [開發指南](#開發指南)
     - [建立新組件](#建立新組件)
       - [1. 確定組件層級](#1-確定組件層級)
       - [2. 建立組件檔案](#2-建立組件檔案)
       - [3. 組件結構](#3-組件結構)
       - [4. Storybook 故事](#4-storybook-故事)
       - [5. 導出組件](#5-導出組件)
-  - [📚 Storybook 使用](#-storybook-使用)
+  - [Storybook 使用](#storybook-使用)
     - [啟動 Storybook](#啟動-storybook)
     - [Storybook 組織結構](#storybook-組織結構)
     - [組件文檔](#組件文檔)
     - [MSW 整合](#msw-整合)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO - 應該這樣做](#-do---應該這樣做)
+  - [最佳實踐](#最佳實踐)
+    - [DO - 應該這樣做](#do---應該這樣做)
       - [1. 遵循 Atomic Design](#1-遵循-atomic-design)
       - [2. 使用 TypeScript](#2-使用-typescript)
       - [3. 提供 Storybook 故事](#3-提供-storybook-故事)
       - [4. 組件文檔](#4-組件文檔)
-    - [❌ DON'T - 不要這樣做](#-dont---不要這樣做)
+    - [DON'T - 不要這樣做](#dont---不要這樣做)
       - [1. 不要跨層級引用](#1-不要跨層級引用)
       - [2. 不要在組件中寫業務邏輯](#2-不要在組件中寫業務邏輯)
-  - [🤝 與設計師協作](#-與設計師協作)
+  - [與設計師協作](#與設計師協作)
     - [設計與開發流程](#設計與開發流程)
     - [從設計稿到程式碼](#從設計稿到程式碼)
     - [溝通檢查清單](#溝通檢查清單)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
     - [給設計師](#給設計師)
     - [給開發者](#給開發者)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 前端採用 **Atomic Design** 設計系統，使用 **Material-UI 7** 作為基礎 UI 框架，並透過 **Storybook** 進行組件開發和文檔管理。
 
@@ -83,7 +83,7 @@ NPT 前端採用 **Atomic Design** 設計系統，使用 **Material-UI 7** 作�
 
 ---
 
-## 🏗️ Atomic Design 架構
+## Atomic Design 架構
 
 ### 組件層級
 
@@ -99,7 +99,7 @@ Templates (模板)
 Pages (頁面)
 ```
 
-### 📌 組件分類說明（重要）
+### 組件分類說明（重要）
 
 本專案採用**務實的 Atomic Design** 實踐方式。某些組件的實際位置基於開發效率和團隊協作考量，而非嚴格的理論分類。
 
@@ -117,16 +117,16 @@ Pages (頁面)
 | **LanguageSwitcher**     | `atoms/`     | Molecule | 視為單一功能按鈕；在多個 Layout 中被引用              |
 | **SnackbarWithProgress** | `atoms/`     | Molecule | 通知提示的基礎組件；單一職責原則                      |
 
-#### 💡 對開發者的建議
+#### 對開發者的建議
 
 - ✅ **尋找組件**：使用 IDE 全域搜尋 (Cmd/Ctrl + P)
 - ✅ **引用組件**：從 `@/components` 索引檔統一引用
 - ✅ **新增組件**：參考現有類似組件的放置位置
 - ✅ **不確定時**：詢問團隊或參考本文檔組件清單
 
-> 💡 **記住**：分類的目的是幫助開發，而非限制開發。務實的分類比理論上的完美更重要。
+> **記住**：分類的目的是幫助開發，而非限制開發。務實的分類比理論上的完美更重要。
 
-#### 🔄 何時考慮重新分類？
+#### 何時考慮重新分類？
 
 只有在以下情況才考慮重構組件位置：
 
@@ -224,7 +224,7 @@ apps/frontend/src/components/
 
 ---
 
-## 🎨 Design System（設計系統）
+## Design System（設計系統）
 
 設計系統定義了應用程式的視覺語言基礎，包括顏色、字體排版等核心元素。
 
@@ -305,22 +305,22 @@ import { Typography } from '@mui/material';
 
 ---
 
-## 📝 組件清單
+## 組件清單
 
 為了便於維護，組件清單依 Atomic Design 層級拆分為四份獨立文件：
 
-| 層級                              | 文件                                                     | 說明                                                          |
-| --------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------- |
-| 🔹 **Atoms**                      | [組件清單 - Atoms](./component-library/ATOMS.md)         | 原子組件 — 最小不可分割的 UI 元素（Button、TextField、Icon…） |
-| 🟢 **Molecules**                  | [組件清單 - Molecules](./component-library/MOLECULES.md) | 分子組件 — 由 Atoms 組成的功能單元（FormField、Card、Toast…） |
-| 🟠 **Organisms**                  | [組件清單 - Organisms](./component-library/ORGANISMS.md) | 有機體組件 — 複雜獨立的 UI 區塊（Modal、Sidebar、Form…）      |
-| 🟣 **Layout / Templates / Pages** | [組件清單 - Templates](./component-library/TEMPLATES.md) | 佈局、模板與 Storybook 頁面範例                               |
+| 層級                           | 文件                                                     | 說明                                                          |
+| ------------------------------ | -------------------------------------------------------- | ------------------------------------------------------------- |
+| **Atoms**                      | [組件清單 - Atoms](./component-library/ATOMS.md)         | 原子組件 — 最小不可分割的 UI 元素（Button、TextField、Icon…） |
+| **Molecules**                  | [組件清單 - Molecules](./component-library/MOLECULES.md) | 分子組件 — 由 Atoms 組成的功能單元（FormField、Card、Toast…） |
+| **Organisms**                  | [組件清單 - Organisms](./component-library/ORGANISMS.md) | 有機體組件 — 複雜獨立的 UI 區塊（Modal、Sidebar、Form…）      |
+| **Layout / Templates / Pages** | [組件清單 - Templates](./component-library/TEMPLATES.md) | 佈局、模板與 Storybook 頁面範例                               |
 
-> 💡 拆分原因：原本單一文件超過 3600 行，不利查閱與維護。依職責分拆後，前端工程師可快速定位所需組件層級。
+> 拆分原因：原本單一文件超過 3600 行，不利查閱與維護。依職責分拆後，前端工程師可快速定位所需組件層級。
 
 ---
 
-## 🚀 開發指南
+## 開發指南
 
 ### 建立新組件
 
@@ -420,7 +420,7 @@ export type { AvatarProps } from './Avatar';
 
 ---
 
-## 📚 Storybook 使用
+## Storybook 使用
 
 Storybook 是設計規範的展示來源，所有規範與組件都必須有對應的 Story，並與專案 Token / 字體 / 斷點保持一致。
 
@@ -483,7 +483,7 @@ pnpm storybook
    ForgotPasswordPage, LoginPage, LoginPageWithMSW, ResetPasswordPage
 ```
 
-> 💡 排序規則在 `.storybook/preview.tsx` 的 `storySort` 設定。新增組件時只需確保 Story 的 `title` 正確（如 `Molecules/KPICard`），Storybook 會自動依字母排序放入對應位置。
+> 排序規則在 `.storybook/preview.tsx` 的 `storySort` 設定。新增組件時只需確保 Story 的 `title` 正確（如 `Molecules/KPICard`），Storybook 會自動依字母排序放入對應位置。
 
 ### 組件文檔
 
@@ -534,9 +534,9 @@ export const Success: Story = {
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO - 應該這樣做
+### DO - 應該這樣做
 
 #### 1. 遵循 Atomic Design
 
@@ -592,7 +592,7 @@ export const WithError: Story = { ... };
 export const Button: React.FC<ButtonProps> = ({ ... }) => { ... };
 ```
 
-### ❌ DON'T - 不要這樣做
+### DON'T - 不要這樣做
 
 #### 1. 不要跨層級引用
 
@@ -623,7 +623,7 @@ const LoginForm = ({ onSubmit }) => {
 
 ---
 
-## 🤝 與設計師協作
+## 與設計師協作
 
 ### 設計與開發流程
 
@@ -675,14 +675,14 @@ const LoginForm = ({ onSubmit }) => {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 ### 給設計師
 
-- 🎨 [DESIGN_GUIDE.md](./DESIGN_GUIDE.md) - 組件設計指南
+- [DESIGN_GUIDE.md](./DESIGN_GUIDE.md) - 組件設計指南
 
 ### 給開發者
 
-- 🔧 [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合指南
-- 🧪 [MSW_SETUP.md](./MSW_SETUP.md) - MSW 設置
-- 📐 [MONOREPO_STRUCTURE.md](../getting-started/MONOREPO_STRUCTURE.md) - 專案結構
+- [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合指南
+- [MSW_SETUP.md](./MSW_SETUP.md) - MSW 設置
+- [MONOREPO_STRUCTURE.md](../getting-started/MONOREPO_STRUCTURE.md) - 專案結構

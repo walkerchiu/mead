@@ -1,5 +1,29 @@
 # Backend Conventions
 
+## 目錄
+
+- [1. RBAC 命名風格：action-semantic](#1-rbac-命名風格：action-semantic)
+- [2. Resolver arg 命名規則](#2-resolver-arg-命名規則)
+  - [2.1 單一目標 mutation（CRUD 該 resource 本身）— 用 `id`](#21-單一目標-mutationcrud-該-resource-本身—-用-id)
+  - [2.2 關係型 mutation（兩個 resource 間的 link，無「單一 target」）— 全用 `{X}Id`](#22-關係型-mutation兩個-resource-間的-link，無單一-target—-全用-xid)
+  - [2.3 單一資源 Query（拿一筆）— 用 `id`](#23-單一資源-query拿一筆—-用-id)
+  - [2.4 Collection Query（scoped 列表或相關子集）— 用 `{X}Id`](#24-collection-queryscoped-列表或相關子集—-用-xid)
+  - [2.5 Delete mutation 回傳型別](#25-delete-mutation-回傳型別)
+- [3. GraphQL schema 常用型別欄位](#3-graphql-schema-常用型別欄位)
+  - [3.1 `PageInfo`](#31-pageinfo)
+  - [3.2 `{Module}ActivityEvent`（業務模組擴充用）](#32-moduleactivityevent業務模組擴充用)
+- [4. Resolver 守法：用 decorator，不要硬編角色名](#4-resolver-守法：用-decorator，不要硬編角色名)
+  - [正確](#正確)
+  - [錯誤](#錯誤)
+  - [例外可以手動檢查](#例外可以手動檢查)
+- [5. 模板內建 baseline permission](#5-模板內建-baseline-permission)
+  - [HQ_SCOPE](#hqscope)
+  - [CUSTOMER_SCOPE](#customerscope)
+- [6. 檢核工具](#6-檢核工具)
+  - [加新規則](#加新規則)
+
+---
+
 > 本文件定義 NPT 模板的後端慣例。新業務模組請依此規範實作。
 >
 > 本文件由 Phase 0 建立，之後每次 convention 變更都要 commit 更新。
@@ -139,7 +163,7 @@ type {Module}ActivityEvent {
 
 ## 4. Resolver 守法：用 decorator，不要硬編角色名
 
-### ✅ 正確
+### 正確
 
 ```ts
 @Mutation(...)
@@ -156,7 +180,7 @@ async createUser(...) { ... }
 async listUsers(...) { ... }
 ```
 
-### ❌ 錯誤
+### 錯誤
 
 ```ts
 const isManager = user.roles?.some(

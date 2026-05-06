@@ -4,29 +4,29 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [會話管理系統用詞規範 (Session Terminology)](#會話管理系統用詞規範-session-terminology)
-  - [📋 目錄](#-目錄)
-  - [🔄 會話狀態 (Session Status)](#-會話狀態-session-status)
+  - [目錄](#目錄)
+  - [會話狀態 (Session Status)](#會話狀態-session-status)
     - [狀態定義](#狀態定義)
     - [狀態轉換](#狀態轉換)
-  - [🛠️ 撤銷方式 (Revoked Method)](#️-撤銷方式-revoked-method)
+  - [撤銷方式 (Revoked Method)](#撤銷方式-revoked-method)
     - [方式定義](#方式定義)
-  - [📊 審計日誌動作 (Audit Log Actions)](#-審計日誌動作-audit-log-actions)
+  - [審計日誌動作 (Audit Log Actions)](#審計日誌動作-audit-log-actions)
     - [動作定義](#動作定義)
     - [審計日誌內容範例](#審計日誌內容範例)
-  - [🎨 UI 顯示規範](#-ui-顯示規範)
-  - [🌐 前端翻譯鍵值](#-前端翻譯鍵值)
-  - [💾 數據庫欄位](#-數據庫欄位)
-  - [✅ 實現檢查清單](#-實現檢查清單)
-  - [❓ 常見問題 (FAQ)](#-常見問題-faq)
-  - [📚 相關文檔](#-相關文檔)
-  - [🧪 測試工具](#-測試工具)
+  - [UI 顯示規範](#ui-顯示規範)
+  - [前端翻譯鍵值](#前端翻譯鍵值)
+  - [數據庫欄位](#數據庫欄位)
+  - [實現檢查清單](#實現檢查清單)
+  - [常見問題 (FAQ)](#常見問題-faq)
+  - [相關文檔](#相關文檔)
+  - [測試工具](#測試工具)
 
 ---
 
-## 🔄 會話狀態 (Session Status)
+## 會話狀態 (Session Status)
 
 ### 狀態定義
 
@@ -46,16 +46,16 @@ ACTIVE ──用戶登出──→ REVOKED (USER_LOGOUT)
        ──時間過期──→ EXPIRED (AUTO_EXPIRE)
 ```
 
-### ⚠️ 重要說明
+### 重要說明
 
 **已過期 (EXPIRED)** 和 **已撤銷 (REVOKED)** 是不同的概念：
 
-- ⏰ **已過期**：會話因時間到期而自然失效，由系統 Cron Job 自動處理
-- 🚫 **已撤銷**：會話被人為主動終止（用戶登出、管理員操作、安全措施）
+- **已過期**：會話因時間到期而自然失效，由系統 Cron Job 自動處理
+- **已撤銷**：會話被人為主動終止（用戶登出、管理員操作、安全措施）
 
 ---
 
-## 🛠️ 撤銷方式 (Revoked Method)
+## 撤銷方式 (Revoked Method)
 
 ### 方式定義
 
@@ -67,72 +67,72 @@ ACTIVE ──用戶登出──→ REVOKED (USER_LOGOUT)
 | `AUTO_EXPIRE`      | 自動過期   | Auto Expired     | Cron Job 處理過期會話  | 灰色 | 系統     |
 | `SECURITY_MEASURE` | 安全措施   | Security Revoked | 安全事件觸發的撤銷     | 紅色 | 系統     |
 
-### 📝 詳細說明
+### 詳細說明
 
-#### 🟢 USER_LOGOUT（自己登出）
+#### USER_LOGOUT（自己登出）
 
-- ⏰ **觸發時機**：用戶點擊登出按鈕
-- 🎯 **影響範圍**：僅當前會話
-- 💾 **數據庫記錄**：
+- **觸發時機**：用戶點擊登出按鈕
+- **影響範圍**：僅當前會話
+- **數據庫記錄**：
   - `revokedAt`: 登出時間
   - `revokedBy`: 用戶自己的 ID
   - `revokedMethod`: `USER_LOGOUT`
   - `revokedReason`: "用戶主動登出" 或自定義原因
-- 📊 **審計日誌動作**：`SESSION_REVOKED`
+- **審計日誌動作**：`SESSION_REVOKED`
 
-#### 🟠 HQ_FORCE（管理員撤銷）
+#### HQ_FORCE（管理員撤銷）
 
-- ⏰ **觸發時機**：管理員在會話管理頁面撤銷特定會話
-- 🎯 **影響範圍**：單一會話
-- 💾 **數據庫記錄**：
+- **觸發時機**：管理員在會話管理頁面撤銷特定會話
+- **影響範圍**：單一會話
+- **數據庫記錄**：
   - `revokedAt`: 撤銷時間
   - `revokedBy`: 管理員 ID
   - `revokedMethod`: `HQ_FORCE`
   - `revokedReason`: 管理員提供的原因
-- 📊 **審計日誌動作**：`SESSION_REVOKED`
-- 🖥️ **UI 顯示**：顯示撤銷者姓名（例如："管理員撤銷 (Super HQ)"）
+- **審計日誌動作**：`SESSION_REVOKED`
+- **UI 顯示**：顯示撤銷者姓名（例如："管理員撤銷 (Super HQ)"）
 
-#### 🟠 BATCH_REVOKE（批量撤銷）
+#### BATCH_REVOKE（批量撤銷）
 
-- ⏰ **觸發時機**：管理員使用批量撤銷功能
-- 🎯 **影響範圍**：多個會話（根據條件篩選）
-- 💾 **數據庫記錄**：
+- **觸發時機**：管理員使用批量撤銷功能
+- **影響範圍**：多個會話（根據條件篩選）
+- **數據庫記錄**：
   - `revokedAt`: 撤銷時間
   - `revokedBy`: 管理員 ID
   - `revokedMethod`: `BATCH_REVOKE`
   - `revokedReason`: 管理員提供的原因
-- 📊 **審計日誌動作**：`BATCH_SESSIONS_REVOKED`
-- 🖥️ **UI 顯示**：顯示撤銷者姓名（例如："批量撤銷 (Super HQ)"）
+- **審計日誌動作**：`BATCH_SESSIONS_REVOKED`
+- **UI 顯示**：顯示撤銷者姓名（例如："批量撤銷 (Super HQ)"）
 
-#### ⚪ AUTO_EXPIRE（自動過期）
+#### AUTO_EXPIRE（自動過期）
 
-- ⏰ **觸發時機**：Cron Job 定期掃描（每 6 小時）
-- 🎯 **影響範圍**：所有已過期但未處理的會話
-- 💾 **數據庫記錄**：
+- **觸發時機**：Cron Job 定期掃描（每 6 小時）
+- **影響範圍**：所有已過期但未處理的會話
+- **數據庫記錄**：
   - `revokedAt`: 處理時間
   - `revokedBy`: `null`（系統自動）
   - `revokedMethod`: `AUTO_EXPIRE`
   - `revokedReason`: "Session expired automatically"
-- 📊 **審計日誌動作**：`SESSION_EXPIRED`
-- 🖥️ **UI 顯示**：顯示為「已過期」狀態，而非「已撤銷」
+- **審計日誌動作**：`SESSION_EXPIRED`
+- **UI 顯示**：顯示為「已過期」狀態，而非「已撤銷」
 
-#### 🔴 SECURITY_MEASURE（安全措施）
+#### SECURITY_MEASURE（安全措施）
 
-- ⏰ **觸發時機**：
+- **觸發時機**：
   - 偵測到可疑活動
   - 密碼重設後撤銷所有會話
   - 帳號被鎖定或停用
-- 🎯 **影響範圍**：特定用戶的所有會話
-- 💾 **數據庫記錄**：
+- **影響範圍**：特定用戶的所有會話
+- **數據庫記錄**：
   - `revokedAt`: 撤銷時間
   - `revokedBy`: 系統 ID 或管理員 ID
   - `revokedMethod`: `SECURITY_MEASURE`
   - `revokedReason`: 詳細的安全原因
-- 📊 **審計日誌動作**：`SESSION_REVOKED`
+- **審計日誌動作**：`SESSION_REVOKED`
 
 ---
 
-## 📊 審計日誌動作 (Audit Log Actions)
+## 審計日誌動作 (Audit Log Actions)
 
 ### 動作定義
 
@@ -190,7 +190,7 @@ ACTIVE ──用戶登出──→ REVOKED (USER_LOGOUT)
 
 ---
 
-## 🎨 UI 顯示規範
+## UI 顯示規範
 
 ### 會話列表表格
 
@@ -228,7 +228,7 @@ SECURITY_MEASURE  → error (紅色)
 
 ---
 
-## 🌐 前端翻譯鍵值
+## 前端翻譯鍵值
 
 ### 會話狀態
 
@@ -248,7 +248,7 @@ SECURITY_MEASURE  → error (紅色)
 
 ---
 
-## 💾 數據庫欄位
+## 數據庫欄位
 
 ### Session 表相關欄位
 
@@ -273,7 +273,7 @@ SECURITY_MEASURE  → error (紅色)
 
 ---
 
-## ✅ 實現檢查清單
+## 實現檢查清單
 
 ### 後端實作
 
@@ -336,21 +336,21 @@ SECURITY_MEASURE  → error (紅色)
 
 ### 測試覆蓋
 
-- ⏳ **待完成** - 單元測試：`getSessionStatus` 各種情況
-- ⏳ **待完成** - 整合測試：Cron Job 正確標記過期會話為 EXPIRED
-- ⏳ **待完成** - E2E 測試：撤銷會話後重新登入，會話仍顯示為 REVOKED
-- ⏳ **待完成** - E2E 測試：過期會話顯示為 EXPIRED 而非 REVOKED
+- **待完成** - 單元測試：`getSessionStatus` 各種情況
+- **待完成** - 整合測試：Cron Job 正確標記過期會話為 EXPIRED
+- **待完成** - E2E 測試：撤銷會話後重新登入，會話仍顯示為 REVOKED
+- **待完成** - E2E 測試：過期會話顯示為 EXPIRED 而非 REVOKED
 
 ---
 
-## ❓ 常見問題 (FAQ)
+## 常見問題 (FAQ)
 
 ### Q1: 為什麼要區分「已過期」和「已撤銷」？
 
 **A:** 這兩者代表不同的原因和責任：
 
-- ⏰ **已過期**：自然的時間流逝，系統預期行為
-- 🚫 **已撤銷**：人為主動操作，可能是安全問題或用戶選擇
+- **已過期**：自然的時間流逝，系統預期行為
+- **已撤銷**：人為主動操作，可能是安全問題或用戶選擇
 
 區分這兩者有助於審計和安全分析。
 
@@ -395,14 +395,13 @@ SECURITY_MEASURE  → error (紅色)
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
-- [專案開發路線圖](../PROJECT_ROADMAP.md)
 - [Cron Jobs 文檔](./CRON_JOBS.md) - 定期任務實作指南
 - [前端錯誤處理指南](../frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)
 - [GraphQL Subscriptions 實現計劃](./SUBSCRIPTION_IMPLEMENTATION_PLAN.md)
 - [RBAC 架構](../authentication/RBAC_ARCHITECTURE.md)
 
-## 🧪 測試工具
+## 測試工具
 
 - [過期會話清理測試腳本](../../apps/backend/src/scripts/test-expired-sessions-cleanup.ts)

@@ -7,25 +7,25 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [RBAC 架構設計文件](#rbac-架構設計文件)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🏗️ 架構圖](#️-架構圖)
-  - [📊 資料模型](#-資料模型)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [架構圖](#架構圖)
+  - [資料模型](#資料模型)
     - [1. AccessScope Enum](#1-accessscope-enum)
     - [2. User Model (更新)](#2-user-model-更新)
     - [3. Role Model](#3-role-model)
     - [4. Permission Model](#4-permission-model)
     - [5. UserRole (多對多關聯表)](#5-userrole-多對多關聯表)
     - [6. RolePermission (多對多關聯表)](#6-rolepermission-多對多關聯表)
-  - [📝 權限命名規範](#-權限命名規範)
+  - [權限命名規範](#權限命名規範)
     - [格式](#格式)
     - [Resource 類別](#resource-類別)
     - [Action 類別](#action-類別)
     - [範例](#範例)
-  - [🎯 預設角色與權限](#-預設角色與權限)
+  - [預設角色與權限](#預設角色與權限)
     - [HQ Portal (HQ_SCOPE)](#hq-portal-hq_scope)
       - [SUPER_HQ](#super_hq)
       - [CONTENT_EDITOR](#content_editor)
@@ -34,26 +34,26 @@
       - [OWNER](#owner)
       - [MEMBER](#member)
       - [GUEST](#guest)
-  - [🔐 JWT Token 結構](#-jwt-token-結構)
-  - [🔍 權限檢查流程](#-權限檢查流程)
-  - [📝 Decorator 使用範例](#-decorator-使用範例)
-  - [🔄 Migration 策略](#-migration-策略)
+  - [JWT Token 結構](#jwt-token-結構)
+  - [權限檢查流程](#權限檢查流程)
+  - [Decorator 使用範例](#decorator-使用範例)
+  - [Migration 策略](#migration-策略)
     - [從現有系統遷移](#從現有系統遷移)
-  - [🚀 未來擴展](#-未來擴展)
+  - [未來擴展](#未來擴展)
     - [1. 角色繼承](#1-角色繼承)
     - [2. 條件權限](#2-條件權限)
     - [3. 時間限制權限](#3-時間限制權限)
-  - [📋 Phase 3: Field-Level Authorization (欄位級別授權)](#-phase-3-field-level-authorization-欄位級別授權)
+  - [Phase 3: Field-Level Authorization (欄位級別授權)](#phase-3-field-level-authorization-欄位級別授權)
     - [概述](#概述)
     - [三層權限控制](#三層權限控制)
     - [欄位裝飾器](#欄位裝飾器)
     - [權限矩陣（含欄位級別）](#權限矩陣含欄位級別)
     - [效能優化](#效能優化)
-  - [📖 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 本系統採用多層式權限控制架構：
 
@@ -62,14 +62,14 @@
 3. **RBAC（角色權限）** - 在每個介面內進行細粒度權限控制
 4. **Field-Level Authorization** - 精確控制欄位可見性
 
-> **🔗 相關文檔**
+> **相關文檔**
 >
 > - [Row-Level Security](./ROW_LEVEL_SECURITY.md) - AccessScope 資料行過濾
 > - [Field-Level Authorization](./FIELD_AUTHORIZATION.md) - GraphQL 欄位權限
 
 ---
 
-## 🏗️ 架構圖
+## 架構圖
 
 ```text
 JWT Token
@@ -120,7 +120,7 @@ JWT Token
 
 ---
 
-## 📊 資料模型
+## 資料模型
 
 ### 1. AccessScope Enum
 
@@ -235,7 +235,7 @@ model RolePermission {
 
 ---
 
-## 📝 權限命名規範
+## 權限命名規範
 
 ### 格式
 
@@ -278,7 +278,7 @@ cron_jobs:write         // 修改排程任務
 
 ---
 
-## 🎯 預設角色與權限
+## 預設角色與權限
 
 > 完整的角色權限對照表請參考 [PERMISSION_SYSTEM.md](./PERMISSION_SYSTEM.md#角色權限對照表)。
 
@@ -301,7 +301,7 @@ cron_jobs:write         // 修改排程任務
 
 ---
 
-## 🔐 JWT Token 結構
+## JWT Token 結構
 
 ```typescript
 interface JwtPayload {
@@ -337,7 +337,7 @@ interface JwtPayload {
 
 ---
 
-## 🔍 權限檢查流程
+## 權限檢查流程
 
 ```typescript
 // Step 1: 驗證 JWT Token
@@ -378,7 +378,7 @@ if (!hasPermission) {
 
 ---
 
-## 📝 Decorator 使用範例
+## Decorator 使用範例
 
 ```typescript
 // 檢查 AccessScope
@@ -400,7 +400,7 @@ async updateUser() { }
 
 ---
 
-## 🔄 Migration 策略
+## Migration 策略
 
 ### 從現有系統遷移
 
@@ -414,7 +414,7 @@ async updateUser() { }
 
 ---
 
-## 🚀 未來擴展
+## 未來擴展
 
 ### 1. 角色繼承
 
@@ -453,7 +453,7 @@ Customer Scope:
 
 ---
 
-## 📋 Phase 3: Field-Level Authorization (欄位級別授權)
+## Phase 3: Field-Level Authorization (欄位級別授權)
 
 ### 概述
 
@@ -509,7 +509,7 @@ export class UserType {
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 - [權限系統](./PERMISSION_SYSTEM.md) - 完整的角色定義、權限清單及對照表（**主要參考**）
 - [Row-Level Security](./ROW_LEVEL_SECURITY.md) - AccessScope 資料行過濾

@@ -288,7 +288,7 @@ function CronJobsContent() {
 
 export default function CronJobsPage() {
   return (
-    <ProtectedRoute requiredPermission="HQ_SCOPE">
+    <ProtectedRoute requiredScopes={['HQ_SCOPE']}>
       <CronJobsContent />
     </ProtectedRoute>
   );

@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [環境分層](#環境分層)
 - [目前的部署架構（Dev）](#目前的部署架構dev)
@@ -104,7 +104,7 @@ NPT 規劃四層環境：
 
 ## 建議的正式部署架構
 
-> 📌 **規劃中**：本節為尚未實作的建議架構。
+> **規劃中**：本節為尚未實作的建議架構。
 
 ### 方案 A：單機 Docker Compose（小規模 / 內部使用）
 
@@ -378,8 +378,6 @@ kubectl rollout undo deployment/npt-backend
 2. **CI/CD pipeline**（GitHub Actions）
 3. **基礎監控**（至少 Sentry + 基本日誌集中）
 4. **`/health` endpoint**（使用 `@nestjs/terminus`）
-
-追蹤進度見 [PROJECT_ROADMAP](../PROJECT_ROADMAP.md)。
 
 ---
 

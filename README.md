@@ -6,7 +6,7 @@
 
 ![Node.js](https://img.shields.io/badge/Node.js-%3E%3D20.0.0-339933?logo=node.js&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-%3E%3D9.0.0-F69220?logo=pnpm&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?logo=typescript&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
 ![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)
 ![MUI](https://img.shields.io/badge/MUI-7-007FFF?logo=mui&logoColor=white)
@@ -16,7 +16,7 @@
 ![Turborepo](https://img.shields.io/badge/Turborepo-2-EF4444?logo=turborepo&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=white)
 
-## 📋 目錄
+## 目錄
 
 - [架構](#架構)
 - [主要功能](#主要功能)
@@ -67,7 +67,7 @@ npt/
 
 ## 內建功能
 
-### 🔐 認證與授權
+### 認證與授權
 
 - JWT Token 認證（access + refresh）
 - 雙因素認證（2FA，Email-based）
@@ -78,13 +78,13 @@ npt/
 - 個人存取權杖（PAT）基礎建設
 - 帳號鎖定、密碼歷史、密碼政策
 
-### 👤 用戶與角色管理
+### 用戶與角色管理
 
 - 用戶 CRUD、軟刪除、還原
 - HQ 後台管理介面（用戶、角色、會話）
 - Profile / Account 個人設定頁
 
-### 📊 資料管理
+### 資料管理
 
 - GraphQL API（Apollo Server，支援 Subscriptions）
 - Prisma ORM + TimescaleDB
@@ -92,26 +92,26 @@ npt/
 - 稽核日誌系統（RabbitMQ 批次寫入 + TimescaleDB 優化）
 - Offset-based 分頁
 
-### 🔔 通知
+### 通知
 
 - 系統通知（鈴鐺 + 通知中心，支援 BroadcastChannel 跨頁同步）
 - Email 通知（密碼變更、會話撤銷、PAT 建立/撤銷等）
 - GraphQL Subscriptions 即時推播
 
-### ⏰ 系統運維
+### 系統運維
 
 - Cron Job 監控與管理介面（分散式鎖）
 - Session 管理與批次撤銷
 - TLS 自動化（LetsEncrypt / Cloudflare / AWS ACM）
 
-### 🌐 多語系 (i18n)
+### 多語系 (i18n)
 
 - 前端：next-intl（路徑前綴 `/en`、`/zh-TW`）
 - 後端：nestjs-i18n（Accept-Language / x-lang header）
 - Email 模板：依語言載入對應模板
 - 支援語言：English (en)、繁體中文 (zh-TW)
 
-### 🎨 前端技術
+### 前端技術
 
 - Next.js 16 App Router
 - Material-UI 7 組件庫
@@ -119,7 +119,7 @@ npt/
 - Atomic Design 架構
 - Storybook 10 組件展示
 
-### 🚀 開發工具
+### 開發工具
 
 - NPT CLI（一鍵 init / dev / restart / db / status / doctor）
 - Turborepo 任務編排
@@ -180,10 +180,11 @@ NPT CLI 會自動完成：
 
 ### 預設帳號（development / uat seed 共用）
 
-| Email                | 密碼           | 角色                                              |
-| -------------------- | -------------- | ------------------------------------------------- |
-| `hq@example.com`     | `Password123!` | `SUPER_HQ`（HQ）+ `MANAGER`（CUSTOMER）— 最高權限 |
-| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE）— 用於測試「未授權」情境    |
+| Email                | 密碼           | 角色                                                    |
+| -------------------- | -------------- | ------------------------------------------------------- |
+| `hq@example.com`     | `Password123!` | `SUPER_HQ`（HQ）+ `MANAGER`（CUSTOMER）— 最高權限       |
+| `admin@example.com`  | `Password123!` | `OWNER`（CUSTOMER）— 純 Customer Scope dashboard 體驗用 |
+| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE）— 用於測試「未授權」情境          |
 
 > Production 環境刻意**不**建立任何測試帳號。部署前請改密碼並建立正式帳號。
 > 詳見 `apps/backend/database/prisma/seeds/development.ts`。
@@ -351,11 +352,11 @@ docker-compose ps                              # 查看服務狀態
 
 完整的專案文檔已組織在 [`docs/`](docs/) 目錄中。
 
-### 🎯 開始閱讀
+### 開始閱讀
 
-**[📖 文檔導航中心](docs/README.md)** ← 從這裡開始！
+**[文檔導航中心](docs/README.md)** ← 從這裡開始！
 
-### 📖 新手推薦閱讀順序
+### 新手推薦閱讀順序
 
 1. [貢獻指南](docs/getting-started/CONTRIBUTING.md) - 開發流程、Commit 規範、PR 流程
 2. [NPT CLI 完整指南](docs/getting-started/CLI_GUIDE.md) - 開發者工具
@@ -364,7 +365,7 @@ docker-compose ps                              # 查看服務狀態
 5. [前後端 i18n 協調機制](docs/getting-started/I18N_COORDINATION.md) - 多國語系
 6. [疑難排解](docs/getting-started/TROUBLESHOOTING.md) - 遇到問題時先看這裡
 
-### 🔥 熱門文檔
+### 熱門文檔
 
 - [API 回應格式規範](docs/backend/API_RESPONSE_FORMAT.md) - 統一 API 格式
 - [RBAC 架構](docs/authentication/RBAC_ARCHITECTURE.md) - 角色權限系統
@@ -376,3 +377,15 @@ docker-compose ps                              # 查看服務狀態
 ## 作者
 
 **Walker Chiu** - [walker.chiu@icp-si.com](mailto:walker.chiu@icp-si.com)
+
+---
+
+## 版權聲明 / Copyright
+
+Copyright 2026 **加雲聯網股份有限公司** (Intelligent Cloud Plus Inc.)
+All Rights Reserved.
+
+本軟體為加雲聯網股份有限公司之專有財產，未經書面授權不得複製、修改、散布或使用。
+This software is proprietary to Intelligent Cloud Plus Inc. and may not
+be reproduced, modified, distributed, or used without prior written
+permission. See [LICENSE](./LICENSE) for full terms.

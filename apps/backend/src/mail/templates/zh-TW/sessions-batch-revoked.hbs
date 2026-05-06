@@ -4,19 +4,87 @@
     <meta name='viewport' content='width=device-width, initial-scale=1.0' />
     <title>多個會話已被終止</title>
     <style>
-      body { font-family: 'Microsoft JhengHei', 'PingFang TC', -apple-system, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f6f9; }
-      .container { max-width: 600px; margin: 20px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
-      .header { background-color: #1a365d; color: white; padding: 28px 24px; text-align: center; }
-      .header h2 { margin: 0; font-size: 22px; font-weight: 600; }
-      .content { padding: 32px 24px; }
-      .content p { margin: 0 0 16px; }
-      .info-box { background-color: #f7f8fa; border-left: 4px solid #2b6cb0; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
-      .info-box h3 { margin: 0 0 10px; font-size: 16px; color: #1a365d; }
-      .session-item { padding: 12px 14px; margin: 8px 0; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; }
-      .session-item p { margin: 4px 0; font-size: 14px; }
-      .admin-message { background-color: #fffbeb; border-left: 4px solid #d69e2e; padding: 14px 16px; margin: 20px 0; border-radius: 4px; }
-      .admin-message h3 { margin: 0 0 8px; font-size: 16px; color: #744210; }
-      .footer { background-color: #f7f8fa; padding: 20px 24px; text-align: center; font-size: 12px; color: #888; border-top: 1px solid #e8ecf1; }
+      body {
+        font-family:
+          'Microsoft JhengHei',
+          'PingFang TC',
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        line-height: 1.6;
+        color: #333;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f6f9;
+      }
+      .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .header {
+        background-color: #1a365d;
+        color: white;
+        padding: 28px 24px;
+        text-align: center;
+      }
+      .header h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+      }
+      .content {
+        padding: 32px 24px;
+      }
+      .content p {
+        margin: 0 0 16px;
+      }
+      .info-box {
+        background-color: #f7f8fa;
+        border-left: 4px solid #2b6cb0;
+        padding: 14px 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .info-box h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+        color: #1a365d;
+      }
+      .session-item {
+        padding: 12px 14px;
+        margin: 8px 0;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+      }
+      .session-item p {
+        margin: 4px 0;
+        font-size: 14px;
+      }
+      .admin-message {
+        background-color: #fffbeb;
+        border-left: 4px solid #d69e2e;
+        padding: 14px 16px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      .admin-message h3 {
+        margin: 0 0 8px;
+        font-size: 16px;
+        color: #744210;
+      }
+      .footer {
+        background-color: #f7f8fa;
+        padding: 20px 24px;
+        text-align: center;
+        font-size: 12px;
+        color: #888;
+        border-top: 1px solid #e8ecf1;
+      }
     </style>
   </head>
   <body>
@@ -35,7 +103,8 @@
           {{#each sessions}}
             <div class='session-item'>
               <p><strong>設備：</strong>{{this.deviceInfo}}</p>
-              {{#if this.browser}}<p><strong>瀏覽器：</strong>{{this.browser}}</p>{{/if}}
+              {{#if this.browser}}<p><strong
+                  >瀏覽器：</strong>{{this.browser}}</p>{{/if}}
               {{#if this.ipAddress}}<p><strong>IP 位址：</strong>{{this.ipAddress}}</p>{{/if}}
               <p><strong>最後活動：</strong>{{this.lastUsedAt}}</p>
             </div>
@@ -44,7 +113,8 @@
 
         <div class='info-box'>
           <h3>撤銷資訊</h3>
-          <p style='margin: 0;'><strong>撤銷者：</strong>{{revokedByName}} ({{revokedBy}})</p>
+          <p style='margin: 0;'><strong>撤銷者：</strong>{{revokedByName}}
+            ({{revokedBy}})</p>
           <p style='margin: 4px 0 0;'><strong>原因：</strong>{{reason}}</p>
           <p style='margin: 4px 0 0;'><strong>時間：</strong>{{timestamp}}</p>
         </div>
@@ -57,15 +127,22 @@
         {{/if}}
 
         <p>如需重新登入，請訪問我們的網站。如有任何疑問，請聯繫支援團隊。</p>
-        <p><strong>支援郵箱：</strong><a href='mailto:{{supportEmail}}' style='color: #2b6cb0;'>{{supportEmail}}</a></p>
+        <p><strong>支援郵箱：</strong><a
+            href='mailto:{{supportEmail}}'
+            style='color: #2b6cb0;'
+          >{{supportEmail}}</a></p>
         <p style='text-align: center; margin-top: 24px;'>
-          <a href='{{dashboardUrl}}' style='display: inline-block; padding: 12px 32px; background-color: #2b6cb0; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;'>前往系統</a>
+          <a
+            href='{{dashboardUrl}}'
+            style='display: inline-block; padding: 12px 32px; background-color: #2b6cb0; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600;'
+          >前往系統</a>
         </p>
       </div>
 
       <div class='footer'>
         <p>此郵件由系統自動發送，請勿直接回覆。</p>
-        <p>&copy; 2026 加雲聯網 Intelligent Cloud Plus, Inc. All rights reserved.</p>
+        <p>&copy; 2026 加雲聯網 Intelligent Cloud Plus, Inc. All rights
+          reserved.</p>
       </div>
     </div>
   </body>

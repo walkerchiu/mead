@@ -52,13 +52,21 @@ export function useSidebarItems(): SidebarMenuItem[] {
 
     setPermissions({
       isHQ: hasHQScope,
+      // 「系統管理」整組對齊 backend：所有子頁 query 都是 RequireHqScope，且子頁 path 全部
+      // /hq/*。customer scope 的 OWNER 因為 "*" glob 也會拿到 users:* / sessions:read /
+      // sessions:revoke 等 permission claim，但 backend 不開放給 customer scope。為了避免
+      // menu 引導使用者到 401 死路，整組以 hasHQScope 為前提。
       canManageUsers:
-        isSuperHQ ||
-        perms.includes('users:create') ||
-        (hasHQScope && perms.includes('users:read')),
-      canViewAuditLogs: isSuperHQ || perms.includes('audit-logs:read'),
-      canManageSessions: isSuperHQ || perms.includes('sessions:read'),
-      canViewCronJobs: isSuperHQ || perms.includes('cron_jobs:read'),
+        hasHQScope &&
+        (isSuperHQ ||
+          perms.includes('users:create') ||
+          perms.includes('users:read')),
+      canViewAuditLogs:
+        hasHQScope && (isSuperHQ || perms.includes('audit-logs:read')),
+      canManageSessions:
+        hasHQScope && (isSuperHQ || perms.includes('sessions:read')),
+      canViewCronJobs:
+        hasHQScope && (isSuperHQ || perms.includes('cron_jobs:read')),
     });
   }, [authReady]);
 
@@ -79,7 +87,7 @@ export function useSidebarItems(): SidebarMenuItem[] {
       id: 'users',
       label: t('users'),
       icon: <UsersIcon />,
-      path: permissions.isHQ ? '/hq/users' : '/users',
+      path: '/hq/users',
     });
   }
 

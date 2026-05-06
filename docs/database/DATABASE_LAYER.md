@@ -4,55 +4,55 @@ Backend 的內部資料庫層，使用 Prisma ORM 管理 schema、遷移與種�
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Database Layer](#database-layer)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🏗️ 目錄結構](#️-目錄結構)
-  - [🚀 快速開始](#-快速開始)
-  - [🛠️ 常用命令](#️-常用命令)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [目錄結構](#目錄結構)
+  - [快速開始](#快速開始)
+  - [常用命令](#常用命令)
     - [從 Backend 目錄執行](#從-backend-目錄執行)
     - [使用 CLI（從專案根目錄）](#使用-cli從專案根目錄)
-  - [📐 Schema 結構](#-schema-結構)
+  - [Schema 結構](#schema-結構)
     - [多檔案架構](#多檔案架構)
     - [編輯工作流程](#編輯工作流程)
     - [Base Schema 配置](#base-schema-配置)
-  - [🌱 種子資料](#-種子資料)
+  - [種子資料](#種子資料)
     - [環境別載入](#環境別載入)
     - [執行 Seed](#執行-seed)
-  - [🔄 Migration 遷移](#-migration-遷移)
+  - [Migration 遷移](#migration-遷移)
     - [1. 修改 Schema](#1-修改-schema)
     - [2. 建立 Migration](#2-建立-migration)
     - [3. 檢查生成的 SQL](#3-檢查生成的-sql)
     - [4. 執行 Migration](#4-執行-migration)
-  - [❓ 常見問題](#-常見問題)
+  - [常見問題](#常見問題)
     - [Q: 為什麼要模組化 schema？](#q-為什麼要模組化-schema)
     - [Q: Prisma Client 在哪裡？](#q-prisma-client-在哪裡)
     - [Q: 如何在程式碼中使用？](#q-如何在程式碼中使用)
     - [Q: 為什麼沒有獨立的 package.json？](#q-為什麼沒有獨立的-packagejson)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [TypeScript 找不到 `@prisma/client`](#typescript-找不到-prismaclient)
     - [Schema 合併失敗](#schema-合併失敗)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO（應該做）](#-do應該做)
-    - [❌ DON'T（不要做）](#-dont不要做)
-  - [💾 備份與還原](#-備份與還原)
+  - [最佳實踐](#最佳實踐)
+    - [DO（應該做）](#do應該做)
+    - [DON'T（不要做）](#dont不要做)
+  - [備份與還原](#備份與還原)
     - [快速備份/還原](#快速備份還原)
     - [備份檔案位置](#備份檔案位置)
     - [環境差異](#環境差異)
-  - [🔗 技術堆疊](#-技術堆疊)
-  - [📚 相關資源](#-相關資源)
+  - [技術堆疊](#技術堆疊)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 Backend 的內部資料庫層，使用 Prisma ORM 管理 schema、遷移與種子資料。專案採用模組化 schema 設計，提供完整的備份還原機制，支援多環境部署。
 
 ---
 
-## 🏗️ 目錄結構
+## 目錄結構
 
 ```text
 apps/backend/database/
@@ -75,7 +75,7 @@ apps/backend/database/
 
 ---
 
-## 🚀 快速開始
+## 快速開始
 
 ```bash
 # 1. 生成 Prisma Client
@@ -95,7 +95,7 @@ pnpm db:studio
 
 ---
 
-## 🛠️ 常用命令
+## 常用命令
 
 ### 從 Backend 目錄執行
 
@@ -139,7 +139,7 @@ pnpm db:seed
 
 ---
 
-## 📐 Schema 結構
+## Schema 結構
 
 ### 多檔案架構
 
@@ -193,14 +193,14 @@ datasource db {
 
 ---
 
-## 🌱 種子資料
+## 種子資料
 
 ### 環境別載入
 
 Seed 系統根據 `NPT_ENV` 環境變數載入對應資料：
 
 - **base**: 所有環境的基礎資料（roles、permissions、cron-job configs）
-- **development / uat**: 共用同一組測試帳號（`hq@example.com` 與 `public@example.com`）
+- **development / uat**: 共用同一組測試帳號（`hq@example.com`、`admin@example.com`、`public@example.com`）
 - **production**: 僅載入 base，**不**建立任何測試帳號
 
 ### 執行 Seed
@@ -215,16 +215,17 @@ NPT_ENV=uat pnpm db:seed
 
 ### 預設帳號（development / uat）
 
-| Email                | 密碼           | 角色                   |
-| -------------------- | -------------- | ---------------------- |
-| `hq@example.com`     | `Password123!` | `SUPER_HQ` + `MANAGER` |
-| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE） |
+| Email                | 密碼           | 角色                                         |
+| -------------------- | -------------- | -------------------------------------------- |
+| `hq@example.com`     | `Password123!` | `SUPER_HQ` (HQ) + `MANAGER` (CUSTOMER)       |
+| `admin@example.com`  | `Password123!` | `OWNER` (CUSTOMER) — 純客戶端 dashboard 體驗 |
+| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE）                       |
 
 > Production 環境**不**建立任何測試帳號，部署前需自行建立正式帳號流程。
 
 ---
 
-## 🔄 Migration 遷移
+## Migration 遷移
 
 ### 1. 修改 Schema
 
@@ -258,7 +259,7 @@ prisma/migrations/
 
 ---
 
-## ❓ 常見問題
+## 常見問題
 
 ### Q: 為什麼要模組化 schema？
 
@@ -305,7 +306,7 @@ export class UserService {
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### TypeScript 找不到 `@prisma/client`
 
@@ -340,9 +341,9 @@ generator client {
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO（應該做）
+### DO（應該做）
 
 1. **編輯 schemas/ 中的檔案**
 
@@ -363,7 +364,7 @@ generator client {
    pnpm db:migrate  # 確認後建立 migration
    ```
 
-### ❌ DON'T（不要做）
+### DON'T（不要做）
 
 1. **不要直接編輯 schema.prisma**
    - ❌ 會在下次合併時被覆蓋
@@ -376,7 +377,7 @@ generator client {
 
 ---
 
-## 💾 備份與還原
+## 備份與還原
 
 ### 快速備份/還原
 
@@ -421,7 +422,7 @@ backups/
 
 ---
 
-## 🔗 技術堆疊
+## 技術堆疊
 
 - **Prisma ORM**: 6.19.2
 - **TimescaleDB**: PostgreSQL 相容的時間序列資料庫
@@ -430,7 +431,7 @@ backups/
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [Prisma Schema 組織](./PRISMA_SCHEMA_ORGANIZATION.md)
 - [軟刪除實現](./SOFT_DELETE.md)

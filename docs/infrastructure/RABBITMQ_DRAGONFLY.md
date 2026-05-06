@@ -4,58 +4,58 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [RabbitMQ 和 Dragonfly 整合文件](#rabbitmq-和-dragonfly-整合文件)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🏗️ 架構](#️-架構)
-  - [🐰 RabbitMQ](#-rabbitmq)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [架構](#架構)
+  - [RabbitMQ](#rabbitmq)
     - [用途](#用途)
     - [服務資訊](#服務資訊)
     - [管理介面](#管理介面)
-  - [🐲 Dragonfly](#-dragonfly)
+  - [Dragonfly](#dragonfly)
     - [用途](#用途-1)
     - [服務資訊](#服務資訊-1)
     - [為什麼選 Dragonfly？](#為什麼選-dragonfly)
-  - [📦 Docker Compose 設定](#-docker-compose-設定)
+  - [Docker Compose 設定](#docker-compose-設定)
     - [完整服務](#完整服務)
     - [啟動服務](#啟動服務)
     - [健康檢查](#健康檢查)
-  - [🔧 應用程式整合](#-應用程式整合)
+  - [應用程式整合](#應用程式整合)
     - [環境變數](#環境變數)
     - [Queue Module](#queue-module)
     - [Cache Module](#cache-module)
-  - [📝 使用範例](#-使用範例)
+  - [使用範例](#使用範例)
     - [發送到佇列](#發送到佇列)
     - [處理佇列訊息](#處理佇列訊息)
     - [使用快取](#使用快取)
-  - [⚡ 效能優化](#-效能優化)
+  - [效能優化](#效能優化)
     - [批次處理策略](#批次處理策略)
     - [快取策略](#快取策略)
-  - [📊 監控](#-監控)
+  - [監控](#監控)
     - [RabbitMQ 監控](#rabbitmq-監控)
     - [Dragonfly 監控](#dragonfly-監控)
     - [效能指標](#效能指標)
-  - [🔒 生產環境配置](#-生產環境配置)
+  - [生產環境配置](#生產環境配置)
     - [RabbitMQ](#rabbitmq)
     - [Dragonfly](#dragonfly)
     - [高可用性](#高可用性)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [RabbitMQ 問題](#rabbitmq-問題)
     - [Dragonfly 問題](#dragonfly-問題)
-  - [📈 效能提升](#-效能提升)
+  - [效能提升](#效能提升)
     - [Before (無佇列/快取)](#before-無佇列快取)
     - [After (有佇列/快取)](#after-有佇列快取)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 系統已整合 RabbitMQ (訊息佇列) 和 Dragonfly (Redis 替代方案) 來改善 Audit Log 的存取體驗。
 
-## 🏗️ 架構
+## 架構
 
 ```text
 API Request
@@ -71,7 +71,7 @@ AuditLogConsumer 批次處理
 查詢時從 Dragonfly Cache 讀取
 ```
 
-## 🐰 RabbitMQ
+## RabbitMQ
 
 ### 用途
 
@@ -96,7 +96,7 @@ AuditLogConsumer 批次處理
 - 查看 Consumer 連線
 - 手動發送測試訊息
 
-## 🐲 Dragonfly
+## Dragonfly
 
 ### 用途
 
@@ -121,7 +121,7 @@ AuditLogConsumer 批次處理
 - ✅ 多執行緒架構
 - ✅ 垂直擴展能力強
 
-## 📦 Docker Compose 設定
+## Docker Compose 設定
 
 ### 完整服務
 
@@ -161,7 +161,7 @@ redis-cli ping
 docker exec $(grep DRAGONFLY_CONTAINER_NAME .env.docker | cut -d'=' -f2) redis-cli ping
 ```
 
-## 🔧 應用程式整合
+## 應用程式整合
 
 ### 環境變數
 
@@ -223,7 +223,7 @@ export class QueueModule {}
 export class CacheModule {}
 ```
 
-## 📝 使用範例
+## 使用範例
 
 ### 發送到佇列
 
@@ -292,7 +292,7 @@ export class AuditLogService {
 }
 ```
 
-## ⚡ 效能優化
+## 效能優化
 
 ### 批次處理策略
 
@@ -364,7 +364,7 @@ await this.cacheManager.del('audit_logs_recent');
 await this.cacheManager.reset();
 ```
 
-## 📊 監控
+## 監控
 
 ### RabbitMQ 監控
 
@@ -416,7 +416,7 @@ if (duration > 1000) {
 }
 ```
 
-## 🔒 生產環境配置
+## 生產環境配置
 
 ### RabbitMQ
 
@@ -470,7 +470,7 @@ dragonfly-replica:
   command: --replicaof dragonfly-master 6379
 ```
 
-## 🚨 故障排除
+## 故障排除
 
 ### RabbitMQ 問題
 
@@ -516,7 +516,7 @@ redis-cli ping
 docker-compose restart dragonfly
 ```
 
-## 📈 效能提升
+## 效能提升
 
 ### Before (無佇列/快取)
 
@@ -531,7 +531,7 @@ docker-compose restart dragonfly
 - 查詢速度: 快 10-100 倍 (快取命中)
 - 高流量處理: 平順
 
-## 📚 相關資源
+## 相關資源
 
 - [RabbitMQ 官方文件](https://www.rabbitmq.com/documentation.html)
 - [Dragonfly 官方文件](https://www.dragonflydb.io/docs)

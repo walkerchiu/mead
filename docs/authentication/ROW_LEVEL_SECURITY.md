@@ -4,44 +4,44 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Row-Level Security (RLS) - 行級別安全控制](#row-level-security-rls---行級別安全控制)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🎯 訪問規則](#-訪問規則)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [訪問規則](#訪問規則)
     - [AccessScope 訪問矩陣](#accessscope-訪問矩陣)
     - [視覺化權限樹](#視覺化權限樹)
-  - [🔧 技術實現](#-技術實現)
+  - [技術實現](#技術實現)
     - [1. Service 層過濾](#1-service-層過濾)
     - [2. Resolver 層應用](#2-resolver-層應用)
     - [3. Prisma 查詢過濾](#3-prisma-查詢過濾)
-  - [📝 實際應用範例](#-實際應用範例)
+  - [實際應用範例](#實際應用範例)
     - [範例 1: HQ 查詢所有用戶](#範例-1-hq-查詢所有用戶)
     - [範例 2: Customer 查詢用戶](#範例-2-customer-查詢用戶)
     - [範例 3: Public 查詢用戶](#範例-3-public-查詢用戶)
-  - [🔗 關聯查詢處理](#-關聯查詢處理)
-  - [🔧 配置選項](#-配置選項)
+  - [關聯查詢處理](#關聯查詢處理)
+  - [配置選項](#配置選項)
     - [UserQueryContext 介面](#userquerycontext-介面)
     - [擴展 RLS 規則](#擴展-rls-規則)
-  - [🧪 測試](#-測試)
+  - [測試](#測試)
     - [測試不同權限的查詢](#測試不同權限的查詢)
       - [1. 使用 HQ Token 測試](#1-使用-hq-token-測試)
       - [2. 使用 Customer Token 測試](#2-使用-customer-token-測試)
-  - [🔒 安全性考量](#-安全性考量)
-    - [✅ 已實現的保護](#-已實現的保護)
-    - [⚠️ 注意事項](#️-注意事項)
-  - [🔄 與其他安全機制的關係](#-與其他安全機制的關係)
-  - [⚡ 效能考量](#-效能考量)
-  - [📖 相關文檔](#-相關文檔)
+  - [安全性考量](#安全性考量)
+    - [已實現的保護](#已實現的保護)
+    - [注意事項](#注意事項)
+  - [與其他安全機制的關係](#與其他安全機制的關係)
+  - [效能考量](#效能考量)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 Row-Level Security (RLS) 是一種資料庫級別的安全機制，根據用戶的身份和權限自動過濾查詢結果。本系統在應用層實現了 RLS，確保用戶只能查看其有權限存取的資料。
 
-> **🔗 相關文檔**
+> **相關文檔**
 >
 > - [RBAC 架構](./RBAC_ARCHITECTURE.md) - 角色權限基礎架構（含完整架構圖）
 > - [Field-Level Authorization](./FIELD_AUTHORIZATION.md) - 欄位級別權限控制
@@ -50,7 +50,7 @@ Row-Level Security (RLS) 是一種資料庫級別的安全機制，根據用戶�
 
 ---
 
-## 🎯 訪問規則
+## 訪問規則
 
 ### AccessScope 訪問矩陣
 
@@ -82,7 +82,7 @@ PUBLIC_SCOPE (基本權限)
 
 ---
 
-## 🔧 技術實現
+## 技術實現
 
 ### 1. Service 層過濾
 
@@ -182,7 +182,7 @@ const users = await this.prisma.user.findMany({
 
 ---
 
-## 📝 實際應用範例
+## 實際應用範例
 
 ### 範例 1: HQ 查詢所有用戶
 
@@ -280,7 +280,7 @@ query {
 
 ---
 
-## 🔗 關聯查詢處理
+## 關聯查詢處理
 
 RLS 規則**自動適用於關聯查詢**：
 
@@ -307,7 +307,7 @@ query {
 
 ---
 
-## 🔧 配置選項
+## 配置選項
 
 ### UserQueryContext 介面
 
@@ -346,7 +346,7 @@ private buildAccessScopeFilter(context?: UserQueryContext) {
 
 ---
 
-## 🧪 測試
+## 測試
 
 ### 測試不同權限的查詢
 
@@ -390,16 +390,16 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## 🔒 安全性考量
+## 安全性考量
 
-### ✅ 已實現的保護
+### 已實現的保護
 
 1. **Service 層過濾** - 資料在查詢時就被過濾，不會洩漏
 2. **Resolver 層驗證** - 雙重檢查，確保上下文正確傳遞
 3. **Prisma 層面過濾** - 資料庫查詢層面的過濾
 4. **關聯查詢保護** - 關聯資料自動遵守 RLS 規則
 
-### ⚠️ 注意事項
+### 注意事項
 
 1. **不要繞過 Service 層**
    - 始終通過 Service 方法查詢資料
@@ -415,7 +415,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## 🔄 與其他安全機制的關係
+## 與其他安全機制的關係
 
 ```text
 請求流程：
@@ -434,7 +434,7 @@ curl -X POST http://localhost:4000/graphql \
 
 ---
 
-## ⚡ 效能考量
+## 效能考量
 
 - **查詢效能**: RLS 過濾在資料庫查詢層面，效能影響極小
 - **索引建議**: 在 `accessScopes` 欄位上建立索引
@@ -447,7 +447,7 @@ CREATE INDEX idx_user_access_scopes ON "User" USING GIN (access_scopes);
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 - [RBAC Architecture](./RBAC_ARCHITECTURE.md) - RBAC 架構與完整權限系統
 - [Field Authorization](./FIELD_AUTHORIZATION.md) - 欄位級別授權

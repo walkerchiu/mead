@@ -2,25 +2,22 @@
 
 歡迎來到 NPT (New Project Template) 文檔！本模板僅含「身份／系統管理」核心模組，業務模組由各專案自行擴充。文檔依主題分類，方便快速查找。
 
----
-
-## 🎯 快速導航
+## 快速導航
 
 ### 我是第一次使用本模板？
 
 1. **專案概覽與用途** → 返回 [根目錄 README](../README.md)
-2. **模板狀態與擴充指南** → [模板路線圖](PROJECT_ROADMAP.md)
-3. **貢獻指南** → [Contributing Guide](getting-started/CONTRIBUTING.md)（開發流程、Commit、PR）
-4. **開發工具** → [NPT CLI 完整指南](getting-started/CLI_GUIDE.md)
-5. **環境設置** → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
-6. **專案結構** → [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)
-7. **遇到問題** → [疑難排解](getting-started/TROUBLESHOOTING.md)
+2. **貢獻指南** → [Contributing Guide](getting-started/CONTRIBUTING.md)（開發流程、Commit、PR）
+3. **開發工具** → [NPT CLI 完整指南](getting-started/CLI_GUIDE.md)
+4. **環境設置** → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
+5. **專案結構** → [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)
+6. **遇到問題** → [疑難排解](getting-started/TROUBLESHOOTING.md)
 
 ---
 
-## 📚 文檔分類目錄
+## 文檔分類目錄
 
-### 🚀 [入門指南](getting-started/) (7 docs)
+### [入門指南](getting-started/)
 
 新手必讀！從環境設置到專案結構、貢獻流程的完整指引。
 
@@ -32,34 +29,35 @@
 | [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)   | pnpm workspace + Turborepo 架構                        | 8 分鐘   |
 | [前後端 i18n 協調機制](getting-started/I18N_COORDINATION.md) | 前端（next-intl）與後端（nestjs-i18n）如何協調語言設定 | 8 分鐘   |
 | [部署指南](getting-started/DEPLOYMENT.md)                    | 環境分層、部署架構、發布流程（規劃中 + 目前作法）      | 15 分鐘  |
+| [Markdown 風格指南](getting-started/MARKDOWN_STYLE_GUIDE.md) | 文件編寫規範（標題、emoji、編排、code block 等）       | 5 分鐘   |
 | [疑難排解](getting-started/TROUBLESHOOTING.md)               | 常見問題排查：環境、Docker、認證、效能等               | 參考用   |
 
 ---
 
-### 🎨 [前端開發](frontend/) (10 docs + 4 組件子文件)
+### [前端開發](frontend/)
 
 Next.js + React + Apollo Client 前端開發指南。
 
-| 文檔                                                                           | 說明                                                  | 閱讀時間 |
-| ------------------------------------------------------------------------------ | ----------------------------------------------------- | -------- |
-| [組件設計指南](frontend/DESIGN_GUIDE.md)                                       | **給 UI/UX 設計師** - 設計規範和視覺標準 (含暗色模式) | 20 分鐘  |
-| [組件庫開發指南](frontend/COMPONENT_LIBRARY.md)                                | **給開發者** - Atomic Design 架構總覽與 Storybook     | 15 分鐘  |
-| └ [組件 — Atoms](frontend/component-library/ATOMS.md)                          | 原子組件清單（Button、TextField、Icon…）              | 10 分鐘  |
-| └ [組件 — Molecules](frontend/component-library/MOLECULES.md)                  | 分子組件清單（FormField、Card、Toast…）               | 12 分鐘  |
-| └ [組件 — Organisms](frontend/component-library/ORGANISMS.md)                  | 有機體組件清單（Modal、Sidebar、Form…）               | 12 分鐘  |
-| └ [組件 — Layout / Templates / Pages](frontend/component-library/TEMPLATES.md) | 佈局、模板與頁面範例                                  | 8 分鐘   |
-| [主題系統](frontend/THEME_SYSTEM.md)                                           | Light/Dark/System 主題系統完整實作與使用              | 25 分鐘  |
-| [通知同步系統](frontend/NOTIFICATION_SYNC_SYSTEM.md)                           | ✅ 同頁面/跨頁面即時同步、BroadcastChannel 整合       | 20 分鐘  |
-| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md)                | ScrollControl 設計思路與 API                          | 10 分鐘  |
-| [前端認證整合](frontend/FRONTEND_INTEGRATION.md)                               | Next.js + Apollo Client 認證系統                      | 20 分鐘  |
-| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)                  | Error Boundaries 與錯誤追蹤                           | 18 分鐘  |
-| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                                 | Content Security Policy 與 Edge Runtime 相容          | 15 分鐘  |
-| [i18n 設置指南](frontend/I18N_SETUP.md)                                        | next-intl 多語系配置與使用                            | 12 分鐘  |
-| [MSW 設置](frontend/MSW_SETUP.md)                                              | Mock Service Worker API 模擬                          | 10 分鐘  |
+| 文檔                                                                         | 說明                                                  | 閱讀時間 |
+| ---------------------------------------------------------------------------- | ----------------------------------------------------- | -------- |
+| [組件設計指南](frontend/DESIGN_GUIDE.md)                                     | **給 UI/UX 設計師** - 設計規範和視覺標準 (含暗色模式) | 20 分鐘  |
+| [組件庫開發指南](frontend/COMPONENT_LIBRARY.md)                              | **給開發者** - Atomic Design 架構總覽與 Storybook     | 15 分鐘  |
+| [組件 — Atoms](frontend/component-library/ATOMS.md)                          | 原子組件清單（Button、TextField、Icon…）              | 10 分鐘  |
+| [組件 — Molecules](frontend/component-library/MOLECULES.md)                  | 分子組件清單（FormField、Card、Toast…）               | 12 分鐘  |
+| [組件 — Organisms](frontend/component-library/ORGANISMS.md)                  | 有機體組件清單（Modal、Sidebar、Form…）               | 12 分鐘  |
+| [組件 — Layout / Templates / Pages](frontend/component-library/TEMPLATES.md) | 佈局、模板與頁面範例                                  | 8 分鐘   |
+| [主題系統](frontend/THEME_SYSTEM.md)                                         | Light/Dark/System 主題系統完整實作與使用              | 25 分鐘  |
+| [通知同步系統](frontend/NOTIFICATION_SYNC_SYSTEM.md)                         | ✅ 同頁面/跨頁面即時同步、BroadcastChannel 整合       | 20 分鐘  |
+| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md)              | ScrollControl 設計思路與 API                          | 10 分鐘  |
+| [前端認證整合](frontend/FRONTEND_INTEGRATION.md)                             | Next.js + Apollo Client 認證系統                      | 20 分鐘  |
+| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)                | Error Boundaries 與錯誤追蹤                           | 18 分鐘  |
+| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                               | Content Security Policy 與 Edge Runtime 相容          | 15 分鐘  |
+| [i18n 設置指南](frontend/I18N_SETUP.md)                                      | next-intl 多語系配置與使用                            | 12 分鐘  |
+| [MSW 設置](frontend/MSW_SETUP.md)                                            | Mock Service Worker API 模擬                          | 10 分鐘  |
 
 ---
 
-### 🔧 [後端開發](backend/) (15 docs)
+### [後端開發](backend/)
 
 NestJS + GraphQL + Prisma 後端開發指南。
 
@@ -83,7 +81,7 @@ NestJS + GraphQL + Prisma 後端開發指南。
 
 ---
 
-### 🔐 [認證與授權](authentication/) (10 docs)
+### [認證與授權](authentication/)
 
 完整的認證、授權與安全機制。
 
@@ -102,7 +100,7 @@ NestJS + GraphQL + Prisma 後端開發指南。
 
 ---
 
-### 🗄️ [資料庫](database/) (5 docs)
+### [資料庫](database/)
 
 Prisma + PostgreSQL 資料庫設計、備份還原與最佳實踐。
 
@@ -116,7 +114,7 @@ Prisma + PostgreSQL 資料庫設計、備份還原與最佳實踐。
 
 ---
 
-### 🐳 [基礎設施](infrastructure/) (4 docs)
+### [基礎設施](infrastructure/)
 
 Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
@@ -129,7 +127,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
 ---
 
-## 🎓 推薦學習路徑
+## 推薦學習路徑
 
 ### 路徑 1：新手入門（預計 1 小時）
 
@@ -217,7 +215,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
 ---
 
-## 🔍 依功能快速查找
+## 依功能快速查找
 
 ### 認證與會話
 

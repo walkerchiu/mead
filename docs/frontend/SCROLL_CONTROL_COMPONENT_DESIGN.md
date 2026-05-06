@@ -4,7 +4,44 @@
 
 ---
 
-## 📋 需求分析
+## 目錄
+
+- [需求分析](#需求分析)
+  - [核心需求](#核心需求)
+  - [使用場景](#使用場景)
+- [組件設計](#組件設計)
+  - [組件架構（Atomic Design）](#組件架構atomic-design)
+  - [組件層級](#組件層級)
+- [技術規格](#技術規格)
+  - [1. ScrollButton (Atom)](#1-scrollbutton-atom)
+  - [2. ScrollControl (Molecule)](#2-scrollcontrol-molecule)
+- [國際化支援](#國際化支援)
+  - [翻譯鍵值](#翻譯鍵值)
+- [Storybook Stories](#storybook-stories)
+  - [ScrollButton.stories.tsx](#scrollbuttonstoriestsx)
+  - [ScrollControl.stories.tsx](#scrollcontrolstoriestsx)
+- [使用範例](#使用範例)
+  - [基本使用](#基本使用)
+  - [自定義位置](#自定義位置)
+  - [僅顯示部分按鈕](#僅顯示部分按鈕)
+  - [在特定容器內捲動](#在特定容器內捲動)
+- [測試策略](#測試策略)
+  - [單元測試 (Vitest)](#單元測試-vitest)
+- [實作檢查清單](#實作檢查清單)
+  - [Phase 1: Atom 組件](#phase-1-atom-組件)
+  - [Phase 2: Molecule 組件](#phase-2-molecule-組件)
+  - [Phase 3: 國際化](#phase-3-國際化)
+  - [Phase 4: 測試](#phase-4-測試)
+  - [Phase 5: 文檔](#phase-5-文檔)
+  - [Phase 6: 整合](#phase-6-整合)
+- [效能考量](#效能考量)
+  - [優化策略](#優化策略)
+- [無障礙考量](#無障礙考量)
+- [響應式設計](#響應式設計)
+  - [斷點行為](#斷點行為)
+- [未來擴展](#未來擴展)
+
+## 需求分析
 
 ### 核心需求
 
@@ -22,7 +59,7 @@
 
 ---
 
-## 🎨 組件設計
+## 組件設計
 
 ### 組件架構（Atomic Design）
 
@@ -54,7 +91,7 @@ Molecules (分子組件)
 
 ---
 
-## 💻 技術規格
+## 技術規格
 
 ### 1. ScrollButton (Atom)
 
@@ -442,7 +479,7 @@ export function ScrollControl({
 
 ---
 
-## 🌐 國際化支援
+## 國際化支援
 
 ### 翻譯鍵值
 
@@ -478,7 +515,7 @@ export function ScrollControl({
 
 ---
 
-## 📖 Storybook Stories
+## Storybook Stories
 
 ### ScrollButton.stories.tsx
 
@@ -662,7 +699,7 @@ export const SlowScroll: Story = {
 
 ---
 
-## 📝 使用範例
+## 使用範例
 
 ### 基本使用
 
@@ -711,7 +748,7 @@ const containerRef = useRef<HTMLDivElement>(null);
 
 ---
 
-## 🧪 測試策略
+## 測試策略
 
 ### 單元測試 (Vitest)
 
@@ -762,7 +799,7 @@ describe('ScrollControl', () => {
 
 ---
 
-## 🎯 實作檢查清單
+## 實作檢查清單
 
 ### Phase 1: Atom 組件
 
@@ -808,7 +845,7 @@ describe('ScrollControl', () => {
 
 ---
 
-## 🚀 效能考量
+## 效能考量
 
 ### 優化策略
 
@@ -819,7 +856,7 @@ describe('ScrollControl', () => {
 
 ---
 
-## ♿ 無障礙考量
+## 無障礙考量
 
 - ✅ 所有按鈕都有 `aria-label`
 - ✅ 支援鍵盤操作（Tab 聚焦）
@@ -829,7 +866,7 @@ describe('ScrollControl', () => {
 
 ---
 
-## 📱 響應式設計
+## 響應式設計
 
 ### 斷點行為
 
@@ -839,7 +876,7 @@ describe('ScrollControl', () => {
 
 ---
 
-## 🔮 未來擴展
+## 未來擴展
 
 1. **動畫選項**: 支援不同的捲動動畫效果
 2. **進度指示**: 顯示當前捲動位置的百分比

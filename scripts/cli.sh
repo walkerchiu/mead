@@ -19,7 +19,7 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # 載入共用函數
 source "$SCRIPT_DIR/utils/common.sh"
 
-VERSION="1.1.0"
+VERSION="1.0.0"
 
 # 顯示版本
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
@@ -30,7 +30,7 @@ fi
 # 顯示 top-level help
 if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "help" ]]; then
   cat <<EOF
-NPT CLI v$VERSION - 開發工作流程管理工具
+NPT CLI v$VERSION - 給軟體專案的開發樣板
 
 使用方式:
   ./scripts/cli.sh                進入互動式選單（16 個功能）
@@ -81,8 +81,8 @@ show_interactive_menu() {
     echo -e ""
     echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║                                                          ║${NC}"
-    echo -e "${GREEN}║                      ${NC}${BLUE}${BOLD}NPT CLI${NC} ${GREEN}v$VERSION                     ║${NC}"
-    echo -e "${GREEN}║             開發工作流程管理工具 - 互動式選單            ║${NC}"
+    echo -e "${GREEN}║                      ${NC}${BLUE}${BOLD}NPT CLI${NC} ${GREEN}v$VERSION                      ║${NC}"
+    echo -e "${GREEN}║             給軟體專案的開發樣板 - 互動式選單            ║${NC}"
     echo -e "${GREEN}║                                                          ║${NC}"
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
     echo -e ""

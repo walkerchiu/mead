@@ -13,6 +13,14 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # 載入共用函數
 source "$SCRIPT_DIR/../utils/common.sh"
 
+# 載入 .env.docker（若存在）— 為了讀 SEAWEEDFS_S3_PASSWORD 等變數，
+# 讓 _is_insecure_s3_password 能正確判斷
+if [[ -f "$PROJECT_ROOT/.env.docker" ]]; then
+  set -a
+  source "$PROJECT_ROOT/.env.docker"
+  set +a
+fi
+
 # 顯示幫助
 show_command_help() {
   echo -e "\n${GREEN}./scripts/cli.sh status${NC} - 查看服務狀態\n"
@@ -55,8 +63,33 @@ check_service() {
   local port="$2"
   local url="${3:-}"
 
-  if lsof -ti:$port >/dev/null 2>&1; then
-    PID=$(lsof -ti:$port | head -1)
+  # 只看真正在 LISTEN 的進程，避免被 client connection（CLOSE_WAIT/ESTABLISHED）誤觸
+  if lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+    PID=$(lsof -ti:"$port" -sTCP:LISTEN | head -1)
+
+    # 過濾 Docker port forward sentinel：
+    # macOS 是 `com.docker.backend`（Docker Desktop 後端進程），Linux 是 `docker-proxy`。
+    # 若 port 是被 docker forward 佔用，代表是別的 docker container 在用此 port，
+    # 不是「自己的 host process（如 Prisma Studio）」在跑，應視為未運行。
+    PROC=$(ps -p "$PID" -o comm= 2>/dev/null || echo "")
+    if [[ "$PROC" == *"com.docker"* ]] || [[ "$PROC" == *"docker-proxy"* ]]; then
+      echo -e "  ${RED}✗${NC} ${name} ${DIM}(Port ${port}，被其他 docker container forward 佔用)${NC} ${RED}未運行${NC}"
+      echo -e "      ${DIM}啟動: ${CYAN}./scripts/cli.sh dev${NC}"
+      return 1
+    fi
+
+    # 過濾「不在當前 repo 啟動的服務」：
+    # 透過 process working directory 判斷此 PID 是否屬於當前 PROJECT_ROOT。
+    # 例：3000 port 被別的 repo 的 next dev 佔用時，cwd 在別的目錄，應視為「別人在用」。
+    # 注意：要用 `$PROJECT_ROOT/*` 比對而非 `$PROJECT_ROOT*`，否則 `/icp/nptc` 會被
+    # `/icp/npt` 的 PROJECT_ROOT 誤認為前綴相符（`nptc` 字面前綴是 `npt`）。
+    PROC_CWD=$(lsof -p "$PID" 2>/dev/null | awk '$4 == "cwd" {print $NF}' | head -1)
+    if [[ -n "$PROC_CWD" && "$PROC_CWD" != "$PROJECT_ROOT" && "$PROC_CWD" != "$PROJECT_ROOT"/* ]]; then
+      echo -e "  ${RED}✗${NC} ${name} ${DIM}(Port ${port}，被其他專案佔用)${NC} ${RED}未運行${NC}"
+      echo -e "      ${DIM}佔用者: ${PROC_CWD}${NC}"
+      echo -e "      ${DIM}啟動: ${CYAN}./scripts/cli.sh dev${NC}"
+      return 1
+    fi
 
     # 獲取資源使用（macOS 和 Linux 兼容）
     if [[ "$OSTYPE" == "darwin"* ]]; then
@@ -256,6 +289,14 @@ fi
 # 一般模式
 cd "$PROJECT_ROOT"
 
+# JSON 模式：先把人類可讀輸出全部丟掉，只用既有 check 邏輯收集 RUNNING/TOTAL，
+# 最後 emit 一份結構化 JSON（避免雙跑或大改 check_service 函式）。
+# 若要更詳細的 per-service breakdown，請用 `status` 不帶 --json，或 `doctor`。
+if [[ "$JSON_OUTPUT" == "true" ]]; then
+  exec 3>&1
+  exec >/dev/null
+fi
+
 if [[ "$HEALTH_CHECK" == "true" ]]; then
   print_header "服務健康檢查"
 else
@@ -265,34 +306,35 @@ fi
 TOTAL=0
 RUNNING=0
 
+# 應用服務 — 用陣列記錄，方便 JSON 輸出
+APP_SERVICES=("Frontend:3000:http://localhost:3000" "Backend:4000:http://localhost:4000/graphql" "Storybook:6006:http://localhost:6006" "Prisma Studio:5555:http://localhost:5555")
+APP_RUNNING=()
+
 echo -e "${YELLOW}📦 應用服務${NC}"
-check_service "Frontend" 3000 "http://localhost:3000" && ((RUNNING++)) || true
-((TOTAL++))
-check_service "Backend" 4000 "http://localhost:4000/graphql" && ((RUNNING++)) || true
-((TOTAL++))
-check_service "Storybook" 6006 "http://localhost:6006" && ((RUNNING++)) || true
-((TOTAL++))
-check_service "Prisma Studio" 5555 "http://localhost:5555" && ((RUNNING++)) || true
-((TOTAL++))
+for entry in "${APP_SERVICES[@]}"; do
+  IFS=':' read -r svc_name svc_port svc_url1 svc_url2 svc_url3 <<< "$entry"
+  svc_url="${svc_url1}:${svc_url2}:${svc_url3}"
+  if check_service "$svc_name" "$svc_port" "$svc_url"; then
+    ((RUNNING++))
+    APP_RUNNING+=("$svc_name")
+  fi
+  ((TOTAL++))
+done
 echo ""
 
+# Docker 服務
+DOCKER_SERVICES=("PostgreSQL:timescaledb:false" "RabbitMQ:rabbitmq:false" "Dragonfly:dragonfly:false" "Mailpit:mailpit:false" "SeaweedFS Master:seaweedfs-master:true" "SeaweedFS Volume:seaweedfs-volume:true" "SeaweedFS Filer:seaweedfs-filer:true" "SeaweedFS S3:seaweedfs-s3:true")
+DOCKER_RUNNING=()
+
 echo -e "${YELLOW}🐳 Docker 服務${NC}"
-check_docker_service "PostgreSQL" "$(get_container_name timescaledb)" && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "RabbitMQ" "$(get_container_name rabbitmq)" && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "Dragonfly" "$(get_container_name dragonfly)" && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "Mailpit" "$(get_container_name mailpit)" && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "SeaweedFS Master" "$(get_container_name seaweedfs-master)" true && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "SeaweedFS Volume" "$(get_container_name seaweedfs-volume)" true && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "SeaweedFS Filer" "$(get_container_name seaweedfs-filer)" true && ((RUNNING++)) || true
-((TOTAL++))
-check_docker_service "SeaweedFS S3" "$(get_container_name seaweedfs-s3)" true && ((RUNNING++)) || true
-((TOTAL++))
+for entry in "${DOCKER_SERVICES[@]}"; do
+  IFS=':' read -r svc_name svc_container svc_storage <<< "$entry"
+  if check_docker_service "$svc_name" "$(get_container_name "$svc_container")" "$svc_storage"; then
+    ((RUNNING++))
+    DOCKER_RUNNING+=("$svc_name")
+  fi
+  ((TOTAL++))
+done
 
 show_summary $TOTAL $RUNNING
 
@@ -304,7 +346,12 @@ if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
   echo ""
   echo -e "  ${CYAN}S3 端點:${NC}      http://localhost:${SEAWEEDFS_S3_PORT:-8333}"
   echo -e "  ${CYAN}Access Key:${NC}   ${SEAWEEDFS_S3_USER:-admin}"
-  echo -e "  ${CYAN}Secret Key:${NC}   ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+  # 不直接印密碼字面值（避免洩漏 default admin123）。helper 來自 common.sh
+  if _is_insecure_s3_password; then
+    echo -e "  ${CYAN}Secret Key:${NC}   ${RED}***INSECURE-DEFAULT***${NC} ${YELLOW}⚠ 請改 .env.docker SEAWEEDFS_S3_PASSWORD${NC}"
+  else
+    echo -e "  ${CYAN}Secret Key:${NC}   ${SEAWEEDFS_S3_PASSWORD}"
+  fi
   echo ""
   echo -e "  ${CYAN}Master UI:${NC}    http://localhost:${SEAWEEDFS_MASTER_PORT:-9333}"
   echo -e "  ${CYAN}Filer UI:${NC}     http://localhost:${SEAWEEDFS_FILER_PORT:-8888}"
@@ -313,8 +360,20 @@ if docker ps --format '{{.Names}}' | grep -q 'seaweedfs' 2>/dev/null; then
   echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 fi
 
-# JSON 輸出模式
+# JSON 輸出模式：把所有人類輸出 redirect 掉之後，emit 結構化 JSON
 if [[ "$JSON_OUTPUT" == "true" ]]; then
-  echo ""
-  echo '{"total":'$TOTAL',"running":'$RUNNING',"status":"'$([ $RUNNING -eq $TOTAL ] && echo "healthy" || echo "degraded")'"}'
+  exec >&3
+  # 用 jq 拼 JSON 比手刻安全；fallback 到 jq 沒裝時用簡單版
+  status_label=$([ "$RUNNING" -eq "$TOTAL" ] && echo "healthy" || echo "degraded")
+  if command -v jq >/dev/null 2>&1; then
+    jq -n \
+      --arg status "$status_label" \
+      --argjson total "$TOTAL" \
+      --argjson running "$RUNNING" \
+      --argjson app "$(printf '%s\n' "${APP_RUNNING[@]:-}" | jq -R . | jq -s 'map(select(. != ""))')" \
+      --argjson docker "$(printf '%s\n' "${DOCKER_RUNNING[@]:-}" | jq -R . | jq -s 'map(select(. != ""))')" \
+      '{status: $status, total: $total, running: $running, app: $app, docker: $docker}'
+  else
+    echo "{\"status\":\"$status_label\",\"total\":$TOTAL,\"running\":$RUNNING}"
+  fi
 fi

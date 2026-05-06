@@ -81,8 +81,8 @@ kill_process() {
   local port="$1"
   local service_name="$2"
 
-  # 方法 1: 通過端口查找進程
-  PIDS=$(lsof -ti:$port 2>/dev/null || true)
+  # 方法 1: 通過端口查找進程（只看 LISTEN，避免被 client connection 誤觸）
+  PIDS=$(lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null || true)
 
   # 方法 2: 通過進程名稱查找後台進程（處理殭屍進程）
   local EXTRA_PIDS=""
@@ -97,7 +97,10 @@ kill_process() {
       ;;
     "Storybook")
       # 查找 storybook 進程
-      EXTRA_PIDS=$(ps aux | grep "storybook" | grep -v grep | awk '{print $2}' || true)
+      # `grep -vE "(restart|stop|cli)\.sh"` 排除 wrapper 自己 — 否則
+      # `bash stop.sh storybook` / `bash restart.sh storybook` 自己的 cmdline
+      # 含 "storybook" 字樣會被 grep 抓到並一起 kill，造成後續流程中斷。
+      EXTRA_PIDS=$(ps aux | grep "storybook" | grep -v grep | grep -vE "(restart|stop|cli)\.sh" | awk '{print $2}' || true)
       ;;
   esac
 

@@ -4,45 +4,45 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Docker 設置與安全指南](#docker-設置與安全指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [服務列表](#服務列表)
-  - [🚀 快速開始](#-快速開始)
+  - [快速開始](#快速開始)
     - [使用 NPT CLI（推薦）](#使用-npt-cli推薦)
     - [手動啟動](#手動啟動)
-  - [✨ 服務說明](#-服務說明)
+  - [服務說明](#服務說明)
     - [1. TimescaleDB (PostgreSQL)](#1-timescaledb-postgresql)
     - [2. RabbitMQ](#2-rabbitmq)
     - [3. Dragonfly (Redis)](#3-dragonfly-redis)
     - [4. Mailpit](#4-mailpit)
     - [5. SeaweedFS（選用）](#5-seaweedfs選用)
-  - [🔧 環境變數配置](#-環境變數配置)
+  - [環境變數配置](#環境變數配置)
     - [.env.docker 檔案結構](#envdocker-檔案結構)
     - [重要事項](#重要事項)
-  - [🔒 安全最佳實踐](#-安全最佳實踐)
+  - [安全最佳實踐](#安全最佳實踐)
     - [1. 使用強密碼](#1-使用強密碼)
     - [2. 密碼同步](#2-密碼同步)
     - [3. 環境隔離](#3-環境隔離)
     - [4. 容器安全](#4-容器安全)
-  - [📝 常用操作](#-常用操作)
+  - [常用操作](#常用操作)
     - [啟動與停止](#啟動與停止)
     - [查看狀態](#查看狀態)
     - [查看日誌](#查看日誌)
     - [重啟服務](#重啟服務)
     - [進入容器](#進入容器)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [問題 1：容器無法啟動](#問題-1容器無法啟動)
     - [問題 2：資料庫連線失敗](#問題-2資料庫連線失敗)
     - [問題 3：RabbitMQ 管理介面無法訪問](#問題-3rabbitmq-管理介面無法訪問)
     - [問題 4：Dragonfly 記憶體不足](#問題-4dragonfly-記憶體不足)
-  - [📚 相關資源](#-相關資源)
+  - [相關資源](#相關資源)
 
 ---
 
-## 📖 概述
+## 概述
 
 本專案使用 Docker Compose 管理開發環境所需的服務，包括資料庫、訊息佇列、快取和郵件測試服務。所有服務都經過優化配置，提供穩定的開發體驗。
 
@@ -61,7 +61,7 @@
 
 ---
 
-## 🚀 快速開始
+## 快速開始
 
 ### 使用 NPT CLI（推薦）
 
@@ -88,12 +88,12 @@ docker-compose ps
 
 ---
 
-## ✨ 服務說明
+## 服務說明
 
 ### 1. TimescaleDB (PostgreSQL)
 
-**用途**: 主資料庫  
-**Port**: 5432  
+**用途**: 主資料庫
+**Port**: 5432
 **Image**: `timescale/timescaledb:latest-pg16`
 
 **特色**:
@@ -104,7 +104,7 @@ docker-compose ps
 
 ### 2. RabbitMQ
 
-**用途**: 訊息佇列  
+**用途**: 訊息佇列
 **Ports**:
 
 - 5672 (AMQP)
@@ -112,13 +112,13 @@ docker-compose ps
 
 **Image**: `rabbitmq:3.13-management`
 
-**管理介面**: http://localhost:15672  
+**管理介面**: http://localhost:15672
 **預設帳號**: 見 .env.docker
 
 ### 3. Dragonfly (Redis)
 
-**用途**: 快取和 Session  
-**Port**: 6379  
+**用途**: 快取和 Session
+**Port**: 6379
 **Image**: `docker.dragonflydb.io/dragonflydb/dragonfly`
 
 **特色**:
@@ -129,7 +129,7 @@ docker-compose ps
 
 ### 4. Mailpit
 
-**用途**: 郵件測試服務  
+**用途**: 郵件測試服務
 **Ports**:
 
 - 1025 (SMTP)
@@ -182,7 +182,7 @@ docker-compose --env-file .env.docker --profile storage up -d
 
 ---
 
-## 🔧 環境變數配置
+## 環境變數配置
 
 ### .env.docker 檔案結構
 
@@ -224,7 +224,7 @@ POSTGRES_DB=npt_db
 
 ---
 
-## 🔒 安全最佳實踐
+## 安全最佳實踐
 
 ### 1. 使用強密碼
 
@@ -300,7 +300,7 @@ services:
 
 ---
 
-## 📝 常用操作
+## 常用操作
 
 ### 啟動與停止
 
@@ -367,7 +367,7 @@ docker-compose exec dragonfly redis-cli
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### 問題 1：容器無法啟動
 
@@ -439,7 +439,7 @@ services:
 
 ---
 
-## 📚 相關資源
+## 相關資源
 
 - [CLI Guide](./CLI_GUIDE.md) - CLI 工具使用指南
 - [Monorepo Structure](./MONOREPO_STRUCTURE.md) - 專案結構說明

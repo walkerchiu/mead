@@ -4,47 +4,47 @@ Storybook 與開發環境的 API Mock 完整設置指南。
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [MSW (Mock Service Worker) 設置指南](#msw-mock-service-worker-設置指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🚀 必要步驟](#-必要步驟)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [必要步驟](#必要步驟)
     - [1. 初始化 MSW Service Worker](#1-初始化-msw-service-worker)
     - [2. 驗證檔案已創建](#2-驗證檔案已創建)
     - [3. 確認 Storybook 配置](#3-確認-storybook-配置)
     - [4. 重啟 Storybook](#4-重啟-storybook)
-  - [🔍 驗證 MSW 是否正常工作](#-驗證-msw-是否正常工作)
+  - [驗證 MSW 是否正常工作](#驗證-msw-是否正常工作)
     - [方法 1: 檢查瀏覽器 Console](#方法-1-檢查瀏覽器-console)
     - [方法 2: 測試 Apollo + MSW Story](#方法-2-測試-apollo--msw-story)
     - [方法 3: 檢查 Network 標籤](#方法-3-檢查-network-標籤)
-  - [🎯 MSW 在 Storybook 中的作用](#-msw-在-storybook-中的作用)
+  - [MSW 在 Storybook 中的作用](#msw-在-storybook-中的作用)
     - [工作流程](#工作流程)
     - [好處](#好處)
-  - [📁 相關檔案](#-相關檔案)
+  - [相關檔案](#相關檔案)
     - [Mock Handlers](#mock-handlers)
     - [Storybook 配置](#storybook-配置)
-  - [🚨 故障排除](#-故障排除)
+  - [故障排除](#故障排除)
     - [Q: Service Worker 註冊失敗](#q-service-worker-註冊失敗)
     - [Q: MSW 沒有攔截請求](#q-msw-沒有攔截請求)
     - [Q: 看到 CORS 錯誤](#q-看到-cors-錯誤)
     - [Q: Handler 沒有被調用](#q-handler-沒有被調用)
-  - [🔧 進階配置](#-進階配置)
+  - [進階配置](#進階配置)
     - [Story 級別的 Handler 覆蓋](#story-級別的-handler-覆蓋)
     - [延遲響應（模擬慢網路）](#延遲響應模擬慢網路)
-  - [🎯 最佳實踐](#-最佳實踐)
+  - [最佳實踐](#最佳實踐)
     - [驗收清單](#驗收清單)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 MSW (Mock Service Worker) 是一個 API mocking 工具，可在開發和測試環境中攔截網路請求並返回模擬數據。本指南涵蓋在 Storybook 中設置和使用 MSW 的完整流程。
 
 ---
 
-## 🚀 必要步驟
+## 必要步驟
 
 ### 1. 初始化 MSW Service Worker
 
@@ -88,7 +88,7 @@ pnpm storybook
 
 ---
 
-## 🔍 驗證 MSW 是否正常工作
+## 驗證 MSW 是否正常工作
 
 ### 方法 1: 檢查瀏覽器 Console
 
@@ -141,7 +141,7 @@ pnpm storybook
 
 ---
 
-## 🎯 MSW 在 Storybook 中的作用
+## MSW 在 Storybook 中的作用
 
 ### 工作流程
 
@@ -168,7 +168,7 @@ Component 收到響應
 
 ---
 
-## 📁 相關檔案
+## 相關檔案
 
 ### Mock Handlers
 
@@ -192,7 +192,7 @@ src/mocks/
 
 ---
 
-## 🚨 故障排除
+## 故障排除
 
 ### Q: Service Worker 註冊失敗
 
@@ -224,7 +224,7 @@ src/mocks/
 
 ---
 
-## 🔧 進階配置
+## 進階配置
 
 ### Story 級別的 Handler 覆蓋
 
@@ -262,7 +262,7 @@ graphql.mutation('Login', async () => {
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
 ### 驗收清單
 
@@ -277,8 +277,8 @@ graphql.mutation('Login', async () => {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
-- 🔧 [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合指南
-- 📚 [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) - 組件庫開發
-- 🌐 [MSW 官方文檔](https://mswjs.io/) - Mock Service Worker 官方文檔
+- [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合指南
+- [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) - 組件庫開發
+- [MSW 官方文檔](https://mswjs.io/) - Mock Service Worker 官方文檔

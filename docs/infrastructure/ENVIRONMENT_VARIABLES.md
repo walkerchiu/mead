@@ -4,17 +4,17 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [環境變數配置指南](#環境變數配置指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [📋 專案結構](#-專案結構)
-  - [🚀 快速設置](#-快速設置)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [專案結構](#專案結構)
+  - [快速設置](#快速設置)
     - [1️⃣ Docker 服務](#1️⃣-docker-服務)
     - [2️⃣ Backend](#2️⃣-backend)
     - [3️⃣ Frontend](#3️⃣-frontend)
-  - [🔐 環境變數詳解](#-環境變數詳解)
+  - [環境變數詳解](#環境變數詳解)
     - [Docker (.env.docker)](#docker-envdocker)
     - [Backend (.env)](#backend-env)
       - [核心配置](#核心配置)
@@ -28,22 +28,22 @@
       - [功能開關](#功能開關)
       - [錯誤追蹤配置 (Sentry)](#錯誤追蹤配置-sentry)
       - [配置驗證](#配置驗證)
-  - [🔒 密碼同步](#-密碼同步)
+  - [密碼同步](#密碼同步)
     - [PostgreSQL 密碼](#postgresql-密碼)
     - [RabbitMQ 密碼](#rabbitmq-密碼)
-  - [🎯 不同環境配置](#-不同環境配置)
+  - [不同環境配置](#不同環境配置)
     - [開發環境 (Development)](#開發環境-development)
     - [生產環境 (Production)](#生產環境-production)
-  - [🛡️ 安全最佳實踐](#️-安全最佳實踐)
+  - [安全最佳實踐](#安全最佳實踐)
     - [1. JWT Secret 生成](#1-jwt-secret-生成)
     - [2. 系統服務密碼強度要求](#2-系統服務密碼強度要求)
-    - [3. 不要做的事 ❌](#3-不要做的事-)
-    - [4. 應該做的事 ✅](#4-應該做的事-)
-  - [🔍 驗證配置](#-驗證配置)
+    - [3. 不要做的事](#3-不要做的事-)
+    - [4. 應該做的事](#4-應該做的事-)
+  - [驗證配置](#驗證配置)
     - [檢查 Docker 服務](#檢查-docker-服務)
     - [檢查 Backend](#檢查-backend)
     - [檢查 Frontend](#檢查-frontend)
-  - [🆘 疑難排解](#-疑難排解)
+  - [疑難排解](#疑難排解)
     - [問題 1: Backend 無法連接資料庫](#問題-1-backend-無法連接資料庫)
     - [問題 2: JWT 認證失敗](#問題-2-jwt-認證失敗)
     - [問題 3: CORS 錯誤](#問題-3-cors-錯誤)
@@ -51,30 +51,30 @@
     - [問題 5: Apollo Client 配置警告](#問題-5-apollo-client-配置警告)
     - [問題 6: Sentry 未收到錯誤](#問題-6-sentry-未收到錯誤)
     - [問題 7: GraphQL 端點連線失敗](#問題-7-graphql-端點連線失敗)
-  - [📚 環境變數載入順序](#-環境變數載入順序)
+  - [環境變數載入順序](#環境變數載入順序)
     - [Next.js (Frontend)](#nextjs-frontend)
     - [NestJS (Backend)](#nestjs-backend)
-  - [📖 相關文檔](#-相關文檔)
-  - [✅ 設置檢查清單](#-設置檢查清單)
+  - [相關文檔](#相關文檔)
+  - [設置檢查清單](#設置檢查清單)
     - [初始設置](#初始設置)
     - [生產部署前](#生產部署前)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
 
 **核心概念**：
 
-- 🐳 **Docker 層** - 管理容器服務（PostgreSQL、RabbitMQ、Dragonfly、Mailpit）
-- 🔧 **Backend 層** - NestJS 應用配置（API、資料庫連接、JWT、Email）
-- 🎨 **Frontend 層** - Next.js 應用配置（API 端點、公開變數）
-- 🔐 **安全機制** - 密碼同步、JWT Secret 生成、敏感資料保護
+- **Docker 層** - 管理容器服務（PostgreSQL、RabbitMQ、Dragonfly、Mailpit）
+- **Backend 層** - NestJS 應用配置（API、資料庫連接、JWT、Email）
+- **Frontend 層** - Next.js 應用配置（API 端點、公開變數）
+- **安全機制** - 密碼同步、JWT Secret 生成、敏感資料保護
 
 ---
 
-## 📋 專案結構
+## 專案結構
 
 NPT 專案有三個層級的環境變數：
 
@@ -100,7 +100,7 @@ npt/
 
 ---
 
-## 🚀 快速設置
+## 快速設置
 
 ### 1️⃣ Docker 服務
 
@@ -151,7 +151,7 @@ pnpm dev
 
 ---
 
-## 🔐 環境變數詳解
+## 環境變數詳解
 
 ### Docker (.env.docker)
 
@@ -207,7 +207,7 @@ DATABASE_URL="postgresql://npt_uat:password@uat-db:5432/npt_db_uat?schema=public
 DATABASE_URL="postgresql://npt_prod:password@prod-db:5432/npt_db_prod?schema=public&sslmode=require&connection_limit=20&pool_timeout=10"
 ```
 
-> **💡 提示**：`connection_limit` 應根據應用程式規模和資料庫負載調整。過高會消耗資料庫資源，過低會導致連線等待。
+> **提示**：`connection_limit` 應根據應用程式規模和資料庫負載調整。過高會消耗資料庫資源，過低會導致連線等待。
 
 #### 快取與訊息佇列
 
@@ -217,7 +217,7 @@ DATABASE_URL="postgresql://npt_prod:password@prod-db:5432/npt_db_prod?schema=pub
 | `REDIS_PORT`   | Redis/Dragonfly 端口 | `6379`                              | ✅   |
 | `RABBITMQ_URL` | RabbitMQ 連線字串    | `amqp://hq:password@localhost:5672` | ✅   |
 
-> **📌 說明**：專案使用 Dragonfly（Redis 協議相容）作為快取和 PubSub。開發環境使用 Memory PubSub，生產環境自動切換為 Distributed PubSub。
+> **說明**：專案使用 Dragonfly（Redis 協議相容）作為快取和 PubSub。開發環境使用 Memory PubSub，生產環境自動切換為 Distributed PubSub。
 
 #### 前端 URL
 
@@ -385,7 +385,7 @@ NEXT_PUBLIC_APOLLO_MAX_RETRIES=100  # 太高,自動調整為 10
 
 ---
 
-## 🔒 密碼同步
+## 密碼同步
 
 **重要**：以下密碼必須保持一致！
 
@@ -413,7 +413,7 @@ RABBITMQ_URL=amqp://hq:dev_rabbitmq_2024@localhost:5672
 
 ---
 
-## 🎯 不同環境配置
+## 不同環境配置
 
 ### 開發環境 (Development)
 
@@ -499,7 +499,7 @@ pnpm start
 
 ---
 
-## 🛡️ 安全最佳實踐
+## 安全最佳實踐
 
 ### 1. JWT Secret 生成
 
@@ -531,9 +531,9 @@ e5df40356b0d79d63104836480a465b411207d95e966a429558c9f28d807b74e
 
 > **注意**：這些是系統配置密碼，由 DevOps 設定，用於服務之間的連線。
 >
-> **用戶帳號密碼規則**不同，請參考 [註冊文檔](../authentication/REGISTRATION.md#-密碼要求)（8+ 字元，大小寫 + 數字 + 符號）。
+> **用戶帳號密碼規則**不同，請參考 [註冊文檔](../authentication/REGISTRATION.md#密碼要求)（8+ 字元，大小寫 + 數字 + 符號）。
 
-### 3. 不要做的事 ❌
+### 3. 不要做的事
 
 - ❌ 將包含實際密碼的 `.env` 檔案提交到 Git
 - ❌ 在 Slack/Email/文件中分享密碼
@@ -541,7 +541,7 @@ e5df40356b0d79d63104836480a465b411207d95e966a429558c9f28d807b74e
 - ❌ 使用 "password", "hq" 等弱密碼
 - ❌ 在 `NEXT_PUBLIC_` 變數中放敏感資訊
 
-### 4. 應該做的事 ✅
+### 4. 應該做的事
 
 - ✅ 使用密碼生成器
 - ✅ 開發和生產環境使用不同密碼
@@ -551,7 +551,7 @@ e5df40356b0d79d63104836480a465b411207d95e966a429558c9f28d807b74e
 
 ---
 
-## 🔍 驗證配置
+## 驗證配置
 
 ### 檢查 Docker 服務
 
@@ -593,7 +593,7 @@ pnpm dev
 
 ---
 
-## 🆘 疑難排解
+## 疑難排解
 
 ### 問題 1: Backend 無法連接資料庫
 
@@ -726,7 +726,7 @@ curl http://localhost:4000/graphql
 
 ---
 
-## 📚 環境變數載入順序
+## 環境變數載入順序
 
 ### Next.js (Frontend)
 
@@ -746,7 +746,7 @@ curl http://localhost:4000/graphql
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 **專案文檔**：
 
@@ -764,7 +764,7 @@ curl http://localhost:4000/graphql
 
 ---
 
-## ✅ 設置檢查清單
+## 設置檢查清單
 
 ### 初始設置
 

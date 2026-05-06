@@ -193,8 +193,11 @@ TRANSEOF
   ALL_FILES=$(find src -type f \( -name "*.ts" -o -name "*.tsx" -o -name "*.js" -o -name "*.jsx" \) 2>/dev/null)
   TOTAL_FILES=$(echo "$ALL_FILES" | wc -l | tr -d ' ')
 
-  # 將 Node 腳本保存到臨時文件
-  cat > /tmp/scan_i18n.js <<'SCANSCRIPT'
+  # 將 Node 腳本保存到臨時文件（用 mktemp 避免 /tmp/ symlink 攻擊與多使用者衝突）
+  local SCAN_SCRIPT
+  SCAN_SCRIPT=$(mktemp -t scan_i18n.XXXXXX.js)
+  trap 'rm -f "$SCAN_SCRIPT"' RETURN
+  cat > "$SCAN_SCRIPT" <<'SCANSCRIPT'
 const fs = require('fs');
 const path = require('path');
 
@@ -249,7 +252,7 @@ console.log(JSON.stringify({
 SCANSCRIPT
 
   # 運行 Node 腳本並保存結果到臨時文件
-  node /tmp/scan_i18n.js "$ALL_FILES" > /tmp/scan_result.json 2>&1 || true
+  node "$SCAN_SCRIPT" "$ALL_FILES" > /tmp/scan_result.json 2>&1 || true
 
   USED_KEYS=$(node -e "const data = require('/tmp/scan_result.json'); console.log(data.usedKeys.join('\n'));" 2>/dev/null || echo "")
   USED_NAMESPACES=$(node -e "const data = require('/tmp/scan_result.json'); console.log(data.usedNamespaces.join('\n'));" 2>/dev/null || echo "")
@@ -393,8 +396,12 @@ UNUSEDEOF
   # 1. 提取所有翻譯鍵定義
   log_info "▶ 1/4 提取翻譯鍵定義"
 
-  # 創建後端掃描腳本
-  cat > /tmp/scan_backend_i18n.js <<'BACKEND_SCAN_SCRIPT'
+  # 創建後端掃描腳本（用 mktemp 避免 /tmp/ symlink 攻擊與多使用者衝突）
+  local BACKEND_SCAN_SCRIPT
+  BACKEND_SCAN_SCRIPT=$(mktemp -t scan_backend_i18n.XXXXXX.js)
+  # 註：caller (check_unused) 已有 RETURN trap 處理 SCAN_SCRIPT，這裡 append 即可
+  trap 'rm -f "$SCAN_SCRIPT" "$BACKEND_SCAN_SCRIPT" "${BACKEND_CODE_SCRIPT:-}"' RETURN
+  cat > "$BACKEND_SCAN_SCRIPT" <<'BACKEND_SCAN_SCRIPT_HEREDOC'
 const fs = require('fs');
 const path = require('path');
 
@@ -456,9 +463,9 @@ console.log(JSON.stringify({
   onlyEn: onlyEn,
   onlyZh: onlyZh
 }));
-BACKEND_SCAN_SCRIPT
+BACKEND_SCAN_SCRIPT_HEREDOC
 
-  BACKEND_TRANSLATION_DATA=$(node /tmp/scan_backend_i18n.js 2>/dev/null || echo '{"allKeys":[],"totalKeys":0,"onlyEn":[],"onlyZh":[]}')
+  BACKEND_TRANSLATION_DATA=$(node "$BACKEND_SCAN_SCRIPT" 2>/dev/null || echo '{"allKeys":[],"totalKeys":0,"onlyEn":[],"onlyZh":[]}')
 
   BACKEND_TOTAL_KEYS=$(echo "$BACKEND_TRANSLATION_DATA" | node -e "const data = JSON.parse(require('fs').readFileSync(0, 'utf8')); console.log(data.totalKeys || 0);" 2>/dev/null || echo "0")
   BACKEND_TRANSLATION_KEYS=$(echo "$BACKEND_TRANSLATION_DATA" | node -e "const data = JSON.parse(require('fs').readFileSync(0, 'utf8')); console.log((data.allKeys || []).join('\\n'));" 2>/dev/null || echo "")
@@ -486,8 +493,9 @@ BACKEND_SCAN_SCRIPT
   BACKEND_ALL_FILES=$(find src -type f \( -name "*.ts" -o -name "*.js" \) ! -path "*/i18n/*" ! -name "*.spec.ts" ! -name "*.test.ts" 2>/dev/null)
   BACKEND_TOTAL_FILES=$(echo "$BACKEND_ALL_FILES" | wc -l | tr -d ' \n')
 
-  # 創建後端代碼掃描腳本
-  cat > /tmp/scan_backend_code.js <<'BACKEND_CODE_SCRIPT'
+  # 創建後端代碼掃描腳本（用 mktemp 避免 /tmp/ symlink 攻擊與多使用者衝突）
+  BACKEND_CODE_SCRIPT=$(mktemp -t scan_backend_code.XXXXXX.js)
+  cat > "$BACKEND_CODE_SCRIPT" <<'BACKEND_CODE_SCRIPT_HEREDOC'
 const fs = require('fs');
 
 const usedKeys = new Set();
@@ -512,9 +520,9 @@ console.log(JSON.stringify({
   usedKeys: Array.from(usedKeys),
   totalFiles: files.length
 }));
-BACKEND_CODE_SCRIPT
+BACKEND_CODE_SCRIPT_HEREDOC
 
-  node /tmp/scan_backend_code.js "$BACKEND_ALL_FILES" > /tmp/backend_scan_result.json 2>&1 || true
+  node "$BACKEND_CODE_SCRIPT" "$BACKEND_ALL_FILES" > /tmp/backend_scan_result.json 2>&1 || true
 
   BACKEND_USED_KEYS=$(node -e "const data = require('/tmp/backend_scan_result.json'); console.log(data.usedKeys.join('\\n'));" 2>/dev/null || echo "")
   BACKEND_USED_KEYS_COUNT=$(printf "%s\n" "$BACKEND_USED_KEYS" | grep -v '^$' | wc -l | tr -d ' \n' || true)

@@ -94,7 +94,7 @@ backup_files() {
       backup_s3_files "$backup_dir" "$timestamp"
       ;;
     *)
-      log_warning "未知的儲存類型: $storage_type，跳過檔案備份"
+      log_warning "未知的儲存類型: ${storage_type}，跳過檔案備份"
       return 0
       ;;
   esac
@@ -222,7 +222,7 @@ restore_files() {
       restore_s3_files "$backup_dir" "$timestamp"
       ;;
     *)
-      log_warning "未知的儲存類型: $storage_type，跳過檔案還原"
+      log_warning "未知的儲存類型: ${storage_type}，跳過檔案還原"
       return 0
       ;;
   esac

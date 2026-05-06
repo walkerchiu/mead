@@ -105,7 +105,7 @@ check_service_running() {
   local port="$1"
   local service_name="$2"
 
-  if ! lsof -ti:$port >/dev/null 2>&1; then
+  if ! lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
     log_warning "$service_name 未運行"
     echo -e "啟動服務: ${CYAN}./scripts/cli.sh dev --${service_name}-only${NC}"
     return 1
@@ -124,7 +124,7 @@ view_app_logs() {
     exit 1
   fi
 
-  PID=$(lsof -ti:$port | head -1)
+  PID=$(lsof -ti:"$port" -sTCP:LISTEN | head -1)
 
   log_info "服務 PID: $PID"
   log_info "按 Ctrl+C 停止"
@@ -153,26 +153,18 @@ view_docker_logs() {
   local container_name="$1"
   local display_name="${2:-$container_name}"
 
-  # 建構 docker logs 命令
-  local cmd="docker logs"
-
-  if [ "$FOLLOW" = true ]; then
-    cmd="$cmd -f"
-  fi
-
-  cmd="$cmd --tail $LINES"
-
-  if [ -n "$SINCE" ]; then
-    cmd="$cmd --since $SINCE"
-  fi
-
-  cmd="$cmd $container_name"
+  # 用 array 構造命令避免 shell injection（LINES / SINCE 來自 user --lines / --since 旗標）
+  local cmd_args=(docker logs)
+  [ "$FOLLOW" = true ] && cmd_args+=(-f)
+  cmd_args+=(--tail "$LINES")
+  [ -n "$SINCE" ] && cmd_args+=(--since "$SINCE")
+  cmd_args+=("$container_name")
 
   print_header "$display_name 日誌"
-  log_info "執行: $cmd"
+  log_info "執行: ${cmd_args[*]}"
   echo ""
 
-  eval "$cmd" || {
+  "${cmd_args[@]}" || {
     log_error "容器 $container_name 未運行"
     echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker up -d${NC}"
     exit 1
@@ -183,22 +175,16 @@ view_docker_logs() {
 view_all_docker_logs() {
   print_header "所有 Docker 服務日誌"
 
-  local cmd="docker-compose --env-file .env.docker logs"
+  # 用 array 構造命令避免 shell injection
+  local cmd_args=(docker-compose --env-file .env.docker logs)
+  [ "$FOLLOW" = true ] && cmd_args+=(-f)
+  cmd_args+=(--tail "$LINES")
+  [ -n "$SINCE" ] && cmd_args+=(--since "$SINCE")
 
-  if [ "$FOLLOW" = true ]; then
-    cmd="$cmd -f"
-  fi
-
-  cmd="$cmd --tail $LINES"
-
-  if [ -n "$SINCE" ]; then
-    cmd="$cmd --since $SINCE"
-  fi
-
-  log_info "執行: $cmd"
+  log_info "執行: ${cmd_args[*]}"
   echo ""
 
-  eval "$cmd" || {
+  "${cmd_args[@]}" || {
     log_error "Docker 服務未運行"
     echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker up -d${NC}"
     exit 1
@@ -257,24 +243,17 @@ case "$SERVICE" in
   seaweedfs|weed)
     print_header "SeaweedFS 所有服務日誌"
 
-    cmd="docker-compose --env-file .env.docker logs"
+    # 用 array 構造命令避免 shell injection
+    cmd_args=(docker-compose --env-file .env.docker logs)
+    [ "$FOLLOW" = true ] && cmd_args+=(-f)
+    cmd_args+=(--tail "$LINES")
+    [ -n "$SINCE" ] && cmd_args+=(--since "$SINCE")
+    cmd_args+=(seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3)
 
-    if [ "$FOLLOW" = true ]; then
-      cmd="$cmd -f"
-    fi
-
-    cmd="$cmd --tail $LINES"
-
-    if [ -n "$SINCE" ]; then
-      cmd="$cmd --since $SINCE"
-    fi
-
-    cmd="$cmd seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3"
-
-    log_info "執行: $cmd"
+    log_info "執行: ${cmd_args[*]}"
     echo ""
 
-    eval "$cmd" || {
+    "${cmd_args[@]}" || {
       log_error "SeaweedFS 服務未運行"
       echo -e "啟動服務: ${CYAN}./scripts/cli.sh storage start${NC}"
       exit 1

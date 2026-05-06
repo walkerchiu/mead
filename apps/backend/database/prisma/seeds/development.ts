@@ -14,6 +14,9 @@ export async function seedDevelopment(prisma: PrismaClient) {
   const managerRole = await prisma.role.findFirstOrThrow({
     where: { name: 'MANAGER', scope: 'CUSTOMER_SCOPE' },
   });
+  const ownerRole = await prisma.role.findFirstOrThrow({
+    where: { name: 'OWNER', scope: 'CUSTOMER_SCOPE' },
+  });
 
   // Super HQ 用戶（同時擁有 HQ_SCOPE 和 CUSTOMER_SCOPE）
   const hqUser = await prisma.user.upsert({
@@ -59,6 +62,34 @@ export async function seedDevelopment(prisma: PrismaClient) {
     },
   });
 
+  // Customer Admin 用戶（純 CUSTOMER_SCOPE，OWNER 角色）
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@example.com' },
+    update: {
+      accessScopes: ['CUSTOMER_SCOPE'],
+    },
+    create: {
+      email: 'admin@example.com',
+      password: hashedPassword,
+      name: 'Customer Admin',
+      accessScopes: ['CUSTOMER_SCOPE'],
+    },
+  });
+
+  await prisma.userRole.upsert({
+    where: {
+      userId_roleId: {
+        userId: adminUser.id,
+        roleId: ownerRole.id,
+      },
+    },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      roleId: ownerRole.id,
+    },
+  });
+
   // Public 用戶
   const publicUser = await prisma.user.upsert({
     where: { email: 'public@example.com' },
@@ -90,6 +121,16 @@ export async function seedDevelopment(prisma: PrismaClient) {
   });
 
   await prisma.profile.upsert({
+    where: { userId: adminUser.id },
+    update: {},
+    create: {
+      userId: adminUser.id,
+      bio: 'Customer scope OWNER (demo admin)',
+      language: 'zh-TW',
+    },
+  });
+
+  await prisma.profile.upsert({
     where: { userId: publicUser.id },
     update: {},
     create: {
@@ -105,6 +146,7 @@ export async function seedDevelopment(prisma: PrismaClient) {
   console.log(
     '  - hq@example.com (SUPER_HQ in HQ_SCOPE + MANAGER in CUSTOMER_SCOPE)',
   );
+  console.log('  - admin@example.com (OWNER in CUSTOMER_SCOPE)');
   console.log('  - public@example.com (PUBLIC_SCOPE only, no roles)');
   console.log('  密碼: Password123!');
 }

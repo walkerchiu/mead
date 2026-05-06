@@ -15,7 +15,7 @@ body {
     var(--font-roboto, Roboto), var(--font-noto-sans-tc, 'Noto Sans TC'),
     sans-serif;
   /* Light mode default background - 企業識別淺冷白 */
-  background-color: #F5F7FA;
+  background-color: #f5f7fa;
   color: #001239;
   /* Smooth transition when theme changes */
   transition:
@@ -25,7 +25,7 @@ body {
 
 /* Dark mode styles applied immediately by blocking script */
 html.dark-mode body {
-  background-color: #0D0D0D;
+  background-color: #0d0d0d;
   color: rgba(255, 255, 255, 0.92);
 }
 
@@ -33,13 +33,13 @@ html.dark-mode body {
 :root {
   /* Light mode: 品牌深藍漸層 (PANTONE 294C → 648C) */
   --auth-gradient-bg: linear-gradient(135deg, #0c3467 0%, #00194e 100%);
-  --auth-solid-bg: #F5F7FA;
+  --auth-solid-bg: #f5f7fa;
 }
 
 html.dark-mode {
   /* Dark mode: 純深黑漸層 */
-  --auth-gradient-bg: linear-gradient(135deg, #1A1A1A 0%, #0D0D0D 100%);
-  --auth-solid-bg: #0D0D0D;
+  --auth-gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  --auth-solid-bg: #0d0d0d;
 }
 
 code,

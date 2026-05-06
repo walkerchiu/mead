@@ -271,7 +271,7 @@ function UsersContent() {
 export default function UsersPage() {
   return (
     <ProtectedRoute
-      requiredScopes={['CUSTOMER_SCOPE']}
+      requiredScopes={['HQ_SCOPE']}
       requiredPermissions={['users:create']}
     >
       <UsersContent />

@@ -163,7 +163,7 @@ env_diff() {
   current=$(get_current_env)
 
   if [[ "$current" == "$target" ]]; then
-    log_info "目標環境與當前環境相同（$current）"
+    log_info "目標環境與當前環境相同（${current}）"
     return
   fi
 

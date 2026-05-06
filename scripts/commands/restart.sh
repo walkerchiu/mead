@@ -87,7 +87,8 @@ kill_process() {
   local port="$1"
   local service_name="$2"
 
-  PIDS=$(lsof -ti:$port 2>/dev/null || true)
+  # 只 kill 真正在 LISTEN 的 server，client connection 會在 server 死後自動關閉
+  PIDS=$(lsof -ti:"$port" -sTCP:LISTEN 2>/dev/null || true)
   if [ -n "$PIDS" ]; then
     log_info "終止 $service_name (port $port, PID: $PIDS)"
     if [ "$FORCE" = true ]; then
@@ -96,7 +97,7 @@ kill_process() {
       echo "$PIDS" | xargs kill 2>/dev/null || true
       sleep 2
       # 檢查是否還在運行
-      if lsof -ti:$port >/dev/null 2>&1; then
+      if lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
         log_warning "$service_name 未正常終止，使用強制終止"
         echo "$PIDS" | xargs kill -9 2>/dev/null || true
       fi

@@ -4,57 +4,57 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [API 回應格式規範 (API Response Format)](#api-回應格式規範-api-response-format)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [核心原則](#核心原則)
-  - [📐 BaseResponse 統一格式](#-baseresponse-統一格式)
+  - [BaseResponse 統一格式](#baseresponse-統一格式)
     - [定義位置](#定義位置)
     - [泛型工廠函數](#泛型工廠函數)
     - [欄位說明](#欄位說明)
-  - [✨ 成功回應](#-成功回應)
+  - [成功回應](#成功回應)
     - [基本成功回應](#基本成功回應)
     - [無資料的成功回應](#無資料的成功回應)
     - [GraphQL Query 範例](#graphql-query-範例)
-  - [🚨 錯誤回應](#-錯誤回應)
+  - [錯誤回應](#錯誤回應)
     - [ErrorDetail 結構](#errordetail-結構)
     - [常見錯誤代碼](#常見錯誤代碼)
     - [單一錯誤範例](#單一錯誤範例)
     - [驗證錯誤範例（多個欄位）](#驗證錯誤範例多個欄位)
     - [GraphQL 錯誤範例](#graphql-錯誤範例)
-  - [📊 分頁回應](#-分頁回應)
+  - [分頁回應](#分頁回應)
     - [PaginatedResponse 定義](#paginatedresponse-定義)
     - [PageInfo 結構](#pageinfo-結構)
     - [分頁回應範例](#分頁回應範例)
     - [GraphQL 分頁 Query](#graphql-分頁-query)
-  - [🔧 GraphQL 特殊處理](#-graphql-特殊處理)
+  - [GraphQL 特殊處理](#graphql-特殊處理)
     - [AllExceptionsFilter 統一異常處理](#allexceptionsfilter-統一異常處理)
       - [HTTP 異常回應](#http-異常回應)
       - [GraphQL 異常回應](#graphql-異常回應)
     - [Union Types（聯合類型）](#union-types聯合類型)
-  - [🔍 Request ID 追蹤](#-request-id-追蹤)
+  - [Request ID 追蹤](#request-id-追蹤)
     - [自動生成 Request ID](#自動生成-request-id)
     - [使用方式](#使用方式)
       - [前端發送請求](#前端發送請求)
       - [後端記錄日誌](#後端記錄日誌)
       - [審計日誌整合](#審計日誌整合)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO - 應該這樣做](#-do---應該這樣做)
+  - [最佳實踐](#最佳實踐)
+    - [DO - 應該這樣做](#do---應該這樣做)
       - [1. 明確的成功訊息](#1-明確的成功訊息)
       - [2. 詳細的錯誤資訊](#2-詳細的錯誤資訊)
       - [3. 使用泛型回應類型](#3-使用泛型回應類型)
       - [4. 記錄 Request ID](#4-記錄-request-id)
-    - [❌ DON'T - 不要這樣做](#-dont---不要這樣做)
+    - [DON'T - 不要這樣做](#dont---不要這樣做)
       - [1. 不要暴露內部錯誤](#1-不要暴露內部錯誤)
       - [2. 不要混用回應格式](#2-不要混用回應格式)
       - [3. 不要忽略錯誤詳情](#3-不要忽略錯誤詳情)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `BaseResponse<T>`，確保所有 API 回應結構一致。
 
@@ -68,7 +68,7 @@ NPT 專案採用 **GraphQL-first** 設計，使用統一的泛型回應格式 `B
 
 ---
 
-## 📐 BaseResponse 統一格式
+## BaseResponse 統一格式
 
 ### 定義位置
 
@@ -111,7 +111,7 @@ export function BaseResponse<T>(classRef: Type<T>) {
 
 ---
 
-## ✨ 成功回應
+## 成功回應
 
 ### 基本成功回應
 
@@ -168,7 +168,7 @@ query {
 
 ---
 
-## 🚨 錯誤回應
+## 錯誤回應
 
 ### ErrorDetail 結構
 
@@ -262,7 +262,7 @@ export class ErrorDetail {
 
 ---
 
-## 📊 分頁回應
+## 分頁回應
 
 ### PaginatedResponse 定義
 
@@ -362,7 +362,7 @@ query {
 
 ---
 
-## 🔧 GraphQL 特殊處理
+## GraphQL 特殊處理
 
 ### AllExceptionsFilter 統一異常處理
 
@@ -439,7 +439,7 @@ mutation Login {
 
 ---
 
-## 🔍 Request ID 追蹤
+## Request ID 追蹤
 
 ### 自動生成 Request ID
 
@@ -479,9 +479,9 @@ SELECT * FROM audit_logs WHERE request_id = 'req-1234567890';
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO - 應該這樣做
+### DO - 應該這樣做
 
 #### 1. 明確的成功訊息
 
@@ -517,7 +517,7 @@ export class CreateUserResponse extends BaseResponse(UserType) {}
 logger.info(`[${requestId}] 用戶登入成功`, { userId: user.id });
 ```
 
-### ❌ DON'T - 不要這樣做
+### DON'T - 不要這樣做
 
 #### 1. 不要暴露內部錯誤
 
@@ -561,7 +561,7 @@ throw new BadRequestException({
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [PAGINATION_GUIDE.md](./PAGINATION_GUIDE.md) - 分頁實現指南
 - [AUDIT_LOG_SYSTEM.md](./AUDIT_LOG_SYSTEM.md) - 審計日誌系統

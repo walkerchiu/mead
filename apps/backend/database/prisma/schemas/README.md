@@ -57,7 +57,7 @@ model Post {
 
 ## 重要提醒
 
-⚠️ **不要直接編輯 `schema.prisma`** - 會被自動覆蓋  
+⚠️ **不要直接編輯 `schema.prisma`** - 會被自動覆蓋
 ✅ **編輯 `prisma/schemas/*.prisma`** - 再執行合併
 
 ## 檔案說明

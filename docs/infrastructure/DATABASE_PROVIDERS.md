@@ -14,7 +14,7 @@ NPT 的資料層只用標準 PostgreSQL 13+ 語法，**沒有綁定 TimescaleDB 
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [選擇矩陣](#選擇矩陣)
 - [本機 TimescaleDB（dev）](#本機-timescaledbdev)
@@ -32,7 +32,7 @@ NPT 的資料層只用標準 PostgreSQL 13+ 語法，**沒有綁定 TimescaleDB 
 
 | Provider                | Postgres 版本 | SSL 強制              | 適合階段   | 備註                                                                        |
 | ----------------------- | ------------- | --------------------- | ---------- | --------------------------------------------------------------------------- |
-| 本機 TimescaleDB        | 16            | ❌（local）           | dev        | `docker-compose` 自帶；`timescaledb` 擴充未啟用也不影響                     |
+| 本機 TimescaleDB        | 16            | ❌ （local）          | dev        | `docker-compose` 自帶；`timescaledb` 擴充未啟用也不影響                     |
 | AWS RDS PostgreSQL      | 13–16         | ✅ `verify-full` 推薦 | UAT / prod | CA bundle 全球共用；`rds.force_ssl=1` 可由 parameter group 設定             |
 | AWS Aurora PostgreSQL   | 13–16         | ✅ 同上               | UAT / prod | Cluster endpoint（writer）+ reader endpoint（讀擴展）                       |
 | Google Cloud SQL for PG | 13–16         | ✅ `verify-ca` 起跳   | UAT / prod | 預設 SSL 較嚴；亦可走 Cloud SQL Auth Proxy 免 CA                            |
@@ -252,7 +252,7 @@ DATABASE_URL="postgresql://npt_prod:PASS@npt-proxy.proxy-xxxxx.ap-northeast-1.rd
 
 ---
 
-## 📖 相關文檔
+## 相關文檔
 
 - [環境變數配置指南](./ENVIRONMENT_VARIABLES.md) — 所有 env key
 - [Docker Setup](../getting-started/DOCKER_SETUP.md) — 本機開發環境

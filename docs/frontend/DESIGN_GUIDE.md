@@ -4,18 +4,18 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [組件設計指南](#組件設計指南)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
-  - [🎯 給設計師](#-給設計師)
+  - [目錄](#目錄)
+  - [概述](#概述)
+  - [給設計師](#給設計師)
     - [這份文件的用途](#這份文件的用途)
     - [你需要的工具](#你需要的工具)
-  - [🏗️ 設計系統概覽](#️-設計系統概覽)
+  - [設計系統概覽](#設計系統概覽)
     - [Atomic Design 架構](#atomic-design-架構)
     - [為什麼這樣設計？](#為什麼這樣設計)
-  - [🎨 設計 Token](#-設計-token)
+  - [設計 Token](#設計-token)
     - [什麼是 Design Token？](#什麼是-design-token)
     - [色彩系統](#色彩系統)
       - [Primary（主色）](#primary主色)
@@ -41,26 +41,26 @@
     - [間距系統](#間距系統)
     - [圓角系統](#圓角系統)
     - [陰影系統](#陰影系統)
-  - [📐 組件規範](#-組件規範)
-    - [🔹 Atoms（原子組件）](#-atoms原子組件)
+  - [組件規範](#組件規範)
+    - [Atoms（原子組件）](#atoms原子組件)
       - [Button（按鈕）](#button按鈕)
       - [CodeInput（驗證碼輸入）](#codeinput驗證碼輸入)
       - [Radio（單選）](#radio單選)
       - [Switch（開關）](#switch開關)
       - [TextField（輸入框）](#textfield輸入框)
-    - [🟢 Molecules（分子組件）](#-molecules分子組件)
+    - [Molecules（分子組件）](#molecules分子組件)
       - [AlertMessage（提示訊息）](#alertmessage提示訊息)
       - [DataList（數據列表）](#datalist數據列表)
       - [DataTable（數據表格）](#datatable數據表格)
       - [FormField（表單欄位）](#formfield表單欄位)
       - [PasswordField（密碼欄位）](#passwordfield密碼欄位)
       - [SelectField（下拉選單）](#selectfield下拉選單)
-    - [🟠 Organisms（有機體組件）](#-organisms有機體組件)
+    - [Organisms（有機體組件）](#organisms有機體組件)
       - [LoginForm（登入表單）](#loginform登入表單)
       - [TwoFactorForm（2FA 表單）](#twofactorform2fa-表單)
-    - [🔵 Templates（模板）](#-templates模板)
+    - [Templates（模板）](#templates模板)
       - [AuthLayout（認證頁面佈局）](#authlayout認證頁面佈局)
-  - [✅ 設計交付清單](#-設計交付清單)
+  - [設計交付清單](#設計交付清單)
     - [Figma 檔案結構](#figma-檔案結構)
       - [推薦的 Page 結構（含說明）](#推薦的-page-結構含說明)
       - [各 Page 的詳細說明](#各-page-的詳細說明)
@@ -70,20 +70,20 @@
       - [實用 Figma 插件](#實用-figma-插件)
       - [命名規範總結](#命名規範總結)
       - [交付檢查清單](#交付檢查清單)
-  - [🤝 設計與開發協作](#-設計與開發協作)
+  - [設計與開發協作](#設計與開發協作)
     - [溝通檢查清單](#溝通檢查清單)
     - [常見問題](#常見問題)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 本指南專為設計師編寫，提供完整的組件設計規範、Design Token 定義和 Figma 最佳實踐。
 
 ---
 
-## 🎯 給設計師
+## 給設計師
 
 ### 這份文件的用途
 
@@ -102,7 +102,7 @@
 
 ---
 
-## 🏗️ 設計系統概覽
+## 設計系統概覽
 
 ### Atomic Design 架構
 
@@ -140,13 +140,13 @@
 
 ---
 
-## 🎨 設計 Token
+## 設計 Token
 
 ### 什麼是 Design Token？
 
 Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間距等。
 
-> 💡 **給設計師的建議**：在 Figma 中使用 **Variables** 功能來管理這些 Token
+> **給設計師的建議**：在 Figma 中使用 **Variables** 功能來管理這些 Token
 
 ### 色彩系統
 
@@ -375,7 +375,7 @@ Outline
 
 ### 暗色模式設計系統 (Dark Mode)
 
-> 💡 **給設計師的提示**：暗色模式已完全實作,並支援 Light/Dark/System 三種模式自動切換。
+> **給設計師的提示**：暗色模式已完全實作,並支援 Light/Dark/System 三種模式自動切換。
 
 #### 暗色模式設計原則
 
@@ -832,7 +832,7 @@ Chart label:
  - 群組標籤之間：24px（Spacing:3）
 ```
 
-> 💡 **設計原則**：盡量使用 8 的倍數，保持視覺節奏一致
+> **設計原則**：盡量使用 8 的倍數，保持視覺節奏一致
 
 ### 圓角系統
 
@@ -863,9 +863,9 @@ Elevation（高度）:
 
 ---
 
-## 📐 組件規範
+## 組件規範
 
-### 🔹 Atoms（原子組件）
+### Atoms（原子組件）
 
 #### Button（按鈕）
 
@@ -1099,7 +1099,7 @@ Colors
 
 ---
 
-### 🟢 Molecules（分子組件）
+### Molecules（分子組件）
 
 #### AlertMessage（提示訊息）
 
@@ -1559,7 +1559,7 @@ Badge（徽章）顯示：
 
 ---
 
-### 🟠 Organisms（有機體組件）
+### Organisms（有機體組件）
 
 #### LoginForm（登入表單）
 
@@ -1616,7 +1616,7 @@ Badge（徽章）顯示：
 
 ---
 
-### 🔵 Templates（模板）
+### Templates（模板）
 
 #### AuthLayout（認證頁面佈局）
 
@@ -1641,7 +1641,7 @@ Badge（徽章）顯示：
 
 ---
 
-## ✅ 設計交付清單
+## 設計交付清單
 
 ### Figma 檔案結構
 
@@ -2021,49 +2021,49 @@ Badge（徽章）顯示：
 
 #### 各 Page 的詳細說明
 
-**🏠 Cover（封面頁）**
+**Cover（封面頁）**
 
 - **用途**：讓任何人打開檔案時能快速了解這是什麼專案
 - **必須包含**：專案名稱、版本號、最後更新日期、設計團隊
 - **可選包含**：快速導航連結、變更紀錄、專案目標說明
 
-**🎨 Design Tokens（設計基礎變數）**
+**Design Tokens（設計基礎變數）**
 
 - **用途**：集中管理所有設計決策，確保一致性
 - **為什麼重要**：修改一次，所有使用該 Token 的地方都會更新
 - **開發對應**：這些 Token 會直接轉換為程式碼中的變數
 
-**🧩 Components（組件庫）**
+**Components（組件庫）**
 
 - **用途**：所有可重用的 UI 元件
 - **組織原則**：從小到大（Atoms → Molecules → Organisms → Templates）
 - **為什麼分層**：避免循環依賴，小組件可組合成大組件
 
-**📱 Responsive Examples（響應式範例）**
+**Responsive Examples（響應式範例）**
 
 - **用途**：展示同一個頁面在不同裝置上的呈現
 - **為什麼需要**：提前發現在小螢幕上的問題
 - **注意事項**：不只是縮小，而是調整佈局和優先級
 
-**🎭 States & Interactions（狀態與互動）**
+**States & Interactions（狀態與互動）**
 
 - **用途**：展示用戶操作時的視覺反饋
 - **為什麼重要**：開發者需要知道每個狀態該長什麼樣
 - **必須包含**：所有可互動組件的所有可能狀態
 
-**🎨 Color Accessibility（色彩無障礙）**
+**Color Accessibility（色彩無障礙）**
 
 - **用途**：確保色盲或視力障礙者也能正常使用
 - **標準**：WCAG AA 要求對比度至少 4.5:1
 - **工具推薦**：使用 Stark 插件檢查
 
-**📖 Guidelines（使用指南）**
+**Guidelines（使用指南）**
 
 - **用途**：教導他人如何正確使用這些組件
 - **內容建議**：何時用 Contained Button vs Outlined Button
 - **Do & Don't**：用實際範例說明正確和錯誤用法
 
-**🚀 Handoff（交付給開發）**
+**Handoff（交付給開發）**
 
 - **用途**：把設計轉交給開發團隊時需要的所有內容
 - **包含內容**：匯出的圖示、Logo、開發註解、實作檢查表
@@ -2377,7 +2377,7 @@ Button States Frame:
 
 ---
 
-## 🤝 設計與開發協作
+## 設計與開發協作
 
 ### 溝通檢查清單
 
@@ -2408,16 +2408,16 @@ Button States Frame:
 
 ### 常見問題
 
-**Q: 設計稿和實作有差異怎麼辦？**  
+**Q: 設計稿和實作有差異怎麼辦？**
 A: 與開發團隊討論，了解是技術限制還是理解偏差，共同找出最佳解決方案。
 
-**Q: 需要設計深色模式嗎？**  
+**Q: 需要設計深色模式嗎？**
 A: 目前專案尚未實作深色模式，但可以預先規劃 Token 以便未來擴展。
 
-**Q: 動畫效果如何設計？**  
+**Q: 動畫效果如何設計？**
 A: 使用 Figma 的 Prototype 功能展示動畫，或提供動畫說明（時長、緩動函數）。
 
-**Q: 如何確保無障礙設計？**  
+**Q: 如何確保無障礙設計？**
 A:
 
 - 對比度至少 4.5:1（WCAG AA）
@@ -2427,7 +2427,7 @@ A:
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
-- 💻 [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) - 組件開發指南
-- 🔧 [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合文檔
+- [COMPONENT_LIBRARY.md](./COMPONENT_LIBRARY.md) - 組件開發指南
+- [FRONTEND_INTEGRATION.md](./FRONTEND_INTEGRATION.md) - 前端整合文檔

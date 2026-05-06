@@ -4,16 +4,16 @@ Offset-based 分頁實作，適合管理系統和需要跳頁功能的列表查�
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [分頁實現指南 (Pagination Guide)](#分頁實現指南-pagination-guide)
-  - [📋 目錄](#-目錄)
-  - [📖 概述](#-概述)
+  - [目錄](#目錄)
+  - [概述](#概述)
     - [為什麼選擇 Offset-based？](#為什麼選擇-offset-based)
-  - [🏗️ 分頁架構](#️-分頁架構)
+  - [分頁架構](#分頁架構)
     - [核心組件](#核心組件)
     - [檔案結構](#檔案結構)
-  - [🔧 後端實現](#-後端實現)
+  - [後端實現](#後端實現)
     - [1. PaginationInput（輸入參數）](#1-paginationinput輸入參數)
     - [2. PageInfo（分頁元資料）](#2-pageinfo分頁元資料)
     - [3. Pagination Utils（工具函數）](#3-pagination-utils工具函數)
@@ -21,34 +21,34 @@ Offset-based 分頁實作，適合管理系統和需要跳頁功能的列表查�
       - [Resolver 定義](#resolver-定義)
       - [Service 實現](#service-實現)
       - [Response Type 定義](#response-type-定義)
-  - [📱 前端使用](#-前端使用)
+  - [前端使用](#前端使用)
     - [GraphQL Query](#graphql-query)
     - [Apollo Client 使用](#apollo-client-使用)
     - [Material-UI Pagination](#material-ui-pagination)
-  - [⚡ 效能優化](#-效能優化)
-    - [1. 並行查詢（✅ 已實現）](#1-並行查詢-已實現)
+  - [效能優化](#效能優化)
+    - [1. 並行查詢（已實現）](#1-並行查詢-已實現)
     - [2. 資料庫索引](#2-資料庫索引)
     - [3. 選擇性查詢欄位](#3-選擇性查詢欄位)
     - [4. 快取策略](#4-快取策略)
-  - [🎯 最佳實踐](#-最佳實踐)
-    - [✅ DO - 應該這樣做](#-do---應該這樣做)
+  - [最佳實踐](#最佳實踐)
+    - [DO - 應該這樣做](#do---應該這樣做)
       - [1. 限制最大筆數](#1-限制最大筆數)
       - [2. 驗證輸入參數](#2-驗證輸入參數)
       - [3. 提供預設值](#3-提供預設值)
       - [4. 使用並行查詢](#4-使用並行查詢)
-    - [❌ DON'T - 不要這樣做](#-dont---不要這樣做)
+    - [DON'T - 不要這樣做](#dont---不要這樣做)
       - [1. 不要無限制查詢](#1-不要無限制查詢)
       - [2. 不要序列查詢](#2-不要序列查詢)
       - [3. 不要忽略軟刪除](#3-不要忽略軟刪除)
-  - [❓ 常見問題](#-常見問題)
+  - [常見問題](#常見問題)
     - [Q1: 為什麼不使用 Cursor-based pagination？](#q1-為什麼不使用-cursor-based-pagination)
     - [Q2: 如何處理大資料集（100萬+ 筆）？](#q2-如何處理大資料集100萬-筆)
     - [Q3: count() 查詢很慢怎麼辦？](#q3-count-查詢很慢怎麼辦)
-  - [📚 相關文檔](#-相關文檔)
+  - [相關文檔](#相關文檔)
 
 ---
 
-## 📖 概述
+## 概述
 
 NPT 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多數業務場景。
 
@@ -66,7 +66,7 @@ NPT 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多
 
 ---
 
-## 🏗️ 分頁架構
+## 分頁架構
 
 ### 核心組件
 
@@ -107,7 +107,7 @@ apps/backend/src/common/
 
 ---
 
-## 🔧 後端實現
+## 後端實現
 
 ### 1. PaginationInput（輸入參數）
 
@@ -332,7 +332,7 @@ export class PaginatedUsers {
 
 ---
 
-## 📱 前端使用
+## 前端使用
 
 ### GraphQL Query
 
@@ -445,9 +445,9 @@ import { Pagination } from '@mui/material';
 
 ---
 
-## ⚡ 效能優化
+## 效能優化
 
-### 1. 並行查詢（✅ 已實現）
+### 1. 並行查詢（已實現）
 
 ```typescript
 // ✅ 好：並行執行
@@ -511,9 +511,9 @@ return result;
 
 ---
 
-## 🎯 最佳實踐
+## 最佳實踐
 
-### ✅ DO - 應該這樣做
+### DO - 應該這樣做
 
 #### 1. 限制最大筆數
 
@@ -546,7 +546,7 @@ const [data, totalCount] = await Promise.all([
 ]);
 ```
 
-### ❌ DON'T - 不要這樣做
+### DON'T - 不要這樣做
 
 #### 1. 不要無限制查詢
 
@@ -579,7 +579,7 @@ const data = await this.prisma.user.findMany({
 
 ---
 
-## ❓ 常見問題
+## 常見問題
 
 ### Q1: 為什麼不使用 Cursor-based pagination？
 
@@ -625,15 +625,13 @@ async searchUsersPaginated(
 ): Promise<PaginationResult<User>> {
   const where = {
     deletedAt: null,
-    OR: [
-      { name: { contains: keyword, mode: 'insensitive' } },
+    OR: [      { name: { contains: keyword, mode: 'insensitive' } },
       { email: { contains: keyword, mode: 'insensitive' } },
     ],
   };
 
   const skip = calculateSkip(page, limit);
-  const [data, totalCount] = await Promise.all([
-    this.prisma.user.findMany({ where, skip, take: limit }),
+  const [data, totalCount] = await Promise.all([    this.prisma.user.findMany({ where, skip, take: limit }),
     this.prisma.user.count({ where }),
   ]);
 
@@ -643,7 +641,7 @@ async searchUsersPaginated(
 
 ---
 
-## 📚 相關文檔
+## 相關文檔
 
 - [API_RESPONSE_FORMAT.md](./API_RESPONSE_FORMAT.md) - API 回應格式
 - [PRISMA_SCHEMA_ORGANIZATION.md](../database/PRISMA_SCHEMA_ORGANIZATION.md) - 資料庫設計

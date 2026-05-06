@@ -4,7 +4,7 @@
 
 ---
 
-## 📋 目錄
+## 目錄
 
 - [開發流程](#開發流程)
 - [分支策略](#分支策略)
@@ -394,4 +394,3 @@ pnpm format
 - [CLI 工具指南](./CLI_GUIDE.md)
 - [Docker 環境設置](./DOCKER_SETUP.md)
 - [前後端 i18n 協調](./I18N_COORDINATION.md)
-- [專案路線圖](../PROJECT_ROADMAP.md)

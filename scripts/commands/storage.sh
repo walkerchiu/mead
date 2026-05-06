@@ -61,7 +61,11 @@ show_command_help() {
   echo "  - SeaweedFS 是選擇性服務，使用 Docker Compose profiles 管理"
   echo "  - 如果不需要本地 S3 儲存，可以不啟動此服務"
   echo "  - S3 端點: http://localhost:${SEAWEEDFS_S3_PORT:-8333}"
-  echo "  - 預設帳號: ${SEAWEEDFS_S3_USER:-admin} / ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+  if _is_insecure_s3_password; then
+    echo -e "  - ${YELLOW}⚠ SEAWEEDFS_S3_PASSWORD 仍為預設／佔位值，請於 .env.docker 改為強密碼${NC}"
+  else
+    echo "  - 帳號設定：${SEAWEEDFS_S3_USER:-admin} / (密碼從 .env.docker 讀取)"
+  fi
   echo ""
 }
 
@@ -98,7 +102,11 @@ storage_start() {
     echo ""
     echo -e "${YELLOW}S3 端點:${NC} http://localhost:${SEAWEEDFS_S3_PORT:-8333}"
     echo -e "${YELLOW}帳號:${NC} ${SEAWEEDFS_S3_USER:-admin}"
-    echo -e "${YELLOW}密碼:${NC} ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+    if _is_insecure_s3_password; then
+      echo -e "${YELLOW}密碼:${NC} ${RED}***INSECURE-DEFAULT***${NC} ${YELLOW}⚠ 仍為預設／佔位值，請在 .env.docker 改為強密碼後重啟${NC}"
+    else
+      echo -e "${YELLOW}密碼:${NC} ${SEAWEEDFS_S3_PASSWORD}"
+    fi
   else
     log_error "SeaweedFS 啟動失敗"
     return 1
@@ -233,6 +241,29 @@ storage_diagnose() {
   storage_status
   echo ""
 
+  # 先確認自己 repo 的 SeaweedFS containers 全部在跑，否則跳過 port / HTTP 檢查。
+  # 否則別 repo（例如 nptc）的 SeaweedFS 在 forward 同樣 port 會被當成自己的服務 ✓。
+  local self_running=true
+  for svc in seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3; do
+    local cn
+    cn=$(get_container_name "$svc")
+    if ! docker ps --format '{{.Names}}' | grep -q "^${cn}$"; then
+      self_running=false
+      break
+    fi
+  done
+
+  if [[ "$self_running" != true ]]; then
+    echo ""
+    log_error "本 repo 的 SeaweedFS containers 沒有全部運行，跳過 port / HTTP 檢查"
+    log_info "若 port 上看到別 repo 的 forward，會被誤判為 ✓ — 已避免"
+    echo ""
+    echo -e "${YELLOW}建議操作:${NC}"
+    echo -e "  1. 啟動服務: ${CYAN}./scripts/cli.sh storage start${NC}"
+    echo -e "  2. 查看日誌: ${CYAN}./scripts/cli.sh storage logs all${NC}"
+    return 1
+  fi
+
   # 檢查端口
   echo -e "${YELLOW}2. 檢查端口連接${NC}"
   echo ""
@@ -248,7 +279,7 @@ storage_diagnose() {
     local port="${port_info%%:*}"
     local name="${port_info##*:}"
 
-    if lsof -ti:$port >/dev/null 2>&1; then
+    if lsof -ti:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
       log_success "$name (Port $port) 可連接"
     else
       log_error "$name (Port $port) 無法連接"
@@ -326,7 +357,11 @@ storage_info() {
   echo -e "${YELLOW}🔐 S3 認證資訊${NC}"
   echo ""
   echo -e "  ${CYAN}Access Key:${NC}  ${SEAWEEDFS_S3_USER:-admin}"
-  echo -e "  ${CYAN}Secret Key:${NC}  ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+  if _is_insecure_s3_password; then
+    echo -e "  ${CYAN}Secret Key:${NC}  ${RED}***INSECURE-DEFAULT***${NC} ${YELLOW}⚠ 仍為預設／佔位值，請改 .env.docker SEAWEEDFS_S3_PASSWORD${NC}"
+  else
+    echo -e "  ${CYAN}Secret Key:${NC}  ${SEAWEEDFS_S3_PASSWORD}"
+  fi
   echo -e "  ${CYAN}Region:${NC}      us-east-1 (預設)"
   echo ""
 
@@ -340,7 +375,11 @@ storage_info() {
   echo ""
   echo -e "  ${DIM}# 配置 AWS CLI${NC}"
   echo -e "  aws configure set aws_access_key_id ${SEAWEEDFS_S3_USER:-admin}"
-  echo -e "  aws configure set aws_secret_access_key ${SEAWEEDFS_S3_PASSWORD:-admin123}"
+  if _is_insecure_s3_password; then
+    echo -e "  aws configure set aws_secret_access_key ${RED}<請先設 SEAWEEDFS_S3_PASSWORD>${NC}"
+  else
+    echo -e "  aws configure set aws_secret_access_key ${SEAWEEDFS_S3_PASSWORD}"
+  fi
   echo ""
   echo -e "  ${DIM}# 列出 buckets${NC}"
   echo -e "  aws --endpoint-url http://localhost:${SEAWEEDFS_S3_PORT:-8333} s3 ls"

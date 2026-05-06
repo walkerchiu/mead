@@ -2,13 +2,13 @@
 
 > 本文件是 [組件庫總覽](../COMPONENT_LIBRARY.md) 的一部分，專注於 Atomic Design 的第三層 — Organisms（有機體組件）。
 
-## 📋 本文件涵蓋
+## 本文件涵蓋
 
 由 Atoms 和 Molecules 組合而成的複雜 UI 區塊，具有獨立功能，例如完整表單、彈窗對話框、資料表格、側邊選單等。
 
 ---
 
-### 🟠 Organisms（有機體組件）
+### Organisms（有機體組件）
 
 完整的功能單元，由多個 molecules 和 atoms 組合而成。
 
@@ -156,7 +156,7 @@ interface DrawerComponentProps {
 - DetailRow molecules（基本資訊）
 - JSON 展示區（含複製按鈕）
 
-**Storybook**: ⏳ 待補充
+**Storybook**: 待補充
 
 ---
 
@@ -390,13 +390,9 @@ interface DrawerComponentProps {
 
 - **default**: 預設對話框
 - **confirm**: 確認對話框
-- **alert**: 警告對話框 ⚠️
-- **warning**: 警告對話框 ⚠️
-- **error**: 錯誤對話框 ❌
-- **info**: 資訊對話框 ℹ️
-- **success**: 成功對話框 ✓
-
-**特性**:
+- **alert**: 警告對話框 ⚠️ - **warning**: 警告對話框 ⚠️ - **error**: 錯誤對話框 ❌ - **info**: 資訊對話框 ℹ️
+- **success**: 成功對話框
+  **特性**:
 
 - 多種尺寸支援 (xs/sm/md/lg/xl)
 - 全螢幕模式
@@ -835,4 +831,4 @@ const menuItems = createUserMenuItems({
 
 ---
 
-📚 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Molecules](./MOLECULES.md) | [Templates](./TEMPLATES.md)
+**相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Molecules](./MOLECULES.md) | [Templates](./TEMPLATES.md)

@@ -94,7 +94,8 @@ PORTS=(3000 4000 6006)
 PROCESSES_KILLED=0
 
 for PORT in "${PORTS[@]}"; do
-  PIDS=$(lsof -ti:$PORT 2>/dev/null || true)
+  # 只 kill LISTEN server，client connection 會在 server 死後自動關閉
+  PIDS=$(lsof -ti:"$PORT" -sTCP:LISTEN 2>/dev/null || true)
   if [ -n "$PIDS" ]; then
     log_info "發現 port $PORT 被使用 (PID: $PIDS)"
     if [ "$DRY_RUN" = false ]; then
@@ -291,9 +292,9 @@ if [ "$CLEAN_ENV" = true ]; then
         # 先停止所有服務，避免 .env.docker 刪除後無法 docker-compose down
         log_info "正在停止所有服務..."
 
-        # 停止開發伺服器
+        # 停止開發伺服器（只 kill LISTEN server）
         for PORT in 3000 4000 6006 5555; do
-          PIDS=$(lsof -ti:$PORT 2>/dev/null || true)
+          PIDS=$(lsof -ti:"$PORT" -sTCP:LISTEN 2>/dev/null || true)
           if [ -n "$PIDS" ]; then
             echo "$PIDS" | xargs kill -9 2>/dev/null || true
             log_success "已停止 port $PORT 的服務"

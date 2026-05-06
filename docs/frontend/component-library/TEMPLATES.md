@@ -2,7 +2,7 @@
 
 > 本文件是 [組件庫總覽](../COMPONENT_LIBRARY.md) 的一部分，涵蓋 Atomic Design 的頂層 — Layout（佈局組件）、Templates（模板）和 Pages（Storybook 頁面範例）。
 
-## 📋 本文件涵蓋
+## 本文件涵蓋
 
 - **Layout 組件**：跨頁面共用的佈局元件（如 AppBar、Sidebar）
 - **Templates**：頁面結構骨架（如 AuthLayout、DashboardLayout）
@@ -10,7 +10,13 @@
 
 ---
 
-### 🟣 Layout / Templates 組件
+## 目錄
+
+- [本文件涵蓋](#本文件涵蓋)
+  - [Layout / Templates 組件](#layout-templates-組件)
+  - [Pages（Storybook 頁面）](#pagesstorybook-頁面)
+
+### Layout / Templates 組件
 
 跨頁面共用的佈局元件與頁面結構骨架。
 
@@ -242,7 +248,7 @@ interface MainAppBarProps {
 
 ---
 
-### 📄 Pages（Storybook 頁面）
+### Pages（Storybook 頁面）
 
 完整的頁面故事，用於展示實際使用場景。
 
@@ -255,4 +261,4 @@ interface MainAppBarProps {
 
 ---
 
-📚 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Molecules](./MOLECULES.md) | [Organisms](./ORGANISMS.md)
+**相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Molecules](./MOLECULES.md) | [Organisms](./ORGANISMS.md)
