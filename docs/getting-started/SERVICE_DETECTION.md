@@ -6,17 +6,21 @@
 
 ## 目錄
 
-- [為什麼需要這套邏輯](#為什麼需要這套邏輯)
-- [三層過濾](#三層過濾)
-  - [1. `-sTCP:LISTEN` — 只認真正 listen 的伺服器](#1--stcplisten-—-只認真正-listen-的伺服器)
-  - [2. Docker forward sentinel — 過濾 docker container 透過 host port forward](#2-docker-forward-sentinel-—-過濾-docker-container-透過-host-port-forward)
-  - [3. `PROJECT_ROOT` cwd 比對 — 確認 process 屬於當前 repo](#3-projectroot-cwd-比對-—-確認-process-屬於當前-repo)
-- [顯示效果（真實範例）](#顯示效果真實範例)
-- [對 stop / restart / port free 的影響](#對-stop-restart-port-free-的影響)
-- [局限與不適用的情況](#局限與不適用的情況)
-- [觸碰到此邏輯的檔案](#觸碰到此邏輯的檔案)
-- [驗證方式](#驗證方式)
-- [相關文件](#相關文件)
+- [服務偵測邏輯（Service Detection）](#服務偵測邏輯service-detection)
+  - [目錄](#目錄)
+  - [為什麼需要這套邏輯](#為什麼需要這套邏輯)
+  - [三層過濾](#三層過濾)
+    - [1. `-sTCP:LISTEN` — 只認真正 listen 的伺服器](#1--stcplisten--只認真正-listen-的伺服器)
+    - [2. Docker forward sentinel — 過濾 docker container 透過 host port forward](#2-docker-forward-sentinel--過濾-docker-container-透過-host-port-forward)
+    - [3. `PROJECT_ROOT` cwd 比對 — 確認 process 屬於當前 repo](#3-project_root-cwd-比對--確認-process-屬於當前-repo)
+  - [顯示效果（真實範例）](#顯示效果真實範例)
+  - [對 stop / restart / port free 的影響](#對-stop--restart--port-free-的影響)
+  - [局限與不適用的情況](#局限與不適用的情況)
+  - [觸碰到此邏輯的檔案](#觸碰到此邏輯的檔案)
+  - [驗證方式](#驗證方式)
+  - [相關文件](#相關文件)
+
+---
 
 ## 為什麼需要這套邏輯
 
