@@ -284,9 +284,7 @@ useEffect(() => {
 
 ### 測試檔案
 
-- **快速測試**: `apps/frontend/e2e/test-quick-sync-check.spec.ts`
-- **穩健測試**: `apps/frontend/e2e/test-sync-robust.spec.ts`
-- **完整測試**: `apps/frontend/e2e/test-sync-fix-verification.spec.ts`
+通知同步的 E2E spec 尚未補齊；目前驗證以人工跨頁實測為主。後續若補上 sync 專屬 spec，可依 `playwright.config.ts` 設定的位置存放。
 
 ---
 

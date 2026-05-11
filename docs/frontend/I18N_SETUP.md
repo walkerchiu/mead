@@ -36,7 +36,7 @@ Next.js 多語系國際化完整設置與使用指南。
     - [Client Component](#client-component)
     - [Server Component](#server-component)
   - [路由導航](#路由導航)
-    - [Link 元件](#link-元件)
+    - [Next.js Link 元件](#link-元件)
     - [useRouter](#userouter)
     - [usePathname](#usepathname)
   - [語言偏好聯動](#語言偏好聯動)

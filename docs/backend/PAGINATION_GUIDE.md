@@ -606,11 +606,11 @@ Cursor-based 更適合社交媒體 feed 和無限滾動。
 
 1. 確保篩選欄位有索引
 2. 使用估算值（大資料集時）：
+
    ```sql
    SELECT reltuples AS estimate FROM pg_class WHERE relname = 'users';
    ```
 
-````
 3. 快取 totalCount（短時間）
 
 ### Q4: 如何實現搜尋 + 分頁？
@@ -637,7 +637,7 @@ async searchUsersPaginated(
 
   return createPaginationResult(data, totalCount, page, limit);
 }
-````
+```
 
 ---
 

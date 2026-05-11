@@ -59,7 +59,7 @@
     - [./scripts/cli.sh env - 環境切換](#scriptsclish-env---環境切換)
     - [./scripts/cli.sh doctor - 環境診斷](#scriptsclish-doctor---環境診斷)
     - [./scripts/cli.sh deps - 依賴管理](#scriptsclish-deps---依賴管理)
-    - [./scripts/cli.sh drift - 跨 repo convention drift 檢查](#scriptsclish-drift---跨-repo-convention-drift-檢查)
+    - [./scripts/cli.sh drift - Backend convention 檢查](#scriptsclish-drift---backend-convention-檢查)
   - [最佳實踐](#最佳實踐)
     - [新開發者學習路徑](#新開發者學習路徑)
     - [開發工作流程](#開發工作流程)
@@ -1000,10 +1000,10 @@ S3_SECRET_KEY=admin123
 ./scripts/cli.sh i18n generate
 ```
 
-自動生成：
+自動生成（執行此命令後產出，git 不追蹤）：
 
-- `apps/backend/src/generated/i18n.generated.ts` - 後端類型定義
-- `apps/frontend/src/types/i18n.generated.ts` - 前端類型定義
+- 後端：`src/generated/i18n.generated.ts`（路徑由 `apps/backend/generate-i18n.module.ts` 內 `typesOutputPath` 決定）
+- 前端：`src/types/i18n.generated.ts`（路徑由 `apps/frontend/generate-i18n-types.ts` 決定）
 - 基於實際翻譯檔案自動生成，確保類型安全
 
 **3. unused - 檢查未使用的翻譯鍵**

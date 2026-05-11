@@ -13,7 +13,7 @@
 ## 目錄
 
 - [本文件涵蓋](#本文件涵蓋)
-  - [Layout / Templates 組件](#layout-templates-組件)
+  - [Layout / Templates 組件](#layout--templates-組件)
   - [Pages（Storybook 頁面）](#pagesstorybook-頁面)
 
 ### Layout / Templates 組件

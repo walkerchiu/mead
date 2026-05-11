@@ -151,8 +151,7 @@ pnpm db:migrate                   # 執行 pending migrations
 若仍有問題：
 
 ```bash
-pnpm --filter @npt/backend db:migrate:reset   # ⚠️ 會清空資料
-pnpm db:seed
+pnpm --filter @npt/backend exec prisma migrate reset   # ⚠️ 會清空資料 + 自動跑 seed
 ```
 
 ### Migration 衝突
@@ -182,8 +181,7 @@ seed 後的預設帳號密碼：所有帳號統一 `Password123!`
 ```bash
 ./scripts/cli.sh db reset        # 互動式重置（會確認）
 # 或：
-pnpm --filter @npt/backend db:migrate:reset
-pnpm db:seed
+pnpm --filter @npt/backend exec prisma migrate reset   # 會清空 + 自動跑 seed
 ```
 
 ---
@@ -351,7 +349,7 @@ open http://localhost:8025        # 預設 port
 
 ### 通知重複出現
 
-可能是 React StrictMode 在開發模式下導致 Effect 執行兩次，生產環境不會。確認 `apps/frontend/next.config.js` 的 `reactStrictMode` 設定。
+可能是 React StrictMode 在開發模式下導致 Effect 執行兩次，生產環境不會。確認 `apps/frontend/next.config.ts` 的 `reactStrictMode` 設定。
 
 ---
 

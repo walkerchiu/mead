@@ -314,19 +314,19 @@ SECURITY_MEASURE  → error (紅色)
   - 實作：包含所有 5 種 revokedMethods 的翻譯（含 `auto_expire`）
 
 - ✅ **已完成** - UI 顯示正確的顏色和標籤
-  - 檔案：`apps/frontend/src/components/organisms/SessionsTable/SessionsTable.tsx`
+  - 檔案：`apps/frontend/src/components/organisms/hq/SessionTable/SessionTable.tsx`
   - 實作：ACTIVE(綠)、EXPIRED(灰)、REVOKED(紅)、AUTO_EXPIRE(灰)
 
 - ✅ **已完成** - 撤銷方式顯示撤銷者姓名（HQ_FORCE, BATCH_REVOKE）
-  - 檔案：`apps/frontend/src/components/organisms/SessionsTable/SessionsTable.tsx`
+  - 檔案：`apps/frontend/src/components/organisms/hq/SessionTable/SessionTable.tsx`
   - 實作：使用 `_with_name` 變體顯示管理員名稱
 
 - ✅ **已完成** - 篩選器支持按狀態和撤銷方式篩選
-  - 檔案：`apps/frontend/src/components/hq/SessionFilters.tsx`
+  - 檔案：`apps/frontend/src/components/organisms/hq/SessionFilters/SessionFilters.tsx`
   - 實作：包含狀態篩選和撤銷方式篩選（含 `AUTO_EXPIRE`）
 
 - ✅ **已完成** - 會話詳情模態框正確顯示所有資訊
-  - 檔案：`apps/frontend/src/components/hq/SessionDetailsModal.tsx`
+  - 檔案：`apps/frontend/src/components/organisms/hq/SessionDetailsModal/SessionDetailsModal.tsx`
   - 實作：
     - EXPIRED 狀態顯示灰色（default）符合規範
     - 當 `revokedAt` 存在時顯示撤銷資訊（包含 AUTO_EXPIRE）

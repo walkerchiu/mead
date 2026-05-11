@@ -266,7 +266,7 @@ SEAWEEDFS_S3_PASSWORD=admin123
 
 ```bash
 # 儲存類型（local 或 seaweedfs）
-STORAGE_TYPE=seaweedfs
+FILE_STORAGE_TYPE=seaweedfs
 
 # S3 配置
 S3_ENDPOINT=http://localhost:8333
@@ -323,7 +323,7 @@ SeaweedFS 已整合到資料管理流程中。
 使用「資料備份」功能會同時備份：
 
 - PostgreSQL 資料庫
-- 檔案儲存（根據 `STORAGE_TYPE` 設定）
+- 檔案儲存（根據 `FILE_STORAGE_TYPE` 設定）
 
 ```bash
 ./scripts/cli.sh
@@ -337,8 +337,8 @@ SeaweedFS 已整合到資料管理流程中。
 
 1. 備份 PostgreSQL 資料庫 → `.sql.gz` 檔案
 2. 備份檔案儲存：
-   - 如果 `STORAGE_TYPE=local`: 打包 `apps/backend/uploads/` → `.tar.gz`
-   - 如果 `STORAGE_TYPE=seaweedfs`: 從 S3 下載所有檔案 → `.tar.gz`
+   - 如果 `FILE_STORAGE_TYPE=local`: 打包 `apps/backend/uploads/` → `.tar.gz`
+   - 如果 `FILE_STORAGE_TYPE=seaweedfs`: 從 S3 下載所有檔案 → `.tar.gz`
 
 ### 還原資料
 

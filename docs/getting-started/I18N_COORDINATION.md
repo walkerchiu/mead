@@ -118,7 +118,7 @@ export const routing = defineRouting({
 
 ### 2. 前端：切換語言
 
-**檔案**：`apps/frontend/src/components/atoms/LanguageSwitcher/LanguageSwitcher.tsx`
+**檔案**：`apps/frontend/src/components/molecules/LanguageSwitcher/LanguageSwitcher.tsx`
 
 ```typescript
 const handleLanguageChange = (locale: Locale) => {

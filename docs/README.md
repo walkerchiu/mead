@@ -29,6 +29,7 @@
 | [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)   | pnpm workspace + Turborepo 架構                        | 8 分鐘   |
 | [前後端 i18n 協調機制](getting-started/I18N_COORDINATION.md) | 前端（next-intl）與後端（nestjs-i18n）如何協調語言設定 | 8 分鐘   |
 | [部署指南](getting-started/DEPLOYMENT.md)                    | 環境分層、部署架構、發布流程（規劃中 + 目前作法）      | 15 分鐘  |
+| [服務偵測機制](getting-started/SERVICE_DETECTION.md)         | CLI 如何辨識本地服務狀態與 port 衝突                   | 8 分鐘   |
 | [Markdown 風格指南](getting-started/MARKDOWN_STYLE_GUIDE.md) | 文件編寫規範（標題、emoji、編排、code block 等）       | 5 分鐘   |
 | [疑難排解](getting-started/TROUBLESHOOTING.md)               | 常見問題排查：環境、Docker、認證、效能等               | 參考用   |
 
@@ -118,12 +119,13 @@ Prisma + PostgreSQL 資料庫設計、備份還原與最佳實踐。
 
 Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
-| 文檔                                                         | 說明                    | 閱讀時間 |
-| ------------------------------------------------------------ | ----------------------- | -------- |
-| [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)      | .env 檔案配置與最佳實踐 | 10 分鐘  |
-| [RabbitMQ + Dragonfly](infrastructure/RABBITMQ_DRAGONFLY.md) | 訊息佇列與快取服務設置  | 15 分鐘  |
-| [SeaweedFS 儲存](infrastructure/SEAWEEDFS_STORAGE.md)        | 分散式檔案儲存服務配置  | 12 分鐘  |
-| [GeoIP 配置指南](infrastructure/GEOIP_LOCATION_SETUP.md)     | 地理位置查詢服務配置    | 12 分鐘  |
+| 文檔                                                         | 說明                       | 閱讀時間 |
+| ------------------------------------------------------------ | -------------------------- | -------- |
+| [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)      | .env 檔案配置與最佳實踐    | 10 分鐘  |
+| [資料庫提供者](infrastructure/DATABASE_PROVIDERS.md)         | TimescaleDB / managed 選項 | 10 分鐘  |
+| [RabbitMQ + Dragonfly](infrastructure/RABBITMQ_DRAGONFLY.md) | 訊息佇列與快取服務設置     | 15 分鐘  |
+| [SeaweedFS 儲存](infrastructure/SEAWEEDFS_STORAGE.md)        | 分散式檔案儲存服務配置     | 12 分鐘  |
+| [GeoIP 配置指南](infrastructure/GEOIP_LOCATION_SETUP.md)     | 地理位置查詢服務配置       | 12 分鐘  |
 
 ---
 

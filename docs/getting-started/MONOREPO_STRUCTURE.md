@@ -75,7 +75,7 @@ npt/
 │   │   ├── src/
 │   │   ├── public/
 │   │   ├── package.json           # @npt/frontend
-│   │   └── next.config.js
+│   │   └── next.config.ts
 │   │
 │   └── backend/                   # NestJS 後端應用
 │       ├── src/
