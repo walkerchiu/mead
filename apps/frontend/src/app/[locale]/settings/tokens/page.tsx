@@ -50,6 +50,7 @@ import { usePersonalAccessTokens } from '@/hooks/usePersonalAccessTokens';
 import { getErrorMessage } from '@/lib/error-utils';
 import type { PersonalAccessToken } from '@/graphql/personal-access-tokens';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 function formatDate(dateStr: string | null) {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('zh-TW', {
@@ -467,7 +468,7 @@ function TokensSettingsPageContent() {
                 fontSize: '0.75rem',
               }}
             >
-              {`curl http://localhost:4000/api/your-endpoint \\
+              {`curl ${API_URL}/api/your-endpoint \\
   -H "Authorization: Bearer ${createdToken || 'npt_xxx'}" \\
   -H "Content-Type: application/json"`}
             </Typography>

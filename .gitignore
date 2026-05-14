@@ -77,3 +77,11 @@ apps/backend/uploads/*
 __pycache__/
 *.pyc
 *.pyo
+
+# AWS bootstrap 一次性產物（DEPLOYMENT_NOTES.txt 的 heredoc 生成；非長期 source of truth）
+*-policy.json
+/trust-policy.json
+
+# SSH 私鑰 / 憑證（絕不入庫）
+*.pem
+*.key

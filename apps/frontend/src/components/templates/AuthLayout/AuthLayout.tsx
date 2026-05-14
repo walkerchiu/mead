@@ -7,8 +7,6 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { ScrollControl } from '@/components/molecules';
-
 /**
  * AuthLayout Template - Atomic Design: Template
  *
@@ -199,17 +197,6 @@ export function AuthLayout({
           </Typography>
         </Box>
       )}
-
-      {/* Scroll Control - Fixed position scroll buttons */}
-      <ScrollControl
-        position="right-bottom"
-        showScrollUp={true}
-        showScrollDown={true}
-        showScrollToTop={true}
-        showScrollToBottom={true}
-        offset={500}
-        visibilityThreshold={300}
-      />
     </Box>
   );
 }
