@@ -1,4 +1,12 @@
-import { getAccessToken, parseJwt } from '@/lib/auth';
+import { useEffect, useState } from 'react';
+import {
+  getAccessToken,
+  parseJwt,
+  isAuthInitComplete,
+  AUTH_INIT_COMPLETE_EVENT,
+} from '@/lib/auth';
+
+type JwtPayload = Record<string, unknown> | null;
 
 /**
  * Role to permissions mapping
@@ -53,14 +61,24 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
  * }
  */
 export function usePermissions() {
+  // localStorage 在 SSR 不存在；token 必須 mount 後讀進 state，
+  // 由 state 變更觸發 re-render，否則首屏永遠拿到空 permissions。
+  const [payload, setPayload] = useState<JwtPayload>(null);
+
+  useEffect(() => {
+    const sync = () => {
+      const token = getAccessToken();
+      setPayload(token ? parseJwt(token) : null);
+    };
+    if (isAuthInitComplete()) sync();
+    window.addEventListener(AUTH_INIT_COMPLETE_EVENT, sync);
+    return () => window.removeEventListener(AUTH_INIT_COMPLETE_EVENT, sync);
+  }, []);
+
   /**
    * Check if user has specified permission
    */
   const hasPermission = (requiredPermission: string): boolean => {
-    const token = getAccessToken();
-    if (!token) return false;
-
-    const payload = parseJwt(token);
     if (!payload) return false;
 
     // Check access scopes (Scope level permissions, e.g., HQ_SCOPE)
@@ -106,17 +124,11 @@ export function usePermissions() {
    * Check if user has specified role
    */
   const hasRole = (requiredRole: string): boolean => {
-    const token = getAccessToken();
-    if (!token) return false;
-
-    const payload = parseJwt(token);
     if (!payload) return false;
-
     const roles = payload.roles as
       | Array<{ scope: string; roleNames: string[] }>
       | undefined;
     if (!roles || !Array.isArray(roles)) return false;
-
     return roles.some((role) => role.roleNames?.includes(requiredRole));
   };
 
@@ -124,12 +136,7 @@ export function usePermissions() {
    * Check if user has specified scope
    */
   const hasScope = (requiredScope: string): boolean => {
-    const token = getAccessToken();
-    if (!token) return false;
-
-    const payload = parseJwt(token);
     if (!payload) return false;
-
     const accessScopes = payload.accessScopes as string[] | undefined;
     return accessScopes?.includes(requiredScope) || false;
   };
