@@ -9,6 +9,7 @@ import { I18nService } from 'nestjs-i18n';
 import { PrismaService } from '../prisma/prisma.service';
 import { TwoFactorAuthService } from '../two-factor-auth/two-factor-auth.service';
 import { AccountLockoutService } from './account-lockout.service';
+import { IpLockoutService } from './ip-lockout.service';
 import { SessionManagementService } from './session-management.service';
 import * as bcrypt from 'bcrypt';
 import { AccessScope } from '../common/enums/access-scope.enum';
@@ -37,6 +38,7 @@ export class AuthService {
     private jwtService: JwtService,
     private twoFactorAuthService: TwoFactorAuthService,
     private accountLockoutService: AccountLockoutService,
+    private ipLockoutService: IpLockoutService,
     private sessionManagementService: SessionManagementService,
     private i18n: I18nService,
     private configService: ConfigService,
@@ -183,6 +185,18 @@ export class AuthService {
     lang?: string,
   ): Promise<AuthTokenResult | TwoFactorLoginResponse> {
     logger.info('[AuthService] Login started', { email });
+
+    // 第一層：IP 鎖定檢查（DB 查詢前就 reject）
+    const ipLock = await this.ipLockoutService.check(ipAddress);
+    if (ipLock.isLocked) {
+      throw new UnauthorizedException(
+        this.i18n.translate('auth.ipLocked', {
+          lang,
+          args: { minutes: ipLock.remainingMinutes },
+        }),
+      );
+    }
+
     logger.info('[AuthService] Asserting valid email', { email });
     assertValidEmail(email, lang, this.i18n);
 
@@ -207,6 +221,8 @@ export class AuthService {
     });
 
     if (!user || user.deletedAt) {
+      // 累計 IP failure — 攻擊者亂猜帳號也算 brute force
+      await this.ipLockoutService.recordFailedLogin(ipAddress);
       throw new UnauthorizedException(
         this.i18n.translate('auth.invalidCredentials', { lang }),
       );
@@ -225,12 +241,24 @@ export class AuthService {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      // 密碼錯誤：委託給 AccountLockoutService（含重設視窗、鎖定通知信）
+      // 密碼錯誤：同時累計 user lock 與 IP lock
       const result = await this.accountLockoutService.recordFailedLogin(
         user.id,
         user.email,
         ipAddress,
       );
+      const ipFailInfo =
+        await this.ipLockoutService.recordFailedLogin(ipAddress);
+
+      // IP 鎖訊息優先 — 攻擊者無從區分是哪個帳號被鎖
+      if (ipFailInfo.isLocked) {
+        throw new UnauthorizedException(
+          this.i18n.translate('auth.ipLocked', {
+            lang,
+            args: { minutes: ipFailInfo.remainingMinutes },
+          }),
+        );
+      }
 
       if (result.isLocked) {
         throw new UnauthorizedException(
@@ -245,7 +273,7 @@ export class AuthService {
       );
     }
 
-    // 密碼正確：重設失敗次數
+    // 密碼正確：重設失敗次數（user + IP）
     if (
       user.failedLoginAttempts > 0 ||
       user.lockedUntil ||
@@ -253,6 +281,7 @@ export class AuthService {
     ) {
       await this.accountLockoutService.resetFailedAttempts(user.id);
     }
+    await this.ipLockoutService.reset(ipAddress);
 
     // 檢查是否啟用 2FA
     const is2FAEnabled = await this.twoFactorAuthService.isEnabled(user.id);

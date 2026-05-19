@@ -11,6 +11,7 @@ import { NotificationModule } from '../notification/notification.module';
 import { CronMonitoringModule } from '../cron-monitoring/cron-monitoring.module';
 import { AuthService } from './auth.service';
 import { AccountLockoutService } from './account-lockout.service';
+import { IpLockoutService } from './ip-lockout.service';
 import { PasswordResetService } from './password-reset.service';
 import { SessionManagementService } from './session-management.service';
 import { HQSessionService } from './hq-session.service';
@@ -52,6 +53,7 @@ import { HQSessionGuard } from './hq-session.guard';
   providers: [
     AuthService,
     AccountLockoutService,
+    IpLockoutService,
     PasswordResetService,
     SessionManagementService,
     HQSessionService,
