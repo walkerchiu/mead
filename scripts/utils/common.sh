@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# NPT CLI - 共用工具函數庫
+# MEAD CLI - 共用工具函數庫
 # ==========================================
 
 # 顏色定義
@@ -285,7 +285,7 @@ spinner() {
 show_help() {
   local command="${1:-}"
 
-  echo -e "\n${GREEN}NPT CLI${NC} - 專案管理工具\n"
+  echo -e "\n${GREEN}MEAD CLI${NC} - 專案管理工具\n"
   echo -e "${YELLOW}使用方式:${NC}"
   echo "  ./scripts/cli.sh <command> [options]"
   echo ""
@@ -347,42 +347,42 @@ get_container_name() {
     timescaledb|postgres|postgresql)
       env_var_name="POSTGRES_CONTAINER_NAME"
       compose_service_name="timescaledb"
-      default_name="npt-timescaledb"
+      default_name="mead-timescaledb"
       ;;
     rabbitmq|rabbit)
       env_var_name="RABBITMQ_CONTAINER_NAME"
       compose_service_name="rabbitmq"
-      default_name="npt-rabbitmq"
+      default_name="mead-rabbitmq"
       ;;
     dragonfly|redis)
       env_var_name="DRAGONFLY_CONTAINER_NAME"
       compose_service_name="dragonfly"
-      default_name="npt-dragonfly"
+      default_name="mead-dragonfly"
       ;;
     mailpit|mail)
       env_var_name="MAILPIT_CONTAINER_NAME"
       compose_service_name="mailpit"
-      default_name="npt-mailpit"
+      default_name="mead-mailpit"
       ;;
     seaweedfs-master|seaweedfs_master)
       env_var_name="SEAWEEDFS_MASTER_CONTAINER_NAME"
       compose_service_name="seaweedfs-master"
-      default_name="npt-seaweedfs-master"
+      default_name="mead-seaweedfs-master"
       ;;
     seaweedfs-volume|seaweedfs_volume)
       env_var_name="SEAWEEDFS_VOLUME_CONTAINER_NAME"
       compose_service_name="seaweedfs-volume"
-      default_name="npt-seaweedfs-volume"
+      default_name="mead-seaweedfs-volume"
       ;;
     seaweedfs-filer|seaweedfs_filer)
       env_var_name="SEAWEEDFS_FILER_CONTAINER_NAME"
       compose_service_name="seaweedfs-filer"
-      default_name="npt-seaweedfs-filer"
+      default_name="mead-seaweedfs-filer"
       ;;
     seaweedfs-s3|seaweedfs_s3)
       env_var_name="SEAWEEDFS_S3_CONTAINER_NAME"
       compose_service_name="seaweedfs-s3"
-      default_name="npt-seaweedfs-s3"
+      default_name="mead-seaweedfs-s3"
       ;;
     *)
       log_error "不支援的服務類型: $service_name"

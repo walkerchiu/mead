@@ -1,10 +1,10 @@
 # 資料庫供應商對照指南
 
-NPT 的資料層只用標準 PostgreSQL 13+ 語法，**沒有綁定 TimescaleDB extension**。本機 Docker 用 `timescale/timescaledb:latest-pg16` 只是取其「含 pg16 + extension ready」方便未來擴充，目前所有 migration 都能直接跑在任何託管 Postgres。
+MEAD 的資料層只用標準 PostgreSQL 13+ 語法，**沒有綁定 TimescaleDB extension**。本機 Docker 用 `timescale/timescaledb:latest-pg16` 只是取其「含 pg16 + extension ready」方便未來擴充，目前所有 migration 都能直接跑在任何託管 Postgres。
 
 本指南說明各 provider 的連線字串、SSL、必備 grants 與已知限制。
 
-> **Prisma 規範**：NPT 使用 Prisma ORM，所有連線參數（`sslmode`、`sslrootcert`、`application_name` 等）必須出現在 `DATABASE_URL` 的 query string，不能像 node-postgres 那樣傳 driver option。為簡化操作，後端啟動時會由 [`apps/backend/src/prisma/database-url.ts`](../../apps/backend/src/prisma/database-url.ts) 把以下 env 自動 splice 進 URL：
+> **Prisma 規範**：MEAD 使用 Prisma ORM，所有連線參數（`sslmode`、`sslrootcert`、`application_name` 等）必須出現在 `DATABASE_URL` 的 query string，不能像 node-postgres 那樣傳 driver option。為簡化操作，後端啟動時會由 [`apps/backend/src/prisma/database-url.ts`](../../apps/backend/src/prisma/database-url.ts) 把以下 env 自動 splice 進 URL：
 >
 > - `DATABASE_SSL_MODE` → `?sslmode=...`
 > - `DATABASE_SSL_CA` / `DATABASE_SSL_CA_PATH` → `?sslrootcert=...`（inline CA 會寫入 OS tempdir）
@@ -46,7 +46,7 @@ NPT 的資料層只用標準 PostgreSQL 13+ 語法，**沒有綁定 TimescaleDB 
 
 ```bash
 # .env
-DATABASE_URL="postgresql://postgres:CHANGEME_postgres_dev123@localhost:5432/npt_db?schema=public&connection_limit=10&pool_timeout=10"
+DATABASE_URL="postgresql://postgres:CHANGEME_postgres_dev123@localhost:5432/mead_db?schema=public&connection_limit=10&pool_timeout=10"
 # 本機 Docker 無 SSL
 # DATABASE_SSL_MODE=disable
 ```
@@ -62,14 +62,14 @@ DATABASE_URL="postgresql://postgres:CHANGEME_postgres_dev123@localhost:5432/npt_
 
 ```bash
 aws rds create-db-instance \
-  --db-instance-identifier npt-prod \
+  --db-instance-identifier mead-prod \
   --engine postgres \
   --engine-version 16 \
   --db-instance-class db.t4g.medium \
   --allocated-storage 100 \
-  --master-username npt_prod \
+  --master-username mead_prod \
   --master-user-password '<strong>' \
-  --db-name npt_db_production \
+  --db-name mead_db_production \
   --vpc-security-group-ids sg-xxx \
   --backup-retention-period 14 \
   --storage-encrypted
@@ -78,9 +78,9 @@ aws rds create-db-instance \
 ### 連線字串（推薦：拆給 env）
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@npt-prod.xxxxx.ap-northeast-1.rds.amazonaws.com:5432/npt_db_production?schema=public&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@mead-prod.xxxxx.ap-northeast-1.rds.amazonaws.com:5432/mead_db_production?schema=public&connection_limit=20&pool_timeout=10"
 
-DATABASE_APPLICATION_NAME=npt-backend-prod
+DATABASE_APPLICATION_NAME=mead-backend-prod
 DATABASE_SSL_MODE=verify-full
 DATABASE_SSL_CA_PATH=/etc/ssl/rds-combined-ca-bundle.pem
 ```
@@ -88,7 +88,7 @@ DATABASE_SSL_CA_PATH=/etc/ssl/rds-combined-ca-bundle.pem
 或全部寫進 URL（同效果）：
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@npt-prod.xxxxx.ap-northeast-1.rds.amazonaws.com:5432/npt_db_production?schema=public&sslmode=verify-full&sslrootcert=/etc/ssl/rds-combined-ca-bundle.pem&application_name=npt-backend-prod&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@mead-prod.xxxxx.ap-northeast-1.rds.amazonaws.com:5432/mead_db_production?schema=public&sslmode=verify-full&sslrootcert=/etc/ssl/rds-combined-ca-bundle.pem&application_name=mead-backend-prod&connection_limit=20&pool_timeout=10"
 ```
 
 ### CA bundle
@@ -120,7 +120,7 @@ curl -o /etc/ssl/rds-combined-ca-bundle.pem \
 ### 連線字串
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@npt-cluster.cluster-xxxxx.ap-northeast-1.rds.amazonaws.com:5432/npt_db_production?schema=public&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@mead-cluster.cluster-xxxxx.ap-northeast-1.rds.amazonaws.com:5432/mead_db_production?schema=public&connection_limit=20&pool_timeout=10"
 DATABASE_SSL_MODE=verify-full
 DATABASE_SSL_CA_PATH=/etc/ssl/rds-combined-ca-bundle.pem
 ```
@@ -132,7 +132,7 @@ DATABASE_SSL_CA_PATH=/etc/ssl/rds-combined-ca-bundle.pem
 ### 連線字串（直連 + CA）
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@34.xxx.xxx.xxx:5432/npt_db_production?schema=public&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@34.xxx.xxx.xxx:5432/mead_db_production?schema=public&connection_limit=20&pool_timeout=10"
 DATABASE_SSL_MODE=verify-ca
 DATABASE_SSL_CA_PATH=/etc/ssl/cloudsql-server-ca.pem
 ```
@@ -146,7 +146,7 @@ CA 下載：Cloud SQL 實例 → Connections → Security → `Download server C
 ./cloud-sql-proxy PROJECT:REGION:INSTANCE --port 5432
 
 # .env
-DATABASE_URL="postgresql://npt_prod:PASS@127.0.0.1:5432/npt_db_production?schema=public&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@127.0.0.1:5432/mead_db_production?schema=public&connection_limit=20&pool_timeout=10"
 DATABASE_SSL_MODE=disable
 ```
 
@@ -159,7 +159,7 @@ DATABASE_SSL_MODE=disable
 ### 連線字串
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@my-pg-flex.postgres.database.azure.com:5432/npt_db_production?schema=public&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:PASS@my-pg-flex.postgres.database.azure.com:5432/mead_db_production?schema=public&connection_limit=20&pool_timeout=10"
 DATABASE_SSL_MODE=verify-full
 DATABASE_SSL_CA_PATH=/etc/ssl/digicert-global-root-ca.pem
 ```
@@ -192,7 +192,7 @@ DATABASE_SSL_MODE=require
 
 ```bash
 # Neon endpoint 已含 project id；支援 branch（每個分支是獨立 database）
-DATABASE_URL="postgresql://npt_prod:PASS@ep-cool-bird-xxxxx.ap-southeast-1.aws.neon.tech/npt_db_production?schema=public&connection_limit=10&pool_timeout=10&sslmode=require"
+DATABASE_URL="postgresql://mead_prod:PASS@ep-cool-bird-xxxxx.ap-southeast-1.aws.neon.tech/mead_db_production?schema=public&connection_limit=10&pool_timeout=10&sslmode=require"
 # 或拆成 env
 DATABASE_SSL_MODE=require
 ```
@@ -243,7 +243,7 @@ replicas × connection_limit ≤ DB max_connections × 0.8
 有助於 Lambda / 多小實例場景。連線字串改成 proxy endpoint：
 
 ```bash
-DATABASE_URL="postgresql://npt_prod:PASS@npt-proxy.proxy-xxxxx.ap-northeast-1.rds.amazonaws.com:5432/npt_db_production?schema=public&sslmode=verify-full"
+DATABASE_URL="postgresql://mead_prod:PASS@mead-proxy.proxy-xxxxx.ap-northeast-1.rds.amazonaws.com:5432/mead_db_production?schema=public&sslmode=verify-full"
 ```
 
 ### PgBouncer（自管）

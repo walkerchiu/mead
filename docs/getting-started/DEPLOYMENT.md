@@ -1,6 +1,6 @@
 # 部署指南
 
-本文件說明 NPT 的部署架構、環境分層、發布流程與營運實務。
+本文件說明 MEAD 的部署架構、環境分層、發布流程與營運實務。
 
 > ⚠️ **狀態**：本專案目前處於**開發階段**，生產部署流程（CI/CD、Dockerfile for production、自動化發布）尚在規劃中。本文件同時涵蓋「目前可行作法」與「建議的正式部署規劃」，請依章節標示區分。
 
@@ -22,14 +22,14 @@
 
 ## 環境分層
 
-NPT 規劃四層環境：
+MEAD 規劃四層環境：
 
-| 環境           | 用途                            | 資料庫                     | 域名                    |
-| -------------- | ------------------------------- | -------------------------- | ----------------------- |
-| **Dev**        | 本機開發                        | 本機 TimescaleDB（Docker） | `localhost`             |
-| **UAT**        | 內部測試、使用者驗證            | 雲端 DB（測試資料）        | `uat.npt.<company>`     |
-| **Staging**    | 發布前驗證，環境等同 Production | 雲端 DB（清洗資料）        | `staging.npt.<company>` |
-| **Production** | 正式營運                        | 雲端 DB（生產資料）        | `npt.<company>`         |
+| 環境           | 用途                            | 資料庫                     | 域名                     |
+| -------------- | ------------------------------- | -------------------------- | ------------------------ |
+| **Dev**        | 本機開發                        | 本機 TimescaleDB（Docker） | `localhost`              |
+| **UAT**        | 內部測試、使用者驗證            | 雲端 DB（測試資料）        | `uat.mead.<company>`     |
+| **Staging**    | 發布前驗證，環境等同 Production | 雲端 DB（清洗資料）        | `staging.mead.<company>` |
+| **Production** | 正式營運                        | 雲端 DB（生產資料）        | `mead.<company>`         |
 
 對應的環境變數範本：
 
@@ -113,8 +113,8 @@ NPT 規劃四層環境：
 ```text
 ┌────────────────────────────────────────────────┐
 │  Reverse Proxy (Nginx / Caddy) :443            │
-│  ├─ npt.example.com        → frontend:3000    │
-│  └─ api.npt.example.com    → backend:4000     │
+│  ├─ mead.example.com        → frontend:3000    │
+│  └─ api.mead.example.com    → backend:4000     │
 └──────────┬─────────────────────────────────────┘
            │
   ┌────────┴─────────────────────────────────────┐
@@ -202,7 +202,7 @@ NPT 規劃四層環境：
 vim apps/backend/database/prisma/schemas/*.prisma
 
 # 建立 migration（互動式輸入名稱）
-pnpm --filter @npt/backend db:migrate
+pnpm --filter @mead/backend db:migrate
 
 # 生成 Prisma Client
 pnpm db:generate
@@ -220,7 +220,7 @@ pnpm db:generate
 **部署時執行**：
 
 ```bash
-pnpm --filter @npt/backend prisma migrate deploy
+pnpm --filter @mead/backend prisma migrate deploy
 ```
 
 **避免**：
@@ -309,7 +309,7 @@ docker compose -f docker-compose.production.yml up -d backend:v1.2.3
 **Kubernetes**：
 
 ```bash
-kubectl rollout undo deployment/npt-backend
+kubectl rollout undo deployment/mead-backend
 ```
 
 ### 資料庫回滾

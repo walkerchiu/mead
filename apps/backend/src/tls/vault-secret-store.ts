@@ -15,17 +15,17 @@ export interface VaultSecretStoreOptions {
  * VaultSecretStore — HashiCorp Vault 的 KV v2 secrets engine 實作
  *
  * 路徑組成：`/{mount}/data/{prefix}/{ref}`
- *   例如 mount=`secret`, prefix=`npt/prod`, ref=`tls/example.com`
- *   → `/secret/data/npt/prod/tls/example.com`
+ *   例如 mount=`secret`, prefix=`mead/prod`, ref=`tls/example.com`
+ *   → `/secret/data/mead/prod/tls/example.com`
  *
  * 認證：
  *   - Token auth（VAULT_TOKEN，dev / staging）
  *   - AppRole（VAULT_ROLE_ID + VAULT_SECRET_ID；production 推薦）
  *
  * Vault policy（最小集）：
- *   path "secret/data/npt/prod/*"     { capabilities = ["create","read","update"] }
- *   path "secret/delete/npt/prod/*"   { capabilities = ["update"] }
- *   path "secret/metadata/npt/prod/*" { capabilities = ["read","delete"] }
+ *   path "secret/data/mead/prod/*"     { capabilities = ["create","read","update"] }
+ *   path "secret/delete/mead/prod/*"   { capabilities = ["update"] }
+ *   path "secret/metadata/mead/prod/*" { capabilities = ["read","delete"] }
  */
 export class VaultSecretStore implements SecretStore {
   private readonly logger = new Logger(VaultSecretStore.name);
@@ -46,7 +46,7 @@ export class VaultSecretStore implements SecretStore {
     this.roleId = opts.roleId;
     this.secretId = opts.secretId;
     this.mount = (opts.mount ?? 'secret').replace(/\/$/, '');
-    this.prefix = (opts.pathPrefix ?? 'npt').replace(/^\/|\/$/g, '');
+    this.prefix = (opts.pathPrefix ?? 'mead').replace(/^\/|\/$/g, '');
 
     this.client = nodeVault({
       apiVersion: 'v1',

@@ -11,7 +11,7 @@
   - [概述](#概述)
     - [服務列表](#服務列表)
   - [快速開始](#快速開始)
-    - [使用 NPT CLI（推薦）](#使用-npt-cli推薦)
+    - [使用 MEAD CLI（推薦）](#使用-mead-cli推薦)
     - [手動啟動](#手動啟動)
   - [服務說明](#服務說明)
     - [1. TimescaleDB (PostgreSQL)](#1-timescaledb-postgresql)
@@ -63,7 +63,7 @@
 
 ## 快速開始
 
-### 使用 NPT CLI（推薦）
+### 使用 MEAD CLI（推薦）
 
 ```bash
 # 一鍵啟動所有服務
@@ -190,7 +190,7 @@ docker-compose --env-file .env.docker --profile storage up -d
 # PostgreSQL (TimescaleDB)
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=your-strong-password-here  # ⚠️ 請修改
-POSTGRES_DB=npt_db
+POSTGRES_DB=mead_db
 
 # RabbitMQ
 RABBITMQ_DEFAULT_USER=hq
@@ -219,7 +219,7 @@ SEAWEEDFS_S3_PASSWORD=your-strong-password-here  # ⚠️ 請修改
 # .env.docker.example（可提交）
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=CHANGE_THIS_IN_PRODUCTION
-POSTGRES_DB=npt_db
+POSTGRES_DB=mead_db
 ```
 
 ---
@@ -249,7 +249,7 @@ openssl rand -hex 64
 **DATABASE_URL 格式**：
 
 ```text
-postgresql://postgres:YOUR_PASSWORD@localhost:5432/npt_db
+postgresql://postgres:YOUR_PASSWORD@localhost:5432/mead_db
 ```
 
 ### 3. 環境隔離
@@ -318,7 +318,7 @@ docker-compose down -v
 ### 查看狀態
 
 ```bash
-# 使用 NPT CLI（推薦）
+# 使用 MEAD CLI（推薦）
 ./scripts/cli.sh status
 
 # 或直接使用 Docker
@@ -329,7 +329,7 @@ docker-compose logs -f
 ### 查看日誌
 
 ```bash
-# 使用 NPT CLI（推薦）
+# 使用 MEAD CLI（推薦）
 ./scripts/cli.sh logs postgres -f
 ./scripts/cli.sh logs rabbitmq -f
 ./scripts/cli.sh logs redis -f
@@ -343,7 +343,7 @@ docker-compose logs -f dragonfly
 ### 重啟服務
 
 ```bash
-# 使用 NPT CLI（推薦）
+# 使用 MEAD CLI（推薦）
 ./scripts/cli.sh restart docker
 
 # 或重啟特定服務
@@ -356,7 +356,7 @@ docker-compose restart dragonfly
 
 ```bash
 # PostgreSQL
-docker-compose exec timescaledb psql -U postgres -d npt_db
+docker-compose exec timescaledb psql -U postgres -d mead_db
 
 # RabbitMQ
 docker-compose exec rabbitmq rabbitmqctl status
@@ -406,7 +406,7 @@ grep DATABASE_URL apps/backend/.env
 grep POSTGRES_PASSWORD .env.docker
 
 # 3. 測試連線
-docker-compose exec timescaledb psql -U postgres -d npt_db -c "SELECT 1"
+docker-compose exec timescaledb psql -U postgres -d mead_db -c "SELECT 1"
 ```
 
 ### 問題 3：RabbitMQ 管理介面無法訪問

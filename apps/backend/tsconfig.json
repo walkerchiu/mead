@@ -1,5 +1,5 @@
 {
-  "extends": "@npt/typescript-config/nestjs.json",
+  "extends": "@mead/typescript-config/nestjs.json",
   "compilerOptions": {
     "outDir": "./dist",
     "baseUrl": "./",

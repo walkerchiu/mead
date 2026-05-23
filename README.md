@@ -1,4 +1,4 @@
-# NPT — New Project Template
+# MEAD — New Project Template
 
 **企業級全端 monorepo 模板**：Next.js 16 + NestJS 11 + GraphQL + TimescaleDB 的應用程式骨架，預先整合認證、授權、稽核日誌、通知、排程任務等基礎建設，協助團隊快速啟動新專案。
 
@@ -39,7 +39,7 @@
 ### 目錄結構
 
 ```text
-npt/
+mead/
 ├── apps/
 │   ├── frontend/              # Next.js 前端應用
 │   └── backend/               # NestJS GraphQL API
@@ -49,7 +49,7 @@ npt/
 │   └── eslint-config/         # 共享 ESLint 設定
 ├── infra/
 │   └── seaweedfs/             # SeaweedFS 儲存服務設定
-├── scripts/                   # NPT CLI 工具腳本
+├── scripts/                   # MEAD CLI 工具腳本
 │   ├── cli.sh                 # CLI 主程式
 │   ├── commands/              # CLI 命令實作
 │   └── utils/                 # CLI 工具函式
@@ -121,7 +121,7 @@ npt/
 
 ### 開發工具
 
-- NPT CLI（一鍵 init / dev / restart / db / status / doctor）
+- MEAD CLI（一鍵 init / dev / restart / db / status / doctor）
 - Turborepo 任務編排
 - pnpm Workspace
 - Docker Compose
@@ -142,11 +142,11 @@ npt/
 
 1. 將本 repo 複製到您的新專案目錄並改名
    ```bash
-   cp -R /path/to/npt /path/to/your-new-project
+   cp -R /path/to/mead /path/to/your-new-project
    cd /path/to/your-new-project
-   git init && git add . && git commit -m "init from NPT template"
+   git init && git add . && git commit -m "init from MEAD template"
    ```
-2. 全域取代 `npt`/`NPT` 為您的專案代號（建議用 IDE 全域 rename）
+2. 全域取代 `mead`/`MEAD` 為您的專案代號（建議用 IDE 全域 rename）
 3. 修改 `apps/backend/database/prisma/seeds/base.ts` 中的權限與角色，加入您專案特有的 perm
 4. 修改 `apps/backend/src/modules/personal-access-token/personal-access-token.service.ts` 的 `ALLOWED_SCOPES`
 5. 在 `apps/backend/src/modules/` 與 `apps/frontend/src/app/[locale]/` 新增您的業務模組
@@ -156,7 +156,7 @@ npt/
 
 ## 快速開始
 
-### 方式 1：使用 NPT CLI（推薦）⭐
+### 方式 1：使用 MEAD CLI（推薦）⭐
 
 最簡單的方式，一鍵完成所有設置：
 
@@ -168,7 +168,7 @@ npt/
 ./scripts/cli.sh init
 ```
 
-NPT CLI 會自動完成：
+MEAD CLI 會自動完成：
 
 - ✅ 系統需求檢查
 - ✅ 依賴安裝
@@ -176,7 +176,7 @@ NPT CLI 會自動完成：
 - ✅ 資料庫初始化
 - ✅ 服務驗證
 
-**完整說明**：[NPT CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
+**完整說明**：[MEAD CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
 
 ### 預設帳號（development / uat seed 共用）
 
@@ -247,8 +247,8 @@ pnpm db:seed
 pnpm dev
 
 # 或個別啟動
-pnpm --filter @npt/frontend dev
-pnpm --filter @npt/backend dev
+pnpm --filter @mead/frontend dev
+pnpm --filter @mead/backend dev
 ```
 
 </details>
@@ -259,7 +259,7 @@ pnpm --filter @npt/backend dev
 
 ### 啟動開發環境
 
-使用 NPT CLI（推薦）：
+使用 MEAD CLI（推薦）：
 
 ```bash
 ./scripts/cli.sh dev
@@ -283,7 +283,7 @@ pnpm dev
 
 ### 常用命令
 
-#### NPT CLI（推薦）
+#### MEAD CLI（推薦）
 
 ```bash
 ./scripts/cli.sh              # 互動式選單
@@ -298,7 +298,7 @@ pnpm dev
 ./scripts/cli.sh clean        # 環境清理
 ```
 
-完整說明: [NPT CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
+完整說明: [MEAD CLI 完整指南](docs/getting-started/CLI_GUIDE.md)
 
 #### pnpm 命令
 
@@ -359,7 +359,7 @@ docker-compose ps                              # 查看服務狀態
 ### 新手推薦閱讀順序
 
 1. [貢獻指南](docs/getting-started/CONTRIBUTING.md) - 開發流程、Commit 規範、PR 流程
-2. [NPT CLI 完整指南](docs/getting-started/CLI_GUIDE.md) - 開發者工具
+2. [MEAD CLI 完整指南](docs/getting-started/CLI_GUIDE.md) - 開發者工具
 3. [Docker 設置指南](docs/getting-started/DOCKER_SETUP.md) - 環境設置
 4. [Monorepo 結構說明](docs/getting-started/MONOREPO_STRUCTURE.md) - 專案結構
 5. [前後端 i18n 協調機制](docs/getting-started/I18N_COORDINATION.md) - 多國語系

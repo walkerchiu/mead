@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# NPT CLI - storage 命令
+# MEAD CLI - storage 命令
 # SeaweedFS 儲存服務管理
 # ==========================================
 
@@ -242,7 +242,7 @@ storage_diagnose() {
   echo ""
 
   # 先確認自己 repo 的 SeaweedFS containers 全部在跑，否則跳過 port / HTTP 檢查。
-  # 否則別 repo（例如 nptc）的 SeaweedFS 在 forward 同樣 port 會被當成自己的服務 ✓。
+  # 否則別 repo（例如 meadc）的 SeaweedFS 在 forward 同樣 port 會被當成自己的服務 ✓。
   local self_running=true
   for svc in seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3; do
     local cn
@@ -410,9 +410,9 @@ storage_reset() {
   cd "$PROJECT_ROOT"
 
   docker volume rm -f \
-    npt_seaweedfs-master-data \
-    npt_seaweedfs-volume-data \
-    npt_seaweedfs-filer-data \
+    mead_seaweedfs-master-data \
+    mead_seaweedfs-volume-data \
+    mead_seaweedfs-filer-data \
     2>/dev/null || true
 
   log_success "SeaweedFS 資料已清除"

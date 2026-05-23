@@ -418,7 +418,7 @@ docker ps | grep seaweedfs-master
 ./scripts/cli.sh logs seaweedfs-master -f
 
 # 重啟 Master
-docker restart npt-seaweedfs-master
+docker restart mead-seaweedfs-master
 ```
 
 ### 問題 3：Volume 磁碟空間不足
@@ -433,7 +433,7 @@ ERROR: no free volumes
 
 ```bash
 # 檢查磁碟使用量
-docker exec npt-seaweedfs-volume df -h
+docker exec mead-seaweedfs-volume df -h
 ```
 
 **解決方案**:
@@ -472,7 +472,7 @@ ERROR: filer metadata store error
 ./scripts/cli.sh storage reset
 
 # 或手動清理 PostgreSQL 表（謹慎使用）
-docker exec npt-timescaledb psql -U postgres -d npt_db -c "DROP SCHEMA IF EXISTS seaweedfs CASCADE;"
+docker exec mead-timescaledb psql -U postgres -d mead_db -c "DROP SCHEMA IF EXISTS seaweedfs CASCADE;"
 ```
 
 ---

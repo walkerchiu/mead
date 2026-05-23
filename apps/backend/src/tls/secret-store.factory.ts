@@ -57,7 +57,10 @@ export class SecretStoreFactory {
       'AWS_SECRETS_MANAGER_REGION',
       'us-east-1',
     );
-    const prefix = this.config.get<string>('AWS_SECRETS_MANAGER_PREFIX', 'npt');
+    const prefix = this.config.get<string>(
+      'AWS_SECRETS_MANAGER_PREFIX',
+      'mead',
+    );
     this.logger.log(
       `[SecretStoreFactory] using AwsSecretsManagerSecretStore region=${region} prefix=${prefix}`,
     );
@@ -73,7 +76,7 @@ export class SecretStoreFactory {
     const roleId = this.config.get<string>('VAULT_ROLE_ID');
     const secretId = this.config.get<string>('VAULT_SECRET_ID');
     const mount = this.config.get<string>('VAULT_MOUNT', 'secret');
-    const pathPrefix = this.config.get<string>('VAULT_PATH_PREFIX', 'npt');
+    const pathPrefix = this.config.get<string>('VAULT_PATH_PREFIX', 'mead');
 
     if (!token && !(roleId && secretId)) {
       throw new Error(

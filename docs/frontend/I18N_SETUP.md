@@ -307,7 +307,7 @@ cd apps/frontend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @npt/frontend generate-i18n-types
+pnpm --filter @mead/frontend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -577,7 +577,7 @@ cp messages/en.json messages/ja.json
 
 ```bash
 # 啟動開發伺服器
-pnpm --filter @npt/frontend dev
+pnpm --filter @mead/frontend dev
 
 # 訪問
 # http://localhost:3000/ja/login
@@ -588,7 +588,7 @@ pnpm --filter @npt/frontend dev
 
 ```bash
 # 重新生成類型以包含新語言
-pnpm --filter @npt/frontend generate-i18n-types
+pnpm --filter @mead/frontend generate-i18n-types
 ```
 
 ---

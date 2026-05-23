@@ -156,7 +156,7 @@ cd apps/backend
 pnpm generate-i18n-types
 
 # 或從根目錄
-pnpm --filter @npt/backend generate-i18n-types
+pnpm --filter @mead/backend generate-i18n-types
 ```
 
 ### 自動生成的類型
@@ -277,7 +277,7 @@ describe('I18n Translations Completeness', () => {
 pnpm test src/i18n/i18n-completeness.spec.ts
 
 # 或從根目錄
-pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @mead/backend test src/i18n/i18n-completeness.spec.ts
 ```
 
 ### 測試失敗範例
@@ -536,10 +536,10 @@ curl -X POST http://localhost:4000/graphql \
   -d '{"query":"{ __typename }"}'
 
 # 執行完整性測試
-pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @mead/backend test src/i18n/i18n-completeness.spec.ts
 
 # 重新生成類型
-pnpm --filter @npt/backend generate-i18n-types
+pnpm --filter @mead/backend generate-i18n-types
 ```
 
 ---

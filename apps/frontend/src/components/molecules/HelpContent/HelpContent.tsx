@@ -149,8 +149,8 @@ export function HelpContent() {
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
           {isZhTW
-            ? '歡迎使用 NPT 專案！按照以下步驟快速上手：'
-            : 'Welcome to NPT project! Follow these steps to get started:'}
+            ? '歡迎使用 MEAD 專案！按照以下步驟快速上手：'
+            : 'Welcome to MEAD project! Follow these steps to get started:'}
         </Typography>
         <List dense>
           {quickStartSteps.map((step, index) => (

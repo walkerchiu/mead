@@ -5,14 +5,14 @@ services:
 
   timescaledb:
     image: timescale/timescaledb:latest-pg16
-    container_name: npt-timescaledb
+    container_name: mead-timescaledb
     restart: unless-stopped
     ports:
       - '127.0.0.1:${POSTGRES_PORT:-5432}:5432'
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env.docker}
-      POSTGRES_DB: ${POSTGRES_DB:-npt_db}
+      POSTGRES_DB: ${POSTGRES_DB:-mead_db}
     volumes:
       - timescaledb-data:/var/lib/postgresql/data
     healthcheck:
@@ -23,7 +23,7 @@ services:
 
   rabbitmq:
     image: rabbitmq:3.13-management-alpine
-    container_name: npt-rabbitmq
+    container_name: mead-rabbitmq
     restart: unless-stopped
     ports:
       - '127.0.0.1:${RABBITMQ_PORT:-5672}:5672' # AMQP 協定（僅限本機存取）
@@ -44,7 +44,7 @@ services:
 
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.5
-    container_name: npt-dragonfly
+    container_name: mead-dragonfly
     restart: unless-stopped
     ports:
       - '127.0.0.1:${REDIS_PORT:-6379}:6379'
@@ -60,7 +60,7 @@ services:
 
   mailpit:
     image: axllent/mailpit:latest
-    container_name: npt-mailpit
+    container_name: mead-mailpit
     restart: unless-stopped
     ports:
       - '127.0.0.1:${MAIL_SMTP_PORT:-1025}:1025' # SMTP 端口
@@ -83,7 +83,7 @@ services:
   # SeaweedFS Master - 管理元資料和卷分配
   seaweedfs-master:
     image: chrislusf/seaweedfs:latest
-    container_name: npt-seaweedfs-master
+    container_name: mead-seaweedfs-master
     restart: unless-stopped
     profiles: ['storage']
     ports:
@@ -108,7 +108,7 @@ services:
   # SeaweedFS Volume Server - 儲存實際檔案
   seaweedfs-volume:
     image: chrislusf/seaweedfs:latest
-    container_name: npt-seaweedfs-volume
+    container_name: mead-seaweedfs-volume
     restart: unless-stopped
     profiles: ['storage']
     ports:
@@ -128,7 +128,7 @@ services:
   # SeaweedFS Filer - 提供檔案系統介面
   seaweedfs-filer:
     image: chrislusf/seaweedfs:latest
-    container_name: npt-seaweedfs-filer
+    container_name: mead-seaweedfs-filer
     restart: unless-stopped
     profiles: ['storage']
     ports:
@@ -149,7 +149,7 @@ services:
   # SeaweedFS S3 Gateway - S3 兼容 API
   seaweedfs-s3:
     image: chrislusf/seaweedfs:latest
-    container_name: npt-seaweedfs-s3
+    container_name: mead-seaweedfs-s3
     restart: unless-stopped
     profiles: ['storage']
     ports:

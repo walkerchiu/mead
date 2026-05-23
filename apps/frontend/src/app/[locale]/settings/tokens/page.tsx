@@ -469,7 +469,7 @@ function TokensSettingsPageContent() {
               }}
             >
               {`curl ${API_URL}/api/your-endpoint \\
-  -H "Authorization: Bearer ${createdToken || 'npt_xxx'}" \\
+  -H "Authorization: Bearer ${createdToken || 'mead_xxx'}" \\
   -H "Content-Type: application/json"`}
             </Typography>
           </Alert>

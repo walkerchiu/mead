@@ -147,7 +147,7 @@ export function AuthLayout({
                   mb: 1,
                 }}
               >
-                🌊 NPT
+                🌊 MEAD
               </Typography>
               {title && (
                 <Typography

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# NPT CLI - db 命令
+# MEAD CLI - db 命令
 # 資料庫管理工具（支援多環境）
 # ==========================================
 
@@ -427,7 +427,7 @@ db_backup() {
 
   # 產生備份檔案名稱
   TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-  BACKUP_FILE="$BACKUP_DIR/npt_db_${ENVIRONMENT}_$TIMESTAMP.sql"
+  BACKUP_FILE="$BACKUP_DIR/mead_db_${ENVIRONMENT}_$TIMESTAMP.sql"
   BACKUP_FILE_GZ="$BACKUP_FILE.gz"
 
   log_step "備份資料庫"
@@ -441,7 +441,7 @@ db_backup() {
         PG_HOST="localhost"
         PG_PORT="${POSTGRES_PORT:-5432}"
         PG_USER="${POSTGRES_USER:-postgres}"
-        PG_DB="${POSTGRES_DB:-npt_db}"
+        PG_DB="${POSTGRES_DB:-mead_db}"
       else
         log_error ".env.docker 不存在"
         exit 1
@@ -632,7 +632,7 @@ db_restore() {
         PG_HOST="localhost"
         PG_PORT="${POSTGRES_PORT:-5432}"
         PG_USER="${POSTGRES_USER:-postgres}"
-        PG_DB="${POSTGRES_DB:-npt_db}"
+        PG_DB="${POSTGRES_DB:-mead_db}"
       else
         log_error ".env.docker 不存在"
         exit 1

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# NPT CLI - init 命令
+# MEAD CLI - init 命令
 # 新開發者專案初始化
 # ==========================================
 
@@ -15,7 +15,7 @@ source "$SCRIPT_DIR/../utils/common.sh"
 
 # 顯示幫助
 show_command_help() {
-  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 NPT 專案\n"
+  echo -e "\n${GREEN}./scripts/cli.sh init${NC} - 初始化 MEAD 專案\n"
   echo -e "${YELLOW}描述:${NC}"
   echo "  為新開發者設置完整的開發環境，包括："
   echo "  - 檢查系統需求 (Node.js, pnpm, Docker)"
@@ -75,7 +75,7 @@ done
 # 切換到專案根目錄
 cd "$PROJECT_ROOT"
 
-print_header "NPT 專案初始化"
+print_header "MEAD 專案初始化"
 
 # ==========================================
 # Step 1: 檢查系統需求
@@ -270,7 +270,7 @@ if [ "$SKIP_DB" = false ]; then
   ENABLE_UUID_SQL="apps/backend/database/prisma/migrations/enable_uuid_v7.sql"
   if [ -f "$ENABLE_UUID_SQL" ]; then
     PG_CONTAINER=$(get_container_name timescaledb)
-    docker exec -i "$PG_CONTAINER" psql -U postgres -d npt_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
+    docker exec -i "$PG_CONTAINER" psql -U postgres -d mead_db -v ON_ERROR_STOP=1 < "$ENABLE_UUID_SQL" &> /dev/null
     log_success "資料庫函式已初始化"
   else
     log_warning "找不到 enable_uuid_v7.sql，跳過"
@@ -397,8 +397,8 @@ echo "  1. 啟動開發環境:"
 echo -e "     ${CYAN}./scripts/cli.sh dev${NC}"
 echo "     "
 echo "     或分別啟動:"
-echo -e "     ${CYAN}pnpm --filter @npt/frontend dev${NC}  # 終端 1"
-echo -e "     ${CYAN}pnpm --filter @npt/backend dev${NC}   # 終端 2"
+echo -e "     ${CYAN}pnpm --filter @mead/frontend dev${NC}  # 終端 1"
+echo -e "     ${CYAN}pnpm --filter @mead/backend dev${NC}   # 終端 2"
 echo ""
 echo "  2. 查看 Storybook:"
 echo -e "     ${CYAN}pnpm storybook${NC}"

@@ -98,7 +98,7 @@ export function AboutContent() {
       {/* Version Information */}
       <Box sx={{ mb: 3, textAlign: 'center' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-          {isZhTW ? 'NPT 專案' : 'NPT Project'}
+          {isZhTW ? 'MEAD 專案' : 'MEAD Project'}
         </Typography>
         <Stack
           direction="row"
@@ -128,8 +128,8 @@ export function AboutContent() {
         </Typography>
         <Typography variant="body2" color="text.secondary" paragraph>
           {isZhTW
-            ? 'NPT（New Project Template）是一套企業級應用程式骨架，預先整合認證授權、用戶管理、稽核日誌、通知系統等基礎建設，協助團隊快速啟動新專案。'
-            : 'NPT (New Project Template) is an enterprise application skeleton with built-in infrastructure for authentication, user management, audit logs, and notifications to help teams kickstart new projects.'}
+            ? 'MEAD（New Project Template）是一套企業級應用程式骨架，預先整合認證授權、用戶管理、稽核日誌、通知系統等基礎建設，協助團隊快速啟動新專案。'
+            : 'MEAD (New Project Template) is an enterprise application skeleton with built-in infrastructure for authentication, user management, audit logs, and notifications to help teams kickstart new projects.'}
         </Typography>
         {isHQ && (
           <Typography variant="body2" color="text.secondary">
@@ -219,7 +219,7 @@ export function AboutContent() {
             : 'This project is released under the MIT License.'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Copyright © 2024 NPT Project Contributors
+          Copyright © 2024 MEAD Project Contributors
         </Typography>
       </Box>
 

@@ -2,7 +2,7 @@
 """
 check-drift.py — Convention drift detector（模板單 repo 版本）
 
-檢查 NPT 模板專案是否符合 docs/backend/CONVENTIONS.md 的後端慣例：
+檢查 MEAD 模板專案是否符合 docs/backend/CONVENTIONS.md 的後端慣例：
   1. §5 baseline permissions — seed 必須包含的核心權限
   2. §1 — 禁用的 dead permissions（已廢棄的命名）
   3. §2.1/2.3 — single-target mutation/query 應該用 `id`
@@ -235,7 +235,7 @@ def run_checks(root: Path) -> list[str]:
 
 
 USAGE = """\
-check-drift.py — NPT 模板 convention 檢查工具
+check-drift.py — MEAD 模板 convention 檢查工具
 
 Usage:
   ./scripts/cli.sh drift            # via CLI wrapper

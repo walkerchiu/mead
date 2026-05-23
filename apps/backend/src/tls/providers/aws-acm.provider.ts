@@ -86,7 +86,7 @@ export class AwsAcmCertProvider implements CertProvider {
           : undefined,
         ValidationMethod: 'DNS',
         IdempotencyToken: idempotencyToken,
-        Tags: [{ Key: 'npt-domain', Value: req.domain }],
+        Tags: [{ Key: 'mead-domain', Value: req.domain }],
       }),
     );
     const arn = req1.CertificateArn;
@@ -222,7 +222,7 @@ export class AwsAcmCertProvider implements CertProvider {
 
   /** IdempotencyToken：同 domain 重跑 issue 不會開新 cert */
   private makeIdempotencyToken(domain: string): string {
-    const raw = `npt-${this.hashShort(domain)}`;
+    const raw = `mead-${this.hashShort(domain)}`;
     return raw.replace(/[^A-Za-z0-9-_]/g, '').slice(0, 32);
   }
 

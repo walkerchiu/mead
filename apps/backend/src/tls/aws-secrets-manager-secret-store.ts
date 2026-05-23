@@ -15,12 +15,12 @@ import { SecretStore, TlsSecret } from './secret-store.interface';
  * AwsSecretsManagerSecretStore — production SecretStore
  *
  * 每個 ref 對應一條 AWS Secrets Manager secret：
- *   SecretId = `{prefix}/{ref}`  例：`npt/prod/tls/example.com`
+ *   SecretId = `{prefix}/{ref}`  例：`mead/prod/tls/example.com`
  *
  * 啟用條件：
  *   TLS_SECRET_STORE=aws-secrets-manager
  *   AWS_SECRETS_MANAGER_REGION=us-east-1
- *   AWS_SECRETS_MANAGER_PREFIX=npt/prod
+ *   AWS_SECRETS_MANAGER_PREFIX=mead/prod
  *   AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY（或 instance profile / shared credentials）
  *
  * 需要 IAM permissions（最小集）：
@@ -29,7 +29,7 @@ import { SecretStore, TlsSecret } from './secret-store.interface';
  *   - secretsmanager:PutSecretValue
  *   - secretsmanager:DescribeSecret
  *   - secretsmanager:DeleteSecret（僅 deleteSecret 用）
- *   Resource: `arn:aws:secretsmanager:{region}:{account}:secret:npt/*`
+ *   Resource: `arn:aws:secretsmanager:{region}:{account}:secret:mead/*`
  */
 export class AwsSecretsManagerSecretStore implements SecretStore {
   private readonly logger = new Logger(AwsSecretsManagerSecretStore.name);
@@ -90,9 +90,9 @@ export class AwsSecretsManagerSecretStore implements SecretStore {
             new CreateSecretCommand({
               Name: secretId,
               SecretString: value,
-              Description: 'npt TLS/DNS secret (auto-managed)',
+              Description: 'mead TLS/DNS secret (auto-managed)',
               Tags: [
-                { Key: 'npt', Value: 'true' },
+                { Key: 'mead', Value: 'true' },
                 { Key: 'kind', Value: this.kindFromRef(ref) },
               ],
             }),

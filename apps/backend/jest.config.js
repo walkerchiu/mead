@@ -19,7 +19,7 @@ module.exports = {
   coverageDirectory: './coverage',
   testEnvironment: 'node',
   moduleNameMapper: {
-    '^@npt/typescript-config/(.*)$':
+    '^@mead/typescript-config/(.*)$':
       '<rootDir>/../../packages/typescript-config/$1',
   },
 };

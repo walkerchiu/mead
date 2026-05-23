@@ -455,7 +455,7 @@ defaultOptions: {
 ### 互動式 CLI
 
 ```bash
-# 啟動 NPT CLI
+# 啟動 MEAD CLI
 ./scripts/cli.sh
 
 # 選擇 14（i18n 多語系管理）
@@ -469,13 +469,13 @@ defaultOptions: {
 
 ```bash
 # 後端：生成類型
-pnpm --filter @npt/backend generate-i18n-types
+pnpm --filter @mead/backend generate-i18n-types
 
 # 後端：測試翻譯完整性
-pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @mead/backend test src/i18n/i18n-completeness.spec.ts
 
 # 前端：生成類型
-pnpm --filter @npt/frontend generate-i18n-types
+pnpm --filter @mead/frontend generate-i18n-types
 
 # 全專案類型檢查
 pnpm type-check

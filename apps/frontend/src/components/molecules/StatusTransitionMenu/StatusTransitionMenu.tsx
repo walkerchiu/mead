@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   Chip,
   Menu,
@@ -72,8 +72,8 @@ export function StatusTransitionMenu({
   confirmLabel = '確認',
 }: StatusTransitionMenuProps) {
   const theme = useTheme();
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const menuOpen = Boolean(anchorEl);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [targetStatus, setTargetStatus] = useState<StatusOption | null>(null);
   const [feedback, setFeedback] = useState('');
@@ -98,13 +98,13 @@ export function StatusTransitionMenu({
     return theme.palette.grey[500];
   };
 
-  const handleButtonClick = () => {
+  const handleButtonClick = (event: React.MouseEvent<HTMLElement>) => {
     if (!hasTransitions) return;
-    setMenuOpen(true);
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setMenuOpen(false);
+    setAnchorEl(null);
   };
 
   const handleSelectStatus = (status: StatusOption) => {
@@ -139,7 +139,6 @@ export function StatusTransitionMenu({
   return (
     <>
       <Button
-        ref={buttonRef}
         variant="outlined"
         onClick={handleButtonClick}
         disabled={disabled}
@@ -162,7 +161,7 @@ export function StatusTransitionMenu({
       </Button>
 
       <Menu
-        anchorEl={buttonRef.current}
+        anchorEl={anchorEl}
         open={menuOpen}
         onClose={handleMenuClose}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}

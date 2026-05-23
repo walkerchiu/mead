@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# NPT CLI - 主入口（互動式）
+# MEAD CLI - 主入口（互動式）
 # ==========================================
 
 set -euo pipefail
@@ -23,14 +23,14 @@ VERSION="1.0.0"
 
 # 顯示版本
 if [[ "${1:-}" == "--version" ]] || [[ "${1:-}" == "-v" ]]; then
-  echo -e "NPT CLI v$VERSION"
+  echo -e "MEAD CLI v$VERSION"
   exit 0
 fi
 
 # 顯示 top-level help
 if [[ "${1:-}" == "--help" ]] || [[ "${1:-}" == "-h" ]] || [[ "${1:-}" == "help" ]]; then
   cat <<EOF
-NPT CLI v$VERSION - 給軟體專案的開發樣板
+MEAD CLI v$VERSION - 教育部藝術設計三大計畫入口網
 
 使用方式:
   ./scripts/cli.sh                進入互動式選單（16 個功能）
@@ -39,7 +39,7 @@ NPT CLI v$VERSION - 給軟體專案的開發樣板
   ./scripts/cli.sh --help         顯示此說明
 
 可用命令:
-  init                初始化 NPT 專案
+  init                初始化 MEAD 專案
   dev                 啟動開發伺服器（支援 --frontend-only / --backend-only 等）
   test                執行測試（型別檢查 + 單元測試）
   status              查看服務狀態（--health 含健康檢查）
@@ -81,8 +81,8 @@ show_interactive_menu() {
     echo -e ""
     echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
     echo -e "${GREEN}║                                                          ║${NC}"
-    echo -e "${GREEN}║                      ${NC}${BLUE}${BOLD}NPT CLI${NC} ${GREEN}v$VERSION                      ║${NC}"
-    echo -e "${GREEN}║             給軟體專案的開發樣板 - 互動式選單            ║${NC}"
+    echo -e "${GREEN}║                      ${NC}${BLUE}${BOLD}MEAD CLI${NC} ${GREEN}v$VERSION                     ║${NC}"
+    echo -e "${GREEN}║         教育部藝術設計三大計畫入口網 - 互動式選單        ║${NC}"
     echo -e "${GREEN}║                                                          ║${NC}"
     echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
     echo -e ""

@@ -45,7 +45,7 @@
 
 ## 概述
 
-NPT 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 和 Microsoft Graph API 雙模式，搭配 Handlebars 模板引擎。
+MEAD 專案使用 `@nestjs-modules/mailer` 作為 Email 服務，支援 SMTP 和 Microsoft Graph API 雙模式，搭配 Handlebars 模板引擎。
 
 - **MailService** — 核心服務：根據 `MAIL_PROVIDER` 自動選擇 SMTP 或 Graph API 發送
 - **GraphMailService** — Graph API 發送：使用 Microsoft OAuth2 Client Credentials Flow
@@ -83,7 +83,7 @@ cp apps/backend/.env.production.example apps/backend/.env.production
 ### 3. 啟動服務
 
 ```bash
-# 使用 NPT CLI
+# 使用 MEAD CLI
 ./scripts/cli.sh dev
 
 # 或手動啟動
@@ -113,7 +113,7 @@ https://ethereal.email/login
 | ----------------------- | ---------------------- | ------------------------------------ | -------------------------------------- |
 | `MAIL_PROVIDER`         | 郵件發送模式           | smtp                                 | graph                                  |
 | `MAIL_FROM`             | 寄件者 Email           | noreply@ethereal.email               | noreply@example.com                    |
-| `MAIL_FROM_NAME`        | 寄件者名稱             | NPT App                              | Your App Name                          |
+| `MAIL_FROM_NAME`        | 寄件者名稱             | MEAD App                             | Your App Name                          |
 | `PASSWORD_RESET_EXPIRY` | 密碼重設有效期（分鐘） | 30                                   | 15                                     |
 | `PASSWORD_RESET_URL`    | 密碼重設頁面 URL       | http://localhost:3000/reset-password | https://app.example.com/reset-password |
 
@@ -420,7 +420,7 @@ Mail Service 支援根據用戶語言偏好發送對應語言的 Email。
 
 ## 開發環境
 
-NPT 專案提供兩種開發環境的 Email 測試方案，您可以根據需求選擇：
+MEAD 專案提供兩種開發環境的 Email 測試方案，您可以根據需求選擇：
 
 ### 方案一：Ethereal Email（線上測試）
 
@@ -439,7 +439,7 @@ MAIL_SECURE=false
 MAIL_USER=your-ethereal-username@ethereal.email
 MAIL_PASS=your-ethereal-password
 MAIL_FROM=noreply@ethereal.email
-MAIL_FROM_NAME=NPT App (Dev)
+MAIL_FROM_NAME=MEAD App (Dev)
 ```
 
 #### 3. 查看發送的郵件
@@ -467,13 +467,13 @@ MAIL_FROM_NAME=NPT App (Dev)
 
 #### 1. Docker Compose 配置
 
-NPT 專案已整合 Mailpit 到 Docker Compose。服務配置位於 `docker-compose.yml`：
+MEAD 專案已整合 Mailpit 到 Docker Compose。服務配置位於 `docker-compose.yml`：
 
 ```yaml
 services:
   mailpit:
     image: axllent/mailpit:latest
-    container_name: npt-mailpit
+    container_name: mead-mailpit
     restart: unless-stopped
     ports:
       - '1025:1025' # SMTP 埠
@@ -482,7 +482,7 @@ services:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
-      - npt-network
+      - mead-network
 ```
 
 #### 2. 環境變數配置
@@ -496,12 +496,12 @@ MAIL_SECURE=false
 MAIL_USER=any
 MAIL_PASS=any
 MAIL_FROM=noreply@localhost
-MAIL_FROM_NAME=NPT App (Dev)
+MAIL_FROM_NAME=MEAD App (Dev)
 ```
 
 #### 3. 啟動服務
 
-使用 NPT CLI 快速啟動：
+使用 MEAD CLI 快速啟動：
 
 ```bash
 # 啟動所有服務（包含 Mailpit）

@@ -23,7 +23,7 @@ import type { DrawerState } from '@/components/organisms';
 const SIDEBAR_WIDTH = 240;
 const SIDEBAR_MINI_WIDTH = 64;
 const APPBAR_HEIGHT = 64;
-const SIDEBAR_STATE_STORAGE_KEY = 'npt.sidebarState';
+const SIDEBAR_STATE_STORAGE_KEY = 'mead.sidebarState';
 
 export interface AppShellProps {
   children: ReactNode;
@@ -155,12 +155,12 @@ export function AppShell({ children, title }: AppShellProps) {
                 '&:hover': {
                   backgroundColor: 'rgba(255, 255, 255, 0.12)',
                   transform: 'translateX(2px)',
-                  '& .npt-home-icon': { opacity: 1 },
+                  '& .mead-home-icon': { opacity: 1 },
                 },
               }}
             >
               <DashboardIcon
-                className="npt-home-icon"
+                className="mead-home-icon"
                 sx={{
                   fontSize: 18,
                   opacity: 0.7,
@@ -168,7 +168,7 @@ export function AppShell({ children, title }: AppShellProps) {
                 }}
               />
               <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                NPT
+                MEAD
               </Typography>
             </MuiLink>
           </Tooltip>

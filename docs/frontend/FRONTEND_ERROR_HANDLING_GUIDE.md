@@ -1,6 +1,6 @@
 # 前端錯誤處理與 Apollo 配置完整指南
 
-NPT Frontend 錯誤處理系統與 Apollo Client 配置的完整使用指南。
+MEAD Frontend 錯誤處理系統與 Apollo Client 配置的完整使用指南。
 
 ---
 

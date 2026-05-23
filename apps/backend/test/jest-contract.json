@@ -7,7 +7,7 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "moduleNameMapper": {
-    "^@npt/typescript-config/(.*)$": "<rootDir>/../../packages/typescript-config/$1"
+    "^@mead/typescript-config/(.*)$": "<rootDir>/../../packages/typescript-config/$1"
   },
   "maxWorkers": 1,
   "testTimeout": 60000

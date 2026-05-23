@@ -1,6 +1,6 @@
-# NPT 模板文檔
+# MEAD 模板文檔
 
-歡迎來到 NPT (New Project Template) 文檔！本模板僅含「身份／系統管理」核心模組，業務模組由各專案自行擴充。文檔依主題分類，方便快速查找。
+歡迎來到 MEAD (New Project Template) 文檔！本模板僅含「身份／系統管理」核心模組，業務模組由各專案自行擴充。文檔依主題分類，方便快速查找。
 
 ## 快速導航
 
@@ -8,7 +8,7 @@
 
 1. **專案概覽與用途** → 返回 [根目錄 README](../README.md)
 2. **貢獻指南** → [Contributing Guide](getting-started/CONTRIBUTING.md)（開發流程、Commit、PR）
-3. **開發工具** → [NPT CLI 完整指南](getting-started/CLI_GUIDE.md)
+3. **開發工具** → [MEAD CLI 完整指南](getting-started/CLI_GUIDE.md)
 4. **環境設置** → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
 5. **專案結構** → [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)
 6. **遇到問題** → [疑難排解](getting-started/TROUBLESHOOTING.md)
@@ -24,7 +24,7 @@
 | 文檔                                                         | 說明                                                   | 閱讀時間 |
 | ------------------------------------------------------------ | ------------------------------------------------------ | -------- |
 | [貢獻指南](getting-started/CONTRIBUTING.md)                  | **新手必讀** - 開發流程、Commit 規範、PR 流程          | 12 分鐘  |
-| [NPT CLI 完整指南](getting-started/CLI_GUIDE.md)             | 開發者 CLI 工具（快速上手+命令參考+架構）              | 15 分鐘  |
+| [MEAD CLI 完整指南](getting-started/CLI_GUIDE.md)            | 開發者 CLI 工具（快速上手+命令參考+架構）              | 15 分鐘  |
 | [Docker 設置指南](getting-started/DOCKER_SETUP.md)           | Docker 服務設置與安全最佳實踐                          | 10 分鐘  |
 | [Monorepo 結構說明](getting-started/MONOREPO_STRUCTURE.md)   | pnpm workspace + Turborepo 架構                        | 8 分鐘   |
 | [前後端 i18n 協調機制](getting-started/I18N_COORDINATION.md) | 前端（next-intl）與後端（nestjs-i18n）如何協調語言設定 | 8 分鐘   |
@@ -39,22 +39,23 @@
 
 Next.js + React + Apollo Client 前端開發指南。
 
-| 文檔                                                                         | 說明                                                  | 閱讀時間 |
-| ---------------------------------------------------------------------------- | ----------------------------------------------------- | -------- |
-| [組件設計指南](frontend/DESIGN_GUIDE.md)                                     | **給 UI/UX 設計師** - 設計規範和視覺標準 (含暗色模式) | 20 分鐘  |
-| [組件庫開發指南](frontend/COMPONENT_LIBRARY.md)                              | **給開發者** - Atomic Design 架構總覽與 Storybook     | 15 分鐘  |
-| [組件 — Atoms](frontend/component-library/ATOMS.md)                          | 原子組件清單（Button、TextField、Icon…）              | 10 分鐘  |
-| [組件 — Molecules](frontend/component-library/MOLECULES.md)                  | 分子組件清單（FormField、Card、Toast…）               | 12 分鐘  |
-| [組件 — Organisms](frontend/component-library/ORGANISMS.md)                  | 有機體組件清單（Modal、Sidebar、Form…）               | 12 分鐘  |
-| [組件 — Layout / Templates / Pages](frontend/component-library/TEMPLATES.md) | 佈局、模板與頁面範例                                  | 8 分鐘   |
-| [主題系統](frontend/THEME_SYSTEM.md)                                         | Light/Dark/System 主題系統完整實作與使用              | 25 分鐘  |
-| [通知同步系統](frontend/NOTIFICATION_SYNC_SYSTEM.md)                         | ✅ 同頁面/跨頁面即時同步、BroadcastChannel 整合       | 20 分鐘  |
-| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md)              | ScrollControl 設計思路與 API                          | 10 分鐘  |
-| [前端認證整合](frontend/FRONTEND_INTEGRATION.md)                             | Next.js + Apollo Client 認證系統                      | 20 分鐘  |
-| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)                | Error Boundaries 與錯誤追蹤                           | 18 分鐘  |
-| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                               | Content Security Policy 與 Edge Runtime 相容          | 15 分鐘  |
-| [i18n 設置指南](frontend/I18N_SETUP.md)                                      | next-intl 多語系配置與使用                            | 12 分鐘  |
-| [MSW 設置](frontend/MSW_SETUP.md)                                            | Mock Service Worker API 模擬                          | 10 分鐘  |
+| 文檔                                                                         | 說明                                                   | 閱讀時間 |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------ | -------- |
+| [組件設計指南](frontend/DESIGN_GUIDE.md)                                     | **給 UI/UX 設計師** - 設計規範和視覺標準 (含暗色模式)  | 20 分鐘  |
+| [組件庫開發指南](frontend/COMPONENT_LIBRARY.md)                              | **給開發者** - Atomic Design 架構總覽與 Storybook      | 15 分鐘  |
+| [組件 — Atoms](frontend/component-library/ATOMS.md)                          | 原子組件清單（Button、TextField、Icon…）               | 10 分鐘  |
+| [組件 — Molecules](frontend/component-library/MOLECULES.md)                  | 分子組件清單（FormField、Card、Toast…）                | 12 分鐘  |
+| [組件 — Organisms](frontend/component-library/ORGANISMS.md)                  | 有機體組件清單（Modal、Sidebar、Form…）                | 12 分鐘  |
+| [組件 — Layout / Templates / Pages](frontend/component-library/TEMPLATES.md) | 佈局、模板與頁面範例                                   | 8 分鐘   |
+| [主題系統](frontend/THEME_SYSTEM.md)                                         | Light/Dark/System 主題系統完整實作與使用               | 25 分鐘  |
+| [通知同步系統](frontend/NOTIFICATION_SYNC_SYSTEM.md)                         | ✅ 同頁面/跨頁面即時同步、BroadcastChannel 整合        | 20 分鐘  |
+| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md)              | ScrollControl 設計思路與 API                           | 10 分鐘  |
+| [前端認證整合](frontend/FRONTEND_INTEGRATION.md)                             | Next.js + Apollo Client 認證系統                       | 20 分鐘  |
+| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)                | Error Boundaries 與錯誤追蹤                            | 18 分鐘  |
+| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                               | Content Security Policy 與 Edge Runtime 相容           | 15 分鐘  |
+| [i18n 設置指南](frontend/I18N_SETUP.md)                                      | next-intl 多語系配置與使用                             | 12 分鐘  |
+| [MSW 設置](frontend/MSW_SETUP.md)                                            | Mock Service Worker API 模擬                           | 10 分鐘  |
+| [SPOSAD 入口網](frontend/SPOSAD_PORTAL.md)                                   | 教育部藝術設計三大計畫入口網（Public Scope）架構與元件 | 12 分鐘  |
 
 ---
 
@@ -119,13 +120,15 @@ Prisma + PostgreSQL 資料庫設計、備份還原與最佳實踐。
 
 Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
-| 文檔                                                         | 說明                       | 閱讀時間 |
-| ------------------------------------------------------------ | -------------------------- | -------- |
-| [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)      | .env 檔案配置與最佳實踐    | 10 分鐘  |
-| [資料庫提供者](infrastructure/DATABASE_PROVIDERS.md)         | TimescaleDB / managed 選項 | 10 分鐘  |
-| [RabbitMQ + Dragonfly](infrastructure/RABBITMQ_DRAGONFLY.md) | 訊息佇列與快取服務設置     | 15 分鐘  |
-| [SeaweedFS 儲存](infrastructure/SEAWEEDFS_STORAGE.md)        | 分散式檔案儲存服務配置     | 12 分鐘  |
-| [GeoIP 配置指南](infrastructure/GEOIP_LOCATION_SETUP.md)     | 地理位置查詢服務配置       | 12 分鐘  |
+| 文檔                                                                 | 說明                                                      | 閱讀時間 |
+| -------------------------------------------------------------------- | --------------------------------------------------------- | -------- |
+| [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)              | .env 檔案配置與最佳實踐                                   | 10 分鐘  |
+| [資料庫提供者](infrastructure/DATABASE_PROVIDERS.md)                 | TimescaleDB / managed 選項                                | 10 分鐘  |
+| [RabbitMQ + Dragonfly](infrastructure/RABBITMQ_DRAGONFLY.md)         | 訊息佇列與快取服務設置                                    | 15 分鐘  |
+| [SeaweedFS 儲存](infrastructure/SEAWEEDFS_STORAGE.md)                | 分散式檔案儲存服務配置                                    | 12 分鐘  |
+| [GeoIP 配置指南](infrastructure/GEOIP_LOCATION_SETUP.md)             | 地理位置查詢服務配置                                      | 12 分鐘  |
+| [自架部署與免費 HTTPS](infrastructure/SELF_HOSTED_TLS_DEPLOYMENT.md) | Caddy + Docker + Let's Encrypt 自架部署與憑證（全棧規劃） | 15 分鐘  |
+| [入口網部署到 EC2（實測）](infrastructure/EC2_PORTAL_DEPLOYMENT.md)  | 前端入口網 + 網域 + HTTPS 憑證逐步部署（已實測）          | 18 分鐘  |
 
 ---
 
@@ -138,7 +141,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
    ↓
 2. 貢獻指南 (getting-started/CONTRIBUTING.md) ⭐ 必讀
    ↓
-3. NPT CLI 完整指南 (getting-started/CLI_GUIDE.md)
+3. MEAD CLI 完整指南 (getting-started/CLI_GUIDE.md)
    ↓
 4. Docker 設置指南 (getting-started/DOCKER_SETUP.md)
    ↓
@@ -204,7 +207,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
    ↓
 4. SeaweedFS 儲存 (infrastructure/SEAWEEDFS_STORAGE.md)
    ↓
-5. NPT CLI 完整指南 (getting-started/CLI_GUIDE.md)
+5. MEAD CLI 完整指南 (getting-started/CLI_GUIDE.md)
    ↓
 6. 部署指南 (getting-started/DEPLOYMENT.md) ⭐ 重要
    ↓
@@ -266,7 +269,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
 ### 開發工具
 
-- CLI 工具 → [NPT CLI 完整指南](getting-started/CLI_GUIDE.md)
+- CLI 工具 → [MEAD CLI 完整指南](getting-started/CLI_GUIDE.md)
 - Docker → [Docker 設置指南](getting-started/DOCKER_SETUP.md)
 - 環境變數 → [環境變數管理](infrastructure/ENVIRONMENT_VARIABLES.md)
 - 備份還原 → [資料庫備份還原](database/BACKUP_RESTORE.md)

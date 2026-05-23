@@ -1,6 +1,6 @@
 # Markdown Style Guide
 
-本專案 `.md` 文件統一規範。新增/編輯文件前請先閱讀，確保跨 repo（rdms / rdms_tenant / npt / nptc / mgc）的文件風格一致。
+本專案 `.md` 文件統一規範。新增/編輯文件前請先閱讀，確保跨 repo（rdms / rdms_tenant / mead / meadc / mgc）的文件風格一致。
 
 ---
 

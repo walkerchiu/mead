@@ -54,7 +54,7 @@ export class CloudflareDnsOperator implements DnsOperator {
       name,
       content: value,
       ttl: 60,
-      comment: 'npt-acme-challenge (auto)',
+      comment: 'mead-acme-challenge (auto)',
     });
     const recordId = (res.result as { id: string } | undefined)?.id;
     if (recordId) {

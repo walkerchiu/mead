@@ -390,9 +390,9 @@ subscription OnUserPresenceChanged($documentId: ID!) {
 **執行指令**:
 
 ```bash
-pnpm --filter @npt/backend db:merge-schemas
-pnpm --filter @npt/backend prisma migrate dev
-pnpm --filter @npt/backend db:generate
+pnpm --filter @mead/backend db:merge-schemas
+pnpm --filter @mead/backend prisma migrate dev
+pnpm --filter @mead/backend db:generate
 ```
 
 ---

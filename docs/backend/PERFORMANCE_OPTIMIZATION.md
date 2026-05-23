@@ -1,6 +1,6 @@
 # 效能優化指南 (Performance Optimization)
 
-說明 NPT 專案的效能優化策略與實作細節，包含 DataLoader、Query Complexity、Redis 快取與資料庫優化。
+說明 MEAD 專案的效能優化策略與實作細節，包含 DataLoader、Query Complexity、Redis 快取與資料庫優化。
 
 ---
 

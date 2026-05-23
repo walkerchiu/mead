@@ -31,7 +31,7 @@ describe('SecretStoreFactory', () => {
       makeConfig({
         TLS_SECRET_STORE: 'aws-secrets-manager',
         AWS_SECRETS_MANAGER_REGION: 'ap-northeast-1',
-        AWS_SECRETS_MANAGER_PREFIX: 'npt/test',
+        AWS_SECRETS_MANAGER_PREFIX: 'mead/test',
       }),
     );
     expect(factory.create()).toBeInstanceOf(AwsSecretsManagerSecretStore);

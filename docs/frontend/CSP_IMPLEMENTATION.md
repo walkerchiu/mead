@@ -1,6 +1,6 @@
 # Content Security Policy (CSP) 實作指南
 
-本文檔說明 NPT 專案的 CSP (Content Security Policy) 實作細節。
+本文檔說明 MEAD 專案的 CSP (Content Security Policy) 實作細節。
 
 ---
 
@@ -10,7 +10,7 @@
   - [目錄](#目錄)
   - [概述](#概述)
     - [為什麼需要 CSP？](#為什麼需要-csp)
-    - [NPT 專案的 CSP 策略](#npt-專案的-csp-策略)
+    - [MEAD 專案的 CSP 策略](#mead-專案的-csp-策略)
   - [CSP 架構](#csp-架構)
   - [Nonce-based 策略](#nonce-based-策略)
     - [什麼是 Nonce?](#什麼是-nonce)
@@ -62,7 +62,7 @@
 - ✅ **點擊劫持防護**: 防止網站被嵌入惡意 iframe
 - ✅ **合規要求**: 許多安全認證要求實作 CSP
 
-### NPT 專案的 CSP 策略
+### MEAD 專案的 CSP 策略
 
 我們使用 **nonce-based CSP**，這是目前最安全且最靈活的 CSP 策略：
 

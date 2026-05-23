@@ -50,7 +50,7 @@ Offset-based 分頁實作，適合管理系統和需要跳頁功能的列表查�
 
 ## 概述
 
-NPT 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多數業務場景。
+MEAD 專案採用 **Offset-based Pagination**（偏移式分頁），適合大多數業務場景。
 
 ### 為什麼選擇 Offset-based？
 

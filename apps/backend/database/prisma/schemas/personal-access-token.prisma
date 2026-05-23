@@ -14,7 +14,7 @@ model PersonalAccessToken {
   /// Token 的 SHA-256 雜湊值（不可逆）
   tokenHash   String    @unique @map("token_hash") @db.Text
 
-  /// Token 前綴（供列表識別，如「npt_a1b2c3d」）
+  /// Token 前綴（供列表識別，如「mead_a1b2c3d」）
   tokenPrefix String    @map("token_prefix") @db.VarChar(12)
 
   /// 授權範圍（依 ALLOWED_SCOPES 白名單而定）

@@ -22,7 +22,7 @@
 個人存取權杖（PAT）讓用戶在不需要瀏覽器登入的情況下，透過 API 存取系統資源。
 
 - **PersonalAccessTokenService** — 權杖管理：建立、列表、撤銷、驗證
-- **PatAuthGuard** — 認證中間層：從 `Authorization: Bearer npt_xxx` 提取並驗證 PAT
+- **PatAuthGuard** — 認證中間層：從 `Authorization: Bearer mead_xxx` 提取並驗證 PAT
 - **PAT 通知** — 建立/撤銷 Token 時自動發送系統通知與 Email
 
 **核心特點：**
@@ -40,7 +40,7 @@
 | ---------------------- | ------------------------------------------------ |
 | **個人存取權杖 (PAT)** | 長效 API Token，用於外部工具存取系統             |
 | **Scope**              | 權杖的授權範圍。模板未預設值，業務專案需自行定義 |
-| **Token Prefix**       | `npt_` 前綴，用於區分 PAT 和 JWT Token           |
+| **Token Prefix**       | `mead_` 前綴，用於區分 PAT 和 JWT Token          |
 
 ---
 
@@ -49,24 +49,24 @@
 ### Token 格式
 
 ```text
-npt_<32 字元隨機 hex>
+mead_<32 字元隨機 hex>
 ```
 
 - 總長度：37 字元
-- 範例：`npt_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`
-- 前綴 `npt_` 用於 Guard 快速辨識是否為 PAT
+- 範例：`mead_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4`
+- 前綴 `mead_` 用於 Guard 快速辨識是否為 PAT
 
 ### 儲存策略
 
-| 項目            | 說明                                    |
-| --------------- | --------------------------------------- |
-| **tokenHash**   | SHA-256 hash（不可逆），存入資料庫      |
-| **tokenPrefix** | 前 12 字元（`npt_a1b2c3d`），供列表識別 |
-| **明文 Token**  | 僅在建立時回傳一次，之後無法再查看      |
+| 項目            | 說明                                     |
+| --------------- | ---------------------------------------- |
+| **tokenHash**   | SHA-256 hash（不可逆），存入資料庫       |
+| **tokenPrefix** | 前 12 字元（`mead_a1b2c3d`），供列表識別 |
+| **明文 Token**  | 僅在建立時回傳一次，之後無法再查看       |
 
 ```typescript
 // Token 產生
-const rawToken = 'npt_' + crypto.randomBytes(16).toString('hex');
+const rawToken = 'mead_' + crypto.randomBytes(16).toString('hex');
 const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
 const tokenPrefix = rawToken.substring(0, 12);
 ```
@@ -123,18 +123,18 @@ const ALLOWED_SCOPES: readonly string[] = [
 
 ### PAT 認證 vs JWT 認證
 
-| 特性     | JWT (一般登入)      | PAT (個人存取權杖)            |
-| -------- | ------------------- | ----------------------------- |
-| 來源     | 登入後產生          | 用戶於設定頁主動建立          |
-| 有效期   | 短（access ~15min） | 長（30/90/180 天）            |
-| 撤銷     | Token 失效機制      | 軟刪除（`revokedAt`）         |
-| Scope    | 完整角色權限        | 僅限白名單內的 scope          |
-| 識別方式 | 標準 JWT            | `Authorization: Bearer npt_*` |
+| 特性     | JWT (一般登入)      | PAT (個人存取權杖)             |
+| -------- | ------------------- | ------------------------------ |
+| 來源     | 登入後產生          | 用戶於設定頁主動建立           |
+| 有效期   | 短（access ~15min） | 長（30/90/180 天）             |
+| 撤銷     | Token 失效機制      | 軟刪除（`revokedAt`）          |
+| Scope    | 完整角色權限        | 僅限白名單內的 scope           |
+| 識別方式 | 標準 JWT            | `Authorization: Bearer mead_*` |
 
 ### PatAuthGuard 流程
 
 1. 從 `Authorization: Bearer <token>` 抓出 token
-2. 檢查前綴 `npt_` 與長度 37 字元
+2. 檢查前綴 `mead_` 與長度 37 字元
 3. SHA-256 雜湊後查 DB（`tokenHash`）
 4. 驗證 `revokedAt is null` 與 `expiresAt > now`
 5. 將 `userId` 與 `scopes` 寫入 request context

@@ -60,7 +60,7 @@
 
 ## 概述
 
-NPT 前端採用 **Atomic Design** 設計系統，使用 **Material-UI 7** 作為基礎 UI 框架，並透過 **Storybook** 進行組件開發和文檔管理。
+MEAD 前端採用 **Atomic Design** 設計系統，使用 **Material-UI 7** 作為基礎 UI 框架，並透過 **Storybook** 進行組件開發和文檔管理。
 
 ### 技術棧
 

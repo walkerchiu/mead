@@ -1,6 +1,6 @@
 # 疑難排解指南
 
-本文件彙整 NPT 開發與使用上常見的問題與排查步驟。
+本文件彙整 MEAD 開發與使用上常見的問題與排查步驟。
 
 ---
 
@@ -75,7 +75,7 @@ pnpm install
 
 ```bash
 ./scripts/cli.sh doctor           # 找出中斷原因
-tail -100 /tmp/npt-init-*.log    # 查看 init log（若有）
+tail -100 /tmp/mead-init-*.log    # 查看 init log（若有）
 ```
 
 常見原因：
@@ -105,13 +105,13 @@ tail -100 /tmp/npt-init-*.log    # 查看 init log（若有）
 
 ```bash
 # 1. 確認 container 運行
-docker ps | grep npt-timescaledb
+docker ps | grep mead-timescaledb
 
 # 2. 檢查密碼一致性
 grep POSTGRES_PASSWORD .env.docker apps/backend/.env
 
 # 3. 測試連線
-docker exec -it npt-timescaledb psql -U postgres -d npt_db -c "SELECT 1;"
+docker exec -it mead-timescaledb psql -U postgres -d mead_db -c "SELECT 1;"
 
 # 4. 重啟
 ./scripts/cli.sh restart timescaledb
@@ -151,7 +151,7 @@ pnpm db:migrate                   # 執行 pending migrations
 若仍有問題：
 
 ```bash
-pnpm --filter @npt/backend exec prisma migrate reset   # ⚠️ 會清空資料 + 自動跑 seed
+pnpm --filter @mead/backend exec prisma migrate reset   # ⚠️ 會清空資料 + 自動跑 seed
 ```
 
 ### Migration 衝突
@@ -160,7 +160,7 @@ pnpm --filter @npt/backend exec prisma migrate reset   # ⚠️ 會清空資料 
 
 ```bash
 # 1. Drop shadow database
-docker exec npt-timescaledb psql -U postgres -c "DROP DATABASE IF EXISTS npt_shadow;"
+docker exec mead-timescaledb psql -U postgres -c "DROP DATABASE IF EXISTS mead_shadow;"
 
 # 2. 重新執行
 pnpm db:migrate
@@ -181,7 +181,7 @@ seed 後的預設帳號密碼：所有帳號統一 `Password123!`
 ```bash
 ./scripts/cli.sh db reset        # 互動式重置（會確認）
 # 或：
-pnpm --filter @npt/backend exec prisma migrate reset   # 會清空 + 自動跑 seed
+pnpm --filter @mead/backend exec prisma migrate reset   # 會清空 + 自動跑 seed
 ```
 
 ---
@@ -213,11 +213,11 @@ grep -E "JWT_|REFRESH_" apps/backend/.env
 
 ```bash
 # 查看是否鎖定
-docker exec npt-timescaledb psql -U postgres -d npt_db -c \
+docker exec mead-timescaledb psql -U postgres -d mead_db -c \
   "SELECT email, locked_until FROM users WHERE email='...';"
 
 # 解鎖（開發環境）
-docker exec npt-timescaledb psql -U postgres -d npt_db -c \
+docker exec mead-timescaledb psql -U postgres -d mead_db -c \
   "UPDATE users SET locked_until=NULL, failed_login_count=0 WHERE email='...';"
 ```
 
@@ -226,13 +226,13 @@ docker exec npt-timescaledb psql -U postgres -d npt_db -c \
 檢查系統時間是否準確（Docker 容器時間與主機時間不一致會導致 JWT 驗證失敗）：
 
 ```bash
-docker exec npt-timescaledb date
+docker exec mead-timescaledb date
 date
 ```
 
 ### PAT（Personal Access Token）401
 
-1. 確認 token 格式是 `npt_` 開頭、共 37 字元
+1. 確認 token 格式是 `mead_` 開頭、共 37 字元
 2. 確認未過期、未撤銷（到 `/settings/tokens` 查看）
 3. 確認 scope 涵蓋所需 API（scope 由各專案於 `personal-access-token.service.ts` 中的 `ALLOWED_SCOPES` 定義）
 
@@ -270,7 +270,7 @@ pnpm db:generate
 
 ### Sidebar 狀態沒持久化
 
-已知行為：用 `localStorage` 儲存於 `npt.sidebarState`，清除瀏覽器資料會重置為預設（桌面展開、行動關閉）。
+已知行為：用 `localStorage` 儲存於 `mead.sidebarState`，清除瀏覽器資料會重置為預設（桌面展開、行動關閉）。
 
 ### Dark mode 切換後部分元件沒跟上
 
@@ -292,7 +292,7 @@ pnpm db:generate
 
 ```bash
 # 查看完整錯誤
-pnpm --filter @npt/backend dev 2>&1 | head -50
+pnpm --filter @mead/backend dev 2>&1 | head -50
 ```
 
 常見原因：
@@ -316,7 +316,7 @@ grep "GRAPHQL_PLAYGROUND\|NODE_ENV" apps/backend/.env
 # 查看 Cron 監控
 # 前端：/hq/cron-jobs
 # 或 log：
-docker logs npt-backend | grep -i cron
+docker logs mead-backend | grep -i cron
 ```
 
 詳見 [Cron Jobs 系統](../backend/CRON_JOBS.md)。
@@ -366,7 +366,7 @@ open http://localhost:8025        # 預設 port
 grep "administration" apps/frontend/messages/zh-TW.json
 
 # 2. 重新生成類型
-pnpm --filter @npt/frontend generate-i18n-types
+pnpm --filter @mead/frontend generate-i18n-types
 
 # 3. 前端重啟
 ./scripts/cli.sh restart frontend
@@ -409,7 +409,7 @@ pnpm test:e2e:debug      # 逐步除錯
 **症狀**：`Missing translation key: xxx`
 
 ```bash
-pnpm --filter @npt/backend test src/i18n/i18n-completeness.spec.ts
+pnpm --filter @mead/backend test src/i18n/i18n-completeness.spec.ts
 ```
 
 修復：比對 `en/` 和 `zh-TW/` 目錄下的所有 JSON，補齊缺失的 key。

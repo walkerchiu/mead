@@ -136,7 +136,7 @@ importers:
       '@nestjs/throttler':
         specifier: ^6.5.0
         version: 6.5.0(@nestjs/common@11.1.19(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@11.1.19)(reflect-metadata@0.2.2)
-      '@npt/typescript-config':
+      '@mead/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
       '@prisma/client':
@@ -3845,7 +3845,7 @@ packages:
     os: [linux]
 
   '@rollup/rollup-linux-ppc64-musl@4.60.3':
-    resolution: {integrity: sha512-E0L8X1dZN1/Rph+5VPF6Xj2G7JJvMACVXtamTJIDrVI44Y3K+G8gQaMEAavbqCGTa16InptiVrX6eM6pmJ+7qA==}
+    resolution: {integrity: sha512-E0L8X1dZN1/Rph+5VPF6Xj2G7JJvMACVXtamTJIDrVI44Y3K+G8gQaMEAavbqCGTa16ImeadiVrX6eM6pmJ+7qA==}
     cpu: [ppc64]
     os: [linux]
 

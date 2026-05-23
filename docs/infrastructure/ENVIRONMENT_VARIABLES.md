@@ -1,6 +1,6 @@
 # 環境變數配置指南
 
-本指南說明如何正確配置 NPT 專案的環境變數。
+本指南說明如何正確配置 MEAD 專案的環境變數。
 
 ---
 
@@ -67,7 +67,7 @@
 
 ## 概述
 
-NPT 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
+MEAD 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 應用和 Frontend 應用的配置。本指南將協助你正確設置和管理這些環境變數，確保開發和生產環境的安全性與一致性。
 
 **核心概念**：
 
@@ -80,10 +80,10 @@ NPT 專案使用三層環境變數架構，分別管理 Docker 服務、Backend 
 
 ## 專案結構
 
-NPT 專案有三個層級的環境變數：
+MEAD 專案有三個層級的環境變數：
 
 ```text
-npt/
+mead/
 ├── .env.docker              # Docker 服務（PostgreSQL, RabbitMQ, Redis）
 ├── .env.docker.example      # Docker 範本 ✅
 ├── apps/
@@ -164,7 +164,7 @@ pnpm dev
 | `POSTGRES_PASSWORD`     | PostgreSQL 密碼 | `dev_postgres_2024` | ✅   |
 | `RABBITMQ_DEFAULT_PASS` | RabbitMQ 密碼   | `dev_rabbitmq_2024` | ✅   |
 | `POSTGRES_USER`         | PostgreSQL 用戶 | `postgres`          | ❌   |
-| `POSTGRES_DB`           | 資料庫名稱      | `npt_db`            | ❌   |
+| `POSTGRES_DB`           | 資料庫名稱      | `mead_db`           | ❌   |
 
 ### Backend (.env)
 
@@ -202,13 +202,13 @@ postgresql://user:password@host:5432/database?schema=public&connection_limit=10&
 
 ```bash
 # 開發環境
-DATABASE_URL="postgresql://postgres:password@localhost:5432/npt_db?schema=public&connection_limit=10&pool_timeout=10"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/mead_db?schema=public&connection_limit=10&pool_timeout=10"
 
 # UAT 環境
-DATABASE_URL="postgresql://npt_uat:password@uat-db:5432/npt_db_uat?schema=public&sslmode=require&connection_limit=10&pool_timeout=10"
+DATABASE_URL="postgresql://mead_uat:password@uat-db:5432/mead_db_uat?schema=public&sslmode=require&connection_limit=10&pool_timeout=10"
 
 # 生產環境
-DATABASE_URL="postgresql://npt_prod:password@prod-db:5432/npt_db_prod?schema=public&sslmode=require&connection_limit=20&pool_timeout=10"
+DATABASE_URL="postgresql://mead_prod:password@prod-db:5432/mead_db_prod?schema=public&sslmode=require&connection_limit=20&pool_timeout=10"
 ```
 
 > **提示**：`connection_limit` 應根據應用程式規模和資料庫負載調整。過高會消耗資料庫資源，過低會導致連線等待。
@@ -241,7 +241,7 @@ DATABASE_URL="postgresql://npt_prod:password@prod-db:5432/npt_db_prod?schema=pub
 | `MAIL_USER`           | SMTP 用戶名稱        | `your-email@ethereal.email`    | SMTP  |
 | `MAIL_PASSWORD`       | SMTP 密碼            | `your-password`                | SMTP  |
 | `MAIL_FROM`           | 寄件者郵箱           | `noreply@localhost`            | ✅    |
-| `MAIL_FROM_NAME`      | 寄件者名稱           | `NPT (Local)`                  | ❌    |
+| `MAIL_FROM_NAME`      | 寄件者名稱           | `MEAD (Local)`                 | ❌    |
 | `MAIL_SECURE`         | 啟用 TLS/SSL         | `false` (開發) / `true` (生產) | ❌    |
 | `GRAPH_TENANT_ID`     | Azure AD 租用戶 ID   | `40d12886-...`                 | Graph |
 | `GRAPH_CLIENT_ID`     | Azure AD 應用程式 ID | `ceb51399-...`                 | Graph |
@@ -327,7 +327,7 @@ Frontend 使用 Next.js 框架,所有環境變數都使用 `NEXT_PUBLIC_` 前綴
 
 | 變數                   | 說明             | 範例                    | 必填 |
 | ---------------------- | ---------------- | ----------------------- | ---- |
-| `NEXT_PUBLIC_APP_NAME` | 應用程式顯示名稱 | `NPT` / `NPT (Dev)`     | ❌   |
+| `NEXT_PUBLIC_APP_NAME` | 應用程式顯示名稱 | `MEAD` / `MEAD (Dev)`   | ❌   |
 | `NEXT_PUBLIC_APP_URL`  | 應用程式基礎 URL | `http://localhost:3000` | ❌   |
 
 #### 功能開關
@@ -400,7 +400,7 @@ NEXT_PUBLIC_APOLLO_MAX_RETRIES=100  # 太高,自動調整為 10
 POSTGRES_PASSWORD=dev_postgres_2024
 
 # apps/backend/.env
-DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/npt_db"
+DATABASE_URL="postgresql://postgres:dev_postgres_2024@localhost:5432/mead_db"
                                     ^^^^^^^^^^^^^^^^^^
 ```
 
@@ -443,7 +443,7 @@ NEXT_PUBLIC_APOLLO_TIMEOUT=30000
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=3
 NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
 NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=10000
-NEXT_PUBLIC_APP_NAME=NPT (Local)
+NEXT_PUBLIC_APP_NAME=MEAD (Local)
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_ENABLE_2FA=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=false
@@ -487,7 +487,7 @@ NEXT_PUBLIC_APOLLO_TIMEOUT=60000           # 生產環境使用較長超時
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=5           # 更多重試次數
 NEXT_PUBLIC_APOLLO_RETRY_INITIAL_DELAY=300
 NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=15000   # 允許更長延遲
-NEXT_PUBLIC_APP_NAME=NPT
+NEXT_PUBLIC_APP_NAME=MEAD
 NEXT_PUBLIC_APP_URL=https://yourapp.com
 NEXT_PUBLIC_ENABLE_2FA=true
 NEXT_PUBLIC_ENABLE_ANALYTICS=true          # 生產必須啟用

@@ -80,7 +80,7 @@ function assertSslMode(mode: string): void {
 function ensureCaPath(env: NodeJS.ProcessEnv): string | null {
   const inline = env.DATABASE_SSL_CA;
   if (inline && inline.trim().length > 0) {
-    const dir = join(tmpdir(), 'npt-ca');
+    const dir = join(tmpdir(), 'mead-ca');
     mkdirSync(dir, { recursive: true });
     const path = join(dir, 'database-ssl-ca.pem');
     writeFileSync(path, inline, { mode: 0o600 });

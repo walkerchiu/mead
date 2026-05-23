@@ -104,7 +104,7 @@ interface DashboardLayoutProps {
 ```tsx
 // 基本用法
 <DashboardLayout
-  title="NPT Dashboard"
+  title="MEAD Dashboard"
   logo={<Logo />}
   user={user}
   sidebarItems={menuItems}
@@ -117,7 +117,7 @@ interface DashboardLayoutProps {
 
 // 完整功能
 <DashboardLayout
-  title="NPT Dashboard"
+  title="MEAD Dashboard"
   logo={<Logo />}
   user={user}
   sidebarItems={menuItems}
@@ -216,7 +216,7 @@ interface MainAppBarProps {
 // Dashboard 範例（基於 Storybook 設計）
 <MainAppBar
   logo={<Box sx={{ fontSize: '1.75rem', fontWeight: 'bold', color: 'white' }}>📊</Box>}
-  title="NPT Dashboard"
+  title="MEAD Dashboard"
   titleLink="/dashboard"
   user={user}
   unreadNotificationCount={3}

@@ -13,10 +13,10 @@
     - [技術棧](#技術棧)
   - [目錄結構](#目錄結構)
   - [應用程式 (Apps)](#應用程式-apps)
-    - [Frontend (@npt/frontend)](#frontend-nptfrontend)
-    - [Backend (@npt/backend)](#backend-nptbackend)
+    - [Frontend (@mead/frontend)](#frontend-meadfrontend)
+    - [Backend (@mead/backend)](#backend-meadbackend)
   - [共用套件 (Packages)](#共用套件-packages)
-    - [@npt/typescript-config](#npttypescript-config)
+    - [@mead/typescript-config](#meadtypescript-config)
     - [@repo/eslint-config](#repoeslint-config)
   - [工作區配置](#工作區配置)
     - [pnpm-workspace.yaml](#pnpm-workspaceyaml)
@@ -43,7 +43,7 @@
 
 ## 概述
 
-NPT 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo** 管理多個應用程式和共用套件。
+MEAD 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo** 管理多個應用程式和共用套件。
 
 ### 為什麼選擇 Monorepo？
 
@@ -69,12 +69,12 @@ NPT 專案採用 **Monorepo** 架構，使用 **pnpm workspace** 和 **Turborepo
 ## 目錄結構
 
 ```text
-npt/
+mead/
 ├── apps/                          # 應用程式目錄
 │   ├── frontend/                  # Next.js 前端應用
 │   │   ├── src/
 │   │   ├── public/
-│   │   ├── package.json           # @npt/frontend
+│   │   ├── package.json           # @mead/frontend
 │   │   └── next.config.ts
 │   │
 │   └── backend/                   # NestJS 後端應用
@@ -85,7 +85,7 @@ npt/
 │       │   │   ├── migrations/
 │       │   │   └── seeds/
 │       │   └── seed.ts
-│       ├── package.json           # @npt/backend
+│       ├── package.json           # @mead/backend
 │       └── nest-cli.json
 │
 ├── packages/                      # 共用套件目錄
@@ -94,7 +94,7 @@ npt/
 │   │   ├── nextjs.json
 │   │   ├── nestjs.json
 │   │   ├── react-library.json
-│   │   └── package.json           # @npt/typescript-config
+│   │   └── package.json           # @mead/typescript-config
 │   │
 │   └── eslint-config/             # ESLint 配置
 │       ├── library.js
@@ -102,7 +102,7 @@ npt/
 │       └── package.json           # @repo/eslint-config
 │
 ├── scripts/                       # 開發者腳本
-│   ├── cli.sh                    # NPT CLI 主腳本
+│   ├── cli.sh                    # MEAD CLI 主腳本
 │   └── commands/                  # 各種命令
 │
 ├── docs/                          # 專案文檔
@@ -116,7 +116,7 @@ npt/
 
 ## 應用程式 (Apps)
 
-### Frontend (@npt/frontend)
+### Frontend (@mead/frontend)
 
 **技術棧**:
 
@@ -158,7 +158,7 @@ pnpm build      # 建置生產版本
 pnpm storybook  # 啟動 Storybook（http://localhost:6006）
 ```
 
-### Backend (@npt/backend)
+### Backend (@mead/backend)
 
 **技術棧**:
 
@@ -216,9 +216,9 @@ pnpm test       # 執行測試
 
 ## 共用套件 (Packages)
 
-NPT 專案只保留真正需要跨應用共用的配置套件。
+MEAD 專案只保留真正需要跨應用共用的配置套件。
 
-### @npt/typescript-config
+### @mead/typescript-config
 
 **用途**: 統一的 TypeScript 配置
 
@@ -234,7 +234,7 @@ NPT 專案只保留真正需要跨應用共用的配置套件。
 ```json
 // apps/frontend/tsconfig.json
 {
-  "extends": "@npt/typescript-config/nextjs.json",
+  "extends": "@mead/typescript-config/nextjs.json",
   "compilerOptions": {
     "baseUrl": "./src"
   }
@@ -269,12 +269,12 @@ packages:
 ### 套件依賴關係
 
 ```typescript
-@npt/frontend
-└── @npt/typescript-config (workspace:*)
+@mead/frontend
+└── @mead/typescript-config (workspace:*)
 
-@npt/backend
+@mead/backend
 ├── @prisma/client (npm package)
-└── @npt/typescript-config (workspace:*)
+└── @mead/typescript-config (workspace:*)
 ```
 
 **說明**:
@@ -332,13 +332,13 @@ pnpm 會自動處理所有 workspace 套件的連結。
 ### 2. 啟動開發環境
 
 ```bash
-# 使用 NPT CLI（推薦）
+# 使用 MEAD CLI（推薦）
 ./scripts/cli.sh dev
 
 # 或手動啟動
 pnpm dev          # 啟動所有應用
-pnpm dev --filter=@npt/frontend  # 只啟動前端
-pnpm dev --filter=@npt/backend   # 只啟動後端
+pnpm dev --filter=@mead/frontend  # 只啟動前端
+pnpm dev --filter=@mead/backend   # 只啟動後端
 ```
 
 ### 3. 建置專案
@@ -348,7 +348,7 @@ pnpm dev --filter=@npt/backend   # 只啟動後端
 pnpm build
 
 # 建置特定應用
-pnpm build --filter=@npt/frontend
+pnpm build --filter=@mead/frontend
 ```
 
 Turborepo 會自動處理依賴順序，並快取建置結果。
@@ -360,7 +360,7 @@ Turborepo 會自動處理依賴順序，並快取建置結果。
 pnpm test
 
 # 執行特定應用的測試
-pnpm test --filter=@npt/backend
+pnpm test --filter=@mead/backend
 ```
 
 ### 5. 型別檢查
@@ -370,7 +370,7 @@ pnpm test --filter=@npt/backend
 pnpm type-check
 
 # 檢查特定專案
-pnpm type-check --filter=@npt/frontend
+pnpm type-check --filter=@mead/frontend
 ```
 
 ### 6. Lint 檢查
@@ -396,7 +396,7 @@ pnpm lint --fix
 ```json
 {
   "dependencies": {
-    "@npt/typescript-config": "workspace:*"
+    "@mead/typescript-config": "workspace:*"
   }
 }
 ```
@@ -454,7 +454,7 @@ git commit -m "feat: add user profile feature"
 }
 
 // ✅ 正確：在 root package.json 安裝共用依賴
-// 或建立 @npt/shared 套件
+// 或建立 @mead/shared 套件
 ```
 
 **2. 不要直接引用其他應用的程式碼**
@@ -490,7 +490,7 @@ pnpm init
 
 # 2. 更新 package.json
 {
-  "name": "@npt/my-app",
+  "name": "@mead/my-app",
   "version": "1.0.0"
 }
 
@@ -507,12 +507,12 @@ pnpm init
 
 # 2. 設定為 workspace 套件
 {
-  "name": "@npt/my-package",
+  "name": "@mead/my-package",
   "version": "1.0.0"
 }
 
 # 3. 在其他專案引用
-pnpm add @npt/my-package --filter=@npt/frontend
+pnpm add @mead/my-package --filter=@mead/frontend
 ```
 
 ### Q3: 為什麼有些依賴要放在 root？

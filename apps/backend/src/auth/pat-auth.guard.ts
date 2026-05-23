@@ -12,7 +12,7 @@ import { logger } from '../common/services/logger.service';
 
 /**
  * PAT Auth Guard
- * 從 Authorization header 提取 npt_ 前綴的 Token，驗證後注入 req.user
+ * 從 Authorization header 提取 mead_ 前綴的 Token，驗證後注入 req.user
  * 與 JWT Guard 互斥：先由 PermissionGuard 判斷該走哪條路徑
  */
 @Injectable()
@@ -46,7 +46,7 @@ export class PatAuthGuard implements CanActivate {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    if (!token.startsWith('npt_')) {
+    if (!token.startsWith('mead_')) {
       throw new UnauthorizedException('Invalid token format');
     }
 

@@ -87,7 +87,7 @@
 
 ### 這份文件的用途
 
-這份文件是 **NPT 專案的組件設計規範**，幫助你：
+這份文件是 **MEAD 專案的組件設計規範**，幫助你：
 
 - ✅ 了解專案已有哪些組件
 - ✅ 知道設計新組件時需要提供什麼
@@ -1648,7 +1648,7 @@ Badge（徽章）顯示：
 #### 推薦的 Page 結構（含說明）
 
 ```text
-📁 NPT Design System
+📁 MEAD Design System
 │
 ├── 📄 🏠 Cover（封面頁）
 │   說明：專案介紹、團隊成員、版本資訊、導航索引
@@ -2310,7 +2310,7 @@ Button States Frame:
 
 ```text
 格式：[專案名稱] - [類型] - [版本]
-範例：NPT - Design System - v1.0
+範例：MEAD - Design System - v1.0
 ```
 
 **Page 命名**：

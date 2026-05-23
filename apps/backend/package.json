@@ -1,5 +1,5 @@
 {
-  "name": "@npt/backend",
+  "name": "@mead/backend",
   "version": "0.1.0",
   "author": {
     "name": "Walker Chiu",
@@ -60,7 +60,7 @@
     "@nestjs/schedule": "^6.1.3",
     "@nestjs/terminus": "^11.1.1",
     "@nestjs/throttler": "^6.5.0",
-    "@npt/typescript-config": "workspace:*",
+    "@mead/typescript-config": "workspace:*",
     "@prisma/client": "6.19.2",
     "acme-client": "^5.4.0",
     "amqp-connection-manager": "^5.0.0",

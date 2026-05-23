@@ -50,7 +50,7 @@
 
 ## 概述
 
-NPT 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
+MEAD 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替代品，提供更高的效能和更低的記憶體使用。
 
 ### 技術棧
 
@@ -102,7 +102,7 @@ NPT 專案使用 **Dragonfly** 作為快取系統，它是 Redis 的現代化替
 services:
   dragonfly:
     image: docker.dragonflydb.io/dragonflydb/dragonfly:v1.14.5
-    container_name: npt-dragonfly
+    container_name: mead-dragonfly
     ports:
       - '6379:6379'
     volumes:
@@ -116,14 +116,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - npt-network
+      - mead-network
 
 volumes:
   dragonfly-data:
     driver: local
 
 networks:
-  npt-network:
+  mead-network:
     driver: bridge
 ```
 

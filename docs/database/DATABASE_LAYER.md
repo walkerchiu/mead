@@ -381,7 +381,7 @@ generator client {
 
 ### 快速備份/還原
 
-使用 NPT CLI 進行資料庫備份與還原：
+使用 MEAD CLI 進行資料庫備份與還原：
 
 ```bash
 # 備份資料庫
@@ -406,11 +406,11 @@ generator client {
 ```text
 backups/
 ├── development/
-│   └── npt_db_development_YYYYMMDD_HHMMSS.sql.gz
+│   └── mead_db_development_YYYYMMDD_HHMMSS.sql.gz
 ├── uat/
-│   └── npt_db_uat_YYYYMMDD_HHMMSS.sql.gz
+│   └── mead_db_uat_YYYYMMDD_HHMMSS.sql.gz
 └── production/
-    └── npt_db_production_YYYYMMDD_HHMMSS.sql.gz
+    └── mead_db_production_YYYYMMDD_HHMMSS.sql.gz
 ```
 
 ### 環境差異

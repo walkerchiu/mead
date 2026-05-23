@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { resolveDatabaseUrl } from './database-url';
 
 const BASE_URL =
-  'postgresql://user:pass@localhost:5432/npt_db?schema=public&connection_limit=10&pool_timeout=10';
+  'postgresql://user:pass@localhost:5432/mead_db?schema=public&connection_limit=10&pool_timeout=10';
 
 function env(
   extra: Record<string, string | undefined> = {},
@@ -15,7 +15,7 @@ function env(
 function writeTempCa(pem: string): string {
   const p = path.join(
     os.tmpdir(),
-    `npt-ca-test-${process.hrtime.bigint()}.pem`,
+    `mead-ca-test-${process.hrtime.bigint()}.pem`,
   );
   fs.writeFileSync(p, pem);
   return p;
@@ -37,10 +37,10 @@ describe('resolveDatabaseUrl', () => {
     it('讀取 DATABASE_APPLICATION_NAME', () => {
       const out = new URL(
         resolveDatabaseUrl(
-          env({ DATABASE_APPLICATION_NAME: 'npt-backend-uat' }),
+          env({ DATABASE_APPLICATION_NAME: 'mead-backend-uat' }),
         ),
       );
-      expect(out.searchParams.get('application_name')).toBe('npt-backend-uat');
+      expect(out.searchParams.get('application_name')).toBe('mead-backend-uat');
     });
   });
 
@@ -153,7 +153,7 @@ describe('resolveDatabaseUrl', () => {
         resolveDatabaseUrl(
           env({
             DATABASE_SSL_MODE: 'require',
-            DATABASE_APPLICATION_NAME: 'npt-backend',
+            DATABASE_APPLICATION_NAME: 'mead-backend',
           }),
         ),
       );
@@ -161,7 +161,7 @@ describe('resolveDatabaseUrl', () => {
       expect(out.searchParams.get('connection_limit')).toBe('10');
       expect(out.searchParams.get('pool_timeout')).toBe('10');
       expect(out.searchParams.get('sslmode')).toBe('require');
-      expect(out.searchParams.get('application_name')).toBe('npt-backend');
+      expect(out.searchParams.get('application_name')).toBe('mead-backend');
     });
 
     it('URL 已含 sslmode → 被 env DATABASE_SSL_MODE 覆寫', () => {

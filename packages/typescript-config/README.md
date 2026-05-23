@@ -1,4 +1,4 @@
-# @npt/typescript-config
+# @mead/typescript-config
 
 共享 TypeScript 編譯器設定預設檔。
 
@@ -17,6 +17,6 @@
 
 ```json
 {
-  "extends": "@npt/typescript-config/nextjs.json"
+  "extends": "@mead/typescript-config/nextjs.json"
 }
 ```

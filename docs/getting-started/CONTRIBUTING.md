@@ -1,6 +1,6 @@
 # 貢獻指南
 
-歡迎為 NPT（New Project Template）貢獻！本文件說明開發流程、提交規範與程式碼審查標準。
+歡迎為 MEAD（New Project Template）貢獻！本文件說明開發流程、提交規範與程式碼審查標準。
 
 ---
 

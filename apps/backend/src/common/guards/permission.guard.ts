@@ -55,7 +55,7 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
   }
 
   /**
-   * 檢查 Authorization header 是否為 PAT Token（npt_ 前綴）
+   * 檢查 Authorization header 是否為 PAT Token（mead_ 前綴）
    */
   private isPatRequest(context: ExecutionContext): boolean {
     try {
@@ -67,14 +67,14 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
         !httpRequest.url.includes('/graphql')
       ) {
         const authHeader = httpRequest.headers?.authorization;
-        return !!authHeader && authHeader.includes('npt_');
+        return !!authHeader && authHeader.includes('mead_');
       }
 
       // GraphQL 請求
       const ctx = GqlExecutionContext.create(context);
       const req = ctx.getContext().req;
       const authHeader = req?.headers?.authorization;
-      return !!authHeader && authHeader.includes('npt_');
+      return !!authHeader && authHeader.includes('mead_');
     } catch {
       return false;
     }

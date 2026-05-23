@@ -4,7 +4,7 @@ import * as path from 'node:path';
 import { FileSecretStore } from './file-secret-store';
 
 function makeTempDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), 'npt-tls-'));
+  return fs.mkdtempSync(path.join(os.tmpdir(), 'mead-tls-'));
 }
 
 describe('FileSecretStore', () => {

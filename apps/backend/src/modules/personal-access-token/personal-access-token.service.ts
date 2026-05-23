@@ -22,7 +22,7 @@ const ALLOWED_EXPIRE_DAYS = [30, 90, 180] as const;
 const MAX_ACTIVE_TOKENS_PER_USER = 3;
 
 /** Token 前綴 */
-const TOKEN_PREFIX = 'npt_';
+const TOKEN_PREFIX = 'mead_';
 
 @Injectable()
 export class PersonalAccessTokenService {
@@ -43,7 +43,7 @@ export class PersonalAccessTokenService {
 
   /**
    * 產生隨機 Token
-   * 格式：npt_<32 字元 hex>
+   * 格式：mead_<32 字元 hex>
    */
   private generateRawToken(): string {
     const random = crypto.randomBytes(16).toString('hex');

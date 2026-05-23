@@ -1,4 +1,4 @@
-# NPT API - NestJS 後端
+# MEAD API - NestJS 後端
 
 NestJS 11 GraphQL API，具備完整認證授權、RBAC、2FA、審計日誌、訊息佇列與快取。
 
@@ -6,7 +6,7 @@ NestJS 11 GraphQL API，具備完整認證授權、RBAC、2FA、審計日誌、�
 
 - **NestJS**: 11.1.12
 - **GraphQL**: 16.12.0 (Apollo Server 5.3.0)
-- **Prisma**: 6.1.0（透過 `@npt/database`）
+- **Prisma**: 6.1.0（透過 `@mead/database`）
 - **TypeScript**: 5.9.3
 - **nestjs-i18n**: 多語系（en、zh-TW）
 - **測試**: Jest 30
@@ -102,7 +102,7 @@ apps/backend/
 ```env
 PORT=4000
 NODE_ENV=development
-DATABASE_URL="postgresql://postgres:password@localhost:5432/npt_db?schema=public"
+DATABASE_URL="postgresql://postgres:password@localhost:5432/mead_db?schema=public"
 ```
 
 ## 存取
