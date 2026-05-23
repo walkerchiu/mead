@@ -1,4 +1,9 @@
 {
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "learnMore": "Learn more",
+    "externalLinkAriaLabel": "{label} (opens in new tab)"
+  },
   "common": {
     "none": "None",
     "loading": "Loading...",
@@ -245,12 +250,12 @@
   },
   "pages": {
     "home": {
-      "title": "NPT",
+      "title": "MEAD",
       "subtitle": "New Project Template",
       "goToDashboard": "Go to Dashboard"
     },
     "dashboard": {
-      "title": "NPT Dashboard",
+      "title": "MEAD Dashboard",
       "welcome": "Welcome Back!",
       "description": "You have successfully signed in.",
       "securitySettings": "Security Settings",
@@ -1198,7 +1203,7 @@
     "helpModal": {
       "title": "Help Center",
       "quickStart": "Quick Start",
-      "quickStartDescription": "Welcome to NPT project! Follow these steps to get started:",
+      "quickStartDescription": "Welcome to MEAD project! Follow these steps to get started:",
       "faq": "Frequently Asked Questions",
       "commonFeatures": "Common Features",
       "needMoreHelp": "Need More Help?",
@@ -1207,20 +1212,53 @@
       "documentation": "Documentation"
     },
     "aboutModal": {
-      "title": "About NPT",
-      "projectName": "NPT Project",
+      "title": "About MEAD",
+      "projectName": "MEAD Project",
       "version": "Version",
       "buildDate": "Build Date",
       "projectDescription": "Project Description",
-      "description1": "NPT is a modern full-stack application framework focused on providing secure, scalable, and maintainable enterprise solutions.",
+      "description1": "MEAD is a modern full-stack application framework focused on providing secure, scalable, and maintainable enterprise solutions.",
       "description2": "This project adopts a Monorepo architecture, integrating frontend, backend, and database layers to provide a complete development experience.",
       "mainFeatures": "Main Features",
       "techStack": "Technology Stack",
       "license": "License",
       "licenseText": "This project is released under the MIT License.",
-      "copyright": "Copyright © 2024 NPT Project Contributors",
+      "copyright": "Copyright © 2024 MEAD Project Contributors",
       "contact": "Contact",
       "author": "Project Author"
+    }
+  },
+  "portal": {
+    "eyebrow": "MOE Three Major Arts & Design Programs",
+    "heading": "Opening more possibilities for Taiwan's arts and design",
+    "learnMore": "Learn more",
+    "loading": "Loading program data…",
+    "error": "Failed to load program data. Please try again later.",
+    "retry": "Retry",
+    "footer": {
+      "siteName": "MOE Arts & Design Program Portal",
+      "tagline": "The portal for the Ministry of Education arts and design talent programs,\ndedicated to advancing arts and design education in Taiwan.",
+      "copyright": "Copyright {year} . All Rights Reserved."
+    },
+    "detail": {
+      "back": "Back to home",
+      "intro": "About the program",
+      "objective": "Program objectives",
+      "execution": "Execution items",
+      "stats": "Program impact",
+      "organizers": "Organizers",
+      "timeline": "Timeline",
+      "gallery": "Gallery",
+      "social": "Social",
+      "decorative": "Keywords",
+      "notFound": "Program not found",
+      "loading": "Loading program data…"
+    },
+    "narrative": {
+      "lead": "In 2003 the government issued the “Challenge 2008: National Development Plan” white paper, defining ten national priority programs in response to the new global competitive model of globalization and digitalization. The “Cultural and Creative Industries Development Plan” was one of its sub-programs, with the Ministry of Education tasked with cultivating talent.",
+      "statement": "Strengthening cross-disciplinary cultural and creative talent development to advance the creative industries as a whole.",
+      "trail": "Yet the development of the creative industries calls for an international outlook, drawing on collaborative training with leading institutions and companies abroad. In 2005 the Ministry of Education launched the “Overseas Training Program for Arts and Design Elites,” which has continued through five cohorts to date.",
+      "trail2": "The program also emphasizes communication networks for industry-academia collaboration, aiming to make its results more evident. Beyond developing and promoting industry-academia teaching resources, it seeks to foster long-term partnerships between schools and industry, strengthening cross-disciplinary cultural and creative talent development to advance the creative industries as a whole."
     }
   }
 }

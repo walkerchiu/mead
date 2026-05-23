@@ -1,0 +1,519 @@
+{
+  "version": "2026-05-15",
+  "plans": [
+    {
+      "id": "sposad",
+      "slug": "sposad",
+      "folderName": "01_sposad",
+      "name": {
+        "zh": "教育部 藝術與設計菁英海外培訓計畫",
+        "en": "Scholarship Program for Overseas Study in Arts & Design (SPOSAD)"
+      },
+      "slogan": {
+        "zh": "值得你期待的設計公費留學品牌",
+        "en": null
+      },
+      "intro": "本計畫每年選送優秀學子赴海外頂尖設計校院或知名機構，進行為期一年的進修與實習，並提供全額學費及生活費補助。目前設有「數位動畫組」、「視覺傳達設計組」、「產品設計組」、「建築與景觀設計組」、「時尚設計組」五大培訓領域。透過接軌國際的學術與實務訓練，深化學生的專業能力並拓展國際視野，進而強化國家設計產業核心競爭力，以期打造產業菁英人才的搖籃。",
+      "officialUrl": "https://www.animlab.yuntech.edu.tw/sposad/",
+      "organizers": [
+        "國立雲林科技大學 計畫總辦公室",
+        "國立成功大學 工業設計系",
+        "國立成功大學 建築學系"
+      ],
+      "stats": [
+        {
+          "value": "20+",
+          "unit": "年計畫辦理",
+          "description": "持續推動人才培育"
+        },
+        {
+          "value": "37",
+          "unit": "名學生/年",
+          "description": "透過全國甄選"
+        },
+        {
+          "value": "5",
+          "unit": "組別",
+          "description": "數位動畫、視覺傳達設計、產品設計、建築與景觀設計、時尚設計"
+        },
+        {
+          "value": "160萬",
+          "unit": "每人補助",
+          "description": "全方位支持海外培訓"
+        },
+        {
+          "value": "445",
+          "unit": "累計出國學子",
+          "description": "將臺灣設計力帶向國際"
+        },
+        {
+          "value": "48",
+          "unit": "累積合作機構",
+          "description": "全球頂尖設計學府或實習機構"
+        },
+        {
+          "value": "13",
+          "unit": "累積合作國家",
+          "description": "建立全球培訓機制"
+        }
+      ],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/banner/banner_01.jpg",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/1i8k_ddwnuVxWbfsImlDTaTtymFif40tm/view?usp=drive_link"
+        }
+      ],
+      "socialLinks": [
+        {
+          "platform": "官網",
+          "url": "https://www.animlab.yuntech.edu.tw/sposad/"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/MOESPOSAD"
+        },
+        {
+          "platform": "Linktree",
+          "url": "https://linktr.ee/moesposad?utm_source=linktree_profile_share&ltsid=a2103359-5714-4598-8ea2-dc084b1984bc"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_04.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_05.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_06.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_07.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_08.jpg",
+          "url": null
+        },
+        {
+          "type": "remote_folder",
+          "src": null,
+          "url": "https://drive.google.com/drive/folders/1yxCF9s8T8raykSR1Xm-_tbQ5-RPHqkfy?usp=drive_link"
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "數位動畫",
+          "en": "Digital Animation"
+        },
+        {
+          "zh": "視覺傳達設計",
+          "en": "Visual Communication Design"
+        },
+        {
+          "zh": "產品設計",
+          "en": "Product Design"
+        },
+        {
+          "zh": "建築與景觀設計",
+          "en": "Architecture and Landscape Design"
+        },
+        {
+          "zh": "時尚設計",
+          "en": "Fashion Design"
+        },
+        {
+          "zh": "美國",
+          "en": "United States"
+        },
+        {
+          "zh": "加拿大",
+          "en": "Canada"
+        },
+        {
+          "zh": "英國",
+          "en": "United Kingdom"
+        },
+        {
+          "zh": "法國",
+          "en": "France"
+        },
+        {
+          "zh": "德國",
+          "en": "Germany"
+        },
+        {
+          "zh": "荷蘭",
+          "en": "Netherlands"
+        },
+        {
+          "zh": "丹麥",
+          "en": "Denmark"
+        },
+        {
+          "zh": "義大利",
+          "en": "Italy"
+        },
+        {
+          "zh": "日本",
+          "en": "Japan"
+        },
+        {
+          "zh": "韓國",
+          "en": "South Korea"
+        },
+        {
+          "zh": "馬來西亞",
+          "en": "Malaysia"
+        },
+        {
+          "zh": "澳洲",
+          "en": "Australia"
+        },
+        {
+          "zh": "紐西蘭",
+          "en": "New Zealand"
+        }
+      ]
+    },
+    {
+      "id": "tisdc",
+      "slug": "tisdc",
+      "folderName": "02_tisdc",
+      "name": {
+        "zh": "臺灣國際學生創意設計大賽",
+        "en": "Taiwan International Student Design Competition (TISDC)"
+      },
+      "slogan": {
+        "zh": "讓世界透過設計看見臺灣",
+        "en": "Allowing the world to see Taiwan through design"
+      },
+      "intro": "臺灣國際學生創意設計大賽（TISDC）已成為全球學生設計獎項的指標平台，匯聚來自世界各地的設計新秀，透過競賽激發創意交流，讓設計的力量與無限可能被世界看見。TISDC 持續以「設計公益平台」為核心，關注如何以設計回應時代議題、推動社會價值，並在跨文化對話與國際合作中培養具國際視野的設計人才。",
+      "officialUrl": "https://www.tisdc.org/",
+      "organizers": [
+        "臺灣國際學生創意設計大賽執行小組",
+        "國立臺灣科技大學建築系"
+      ],
+      "stats": [
+        {
+          "value": "19",
+          "unit": "計畫推動年數",
+          "description": "國際學生創意設計大賽推動年數"
+        },
+        {
+          "value": "135",
+          "unit": "參賽國家數",
+          "description": "歷年曾參加 TISDC 的國家總數"
+        },
+        {
+          "value": "219947",
+          "unit": "全球參賽總件數",
+          "description": "歷年總參賽件數"
+        },
+        {
+          "value": "400萬",
+          "unit": "總獎金",
+          "description": "國際學生創意設計大賽總獎金高達新台幣 400 萬元"
+        }
+      ],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/banner/banner_01.png",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/11RWuxpmV1EolE2sWSY2kbHkLnV6NQjCV/view?usp=sharing"
+        }
+      ],
+      "socialLinks": [
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/tisdc.tw?igsh=MWpsODBnd3k5MmNvbg%3D%3D&utm_source=qr"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100009332293905"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/12uNqo-lv_5qGyxZXi_424nhdB09dSiac/view?usp=drive_link"
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/16nDCQcgkP2lKuuKE6ofM2gXvQG_JrVTK/view?usp=drive_link"
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/1xLflOVMiyakLhHcFxHgI4yr3Zo1c_e7H/view?usp=drive_link"
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "出入",
+          "en": "IN OUT"
+        },
+        {
+          "zh": "復甦",
+          "en": "RESTORE"
+        },
+        {
+          "zh": "根",
+          "en": "FUNDAMENTAL"
+        },
+        {
+          "zh": "之後",
+          "en": "NEXT"
+        },
+        {
+          "zh": "轉化",
+          "en": "TRANSFORM"
+        },
+        {
+          "zh": "聽．見",
+          "en": "SIGHT & SOUNDS"
+        },
+        {
+          "zh": "生生",
+          "en": "CIRCLE OF LIFE"
+        },
+        {
+          "zh": "擁抱",
+          "en": "EMBRACE"
+        },
+        {
+          "zh": null,
+          "en": "OPEN"
+        },
+        {
+          "zh": null,
+          "en": "OPPORTUNITY"
+        },
+        {
+          "zh": null,
+          "en": "BREAKTHROUGH & INNOVATION"
+        },
+        {
+          "zh": null,
+          "en": "EMPATHY"
+        },
+        {
+          "zh": null,
+          "en": "ACTION"
+        },
+        {
+          "zh": null,
+          "en": "REGENERATE"
+        },
+        {
+          "zh": null,
+          "en": "ONE WORLD"
+        },
+        {
+          "zh": "惻隱之心",
+          "en": "COMPASSION"
+        },
+        {
+          "zh": "平等",
+          "en": "EQUALITY"
+        },
+        {
+          "zh": "多樣性",
+          "en": "DIVERSITY"
+        },
+        {
+          "zh": "韌性",
+          "en": "RESILIENCE"
+        }
+      ]
+    },
+    {
+      "id": "idc",
+      "slug": "idc",
+      "folderName": "03_idc",
+      "name": {
+        "zh": "教育部鼓勵學生參加藝術與設計類國際競賽計畫",
+        "en": null
+      },
+      "slogan": {
+        "zh": null,
+        "en": null
+      },
+      "intro": "政府自 2003 年開始推動「文化創意產業」政策，其中教育部負責「藝術與設計人才培育計劃」，為此設有「鼓勵學生參加藝術與設計類國際競賽計畫」。此專案計畫為落實我國「大學校院藝術與設計領域人才培育」之目標，加強藝術與設計領域人才培育國際化，規劃國內藝術與設計教育與國際競賽接軌，擬訂獎勵辦法鼓勵全國藝術與設計科系學生積極參與國際競賽，並且透過國際參賽之經驗與觀摩學習，擴展國際視野、提昇專業素質。",
+      "officialUrl": "https://www.moe-idc.org/",
+      "objective": "為落實我國「大學校院藝術與設計領域人才培育」之目標，加強藝術與設計領域人才培育國際化，提昇國內藝術與設計教育與國際比賽接軌之能力，促使全國大學校院藝術與設計科系學生能踴躍參加國際比賽，藉由參與競賽作品之準備，提升學生藝術與設計創作的水準，並且透過參賽作品之觀摩學習，擴展學生國際視野以提昇專業的人力素質。",
+      "executionItems": [
+        "蒐集國際設計競賽資料與整理國際設計競賽辦法。",
+        "辦理「鼓勵學生參加藝術與設計類國際競賽獎勵要點」之獎勵金審查與頒獎典禮暨成果發表記者會。",
+        "舉辦獲獎學生作品海外成果展覽，促進國際交流。",
+        "舉辦國際設計研討會暨工作坊－「來自亞洲的設計力量」系列活動。",
+        "舉辦設計傳承推廣計畫－「設計深耕X生根設計」系列活動，提供設計知識、分享參加國際競賽經驗談及心得交流。",
+        "編輯出版國際競賽獲獎作品之專輯一冊。",
+        "統整歷屆獲獎人資料與建置獲獎作品資料庫。"
+      ],
+      "executionNote": "本專案計畫由教育部主辦，亞洲大學數位媒體設計學系執行。",
+      "organizers": ["亞洲大學 數位媒體設計學系"],
+      "stats": [
+        {
+          "value": "20+",
+          "unit": "年計畫推動",
+          "description": "持續深耕藝術設計教育"
+        },
+        {
+          "value": "60+",
+          "unit": "所學校參與",
+          "description": "全國大專校院"
+        },
+        {
+          "value": "2K+",
+          "unit": "件國際獲獎作品",
+          "description": "國際獲獎作品"
+        },
+        {
+          "value": "95M+",
+          "unit": "元核發獎勵金",
+          "description": "核發獎勵金數"
+        }
+      ],
+      "banners": [],
+      "socialLinks": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/idcmoe"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCcJn_eRHn2B9a43PkzhJk9w?view_as=subscriber"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/idc.org.tw/?hl=zh-tw"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_04.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_05.jpg",
+          "url": null
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "臺灣設計X國際發光",
+          "en": "Taiwan Design X International Spotlighting"
+        },
+        {
+          "zh": "設計力量",
+          "en": "Design Power"
+        },
+        {
+          "zh": "設計深耕X生根設計",
+          "en": "Design Plows Deep X Design Takes Root"
+        },
+        {
+          "zh": "國際設計競賽",
+          "en": "International Design Competition"
+        },
+        {
+          "zh": "來自亞洲的設計力量",
+          "en": "The Power of Asian Design"
+        },
+        {
+          "zh": "國際設計研討會",
+          "en": "International Design Seminar"
+        },
+        {
+          "zh": "國際設計工作坊",
+          "en": "International Design Workshop"
+        },
+        {
+          "zh": "國際交流",
+          "en": "International Exchange"
+        },
+        {
+          "zh": "藝術與設計人才培育",
+          "en": "Art and Design Talent Development"
+        },
+        {
+          "zh": "鼓勵學生",
+          "en": "Encouraging Students"
+        },
+        {
+          "zh": "從校園到世界舞台",
+          "en": "From Campus to the Global Stage"
+        }
+      ]
+    }
+  ]
+}

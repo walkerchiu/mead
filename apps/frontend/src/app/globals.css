@@ -78,3 +78,39 @@ nextjs-portal > div {
   right: auto !important;
   transform: translateX(-50%) !important;
 }
+
+/* ----- 無障礙：跳至主要內容（skip link）----- */
+/* 預設視覺隱藏；獲得鍵盤焦點時顯示於頁面左上方 */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10000;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #001239;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 0.15s ease;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid #ffcc00;
+  outline-offset: 2px;
+}
+
+/* 視覺隱藏但仍由螢幕報讀器讀出 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

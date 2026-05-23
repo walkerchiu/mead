@@ -1,4 +1,9 @@
 {
+  "a11y": {
+    "skipToContent": "跳至主要內容",
+    "learnMore": "了解更多",
+    "externalLinkAriaLabel": "{label}（在新分頁開啟）"
+  },
   "common": {
     "none": "無",
     "loading": "載入中...",
@@ -245,12 +250,12 @@
   },
   "pages": {
     "home": {
-      "title": "NPT",
+      "title": "MEAD",
       "subtitle": "New Project Template",
       "goToDashboard": "前往 Dashboard"
     },
     "dashboard": {
-      "title": "NPT Dashboard",
+      "title": "MEAD Dashboard",
       "welcome": "歡迎回來！",
       "description": "您已成功登入系統。",
       "securitySettings": "安全設定",
@@ -1198,7 +1203,7 @@
     "helpModal": {
       "title": "幫助中心",
       "quickStart": "快速開始",
-      "quickStartDescription": "歡迎使用 NPT 專案！按照以下步驟快速上手：",
+      "quickStartDescription": "歡迎使用 MEAD 專案！按照以下步驟快速上手：",
       "faq": "常見問題",
       "commonFeatures": "常用功能",
       "needMoreHelp": "需要更多幫助？",
@@ -1207,20 +1212,53 @@
       "documentation": "文檔"
     },
     "aboutModal": {
-      "title": "關於 NPT",
-      "projectName": "NPT 專案",
+      "title": "關於 MEAD",
+      "projectName": "MEAD 專案",
       "version": "版本",
       "buildDate": "建置日期",
       "projectDescription": "專案簡介",
-      "description1": "NPT 是一個現代化的全端應用程式框架，專注於提供安全、可擴展且易於維護的企業級解決方案。",
+      "description1": "MEAD 是一個現代化的全端應用程式框架，專注於提供安全、可擴展且易於維護的企業級解決方案。",
       "description2": "本專案採用 Monorepo 架構，整合了前端、後端和資料庫層，提供完整的開發體驗。",
       "mainFeatures": "主要功能",
       "techStack": "技術堆疊",
       "license": "授權資訊",
       "licenseText": "本專案採用 MIT 授權條款發布。",
-      "copyright": "Copyright © 2024 NPT Project Contributors",
+      "copyright": "Copyright © 2024 MEAD Project Contributors",
       "contact": "聯絡資訊",
       "author": "專案作者"
+    }
+  },
+  "portal": {
+    "eyebrow": "教育部藝術設計三大計畫",
+    "heading": "為台灣藝術設計開啟更多可能",
+    "learnMore": "了解更多",
+    "loading": "計畫資料載入中…",
+    "error": "計畫資料載入失敗，請稍後再試。",
+    "retry": "重新載入",
+    "footer": {
+      "siteName": "教育部藝術設計計畫資訊網",
+      "tagline": "教育部藝術與設計人才培育計畫入口網\n致力於推動台灣藝術設計教育發展",
+      "copyright": "Copyright {year} . All Rights Reserved."
+    },
+    "detail": {
+      "back": "返回首頁",
+      "intro": "計畫介紹",
+      "objective": "計畫目的",
+      "execution": "具體執行項目",
+      "stats": "計畫數據成果",
+      "organizers": "執行單位",
+      "timeline": "計畫時程",
+      "gallery": "精彩照片",
+      "social": "社群連結",
+      "decorative": "關鍵字",
+      "notFound": "找不到指定的計畫",
+      "loading": "計畫資料載入中…"
+    },
+    "narrative": {
+      "lead": "我國政府於2003年頒佈「挑戰2008：國家發展重點計畫」白皮書，因應當前全球化、數位化之國際新競爭模式訂定國家十大重點計畫，其中「文化創意產業發展計畫」為子計畫之一，並由教育部專責推動人才培訓。",
+      "statement": "加強跨領域文化創意產業人才培育，帶動文創產業整體的發展與水準的提升。",
+      "trail": "惟文創產業發展應具國際視野薰陶，並借重國外一流校院或公司合作培訓，教育部於2005年啟動「藝術與設計菁英海外培訓計畫」，持續推動至今共5組規模。",
+      "trail2": "本計畫亦著重於產學合作的溝通網絡，期望使計畫之成效更為彰顯。除了發展並推廣產學合作教學資源之外，也希冀促成學校與產業界長期合作關係，加強跨領域文化創意產業人才培育，帶動文創產業整體的發展與水準的提升。"
     }
   }
 }

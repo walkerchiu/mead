@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { Noto_Sans_TC, Roboto, Roboto_Mono } from 'next/font/google';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { GlobalLoadingProgress } from '@/components/atoms/GlobalLoadingProgress';
 import { ClientErrorBoundary } from '@/components/errors';
 import { headers } from 'next/headers';
@@ -39,8 +40,20 @@ export default async function RootLayout({
   const headersList = await headers();
   const nonce = headersList.get('x-nonce') || undefined;
 
+  // 依當前語系設定 <html lang>（無障礙必要屬性 / 政府網站規範）
+  let locale = 'zh-TW';
+  let skipToContent = '跳至主要內容';
+  try {
+    locale = await getLocale();
+    const t = await getTranslations('a11y');
+    skipToContent = t('skipToContent');
+  } catch {
+    /* fallback outside locale routes — 使用 zh-TW 預設字串 */
+  }
+
   return (
     <html
+      lang={locale}
       className={`${roboto.variable} ${notoSansTc.variable} ${robotoMono.variable}`}
     >
       <head>
@@ -79,6 +92,10 @@ export default async function RootLayout({
         />
       </head>
       <body>
+        {/* 跳至主要內容 — 鍵盤使用者的無障礙快捷（focus 時才顯示） */}
+        <a href="#main-content" className="skip-link">
+          {skipToContent}
+        </a>
         {/*
           全站路由 progress bar 由 @bprogress/next 的 ProgressProvider 處理
           （掛在 [locale]/providers.tsx）— bprogress 在 anchor click 的 capture
