@@ -4,7 +4,7 @@ import { Paper } from '@mui/material';
 import { graphql, HttpResponse, delay } from 'msw';
 
 const meta = {
-  title: 'Organisms/TwoFactorSettings',
+  title: 'HQ Scope/Organisms/TwoFactorSettings',
   component: TwoFactorSettings,
   parameters: {
     layout: 'centered',

@@ -331,7 +331,7 @@ const ColorPalette = () => {
 };
 
 const meta = {
-  title: 'Design System/Colors',
+  title: 'HQ Scope/Design System/Colors',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

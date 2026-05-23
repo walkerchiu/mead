@@ -88,7 +88,7 @@ const mockPageInfo: PageInfo = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/SessionTable',
+  title: 'HQ Scope/Organisms/Sessions/Table',
   component: SessionTable,
   parameters: {
     layout: 'fullscreen',

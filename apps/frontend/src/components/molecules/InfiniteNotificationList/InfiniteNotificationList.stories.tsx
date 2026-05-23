@@ -4,7 +4,7 @@ import { NotificationType, UnifiedNotification } from '@/types/notification';
 import { useState } from 'react';
 
 const meta = {
-  title: 'Molecules/InfiniteNotificationList',
+  title: 'HQ Scope/Molecules/InfiniteNotificationList',
   component: InfiniteNotificationList,
   parameters: {
     layout: 'padded',

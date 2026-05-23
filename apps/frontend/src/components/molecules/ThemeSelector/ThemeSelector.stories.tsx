@@ -11,7 +11,7 @@ import { ThemeMode } from '@/components/atoms/ThemeToggleButton';
  * Provides Light, Dark, and System theme switching functionality.
  */
 const meta = {
-  title: 'Molecules/ThemeSelector',
+  title: 'HQ Scope/Molecules/ThemeSelector',
   component: ThemeSelector,
   parameters: {
     layout: 'padded',

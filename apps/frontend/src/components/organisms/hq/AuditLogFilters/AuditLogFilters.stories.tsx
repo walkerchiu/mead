@@ -42,7 +42,7 @@ import { Box, Typography, Paper } from '@mui/material';
  * - Show active filters as chips
  */
 const meta = {
-  title: 'Organisms/HQ/AuditLogFilters',
+  title: 'HQ Scope/Organisms/Audit Logs/Filters',
   component: AuditLogFilters,
   parameters: {
     layout: 'padded',

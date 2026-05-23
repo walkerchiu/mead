@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { FiltersSkeleton } from './FiltersSkeleton';
 
 const meta = {
-  title: 'Atoms/Skeleton/FiltersSkeleton',
+  title: 'HQ Scope/Atoms/Skeleton/FiltersSkeleton',
   component: FiltersSkeleton,
   parameters: {
     layout: 'centered',

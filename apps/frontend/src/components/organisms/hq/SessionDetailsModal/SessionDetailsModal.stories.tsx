@@ -24,7 +24,7 @@ const mockSession: Session = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/SessionDetailsModal',
+  title: 'HQ Scope/Organisms/Sessions/DetailsModal',
   component: SessionDetailsModal,
   parameters: {
     layout: 'centered',

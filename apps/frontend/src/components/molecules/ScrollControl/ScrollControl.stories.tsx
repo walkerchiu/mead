@@ -3,7 +3,7 @@ import { ScrollControl } from './ScrollControl';
 import { Box, Typography } from '@mui/material';
 
 const meta = {
-  title: 'Molecules/ScrollControl',
+  title: 'HQ Scope/Molecules/ScrollControl',
   component: ScrollControl,
   parameters: {
     layout: 'fullscreen',

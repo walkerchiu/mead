@@ -21,7 +21,7 @@ import Box from '@mui/material/Box';
  * - Provide close button (for non-critical messages)
  */
 const meta = {
-  title: 'Molecules/AlertMessage',
+  title: 'HQ Scope/Molecules/AlertMessage',
   component: AlertMessage,
   parameters: {
     layout: 'centered',

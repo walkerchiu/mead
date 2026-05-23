@@ -28,7 +28,7 @@ import Typography from '@mui/material/Typography';
  * - Option menus with icons
  */
 const meta = {
-  title: 'Molecules/SelectField',
+  title: 'HQ Scope/Molecules/SelectField',
   component: SelectField,
   parameters: {
     layout: 'centered',
@@ -506,7 +506,7 @@ export const SearchableWithIcons: Story = {
       { value: 'snowy', label: 'Snowy', icon: <Icon>❄️</Icon> },
       { value: 'stormy', label: 'Stormy', icon: <Icon>⛈️</Icon> },
       { value: 'foggy', label: 'Foggy', icon: <Icon>🌫️</Icon> },
-      { value: 'npty', label: 'Windy', icon: <Icon>💨</Icon> },
+      { value: 'meady', label: 'Windy', icon: <Icon>💨</Icon> },
     ],
     searchable: true,
     placeholder: 'Search weather',

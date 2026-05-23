@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { ScrollButton } from './ScrollButton';
 
 const meta = {
-  title: 'Atoms/ScrollButton',
+  title: 'HQ Scope/Atoms/ScrollButton',
   component: ScrollButton,
   parameters: {
     layout: 'centered',

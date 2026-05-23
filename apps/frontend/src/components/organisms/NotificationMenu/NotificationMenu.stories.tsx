@@ -114,7 +114,7 @@ const mockNotifications: UnifiedNotification[] = [
  * - NotificationList molecule is reserved for full-page notification view
  */
 const meta = {
-  title: 'Organisms/NotificationMenu',
+  title: 'HQ Scope/Organisms/NotificationMenu',
   component: NotificationMenu,
   parameters: {
     layout: 'centered',

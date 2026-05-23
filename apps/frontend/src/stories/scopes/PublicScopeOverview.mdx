@@ -1,0 +1,39 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Public Scope/Overview" />
+
+# Public Scope
+
+公開、免登入的內容呈現層 — 內容網站的訪客端介面（首頁、內容列表、內容內頁等）。
+這是 MEAD 近期的主力開發 scope。
+
+## 定位
+
+- **對象**：未登入訪客、搜尋引擎爬蟲
+- **特性**：純展示、可被索引、不依賴後台與登入流程
+- **不包含**：身分驗證、權限控管、後台管理
+
+## 分層
+
+依 Atomic Design 組織：
+
+```
+Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages
+```
+
+## 現況
+
+首個專案為「教育部藝術設計三大計畫入口網」，元件位於
+`src/components/public/`，依 Atomic Design 分層：
+
+- **Atoms** — LearnMoreButton、SocialIconButton、CarouselDots
+- **Molecules** — PlanStatsBar、PlanTimeline、PlanLogo、SocialLinkBar
+- **Organisms** — DecorativeTextCloud、PlanCard、PlanCarousel、
+  PortalIntroSection、PortalNarrativeSection、PortalFooter
+- **Pages** — PortalLandingPage（首頁完整組裝）
+
+計畫資料來自 `public/data/plans.json`，設計 token 見 `public/tokens.ts`。
+
+新增元件時將 story 的 `title` 設為 `Public Scope/<層級>/<元件名>` 即自動歸類。
+
+> 跨 scope 共用的基礎元件請放在 **Shared**，不要重複放進 Public Scope。

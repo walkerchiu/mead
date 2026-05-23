@@ -22,7 +22,7 @@ import { ThemeMode } from '@/components/atoms/ThemeToggleButton';
  * Fully follows the Atomic Design architecture like the Notification system.
  */
 const meta = {
-  title: 'Organisms/SettingsMenu',
+  title: 'HQ Scope/Organisms/SettingsMenu',
   component: SettingsMenu,
   parameters: {
     layout: 'centered',

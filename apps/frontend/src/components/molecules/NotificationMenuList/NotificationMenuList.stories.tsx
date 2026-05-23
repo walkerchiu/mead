@@ -14,7 +14,7 @@ import { NotificationType } from '@/types/notification';
  * - Organism: NotificationMenu (uses NotificationMenuList + NotificationBadge + Header/Footer)
  */
 const meta = {
-  title: 'Molecules/NotificationMenuList',
+  title: 'HQ Scope/Molecules/NotificationMenuList',
   component: NotificationMenuList,
   parameters: {
     layout: 'centered',

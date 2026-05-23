@@ -31,7 +31,7 @@ import {
  * - Use with react-hook-form
  */
 const meta = {
-  title: 'Molecules/FormField',
+  title: 'HQ Scope/Molecules/FormField',
   component: FormField,
   parameters: {
     layout: 'centered',

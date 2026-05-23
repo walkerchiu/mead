@@ -4,7 +4,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import { IconButton } from './IconButton';
 
 const meta = {
-  title: 'Atoms/IconButton',
+  title: 'HQ Scope/Atoms/IconButton',
   component: IconButton,
   parameters: {
     layout: 'centered',

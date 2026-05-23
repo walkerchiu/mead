@@ -39,7 +39,7 @@ import { Box, Typography, Paper } from '@mui/material';
  * - Show active filters as chips
  */
 const meta = {
-  title: 'Organisms/HQ/SessionFilters',
+  title: 'HQ Scope/Organisms/Sessions/Filters',
   component: SessionFilters,
   parameters: {
     layout: 'padded',

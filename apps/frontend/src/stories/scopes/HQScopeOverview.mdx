@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="HQ Scope/Overview" />
+
+# HQ Scope
+
+後台管理（Headquarters）介面 — 供系統管理員使用的管理功能。
+目前 MEAD 模板現有的完整元件庫都歸在此 scope 下。
+
+## 定位
+
+- **對象**：HQ 管理員
+- **特性**：需登入、受 RBAC 權限控管
+- **包含**：基礎 UI 元件、認證流程、系統運維介面（稽核日誌、Cron Jobs、Session 管理）等
+
+## 分層
+
+依 Atomic Design 組織：
+
+```
+Design System → Atoms → Molecules → Organisms
+              → Layout → Templates → Pages
+```
+
+`Organisms` 下，系統運維類元件再依功能分子群：
+
+- **Organisms/Audit Logs** — 稽核日誌
+- **Organisms/Cron Jobs** — 排程任務監控
+- **Organisms/Sessions** — 會話管理
+
+其餘通用 Organisms（Modal、Drawer、Sidebar、各式選單、認證表單等）維持扁平。
+
+## 現況
+
+此 scope 涵蓋來自模板的全部元件。Public Scope 與 Customer Scope 的樣式預期與
+此處差異甚大，因此這批元件視為 HQ 專屬、不歸入 Shared。
+
+MEAD 近期聚焦於 Public Scope；HQ Scope 的元件先沿用模板現況、暫不擴充。

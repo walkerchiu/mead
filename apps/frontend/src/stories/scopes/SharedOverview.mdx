@@ -1,0 +1,24 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Shared/Overview" />
+
+# Shared
+
+跨 scope 共用的元件 — 真正不專屬於任何單一 scope 者才放這裡。
+
+## 現況
+
+**此 scope 目前為空。**
+
+模板原有的元件已全數移至 **HQ Scope**：Public Scope 與 Customer Scope 的樣式
+預期與 HQ 差異甚大，因此那批元件不算真正共用。
+
+## 何時放這裡
+
+當某個元件**確實**被兩個以上 scope 以相同樣式使用時，才提升到 Shared：
+
+- 一個元件被兩個以上 scope 共用、且樣式一致 → 放 **Shared**
+- 元件只服務單一 scope → 放對應的 `Public / HQ / Customer Scope`
+- 各 scope 樣式不同的同名元件 → 各 scope 下各自實作，不要硬塞 Shared
+
+> 在確定共用需求出現前，寧可先放在所屬 scope，日後再提升到 Shared。

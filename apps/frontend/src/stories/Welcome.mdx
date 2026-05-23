@@ -2,9 +2,9 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Introduction/Welcome" />
 
-# Welcome to NPT Storybook
+# Welcome to MEAD Storybook
 
-This is the NPT project's Storybook component library, built on **Atomic Design** principles.
+This is the MEAD project's Storybook component library, built on **Atomic Design** principles.
 
 ## 🎯 What is Atomic Design?
 
@@ -79,13 +79,21 @@ Examples:
 
 ### Browse Components
 
-In the left sidebar:
+The sidebar is organized into four top-level **scopes**, each with its own
+`Overview` page:
 
-1. **Atoms** - View basic components
-2. **Molecules** - View composite components
-3. **Organisms** - View functional modules
-4. **Templates** - View page templates
-5. **Pages** - View complete page flows
+1. **Public Scope** - Public, login-free content site (near-term focus, currently empty)
+2. **HQ Scope** - Back-office admin; holds the template's full component set today
+3. **Customer Scope** - Logged-in customer-facing screens (currently empty)
+4. **Shared** - Reserved for genuinely cross-scope components (currently empty)
+
+Inside every scope, components follow the same Atomic Design layering:
+**Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages**.
+
+Public Scope and Customer Scope are expected to differ substantially in style,
+so the existing template components are treated as HQ-specific rather than
+shared. Promote a component to **Shared** only once two or more scopes truly
+use it with the same styling.
 
 ### Test Components
 

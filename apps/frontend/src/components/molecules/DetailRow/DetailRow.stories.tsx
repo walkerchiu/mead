@@ -33,7 +33,7 @@ import { Box, Paper } from '@mui/material';
  * - Session information
  */
 const meta = {
-  title: 'Molecules/DetailRow',
+  title: 'HQ Scope/Molecules/DetailRow',
   component: DetailRow,
   parameters: {
     layout: 'padded',

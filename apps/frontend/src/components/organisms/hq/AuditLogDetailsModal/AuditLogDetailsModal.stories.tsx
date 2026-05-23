@@ -37,7 +37,7 @@ const mockAuditLogQueryResult = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/AuditLogDetailsModal',
+  title: 'HQ Scope/Organisms/Audit Logs/DetailsModal',
   component: AuditLogDetailsModal,
   parameters: {
     layout: 'centered',

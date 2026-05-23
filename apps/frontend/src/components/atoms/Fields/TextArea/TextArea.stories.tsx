@@ -18,7 +18,7 @@ import { TextArea } from './TextArea';
  * - Show specific error messages when validation fails
  */
 const meta = {
-  title: 'Atoms/Fields/TextArea',
+  title: 'HQ Scope/Atoms/Fields/TextArea',
   component: TextArea,
   parameters: {
     layout: 'centered',

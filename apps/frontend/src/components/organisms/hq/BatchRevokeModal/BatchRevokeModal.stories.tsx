@@ -6,7 +6,7 @@ import { MockedProvider } from '@apollo/client/testing/react';
 import { BatchRevokeModal } from './BatchRevokeModal';
 
 const meta = {
-  title: 'Organisms/HQ/BatchRevokeModal',
+  title: 'HQ Scope/Organisms/Sessions/BatchRevokeModal',
   component: BatchRevokeModal,
   parameters: {
     layout: 'centered',

@@ -8,7 +8,7 @@ const logAction = (actionName: string) => () => {
 };
 
 const meta = {
-  title: 'Atoms/NotificationItem',
+  title: 'HQ Scope/Atoms/NotificationItem',
   component: NotificationItem,
   parameters: {
     layout: 'centered',

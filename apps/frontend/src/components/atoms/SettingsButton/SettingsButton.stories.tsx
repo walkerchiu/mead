@@ -8,7 +8,7 @@ import { SettingsButton } from './SettingsButton';
  * Trigger button for settings menu, can display icon only or with text label.
  */
 const meta = {
-  title: 'Atoms/SettingsButton',
+  title: 'HQ Scope/Atoms/SettingsButton',
   component: SettingsButton,
   parameters: {
     layout: 'centered',

@@ -193,7 +193,7 @@ const SampleContent = () => (
  * - Applications requiring side navigation
  */
 const meta = {
-  title: 'Templates/DashboardLayout',
+  title: 'HQ Scope/Templates/DashboardLayout',
   component: DashboardLayout,
   parameters: {
     layout: 'fullscreen',
@@ -261,7 +261,7 @@ type Story = StoryObj<typeof meta>;
  */
 export const Default: Story = {
   args: {
-    title: 'NPT Dashboard',
+    title: 'MEAD Dashboard',
     logo: (
       <Box
         sx={{
@@ -301,7 +301,7 @@ export const Default: Story = {
  */
 export const FullFeatured: Story = {
   args: {
-    title: 'NPT Dashboard',
+    title: 'MEAD Dashboard',
     logo: (
       <Box
         sx={{
@@ -362,7 +362,7 @@ export const FullFeatured: Story = {
  */
 export const WithMiniSidebar: Story = {
   args: {
-    title: 'NPT Dashboard',
+    title: 'MEAD Dashboard',
     logo: (
       <Box
         sx={{
@@ -402,7 +402,7 @@ export const WithMiniSidebar: Story = {
  */
 export const WithClosedSidebar: Story = {
   args: {
-    title: 'NPT Dashboard',
+    title: 'MEAD Dashboard',
     logo: (
       <Box
         sx={{

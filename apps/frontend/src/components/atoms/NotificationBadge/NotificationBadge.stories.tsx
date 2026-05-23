@@ -24,7 +24,7 @@ const logAction =
  * - Any place that needs a notification indicator
  */
 const meta = {
-  title: 'Atoms/NotificationBadge',
+  title: 'HQ Scope/Atoms/NotificationBadge',
   component: NotificationBadge,
   parameters: {
     layout: 'centered',

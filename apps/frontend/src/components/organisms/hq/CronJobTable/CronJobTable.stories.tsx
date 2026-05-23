@@ -79,7 +79,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
 ];
 
 const meta = {
-  title: 'Organisms/HQ/CronJobTable',
+  title: 'HQ Scope/Organisms/Cron Jobs/Table',
   component: CronJobTable,
   parameters: {
     layout: 'fullscreen',

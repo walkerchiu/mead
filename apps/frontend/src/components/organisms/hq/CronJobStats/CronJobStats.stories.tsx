@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { CronJobStats } from './CronJobStats';
 
 const meta = {
-  title: 'Organisms/HQ/CronJobStats',
+  title: 'HQ Scope/Organisms/Cron Jobs/Stats',
   component: CronJobStats,
   parameters: {
     layout: 'padded',

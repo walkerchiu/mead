@@ -18,7 +18,7 @@ import { Button } from './Button';
  * - **text**: Less important actions (e.g., "Learn More")
  */
 const meta = {
-  title: 'Atoms/Button',
+  title: 'HQ Scope/Atoms/Button',
   component: Button,
   parameters: {
     layout: 'centered',

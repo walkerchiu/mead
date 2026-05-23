@@ -169,7 +169,7 @@ const MockedNotificationCenter = ({
 };
 
 const meta = {
-  title: 'Organisms/NotificationCenter',
+  title: 'HQ Scope/Organisms/NotificationCenter',
   component: NotificationCenter,
   parameters: {
     layout: 'centered',

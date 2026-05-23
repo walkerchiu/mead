@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Typography, Box } from '@mui/material';
 
 const meta = {
-  title: 'Molecules/Accordion',
+  title: 'HQ Scope/Molecules/Accordion',
   component: Accordion,
   parameters: {
     layout: 'centered',

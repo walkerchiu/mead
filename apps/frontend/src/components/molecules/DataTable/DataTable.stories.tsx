@@ -24,7 +24,7 @@ import Chip from '@mui/material/Chip';
  * - Complex data query interfaces
  */
 const meta = {
-  title: 'Molecules/DataTable',
+  title: 'HQ Scope/Molecules/DataTable',
   component: DataTable,
   parameters: {
     layout: 'padded',

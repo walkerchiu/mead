@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
  */
 
 const meta = {
-  title: 'Pages/LoginPage',
+  title: 'HQ Scope/Pages/LoginPage',
   parameters: {
     layout: 'fullscreen',
     docs: {

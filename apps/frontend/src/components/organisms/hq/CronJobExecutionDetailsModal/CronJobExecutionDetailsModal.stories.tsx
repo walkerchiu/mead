@@ -52,7 +52,7 @@ const runningExecution: CronJobExecution = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/CronJobExecutionDetailsModal',
+  title: 'HQ Scope/Organisms/Cron Jobs/ExecutionDetailsModal',
   component: CronJobExecutionDetailsModal,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import { Icon } from './Icon';
 import { Box, Typography } from '@mui/material';
 
 const meta = {
-  title: 'Atoms/Icon',
+  title: 'HQ Scope/Atoms/Icon',
   component: Icon,
   parameters: {
     layout: 'centered',

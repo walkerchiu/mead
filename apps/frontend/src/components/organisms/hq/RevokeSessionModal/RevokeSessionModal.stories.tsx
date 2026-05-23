@@ -6,7 +6,7 @@ import { MockedProvider } from '@apollo/client/testing/react';
 import { RevokeSessionModal } from './RevokeSessionModal';
 
 const meta = {
-  title: 'Organisms/HQ/RevokeSessionModal',
+  title: 'HQ Scope/Organisms/Sessions/RevokeSessionModal',
   component: RevokeSessionModal,
   parameters: {
     layout: 'centered',

@@ -70,7 +70,7 @@ const mockPageInfo: PageInfo = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/CronJobExecutionHistory',
+  title: 'HQ Scope/Organisms/Cron Jobs/ExecutionHistory',
   component: CronJobExecutionHistory,
   parameters: {
     layout: 'fullscreen',

@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'Organisms/ForgotPasswordForm',
+  title: 'HQ Scope/Organisms/ForgotPasswordForm',
   component: ForgotPasswordForm,
   parameters: {
     layout: 'centered',

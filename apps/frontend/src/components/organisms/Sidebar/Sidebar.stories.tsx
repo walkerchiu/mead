@@ -61,7 +61,7 @@ import { DrawerState } from '@/components/organisms';
  * - Multi-function panels
  */
 const meta = {
-  title: 'Organisms/Sidebar',
+  title: 'HQ Scope/Organisms/Sidebar',
   component: Sidebar,
   parameters: {
     layout: 'fullscreen',

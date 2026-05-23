@@ -76,7 +76,7 @@ const mockNotifications: UnifiedNotification[] = [
  * - Dashboard page header
  */
 const meta = {
-  title: 'Layout/MainAppBar',
+  title: 'HQ Scope/Layout/MainAppBar',
   component: MainAppBar,
   parameters: {
     layout: 'fullscreen',
@@ -917,7 +917,7 @@ export const SettingsPagePattern: Story = {
             📊
           </Box>
         }
-        title="NPT Dashboard"
+        title="MEAD Dashboard"
         titleLink="/dashboard"
         user={mockUser}
         unreadNotificationCount={2}
@@ -964,7 +964,7 @@ export const SettingsPagePattern: Story = {
         </Typography>
         <ul>
           <li>
-            <strong>AppBar</strong> - Displays site title "NPT Dashboard"
+            <strong>AppBar</strong> - Displays site title "MEAD Dashboard"
             (global navigation, consistent across all pages)
           </li>
           <li>

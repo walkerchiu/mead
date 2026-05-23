@@ -15,7 +15,7 @@ import { mockTokens } from '@/mocks/fixtures/users';
  */
 
 const meta = {
-  title: 'Pages/LoginPage (MSW)',
+  title: 'HQ Scope/Pages/LoginPage (MSW)',
   parameters: {
     layout: 'fullscreen',
     docs: {

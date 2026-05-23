@@ -79,7 +79,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
 ];
 
 const meta = {
-  title: 'Organisms/HQ/CronJobListFilters',
+  title: 'HQ Scope/Organisms/Cron Jobs/ListFilters',
   component: CronJobListFilters,
   parameters: {
     layout: 'padded',

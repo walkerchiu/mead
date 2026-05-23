@@ -9,7 +9,7 @@ import { Box, Typography } from '@mui/material';
  * Combines Avatar (Atom) and Badge (Atom).
  */
 const meta = {
-  title: 'Molecules/UserMenuHeader',
+  title: 'HQ Scope/Molecules/UserMenuHeader',
   component: UserMenuHeader,
   parameters: {
     layout: 'padded',

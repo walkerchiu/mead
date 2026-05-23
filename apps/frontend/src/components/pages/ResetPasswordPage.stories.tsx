@@ -5,7 +5,7 @@ import { ResetPasswordForm } from '@/components/organisms';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'Pages/ResetPasswordPage',
+  title: 'HQ Scope/Pages/ResetPasswordPage',
   parameters: {
     layout: 'fullscreen',
     docs: {

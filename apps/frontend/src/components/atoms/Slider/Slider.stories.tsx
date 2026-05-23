@@ -3,7 +3,7 @@ import { Slider } from './Slider';
 import { useState } from 'react';
 
 const meta = {
-  title: 'Atoms/Slider',
+  title: 'HQ Scope/Atoms/Slider',
   component: Slider,
   parameters: {
     layout: 'centered',

@@ -42,7 +42,7 @@ const defaultMock = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/SessionStats',
+  title: 'HQ Scope/Organisms/Sessions/Stats',
   component: SessionStats,
   parameters: {
     layout: 'padded',

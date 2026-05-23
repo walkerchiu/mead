@@ -122,7 +122,7 @@ const mockPageInfo: PageInfo = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/AuditLogTable',
+  title: 'HQ Scope/Organisms/Audit Logs/Table',
   component: AuditLogTable,
   parameters: {
     layout: 'fullscreen',

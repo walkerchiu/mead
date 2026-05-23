@@ -54,7 +54,7 @@ const failedDisabledConfig: CronJobConfig = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/CronJobConfigDetailsModal',
+  title: 'HQ Scope/Organisms/Cron Jobs/ConfigDetailsModal',
   component: CronJobConfigDetailsModal,
   parameters: {
     layout: 'centered',

@@ -5,7 +5,7 @@ import { fn } from 'storybook/test';
 import { CronJobTriggerDialog } from './CronJobTriggerDialog';
 
 const meta = {
-  title: 'Organisms/HQ/CronJobTriggerDialog',
+  title: 'HQ Scope/Organisms/Cron Jobs/TriggerDialog',
   component: CronJobTriggerDialog,
   parameters: {
     layout: 'centered',

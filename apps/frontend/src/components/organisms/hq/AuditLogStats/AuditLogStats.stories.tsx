@@ -46,7 +46,7 @@ const noDataMock = {
 };
 
 const meta = {
-  title: 'Organisms/HQ/AuditLogStats',
+  title: 'HQ Scope/Organisms/Audit Logs/Stats',
   component: AuditLogStats,
   parameters: {
     layout: 'padded',

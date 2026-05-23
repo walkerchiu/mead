@@ -53,37 +53,75 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        // method: 'alphabetical' — items inside each category are sorted A→Z.
-        // `order` only fixes the top-level category sequence. Children inside
-        // (Atoms / Molecules / Organisms / …) are auto-sorted by `method`,
-        // no manual maintenance needed.
+        // Four top-level scopes: Public Scope (near-term focus) / HQ Scope /
+        // Customer Scope / Shared (cross-scope components + auth flow).
+        // method: 'alphabetical' auto-sorts anything not listed in `order`;
+        // the nested arrays in `order` fix the manual sequence per level.
+        // Each scope shares the same Atomic Design layering:
+        //   Overview → Design System → Atoms → Molecules → Organisms
+        //            → Layout → Templates → Pages
         method: 'alphabetical',
         order: [
-          // 1. Introduction (explicit order, not alphabetical)
+          // 0. Introduction
           'Introduction',
           ['Welcome', 'Best Practices', 'Getting Started'],
 
-          // 2. Design System (explicit order, not alphabetical)
-          'Design System',
-          ['Colors', 'Typography'],
+          // 1. Public Scope (near-term focus — content site, no login/admin)
+          'Public Scope',
+          [
+            'Overview',
+            'Design System',
+            ['Colors', 'Typography'],
+            'Atoms',
+            'Molecules',
+            'Organisms',
+            'Layout',
+            'Templates',
+            'Pages',
+          ],
 
-          // 3. Atoms (auto-sorted A→Z internally)
-          'Atoms',
+          // 2. Customer Scope (customer-facing dashboard)
+          'Customer Scope',
+          [
+            'Overview',
+            'Design System',
+            ['Colors', 'Typography'],
+            'Atoms',
+            'Molecules',
+            'Organisms',
+            'Layout',
+            'Templates',
+            'Pages',
+          ],
 
-          // 4. Molecules (auto-sorted A→Z internally)
-          'Molecules',
+          // 3. HQ Scope (back-office admin)
+          'HQ Scope',
+          [
+            'Overview',
+            'Design System',
+            ['Colors', 'Typography'],
+            'Atoms',
+            'Molecules',
+            'Organisms',
+            ['Audit Logs', 'Cron Jobs', 'Sessions'],
+            'Layout',
+            'Templates',
+            'Pages',
+          ],
 
-          // 5. Organisms (auto-sorted A→Z internally)
-          'Organisms',
-
-          // 6. Layout
-          'Layout',
-
-          // 7. Templates
-          'Templates',
-
-          // 8. Pages
-          'Pages',
+          // 4. Shared (cross-scope components + auth flow)
+          'Shared',
+          [
+            'Overview',
+            'Design System',
+            ['Colors', 'Typography'],
+            'Atoms',
+            'Molecules',
+            'Organisms',
+            'Layout',
+            'Templates',
+            'Pages',
+          ],
         ],
         locales: 'en-US',
       },

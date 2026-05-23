@@ -26,7 +26,7 @@ import { useState } from 'react';
  * - Permission management
  */
 const meta = {
-  title: 'Molecules/CheckboxGroup',
+  title: 'HQ Scope/Molecules/CheckboxGroup',
   component: CheckboxGroup,
   parameters: {
     layout: 'centered',

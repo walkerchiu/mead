@@ -26,7 +26,7 @@ import ListItemText from '@mui/material/ListItemText';
  * - Contains special characters: +10 points
  */
 const meta = {
-  title: 'Molecules/PasswordField',
+  title: 'HQ Scope/Molecules/PasswordField',
   component: PasswordField,
   parameters: {
     layout: 'centered',

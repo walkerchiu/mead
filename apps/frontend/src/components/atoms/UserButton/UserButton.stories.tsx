@@ -8,7 +8,7 @@ import { UserButton } from './UserButton';
  * Trigger button for user menu, can display user avatar or icon, supports displaying name and online status.
  */
 const meta = {
-  title: 'Atoms/UserButton',
+  title: 'HQ Scope/Atoms/UserButton',
   component: UserButton,
   parameters: {
     layout: 'centered',

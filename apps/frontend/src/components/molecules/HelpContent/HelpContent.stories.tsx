@@ -3,7 +3,7 @@ import { HelpContent } from './HelpContent';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'Molecules/HelpContent',
+  title: 'HQ Scope/Molecules/HelpContent',
   component: HelpContent,
   parameters: {
     docs: {

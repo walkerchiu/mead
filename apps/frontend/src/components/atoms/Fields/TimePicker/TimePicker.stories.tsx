@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import { TimePicker } from './TimePicker';
 
 const meta = {
-  title: 'Atoms/Fields/TimePicker',
+  title: 'HQ Scope/Atoms/Fields/TimePicker',
   component: TimePicker,
   parameters: {
     layout: 'centered',
