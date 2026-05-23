@@ -1,0 +1,57 @@
+# 正式環境：app（前端 + 後端）+ Caddy 反向代理（自動 HTTPS）。
+# 與基礎設施 docker-compose.yml 疊加使用：
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# 前置：建立 .env（含 SITE_DOMAIN、ACME_EMAIL）、
+#       apps/frontend/.env.production、apps/backend/.env.production
+
+services:
+  # 反向代理 + 自動申請/續簽 Let's Encrypt 憑證
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?請於 .env 設定 SITE_DOMAIN（如 portal.example.gov.tw）}
+      ACME_EMAIL: ${ACME_EMAIL:?請於 .env 設定 ACME_EMAIL（憑證通知信箱）}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data # 憑證與 ACME 帳號 — 務必持久保留，勿刪
+      - caddy-config:/config
+    depends_on:
+      - frontend
+      - backend
+
+  # 前端入口網（Next.js standalone）
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - apps/frontend/.env.production
+    expose:
+      - '3000' # 僅供內網（Caddy）存取，不對外開埠
+
+  # 後端（NestJS GraphQL）
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - apps/backend/.env.production
+    expose:
+      - '4000'
+    depends_on:
+      - timescaledb
+      - rabbitmq
+      - dragonfly
+
+volumes:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,23 @@
+# 不進 build context（縮小、避免污染）— 相依在映像內重新安裝
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+.git
+.github
+.husky
+**/coverage
+**/playwright-report
+**/test-results
+**/storybook-static
+**/*.log
+
+# 環境檔（執行期由 env_file 注入，不打進映像）
+**/.env
+**/.env.*
+!**/.env.*.example
+
+# 設計／文件素材，不需進前後端映像
+docs
+deploy
+*.md

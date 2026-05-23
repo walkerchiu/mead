@@ -1,0 +1,26 @@
+# EC2 前端入口網 — 反向代理 + 自動 HTTPS（Let's Encrypt）。
+# 網域與通知信箱由環境變數注入（見 docker-compose.yml 的 caddy.environment）。
+# Caddy 會自動申請並在到期前自動續簽憑證（存於 caddy-data volume）。
+
+{
+	email {$ACME_EMAIL}
+	# 測試 / 排錯期可先用 staging 避免觸及 LE 正式環境 rate limit；
+	# 確認流程無誤後註解此行改用正式 CA：
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	reverse_proxy frontend:3000 {
+		# 明確轉發正確的對外主機 / 協定
+		header_up Host {host}
+		header_up X-Forwarded-Host {host}
+		header_up X-Forwarded-Proto {scheme}
+		# Next.js standalone 在反向代理後會把內部埠 3000 寫進轉址 Location，
+		# 在此把回應 Location 標頭的 :3000 去除（內部埠固定 3000）
+		header_down Location ":3000" ""
+	}
+
+	header -Server
+}

@@ -9,11 +9,13 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 /**
  * Security Headers Configuration
  *
- * 注意：Content-Security-Policy 現在由 middleware.ts 處理（使用 nonce-based 方案）
- * 這樣可以為每個請求生成唯一的 nonce，移除 'unsafe-inline' 和 'unsafe-eval'
+ * 注意：Content-Security-Policy 由 proxy.ts（middleware）處理（nonce-based），
+ * 為每個請求生成唯一 nonce，移除 'unsafe-inline' / 'unsafe-eval'。
  */
 const securityHeaders = [
   {
@@ -33,82 +35,52 @@ const securityHeaders = [
     value: 'on',
   },
   {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=63072000; includeSubDomains; preload',
-  },
-  {
     key: 'Permissions-Policy',
     value: 'camera=(), microphone=(), geolocation=()',
   },
-  // CSP 現在由 middleware.ts 處理（nonce-based）
+  // HSTS 僅於正式環境輸出（避免在本機 http://localhost 被瀏覽器強制升級 https）。
+  // 不含 `preload` —— preload 一旦被瀏覽器收錄幾乎不可逆，待上線穩定後再視需要加。
+  ...(isProduction
+    ? [
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=63072000; includeSubDomains',
+        },
+      ]
+    : []),
+  // CSP 由 proxy.ts（middleware）處理（nonce-based）
 ];
 
 const nextConfig: NextConfig = {
+  // 自架部署：產出獨立執行檔（含追蹤過的最小 node_modules），供 Docker 使用
+  output: 'standalone',
+  // monorepo：standalone 追蹤需以 workspace root 為基準
+  outputFileTracingRoot: path.resolve(__dirname, '../..'),
   // 明確設定 workspace root，避免 lockfile 警告
   turbopack: {
     root: path.resolve(__dirname, '../..'),
   },
+  // 移除回應的 X-Powered-By: Next.js 標頭（避免洩漏框架資訊）
+  poweredByHeader: false,
+  // 開發期額外檢查（重複 render 找出副作用問題）；不影響正式環境
+  reactStrictMode: true,
   // 禁用開發工具指示器（左上角的 DevTools 按鈕）
   devIndicators: false,
   // 效能優化設定
   compiler: {
     // 移除 console.log (生產環境)
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: isProduction,
   },
   // 圖片優化
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
+    // 入口網圖片幾乎不變動，拉長最佳化快取（1 天）減少重複轉檔
+    minimumCacheTTL: 86400,
   },
-  // Webpack 優化
-  webpack: (config, { isServer }) => {
-    // 優化 bundle 大小
-    if (!isServer) {
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: false,
-            vendors: false,
-            // Vendor chunk for node_modules
-            vendor: {
-              name: 'vendor',
-              chunks: 'all',
-              test: /node_modules/,
-              priority: 20,
-            },
-            // Common chunk for shared code
-            common: {
-              name: 'common',
-              minChunks: 2,
-              chunks: 'all',
-              priority: 10,
-              reuseExistingChunk: true,
-              enforce: true,
-            },
-            // MUI 單獨打包
-            mui: {
-              test: /[\\/]node_modules[\\/]@mui[\\/]/,
-              name: 'mui',
-              chunks: 'all',
-              priority: 30,
-            },
-            // Apollo Client 單獨打包
-            apollo: {
-              test: /[\\/]node_modules[\\/]@apollo[\\/]/,
-              name: 'apollo',
-              chunks: 'all',
-              priority: 30,
-            },
-          },
-        },
-      };
-    }
-    return config;
-  },
+  // 註：本專案以 Turbopack 建置（Next.js 16 預設），自訂 webpack 的 splitChunks
+  // 在 Turbopack 下不會生效（且會觸發警告），故移除；Turbopack 已內建 chunk 切分最佳化。
   async headers() {
     return [
       {
