@@ -44,6 +44,8 @@ infra/seaweedfs/s3.json
 test-results/
 playwright-report/
 playwright/.cache/
+# Playwright MCP 除錯產物（console log / page 快照）
+.playwright-mcp/
 
 # OS
 .DS_Store
