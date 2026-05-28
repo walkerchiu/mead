@@ -32,15 +32,19 @@ const TRANSITION_MS = 420;
 
 /**
  * Slogan 退場動畫總時長（ms）— 點擊計畫卡到大卡完整就位的整段過渡：
- *  - Phase A 0–36%（0–1000ms）：被點擊的卡 + 主標整句（黑字 + 橘字 + 小標）一起
+ *  - Phase A 0–27%（0–1000ms）：被點擊的卡 + 主標整句（黑字 + 橘字 + 小標）一起
  *    往上抽離（1.0s 的「整句往上飄」）。
- *  - Phase B 36–54%（1000–1500ms）：停 0.5s（橘字「抓住一下」的停頓）。
- *  - Phase C 54–89%（1500–2500ms）：黑字 + 小標 + 被點擊的卡繼續上升 1s、淡出視野。
+ *  - Phase B 27–40%（1000–1500ms）：停 0.5s（橘字「抓住一下」的停頓）。
+ *  - Phase C 40–67%（1500–2500ms）：黑字 + 小標 + 被點擊的卡繼續上升 1s、淡出視野。
  *                                     橘字保持在 phase A 落點不動。
- *  - Phase D 89–100%（2500–2800ms）：橘字短暫停留後淡出（強調其「主角」身分）。
+ *  - Phase D 67–81%（2500–3000ms）：橘字單獨存在 0.5s（強調其「主角」身分，
+ *                                     被點擊的卡仍停在 -120 等候）。
+ *  - Phase E 81–95%（3000–3500ms）：被點擊的卡顏色變淺、放大到 3x、淡出；
+ *                                     同時段橘字也淡出。
+ *  - Buffer 95–100%（3500–3700ms）：計畫大卡 slide 結尾（總尾段）。
  *  此值會被 PlanCarousel.EXIT_MS 引用，確保兩邊節奏完全同步。
  */
-export const SLOGAN_EXIT_MS = 2800;
+export const SLOGAN_EXIT_MS = 3700;
 
 /**
  * PortalIntroSection — 入口網主標題區塊。
@@ -106,9 +110,9 @@ export function PortalIntroSection({
           }),
           '@keyframes sloganExitRiseFly': {
             '0%': { transform: 'translateY(0)', opacity: 1 },
-            '36%': { transform: 'translateY(-120px)', opacity: 1 },
-            '54%': { transform: 'translateY(-120px)', opacity: 1 },
-            '89%': { transform: 'translateY(-380px)', opacity: 0 },
+            '27%': { transform: 'translateY(-120px)', opacity: 1 },
+            '40%': { transform: 'translateY(-120px)', opacity: 1 },
+            '67%': { transform: 'translateY(-380px)', opacity: 0 },
             '100%': { transform: 'translateY(-380px)', opacity: 0 },
           },
           '@media (prefers-reduced-motion: reduce)': {
@@ -153,17 +157,18 @@ export function PortalIntroSection({
           // 黑字 / 小標：升 → 停 → 繼續升 + 淡出。
           '@keyframes sloganExitRiseFly': {
             '0%': { transform: 'translateY(0)', opacity: 1 },
-            '36%': { transform: 'translateY(-120px)', opacity: 1 },
-            '54%': { transform: 'translateY(-120px)', opacity: 1 },
-            '89%': { transform: 'translateY(-380px)', opacity: 0 },
+            '27%': { transform: 'translateY(-120px)', opacity: 1 },
+            '40%': { transform: 'translateY(-120px)', opacity: 1 },
+            '67%': { transform: 'translateY(-380px)', opacity: 0 },
             '100%': { transform: 'translateY(-380px)', opacity: 0 },
           },
           // 橘字：升起跟著大家 → 停 → 繼續停（讓黑字先離開）→ 最後才淡出。
           // 「抓住一下才放手」— 強調 keyword 是這頁的主角。
           '@keyframes sloganExitKeywordGrip': {
             '0%': { transform: 'translateY(0)', opacity: 1 },
-            '36%': { transform: 'translateY(-120px)', opacity: 1 },
-            '89%': { transform: 'translateY(-120px)', opacity: 1 },
+            '27%': { transform: 'translateY(-120px)', opacity: 1 },
+            '81%': { transform: 'translateY(-120px)', opacity: 1 },
+            '95%': { transform: 'translateY(-120px)', opacity: 0 },
             '100%': { transform: 'translateY(-120px)', opacity: 0 },
           },
           '@media (prefers-reduced-motion: reduce)': {

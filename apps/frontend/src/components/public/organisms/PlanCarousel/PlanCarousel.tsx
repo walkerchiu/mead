@@ -917,34 +917,39 @@ export function PlanCarousel({
                 {
                   animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
                 },
-              // 被點擊的卡：升起（A）→ 停（B）→
-              // Phase C 0.5s 內一氣完成：顏色變淺、快速放大到 ≥3x、淡出。
-              // 在 EXIT_MS=2800 之內換算：54%→72% 等於 504ms 整段。
-              //  - 54-58%（~110ms）：scale 1→3，translateX 推向中央，filter 變淺。
-              //  - 58-72%（~390ms）：scale 3→3.2，opacity 1→0，filter 更淺。
-              //  - 72-100%：維持淡出後的狀態（避免 forwards 結束後反彈）。
+              // 被點擊的卡：升起（A 0-27%）→ 停（B 27-40%）→
+              // 等候黑字繼續上升 + 橘字單獨存在（C+D 40-81%，停留在 -120）→
+              // Phase E 81-95%（3000-3500ms，0.5s）一氣完成：顏色變淺、放大到
+              // ≥3x、淡出；同期橘字也淡出。95-100% 為計畫大卡 slide 結尾緩衝。
+              //  - 81-83%（~74ms）：scale 1→3，translateX 推向中央，filter 變淺。
+              //  - 83-95%（~444ms）：scale 3→3.2，opacity 1→0，filter 更淺。
               '@keyframes planMiniExitRiseScale': {
                 '0%': {
                   transform: 'translate(0, 0) scale(1)',
                   opacity: 1,
                   filter: 'brightness(1) saturate(1)',
                 },
-                '36%': {
+                '27%': {
                   transform: 'translate(0, -120px) scale(1)',
                   opacity: 1,
                   filter: 'brightness(1) saturate(1)',
                 },
-                '54%': {
+                '40%': {
                   transform: 'translate(0, -120px) scale(1)',
                   opacity: 1,
                   filter: 'brightness(1) saturate(1)',
                 },
-                '58%': {
+                '81%': {
+                  transform: 'translate(0, -120px) scale(1)',
+                  opacity: 1,
+                  filter: 'brightness(1) saturate(1)',
+                },
+                '83%': {
                   transform: 'translate(var(--exit-tx, 0px), -120px) scale(3)',
                   opacity: 1,
                   filter: 'brightness(1.3) saturate(0.5)',
                 },
-                '72%': {
+                '95%': {
                   transform:
                     'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,
