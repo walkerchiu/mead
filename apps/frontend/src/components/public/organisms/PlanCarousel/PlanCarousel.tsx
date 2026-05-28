@@ -918,8 +918,8 @@ export function PlanCarousel({
                   animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
                 },
               // 被點擊的卡：升起 → 停 → 在 Phase C 前段（54-62%，~225ms）
-              // 「快速」往畫面中央放大到 ≥2x，translateX 同步推到 var(--exit-tx)；
-              // 後段（62-89%，~756ms）持續略放大到 2.2x 並淡出（先放大，再淡出）。
+              // 「快速」往畫面中央放大到 ≥3x，translateX 同步推到 var(--exit-tx)；
+              // 後段（62-89%，~756ms）持續略放大到 3.2x 並淡出（先放大，再淡出）。
               '@keyframes planMiniExitRiseScale': {
                 '0%': { transform: 'translate(0, 0) scale(1)', opacity: 1 },
                 '36%': {
@@ -931,17 +931,17 @@ export function PlanCarousel({
                   opacity: 1,
                 },
                 '62%': {
-                  transform: 'translate(var(--exit-tx, 0px), -120px) scale(2)',
+                  transform: 'translate(var(--exit-tx, 0px), -120px) scale(3)',
                   opacity: 1,
                 },
                 '89%': {
                   transform:
-                    'translate(var(--exit-tx, 0px), -120px) scale(2.2)',
+                    'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,
                 },
                 '100%': {
                   transform:
-                    'translate(var(--exit-tx, 0px), -120px) scale(2.2)',
+                    'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,
                 },
               },
