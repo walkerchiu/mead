@@ -919,10 +919,10 @@ export function PlanCarousel({
                 },
               // 被點擊的卡：升起（A 0-27%）→ 停（B 27-40%）→
               // 等候黑字繼續上升 + 橘字單獨存在（C+D 40-81%，停留在 -120）→
-              // Phase E 81-95%（3000-3500ms，0.5s）一氣完成：顏色變淺、放大到
-              // ≥3x、淡出；同期橘字也淡出。95-100% 為計畫大卡 slide 結尾緩衝。
-              //  - 81-83%（~74ms）：scale 1→3，translateX 推向中央，filter 變淺。
-              //  - 83-95%（~444ms）：scale 3→3.2，opacity 1→0，filter 更淺。
+              // Phase E 81-89%（3000-3300ms，0.3s）一氣完成：顏色變淺、放大到
+              // ≥3x、淡出；同期橘字也淡出。89-100% 為計畫大卡 slide 緩衝。
+              //  - 81-82.6%（~60ms）：scale 1→3，translateX 推向中央，filter 變淺。
+              //  - 82.6-89%（~237ms）：scale 3→3.2，opacity 1→0，filter 更淺。
               '@keyframes planMiniExitRiseScale': {
                 '0%': {
                   transform: 'translate(0, 0) scale(1)',
@@ -944,12 +944,12 @@ export function PlanCarousel({
                   opacity: 1,
                   filter: 'brightness(1) saturate(1)',
                 },
-                '83%': {
+                '82.6%': {
                   transform: 'translate(var(--exit-tx, 0px), -120px) scale(3)',
                   opacity: 1,
                   filter: 'brightness(1.3) saturate(0.5)',
                 },
-                '95%': {
+                '89%': {
                   transform:
                     'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,

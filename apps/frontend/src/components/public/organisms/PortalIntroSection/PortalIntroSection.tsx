@@ -39,9 +39,9 @@ const TRANSITION_MS = 420;
  *                                     橘字保持在 phase A 落點不動。
  *  - Phase D 67–81%（2500–3000ms）：橘字單獨存在 0.5s（強調其「主角」身分，
  *                                     被點擊的卡仍停在 -120 等候）。
- *  - Phase E 81–95%（3000–3500ms）：被點擊的卡顏色變淺、放大到 3x、淡出；
+ *  - Phase E 81–89%（3000–3300ms）：被點擊的卡顏色變淺、放大到 3x、淡出 0.3s；
  *                                     同時段橘字也淡出。
- *  - Buffer 95–100%（3500–3700ms）：計畫大卡 slide 結尾（總尾段）。
+ *  - Buffer 89–100%（3300–3700ms）：計畫大卡 slide 結尾（總尾段）。
  *  此值會被 PlanCarousel.EXIT_MS 引用，確保兩邊節奏完全同步。
  */
 export const SLOGAN_EXIT_MS = 3700;
@@ -168,7 +168,7 @@ export function PortalIntroSection({
             '0%': { transform: 'translateY(0)', opacity: 1 },
             '27%': { transform: 'translateY(-120px)', opacity: 1 },
             '81%': { transform: 'translateY(-120px)', opacity: 1 },
-            '95%': { transform: 'translateY(-120px)', opacity: 0 },
+            '89%': { transform: 'translateY(-120px)', opacity: 0 },
             '100%': { transform: 'translateY(-120px)', opacity: 0 },
           },
           '@media (prefers-reduced-motion: reduce)': {
