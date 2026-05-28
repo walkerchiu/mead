@@ -63,8 +63,9 @@ export interface PlanCarouselProps {
    * 供主標切換為「讓 ___ 被看見」（依設計稿過場效果說明）。
    */
   onHoverPlanChange?: (index: number | null) => void;
-  /** 點擊發生時觸發（傳遞給上層以做主標 slogan exit 動畫） */
-  onSelectStart?: () => void;
+  /** 點擊發生時觸發；參數為被點擊的計畫索引，供上層在 EXIT 期間同步渲染
+   *  「計畫大卡從左下方滑入」的覆蓋層（與點擊卡的升起同拍）。 */
+  onSelectStart?: (index: number) => void;
 }
 
 /**
@@ -178,7 +179,7 @@ function peekSx(direction: 'prev' | 'next') {
  * 抽出此 helper 是為了讓「退場舊卡」和「入場新卡」共用同一份星形渲染邏輯，
  * 在左右滑動轉場期間兩張卡（含其周邊星形）能一起滑動，避免星形與卡片脫節。
  */
-function PlanCardWithStars({ plan }: { plan: Plan }) {
+export function PlanCardWithStars({ plan }: { plan: Plan }) {
   const photos = localPhotos(plan);
   const stars = DECOR_STARS[plan.id] ?? [];
   return (
@@ -506,9 +507,6 @@ const EXIT_MS = SLOGAN_EXIT_MS;
  *  改成 360ms + 退出端點 opacity 0，切換明顯俐落。 */
 const SLIDE_MS = 360;
 
-/** 點擊→展開：主標 / mini cards 退場完畢後，大卡從左下方滑入的時長（ms）。 */
-const SLIDE_UP_MS = 720;
-
 /**
  * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
  * 飄過去；途中文字內容會從來源卡漸變成目標卡的文字；抵達後落入目標卡）。
@@ -766,8 +764,10 @@ export function PlanCarousel({
         ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
         : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
     }
+    // click 來源：滑入動畫已在 PortalLandingPage 的 overlay 於 EXIT 期間
+    // 完整跑完，這裡接手時大卡已到定位，用 'none' 避免再播一次造成閃動。
     return clickedExpandId === activePlanForExpand.id
-      ? `planSlideUpFromBL ${SLIDE_UP_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
+      ? 'none'
       : 'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both';
   }, [activePlanForExpand, slideDir, clickedExpandId]);
 
@@ -801,7 +801,7 @@ export function PlanCarousel({
 
   const handleSelect = (i: number) => {
     if (exitingTo !== null) return;
-    onSelectStart?.(); // 通知上層觸發 slogan exit
+    onSelectStart?.(i); // 通知上層觸發 slogan exit + 計畫大卡滑入
     setExitingTo(i);
     if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
     exitTimerRef.current = window.setTimeout(() => {
@@ -917,32 +917,44 @@ export function PlanCarousel({
                 {
                   animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
                 },
-              // 被點擊的卡：升起 → 停 → 在 Phase C 前段（54-62%，~225ms）
-              // 「快速」往畫面中央放大到 ≥3x，translateX 同步推到 var(--exit-tx)；
-              // 後段（62-89%，~756ms）持續略放大到 3.2x 並淡出（先放大，再淡出）。
+              // 被點擊的卡：升起（A）→ 停（B）→
+              // Phase C 0.5s 內一氣完成：顏色變淺、快速放大到 ≥3x、淡出。
+              // 在 EXIT_MS=2800 之內換算：54%→72% 等於 504ms 整段。
+              //  - 54-58%（~110ms）：scale 1→3，translateX 推向中央，filter 變淺。
+              //  - 58-72%（~390ms）：scale 3→3.2，opacity 1→0，filter 更淺。
+              //  - 72-100%：維持淡出後的狀態（避免 forwards 結束後反彈）。
               '@keyframes planMiniExitRiseScale': {
-                '0%': { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                '0%': {
+                  transform: 'translate(0, 0) scale(1)',
+                  opacity: 1,
+                  filter: 'brightness(1) saturate(1)',
+                },
                 '36%': {
                   transform: 'translate(0, -120px) scale(1)',
                   opacity: 1,
+                  filter: 'brightness(1) saturate(1)',
                 },
                 '54%': {
                   transform: 'translate(0, -120px) scale(1)',
                   opacity: 1,
+                  filter: 'brightness(1) saturate(1)',
                 },
-                '62%': {
+                '58%': {
                   transform: 'translate(var(--exit-tx, 0px), -120px) scale(3)',
                   opacity: 1,
+                  filter: 'brightness(1.3) saturate(0.5)',
                 },
-                '89%': {
+                '72%': {
                   transform:
                     'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,
+                  filter: 'brightness(1.5) saturate(0.3)',
                 },
                 '100%': {
                   transform:
                     'translate(var(--exit-tx, 0px), -120px) scale(3.2)',
                   opacity: 0,
+                  filter: 'brightness(1.5) saturate(0.3)',
                 },
               },
               '@keyframes planMiniExitFade': {

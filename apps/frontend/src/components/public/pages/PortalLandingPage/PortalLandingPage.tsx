@@ -11,6 +11,7 @@ import type { Plan } from '@/types/plan';
 import { CarouselDots } from '../../atoms/CarouselDots';
 import { DecorativeTextCloud } from '../../organisms/DecorativeTextCloud';
 import { PlanCarousel } from '../../organisms/PlanCarousel';
+import { PlanCardWithStars } from '../../organisms/PlanCarousel/PlanCarousel';
 import { PortalFooter } from '../../organisms/PortalFooter';
 import { PortalIntroSection } from '../../organisms/PortalIntroSection';
 import { PortalNarrativeSection } from '../../organisms/PortalNarrativeSection';
@@ -59,9 +60,17 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 保持 isExiting=true 讓退場動畫終態鎖在那裡，expanded 模式下主標保持
   // 不可見，視覺上和「整句被抽走」的故事一致。
   const [isExiting, setIsExiting] = useState(false);
-  const handleSelectStart = () => setIsExiting(true);
+  // 點擊到展開過渡期內、要從左下方滑入第二屏中央的計畫索引。
+  // PlanCarousel.onSelectStart(i) 觸發；handleExpandedIndexChange 在 EXIT_MS
+  // 結束時清掉（這時 PlanCarousel 展開分支接手以原位渲染同張大卡）。
+  const [pendingPlanIndex, setPendingPlanIndex] = useState<number | null>(null);
+  const handleSelectStart = (i: number) => {
+    setIsExiting(true);
+    setPendingPlanIndex(i);
+  };
   const handleExpandedIndexChange = (i: number) => {
     setExpandedIndex(i);
+    setPendingPlanIndex(null);
   };
   // 第三屏（敘事段落）的觀察點 — 使用者未點選任何卡、直接往下滑到第三屏時
   // 預設展開第一個計畫（依設計師需求）。改成觀察敘事段落本身（threshold 0、
@@ -261,6 +270,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         <Box
           ref={secondScreenRef}
           sx={{
+            position: 'relative',
             minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
@@ -304,6 +314,45 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               onSelectStart={handleSelectStart}
             />
           </Box>
+          {/* 計畫大卡「從左下方滑入」overlay — 與 PlanCarousel 點擊卡的升起
+              同拍進行（Phase A+B 期間滑入到位）。top:140 對齊 expanded 模式
+              下大卡的最終位置，EXIT 結束時 PlanCarousel 展開分支以同樣位置
+              無動畫接手渲染，視覺上沒有跳動。 */}
+          {pendingPlanIndex !== null && orderedPlans[pendingPlanIndex] && (
+            <Box
+              aria-hidden
+              sx={{
+                position: 'absolute',
+                top: '140px',
+                left: 0,
+                right: 0,
+                mx: 'auto',
+                width: '100%',
+                maxWidth: 760,
+                pointerEvents: 'none',
+                zIndex: 5,
+                // 點擊卡進入 Phase C（淡出）時才滑出 → delay 1500ms（A+B 結束）、
+                // duration 500ms（Phase C 同長）。`both` 讓 delay 期間鎖在
+                // 0% 的左下出發位置（opacity 0、translate(-300,600)），
+                // 視覺上「點擊卡開始淡出時，計畫卡才從左下浮現」。
+                animation:
+                  'planEnterFromBL 500ms cubic-bezier(0.22, 1, 0.36, 1) 1500ms both',
+                '@keyframes planEnterFromBL': {
+                  '0%': {
+                    transform: 'translate(-300px, 600px)',
+                    opacity: 0,
+                  },
+                  '100%': { transform: 'translate(0, 0)', opacity: 1 },
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  animation: 'none',
+                  opacity: 1,
+                },
+              }}
+            >
+              <PlanCardWithStars plan={orderedPlans[pendingPlanIndex]} />
+            </Box>
+          )}
         </Box>
 
         {/* 敘事段落（第三屏） — ref 由 IntersectionObserver 監聽：使用者
