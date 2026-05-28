@@ -93,6 +93,109 @@ function localPhotos(plan: Plan): string[] {
     .map((p) => p.src as string);
 }
 
+/**
+ * 兩側豎立的相鄰計畫預覽矩形 — 半透明毛玻璃。
+ * 依舊版（commit 110588f）設計：760 寬、left/right: -720px 讓多數寬度溢出
+ * 畫面，僅露出 ~40px 在視窗左右側緣。點擊以橫向滑動切換上/下計畫。
+ */
+const PEEK_BASE = {
+  display: 'none',
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  width: 760,
+  p: 0,
+  borderRadius: '17.35px',
+  bgcolor: 'rgba(255, 255, 255, 0.54)',
+  border: '1px solid rgba(138, 138, 138, 0.49)',
+  backdropFilter: 'blur(28.34px)',
+  WebkitBackdropFilter: 'blur(28.34px)',
+  cursor: 'pointer',
+  zIndex: 5,
+  transition: 'background-color 0.25s ease',
+  '&:hover': {
+    bgcolor: 'rgba(255, 255, 255, 0.72)',
+  },
+  '&:focus-visible': {
+    outline: `2px solid ${portalTokens.color.brandOrange}`,
+    outlineOffset: 2,
+  },
+  [portalTokens.mq.tabletUp]: { display: 'block' },
+} as const;
+
+/**
+ * PlanCardWithStars — 展開大卡 + 周圍裝飾星形照片的組合單元。
+ *
+ * 抽出此 helper 是為了讓「退場舊卡」和「入場新卡」共用同一份星形渲染邏輯，
+ * 在左右滑動轉場期間兩張卡（含其周邊星形）能一起滑動，避免星形與卡片脫節。
+ */
+function PlanCardWithStars({ plan }: { plan: Plan }) {
+  const photos = localPhotos(plan);
+  const stars = DECOR_STARS[plan.id] ?? [];
+  return (
+    <>
+      {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示。
+          靜止時微傾、略縮並淡化，像散落半掩在卡片後方的紙堆；hover 時以底邊
+          為軸向觀者翻起、沿 Z 軸前移上抬放大，配合尾段輕微過衝，營造照片
+          「從後方翻出／被抽出」的立體手感（依設計稿 HOVER 說明）。 */}
+      {stars.map((s, i) => {
+        if (!photos[i]) return null;
+        const restTilt = REST_TILT[i % REST_TILT.length];
+        // hover 時依照片落在卡片左 / 右側朝外側微傾，強化「往外抽出」的方向感
+        const leanOut = s.x + STAR_SIZE / 2 < CARD_CENTER_X ? -3 : 3;
+        return (
+          <Box
+            key={i}
+            aria-hidden
+            component="img"
+            src={photos[i]}
+            alt=""
+            sx={{
+              display: 'none',
+              [portalTokens.mq.tabletUp]: { display: 'block' },
+              position: 'absolute',
+              left: `${s.x}px`,
+              top: `${s.y}px`,
+              width: STAR_SIZE,
+              height: STAR_SIZE,
+              objectFit: 'cover',
+              clipPath: STAR_CLIP,
+              zIndex: 0,
+              transformOrigin: 'center bottom',
+              willChange: 'transform, filter',
+              transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
+              filter:
+                'brightness(0.94) saturate(0.95) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.14))',
+              transition:
+                'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
+              '&:hover': {
+                transform: `perspective(900px) rotateX(-12deg) rotateZ(${leanOut}deg) translateY(-24px) translateZ(52px) scale(1.16)`,
+                zIndex: 3,
+                filter:
+                  'brightness(1.03) saturate(1.05) drop-shadow(0 30px 46px rgba(0, 0, 0, 0.34))',
+              },
+              '@media (prefers-reduced-motion: reduce)': {
+                transform: 'none',
+                transition: 'none',
+                filter: 'none',
+                '&:hover': {
+                  transform: 'none',
+                  zIndex: 3,
+                  filter: 'drop-shadow(0 16px 28px rgba(0, 0, 0, 0.28))',
+                },
+              },
+            }}
+          />
+        );
+      })}
+      {/* 作用中的計畫卡片 */}
+      <Box sx={{ position: 'relative', zIndex: 1 }}>
+        <PlanCard plan={plan} />
+      </Box>
+    </>
+  );
+}
+
 interface PlanMiniCardProps {
   plan: Plan;
   onSelect: () => void;
@@ -287,6 +390,8 @@ function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
  */
 /** 點擊小卡到詳細卡之間的「過場」動畫長度（ms）— 殘影 title 升起需 ~550ms */
 const EXIT_MS = 540;
+/** 計畫之間左右滑動切換的轉場長度（ms） */
+const SLIDE_MS = 550;
 
 export function PlanCarousel({
   plans,
@@ -300,11 +405,41 @@ export function PlanCarousel({
   const [exitingTo, setExitingTo] = useState<number | null>(null);
   const exitTimerRef = useRef<number | null>(null);
 
+  // 展開後左右切換計畫的方向（peek 點擊 / dots 變更皆會觸發）
+  const [slideDir, setSlideDir] = useState<'prev' | 'next' | null>(null);
+  // 滑動中暫存的「退場舊計畫」— 與新計畫同時渲染，反方向滑出
+  const [exitingPlan, setExitingPlan] = useState<Plan | null>(null);
+  const slideTimerRef = useRef<number | null>(null);
+  const prevExpandedIdxRef = useRef<number | null>(expandedIndex);
+
   useEffect(() => {
     return () => {
       if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
+      if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
     };
   }, []);
+
+  // 監聽 expandedIndex 變化 → 偵測切換方向、啟動左右滑動轉場。
+  // prev=null（從 mini cards 首次展開）跳過 slide，沿用既有 planExpand 膨脹動畫。
+  useEffect(() => {
+    const prev = prevExpandedIdxRef.current;
+    const curr = expandedIndex;
+    prevExpandedIdxRef.current = curr;
+    if (prev === null || curr === null || prev === curr) return;
+    const total = plans.length;
+    let dir: 'prev' | 'next' = curr > prev ? 'next' : 'prev';
+    // wrap-around：(last → 0) 視為 next；(0 → last) 視為 prev
+    if (prev === total - 1 && curr === 0) dir = 'next';
+    if (prev === 0 && curr === total - 1) dir = 'prev';
+    setSlideDir(dir);
+    setExitingPlan(plans[prev] ?? null);
+    if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
+    slideTimerRef.current = window.setTimeout(() => {
+      setSlideDir(null);
+      setExitingPlan(null);
+      slideTimerRef.current = null;
+    }, SLIDE_MS);
+  }, [expandedIndex, plans]);
 
   const count = plans.length;
   if (count === 0) return null;
@@ -321,6 +456,16 @@ export function PlanCarousel({
       onExpandedIndexChange(i);
       exitTimerRef.current = null;
     }, EXIT_MS);
+  };
+
+  // peek 點擊 — 切到上 / 下一個計畫（環狀 wrap-around）
+  const goPrev = () => {
+    if (expandedIndex === null) return;
+    onExpandedIndexChange((expandedIndex - 1 + count) % count);
+  };
+  const goNext = () => {
+    if (expandedIndex === null) return;
+    onExpandedIndexChange((expandedIndex + 1) % count);
   };
 
   const outerSx = {
@@ -396,22 +541,97 @@ export function PlanCarousel({
     );
   }
 
-  // ── 展開：只顯示詳細大卡（PlanCard）+ 周圍裝飾星形照片，無側邊收合卡 ──
+  // ── 展開：詳細大卡 + 周圍裝飾星形照片 + 兩側豎立 peek 預覽矩形 ──
   const activePlan = plans[expandedIndex];
-  const photos = localPhotos(activePlan);
-  const stars = DECOR_STARS[activePlan.id] ?? [];
+
+  // 滑動轉場用的共用 keyframes — 同時掛在退場舊卡與入場新卡的 sx，
+  // emotion 會以名稱 dedupe，不會重複注入 CSS。
+  const slideKeyframes = {
+    '@keyframes planSlideInRight': {
+      from: { transform: 'translateX(120%)', opacity: 0.25 },
+      to: { transform: 'translateX(0)', opacity: 1 },
+    },
+    '@keyframes planSlideInLeft': {
+      from: { transform: 'translateX(-120%)', opacity: 0.25 },
+      to: { transform: 'translateX(0)', opacity: 1 },
+    },
+    '@keyframes planSlideOutLeft': {
+      from: { transform: 'translateX(0)', opacity: 1 },
+      to: { transform: 'translateX(-120%)', opacity: 0.25 },
+    },
+    '@keyframes planSlideOutRight': {
+      from: { transform: 'translateX(0)', opacity: 1 },
+      to: { transform: 'translateX(120%)', opacity: 0.25 },
+    },
+  } as const;
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
+      {/* 左右兩側豎立的相鄰計畫預覽矩形 — 點擊以橫向滑動切換上 / 下計畫。
+          760 寬 + left/right: -720px 讓多數寬度溢出畫面、僅露 40px 在視窗邊緣。
+          頁面外層已 overflow-x: clip，溢出部分自然裁切。*/}
+      {count > 1 && (
+        <>
+          <Box
+            component="button"
+            type="button"
+            aria-label="上一個計畫"
+            onClick={goPrev}
+            sx={[PEEK_BASE, { left: -720 }]}
+          />
+          <Box
+            component="button"
+            type="button"
+            aria-label="下一個計畫"
+            onClick={goNext}
+            sx={[PEEK_BASE, { right: -720 }]}
+          />
+        </>
+      )}
+
       <Box sx={outerSx}>
         <Box
           sx={{
             position: 'relative',
             display: 'flex',
             justifyContent: 'center',
+            // 滑動時舊卡會 translateX 到 ±120%，須允許其視覺溢出（不裁切）
+            overflow: 'visible',
           }}
         >
-          {/* 展開卡 + 周圍裝飾星形照片 */}
+          {/* 退場舊卡 — 絕對定位疊在新卡同一位置、反方向滑出。
+              key 用 plan.id 確保 React 重新掛載播放動畫；slideDir 控制方向。*/}
+          {exitingPlan && slideDir && (
+            <Box
+              key={`exit-${exitingPlan.id}`}
+              aria-hidden
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                mx: 'auto',
+                width: '100%',
+                maxWidth: 760,
+                pointerEvents: 'none',
+                zIndex: 0,
+                animation:
+                  slideDir === 'next'
+                    ? `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
+                    : `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                ...slideKeyframes,
+                '@media (prefers-reduced-motion: reduce)': {
+                  animation: 'none',
+                  opacity: 0,
+                },
+              }}
+            >
+              <PlanCardWithStars plan={exitingPlan} />
+            </Box>
+          )}
+
+          {/* 入場新卡 — key 變動觸發 React remount、播放對應 in 動畫。
+              slideDir 存在時走左/右滑入；否則（從 mini cards 首次展開）走 planExpand 膨脹。*/}
           <Box
             key={activePlan.id}
             onMouseEnter={() => onHoverPlanChange?.(expandedIndex)}
@@ -420,11 +640,21 @@ export function PlanCarousel({
               position: 'relative',
               width: '100%',
               maxWidth: 760,
-              // 詳細卡從小卡位置「膨脹」而來（依故事第 7 幕 morph）：
-              // 起始 scale 0.55（接近小卡寬 367 / 大卡寬 760 ~ 48%）+ opacity 0
-              // 目標 scale 1 + opacity 1，cubic-bezier ease-out 約 0.55s。
-              animation: 'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both',
-              transformOrigin: 'top center',
+              zIndex: 1,
+              ...(slideDir
+                ? {
+                    animation:
+                      slideDir === 'next'
+                        ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
+                        : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
+                  }
+                : {
+                    // 首次從 mini cards 展開：膨脹進場（依故事第 7 幕 morph）
+                    animation:
+                      'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both',
+                    transformOrigin: 'top center',
+                  }),
+              ...slideKeyframes,
               '@keyframes planExpand': {
                 '0%': { opacity: 0, transform: 'scale(0.55)' },
                 '40%': { opacity: 0.7 },
@@ -433,69 +663,7 @@ export function PlanCarousel({
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}
           >
-            {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示。
-                靜止時微傾、略縮並淡化，像散落半掩在卡片後方的紙堆；hover 時以底邊
-                為軸向觀者翻起、沿 Z 軸前移上抬放大，配合尾段輕微過衝，營造照片
-                「從後方翻出／被抽出」的立體手感（依設計稿 HOVER 說明）。 */}
-            {stars.map((s, i) => {
-              if (!photos[i]) return null;
-              const restTilt = REST_TILT[i % REST_TILT.length];
-              // hover 時依照片落在卡片左 / 右側朝外側微傾，強化「往外抽出」的方向感
-              const leanOut = s.x + STAR_SIZE / 2 < CARD_CENTER_X ? -3 : 3;
-              return (
-                <Box
-                  key={i}
-                  aria-hidden
-                  component="img"
-                  src={photos[i]}
-                  alt=""
-                  sx={{
-                    display: 'none',
-                    [portalTokens.mq.tabletUp]: { display: 'block' },
-                    position: 'absolute',
-                    left: `${s.x}px`,
-                    top: `${s.y}px`,
-                    width: STAR_SIZE,
-                    height: STAR_SIZE,
-                    objectFit: 'cover',
-                    clipPath: STAR_CLIP,
-                    zIndex: 0,
-                    // 以底邊為軸 → hover 時像從紙堆向上翻出，而非整張平移
-                    transformOrigin: 'center bottom',
-                    willChange: 'transform, filter',
-                    transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
-                    filter:
-                      'brightness(0.94) saturate(0.95) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.14))',
-                    // easeOutBack：尾段輕微過衝，做出「彈出 / 被抽出」的回彈手感
-                    transition:
-                      'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
-                    '&:hover': {
-                      // 翻起 + 朝外微傾 + 前移（translateZ）+ 上抬放大 → 從後方翻到前方
-                      transform: `perspective(900px) rotateX(-12deg) rotateZ(${leanOut}deg) translateY(-24px) translateZ(52px) scale(1.16)`,
-                      zIndex: 3,
-                      filter:
-                        'brightness(1.03) saturate(1.05) drop-shadow(0 30px 46px rgba(0, 0, 0, 0.34))',
-                    },
-                    // 降低動態偏好：不做位移 / 翻轉，僅以陰影與層級提供深度提示
-                    '@media (prefers-reduced-motion: reduce)': {
-                      transform: 'none',
-                      transition: 'none',
-                      filter: 'none',
-                      '&:hover': {
-                        transform: 'none',
-                        zIndex: 3,
-                        filter: 'drop-shadow(0 16px 28px rgba(0, 0, 0, 0.28))',
-                      },
-                    },
-                  }}
-                />
-              );
-            })}
-
-            {/* 作用中的計畫卡片 */}
-            <Box sx={{ position: 'relative', zIndex: 1 }}>
-              <PlanCard plan={activePlan} />
-            </Box>
+            <PlanCardWithStars plan={activePlan} />
           </Box>
         </Box>
       </Box>
