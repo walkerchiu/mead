@@ -884,20 +884,37 @@ export function PlanCarousel({
               '&[data-exiting="true"] > [data-mini-card]': {
                 pointerEvents: 'none',
               },
+              // 被點擊的卡與主標一起升起 → 停 → 然後不再繼續上升，而是
+              // 「在原位放大 + 淡出」（依使用者要求：強調這張卡是主角，
+              // 像主鏡頭被推進、最後溶出畫面）。
               '&[data-exiting="true"] > [data-mini-card][data-exit-target="true"]':
                 {
-                  animation: `planMiniExitRiseFly ${EXIT_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                  animation: `planMiniExitRiseScale ${EXIT_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                  // scale 以卡片中心為原點（預設）— 視覺上是「朝鏡頭推進」的感覺。
+                  transformOrigin: 'center center',
                 },
               '&[data-exiting="true"] > [data-mini-card]:not([data-exit-target])':
                 {
                   animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
                 },
-              '@keyframes planMiniExitRiseFly': {
-                '0%': { transform: 'translateY(0)', opacity: 1 },
-                '36%': { transform: 'translateY(-120px)', opacity: 1 },
-                '54%': { transform: 'translateY(-120px)', opacity: 1 },
-                '89%': { transform: 'translateY(-380px)', opacity: 0 },
-                '100%': { transform: 'translateY(-380px)', opacity: 0 },
+              '@keyframes planMiniExitRiseScale': {
+                '0%': { transform: 'translateY(0) scale(1)', opacity: 1 },
+                '36%': {
+                  transform: 'translateY(-120px) scale(1)',
+                  opacity: 1,
+                },
+                '54%': {
+                  transform: 'translateY(-120px) scale(1)',
+                  opacity: 1,
+                },
+                '89%': {
+                  transform: 'translateY(-120px) scale(1.5)',
+                  opacity: 0,
+                },
+                '100%': {
+                  transform: 'translateY(-120px) scale(1.5)',
+                  opacity: 0,
+                },
               },
               '@keyframes planMiniExitFade': {
                 '0%': { opacity: 1, transform: 'translateY(0)' },
