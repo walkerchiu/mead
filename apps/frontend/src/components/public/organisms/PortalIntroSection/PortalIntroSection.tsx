@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState, type ReactNode } from 'react';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -8,58 +10,162 @@ import { portalTokens } from '../../tokens';
 export interface PortalIntroSectionProps {
   /** 上方小標，預設「教育部藝術設計三大計畫」 */
   eyebrow?: string;
-  /** 主標題，預設「為台灣藝術設計開啟更多可能」 */
-  heading?: string;
+  /** 主標題（可含橘色關鍵字節點），預設「為台灣藝術設計開啟更多可能」 */
+  heading?: ReactNode;
+  /** 主標識別鍵 — 變動時觸發淡入淡出交疊過場（依設計師 spec） */
+  headingKey?: string;
+  /** 展開模式：true 時觸發 slogan exit on expand（依 IMPLEMENTATION.md §4.1） */
+  exiting?: boolean;
 }
+
+interface HeadingLayer {
+  id: number;
+  key: string;
+  node: ReactNode;
+}
+
+/** 模組級遞增 id —— 確保 layer key 唯一，避免重複 key 導致 React reconcile 出錯 */
+let LAYER_ID = 0;
+
+/** 主標切換過場時間（ms），需與 keyframes 動畫長度一致 */
+const TRANSITION_MS = 420;
 
 /**
  * PortalIntroSection — 入口網主標題區塊。
  *
- * 置中的小標 + 大標題，承接 hero 文字雲、引出下方計畫輪播。
+ * 置中的小標 + 大標題，承接 hero 文字雲、引出下方計畫卡片。
+ * hover 計畫卡片時主標切換為「讓 ___ 被看見」（關鍵字橘色）；切換採「舊標淡出
+ * 上移、新標淡入下移」交疊過場（依 spec「淡入淡出 + 輕微位移」）。
  */
 export function PortalIntroSection({
   eyebrow = '教育部藝術設計三大計畫',
   heading = '為台灣藝術設計開啟更多可能',
+  headingKey,
+  exiting = false,
 }: PortalIntroSectionProps) {
+  const currentKey = headingKey ?? 'init';
+  // layers：最後一個為當前 in-flow 主標，其餘為退場中的絕對定位覆蓋層
+  const [layers, setLayers] = useState<HeadingLayer[]>(() => [
+    { id: ++LAYER_ID, key: currentKey, node: heading },
+  ]);
+
+  // Render-time 衍生：
+  //  - key 變動 → 加入新 layer 觸發 cross-fade
+  //  - 同 key + 內容變動（如 keyword 切換） → 更新最後一層的 node，不啟動 cross-fade
+  const last = layers[layers.length - 1];
+  if (!last || last.key !== currentKey) {
+    setLayers((prev) => [
+      ...prev,
+      { id: ++LAYER_ID, key: currentKey, node: heading },
+    ]);
+  } else if (last.node !== heading) {
+    // 同 key 但 ReactNode 不同（如 keyword span 變了） → 只更新最後一層
+    setLayers((prev) =>
+      prev.map((l, i) => (i === prev.length - 1 ? { ...l, node: heading } : l)),
+    );
+  }
+
+  // 過場結束後清掉舊 layer（setState 寫在 setTimeout 回呼裡，不在 effect 主體）
+  useEffect(() => {
+    if (layers.length <= 1) return;
+    const t = window.setTimeout(() => {
+      setLayers((prev) => (prev.length > 1 ? prev.slice(-1) : prev));
+    }, TRANSITION_MS);
+    return () => window.clearTimeout(t);
+  }, [layers]);
+
   return (
     <Box sx={{ textAlign: 'center', px: 3 }}>
-      {/* 小標 — 依 Figma node 1:234（Inter Medium 14px / 1.8 / 黑） */}
+      {/* 小標（spec TYPE.smallHeading 22px / 700） */}
       <Typography
         component="p"
         sx={{
-          fontSize: 12,
-          fontWeight: 500,
-          lineHeight: 1.8,
-          color: '#000000',
-          [portalTokens.mq.tabletUp]: { fontSize: 14 },
+          fontSize: 18,
+          fontWeight: 700,
+          lineHeight: 1.6,
+          color: '#1A1A1A',
+          [portalTokens.mq.tabletUp]: { fontSize: 22 },
         }}
       >
         {eyebrow}
       </Typography>
-      {/* 主標 — 依 Figma node 1:233（Inter Medium 24px / 1.8 / 字距 3.36px）；
-          與小標間距依設計稿約 77px（<834px 約 53px） */}
+      {/* 主標 — spec TYPE.slogan 48px / 700；keyword 46 由內層 span 控制 */}
       <Typography
-        // key 隨 heading 變動 → 切換計畫 slogan 時以淡入過場呈現
-        key={heading}
-        // 首頁主標題（無障礙：每頁需有單一 h1）
         component="h1"
         sx={{
-          mt: '53px',
-          fontSize: 20,
-          fontWeight: 500,
-          lineHeight: 1.8,
-          letterSpacing: '0.14em',
-          color: '#000000',
-          [portalTokens.mq.tabletUp]: { mt: '77px', fontSize: 24 },
-          animation: 'portalHeadingFade 0.45s ease',
-          '@keyframes portalHeadingFade': {
-            from: { opacity: 0 },
-            to: { opacity: 1 },
+          position: 'relative',
+          mt: '40px',
+          fontSize: 32,
+          fontWeight: 700,
+          lineHeight: 1.35,
+          letterSpacing: '0.02em',
+          color: '#1A1A1A',
+          [portalTokens.mq.tabletUp]: { mt: '77px', fontSize: 48 },
+          // ★ Slogan exit on expand（IMPLEMENTATION.md §4.1）：
+          //  - 黑字 y 0 → -180 / 0.5s（快、先消失）
+          //  - 橘色 keyword 由內層 span 控制（不在這層做）
+          // 這裡作為「黑字層」整體先升離。
+          ...(exiting && {
+            animation:
+              'sloganExitBlack 0.50s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+          }),
+          // 橘 keyword：y 0 → -40 後 opacity → 0（spec sloganExit.orange）
+          '@keyframes sloganExitBlack': {
+            '0%': { transform: 'translateY(0)', opacity: 1 },
+            '100%': { transform: 'translateY(-180px)', opacity: 0 },
           },
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          ...(exiting && {
+            '& span[data-slogan-keyword]': {
+              animation:
+                'sloganExitOrange 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+            },
+          }),
+          '@keyframes sloganExitOrange': {
+            '0%': { transform: 'translateY(0)', opacity: 1 },
+            '60%': { transform: 'translateY(-40px)', opacity: 1 },
+            '100%': { transform: 'translateY(-40px)', opacity: 0 },
+          },
         }}
       >
-        {heading}
+        {layers.map((layer, idx) => {
+          const isLast = idx === layers.length - 1;
+          return (
+            <Box
+              component="span"
+              key={layer.id}
+              sx={{
+                // 依故事第 2 幕：舊主標 fadeout + 下移、新主標 fadein + 從上滑下
+                ...(isLast
+                  ? {
+                      display: 'inline-block',
+                      animation: `portalHeadingIn ${TRANSITION_MS}ms ease both`,
+                    }
+                  : {
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      animation: `portalHeadingOut ${TRANSITION_MS}ms ease forwards`,
+                    }),
+                // 新主標：從上方 -8 滑下到 0、淡入
+                '@keyframes portalHeadingIn': {
+                  from: { opacity: 0, transform: 'translateY(-8px)' },
+                  to: { opacity: 1, transform: 'translateY(0)' },
+                },
+                // 舊主標：從 0 下移到 +8、淡出
+                '@keyframes portalHeadingOut': {
+                  from: { opacity: 1, transform: 'translateY(0)' },
+                  to: { opacity: 0, transform: 'translateY(8px)' },
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  animation: 'none',
+                },
+              }}
+            >
+              {layer.node}
+            </Box>
+          );
+        })}
       </Typography>
     </Box>
   );

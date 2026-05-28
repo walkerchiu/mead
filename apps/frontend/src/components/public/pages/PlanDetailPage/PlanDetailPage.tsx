@@ -144,7 +144,12 @@ export function PlanDetailPage({ plan, onBack }: PlanDetailPageProps) {
 
         {/* 計畫識別 */}
         <Box sx={{ mt: 4 }}>
-          <PlanLogo name={plan.name} planId={plan.id} size={64} />
+          <PlanLogo
+            name={plan.name}
+            planId={plan.id}
+            logoSrc={plan.logoUrl}
+            size={64}
+          />
         </Box>
 
         {/* 主標 */}

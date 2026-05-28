@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 import Box from '@mui/material/Box';
 import { useLocale, useTranslations } from 'next-intl';
@@ -21,21 +21,62 @@ export interface PortalLandingPageProps {
   plans: Plan[];
 }
 
+/** 過場區卡片顯示順序（依設計稿：菁培 → 設計戰國策 → 創意設計大賽） */
+const PLAN_ORDER: string[] = ['sposad', 'idc', 'tisdc'];
+
+/** hover 計畫卡時主標「讓 ___ 被看見」的橘色關鍵字（依設計稿過場效果） */
+const HOVER_KEYWORD: Record<string, string> = {
+  sposad: '人',
+  idc: '創意',
+  tisdc: '競賽',
+};
+
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
  *
- * 由上而下：hero 文字雲 → 主標題 → 三大計畫輪播 → 頁尾。
- * 切換計畫時，文字雲與輪播卡片同步更新（共用 activeIndex 狀態）。
+ * 由上而下：hero 文字雲 → 主標題 → 三大計畫展開／收合互動區 → 敘事 → 頁尾。
+ * 互動區靜止時為三張收合卡並列，點擊展開該計畫；展開計畫與文字雲、指示點
+ * 共用 expandedIndex 狀態，hover 卡片則以 hoverIndex 切換主標 slogan。
  */
 export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const t = useTranslations('portal');
   const locale = useLocale();
   const language = locale.startsWith('zh') ? 'zh' : 'en';
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  // hover 計畫卡片時，主標切換為該計畫 slogan（依設計稿過場效果說明）
-  const [cardHovered, setCardHovered] = useState(false);
-  const activePlan = plans[activeIndex] ?? plans[0];
+  // null = 靜止（三張收合卡並列）；數字 = 已展開該計畫（依過場效果影片與說明）
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
+  // hover 計畫卡片時，主標切換為該計畫對應的關鍵字 slogan（依設計稿過場效果說明）
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  // 三張卡下方的觀察點 — 使用者捲動到此（看完三卡）且尚未點擊 → 預設展開第一個計畫
+  const expandSentinelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (expandedIndex !== null) return;
+    const el = expandSentinelRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setExpandedIndex(0);
+        }
+      },
+      // rootMargin 下緣縮 50% → sentinel 進入視窗上半部才觸發；
+      // 給使用者足夠時間看完三張卡，再「往下滑」時才自動展開第一個計畫。
+      { threshold: 0, rootMargin: '0px 0px -50% 0px' },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [expandedIndex]);
+
+  // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
+  const orderedPlans: Plan[] = [
+    ...PLAN_ORDER.map((id) => plans.find((p) => p.id === id)).filter(
+      (p): p is Plan => Boolean(p),
+    ),
+    ...plans.filter((p) => !PLAN_ORDER.includes(p.id)),
+  ];
+
+  // hero 文字雲與指示點對應的計畫：靜止時為第一個，展開後為該計畫
+  const activePlan = orderedPlans[expandedIndex ?? 0] ?? orderedPlans[0];
 
   if (!activePlan) return null;
 
@@ -43,14 +84,50 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     .map((p) => p.src)
     .filter((s): s is string => Boolean(s));
 
-  // 計畫對應 slogan：未 hover 時顯示三大計畫整體主標，hover 時切換為該計畫
-  const planSlogan =
-    activePlan.slogan.zh ??
-    activePlan.slogan.en ??
-    activePlan.decorativeText[0]?.zh ??
-    activePlan.decorativeText[0]?.en ??
-    activePlan.name.zh;
-  const heading = cardHovered ? planSlogan : t('heading');
+  // 計畫 fallback slogan（非 zh 語系或無關鍵字對應時使用）
+  const sloganOf = (plan: Plan) =>
+    plan.slogan.zh ??
+    plan.slogan.en ??
+    plan.decorativeText[0]?.zh ??
+    plan.decorativeText[0]?.en ??
+    plan.name.zh;
+
+  // 主標：未 hover → 整體主標；hover 任何計畫 → 「讓 [關鍵字 橘] 被看見」（zh）
+  //
+  // 依 IMPLEMENTATION.md §4.1：
+  //   - 預設↔hover：整句交叉淡化（0.30s）
+  //   - 「關鍵字不做下方升起進場」→ keyword 僅換字、不獨立動畫
+  //   - 同 hover 跨卡：headingKey 統一 → 不重新 cross-fade、只換 keyword 文字
+  const hoveredPlan = hoverIndex != null ? orderedPlans[hoverIndex] : undefined;
+  let heading: ReactNode = t('heading');
+  let headingKey = 'default';
+  if (hoveredPlan) {
+    headingKey = 'hover';
+    const kw = language === 'zh' ? HOVER_KEYWORD[hoveredPlan.id] : undefined;
+    heading = kw ? (
+      <>
+        讓&nbsp;&nbsp;
+        {/* keyword：TYPE.keyword 46px / 700 / 橘色，無 rise 動畫（spec 明定不做）。
+            data-slogan-keyword：供 PortalIntroSection 在 exiting 時對 keyword 套用獨立動畫 */}
+        <Box
+          component="span"
+          data-slogan-keyword=""
+          sx={{
+            display: 'inline-block',
+            color: portalTokens.color.brandOrange,
+            fontSize: 30,
+            [portalTokens.mq.tabletUp]: { fontSize: 46 },
+            fontWeight: 700,
+          }}
+        >
+          {kw}
+        </Box>
+        &nbsp;&nbsp;被看見
+      </>
+    ) : (
+      sloganOf(hoveredPlan)
+    );
+  }
 
   return (
     <Box
@@ -61,6 +138,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         flexDirection: 'column',
         // hover 浮出時側邊圖片會略微溢出，裁掉水平方向避免出現捲軸
         overflowX: 'clip',
+        // ★ 自訂游標（依使用者圖示） — 32x38 SVG 黑底白邊指標、hotspot 在 (5,5)
+        cursor: 'url("/cursors/portal-cursor.svg") 5 5, auto',
+        '& button, & a, & [role="button"]': {
+          cursor: 'url("/cursors/portal-cursor.svg") 5 5, pointer',
+        },
       }}
     >
       {/* <main> landmark — 無障礙必要結構（政府網站規範）；對應 skip-link 目標 */}
@@ -85,26 +167,47 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           />
         </Box>
 
-        {/* 間隔一段距離後 — 主要內容區塊（主標題） */}
-        <Box sx={{ mt: 12, [portalTokens.mq.tabletUp]: { mt: 20 } }}>
-          <PortalIntroSection eyebrow={t('eyebrow')} heading={heading} />
-        </Box>
-
-        {/* 三大計畫輪播 — 主標到卡片留白依 Figma：<420px 235px、
-          420–834px 275px、≥834px 280px */}
+        {/* 第二屏 — default 用 100vh + 卡貼底；expanded 用固定間距讓 slogan 與詳細卡有空間 */}
         <Box
           sx={{
-            mt: '235px',
-            [portalTokens.mq.mobileUp]: { mt: '275px' },
-            [portalTokens.mq.tabletUp]: { mt: '280px' },
+            // default 狀態：100vh 容器、卡片貼底；expanded 狀態：自然流，slogan→卡 280px 間距
+            ...(expandedIndex === null
+              ? {
+                  minHeight: '100vh',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  paddingTop: '33vh',
+                }
+              : {
+                  // expanded：依 Figma 31:215 eyebrow 距 section 頂 ~75px、slogan 距 eyebrow 77、卡距 slogan 280
+                  paddingTop: '75px',
+                }),
           }}
         >
-          <PlanCarousel
-            plans={plans}
-            activeIndex={activeIndex}
-            onActiveIndexChange={setActiveIndex}
-            onHoverChange={setCardHovered}
+          <PortalIntroSection
+            eyebrow={t('eyebrow')}
+            heading={heading}
+            headingKey={headingKey}
           />
+          <Box
+            sx={{
+              ...(expandedIndex === null
+                ? { marginTop: 'auto' }
+                : { marginTop: '280px' }),
+            }}
+          >
+            <PlanCarousel
+              plans={orderedPlans}
+              expandedIndex={expandedIndex}
+              onExpandedIndexChange={setExpandedIndex}
+              onHoverPlanChange={setHoverIndex}
+            />
+            <Box
+              ref={expandSentinelRef}
+              aria-hidden
+              sx={{ height: 1, width: '100%' }}
+            />
+          </Box>
         </Box>
 
         {/* 敘事段落 */}
@@ -140,9 +243,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               }}
             >
               <CarouselDots
-                count={plans.length}
-                activeIndex={activeIndex}
-                onSelect={setActiveIndex}
+                count={orderedPlans.length}
+                activeIndex={expandedIndex ?? 0}
+                onSelect={setExpandedIndex}
               />
             </Box>
           </Box>

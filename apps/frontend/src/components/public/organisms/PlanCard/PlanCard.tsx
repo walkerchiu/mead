@@ -97,7 +97,11 @@ export function PlanCard({ plan }: PlanCardProps) {
               [portalTokens.mq.tabletUp]: { flex: '1 1 0' },
             }}
           >
-            <PlanLogo name={plan.name} planId={plan.id} />
+            <PlanLogo
+              name={plan.name}
+              planId={plan.id}
+              logoSrc={plan.logoUrl}
+            />
             <Typography
               // h2 — 首頁標題層級（h1 為頁面主標）；維持原視覺樣式
               component="h2"

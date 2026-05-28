@@ -11,7 +11,7 @@
 
 ## 0. 架構與設計決策
 
-```
+```text
 網際網路 ──80/443──> Caddy（TLS 終止 + 自動 ACME）──內網 http──> Next.js :3000
 ```
 
@@ -39,10 +39,12 @@
    （TCP；443 另可開 UDP 給 HTTP/3）。LE 驗證需要 80（HTTP-01）或 443（TLS-ALPN-01）至少一個可達。
    - ⚠️ AWS EC2：到 **EC2 Console → Security Groups → Inbound rules** 新增 80、443。
 3. **SSH 存取**：金鑰 + 主機 IP。本次：
+
    ```bash
    ssh -i <金鑰>.pem ubuntu@<主機IP>
    chmod 400 <金鑰>.pem   # 金鑰權限需為 400/600，否則 ssh 會拒絕
    ```
+
 4. **本機**：已安裝 Docker（含 buildx）。
 
 ---

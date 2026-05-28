@@ -5,6 +5,7 @@
       "id": "sposad",
       "slug": "sposad",
       "folderName": "01_sposad",
+      "logoUrl": "/images/plans/01_sposad/logo/logo.png",
       "name": {
         "zh": "教育部 藝術與設計菁英海外培訓計畫",
         "en": "Scholarship Program for Overseas Study in Arts & Design (SPOSAD)"
@@ -209,6 +210,7 @@
       "id": "tisdc",
       "slug": "tisdc",
       "folderName": "02_tisdc",
+      "logoUrl": "/images/plans/02_tisdc/logo/logo.png",
       "name": {
         "zh": "臺灣國際學生創意設計大賽",
         "en": "Taiwan International Student Design Competition (TISDC)"
@@ -382,6 +384,7 @@
       "id": "idc",
       "slug": "idc",
       "folderName": "03_idc",
+      "logoUrl": "/images/plans/03_idc/logo/logo.png",
       "name": {
         "zh": "教育部鼓勵學生參加藝術與設計類國際競賽計畫",
         "en": null
@@ -426,7 +429,13 @@
           "description": "核發獎勵金數"
         }
       ],
-      "banners": [],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/banner/banner_01.jpg",
+          "url": null
+        }
+      ],
       "socialLinks": [
         {
           "platform": "Facebook",

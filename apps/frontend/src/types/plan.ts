@@ -47,6 +47,8 @@ export interface Plan {
   slug: string;
   /** 對應素材資料夾：01_sposad / 02_tisdc / 03_idc */
   folderName: string;
+  /** 計畫官方 logo（完整組合圖：標誌＋品牌字標）於 /public 下的路徑 */
+  logoUrl?: string;
   name: { zh: string; en: string | null };
   slogan: LocalizedText;
   /** 計畫介紹 */

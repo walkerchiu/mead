@@ -37,9 +37,9 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: '計畫連結',
     links: [
-      { label: '菁培計畫', href: '/plans/sposad' },
-      { label: '設計戰國策', href: '/plans/idc' },
-      { label: '台灣國際學生創意設計大賽', href: '/plans/tisdc' },
+      { label: '菁培計畫', href: 'https://www.animlab.yuntech.edu.tw/sposad/' },
+      { label: '設計戰國策', href: 'https://www.moe-idc.org/' },
+      { label: '台灣國際學生創意設計大賽', href: 'https://www.tisdc.org/' },
       { label: '歷年成果', href: '#' },
     ],
   },
@@ -47,7 +47,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
     title: '關於我們',
     links: [
       { label: '計畫緣起', href: '#' },
-      { label: '教育部官網', href: 'https://www.edu.tw/' },
+      { label: '教育部官網', href: 'https://www.edu.tw/Default.aspx' },
       { label: '隱私權政策', href: '#' },
       { label: '網站導覽', href: '#' },
       { label: '無障礙聲明', href: '#' },
@@ -265,15 +265,20 @@ export function PortalFooter({
                   {col.title}
                 </Typography>
                 {col.links.map((link) => {
-                  // 內部路由（/plans/...）用 locale-aware 的 next-intl Link，
-                  // 其餘（# 或外部 http）用一般連結。
+                  // 內部路由（/plans/...）用 locale-aware 的 next-intl Link；
+                  // 外部官網（http/https）於新分頁開啟；其餘（# 佔位）用一般連結。
                   const isInternal = link.href.startsWith('/');
+                  const isExternal = /^https?:\/\//.test(link.href);
                   return (
                     <Link
                       key={link.label}
                       {...(isInternal
                         ? { component: IntlLink, href: link.href }
                         : { href: link.href })}
+                      {...(isExternal && {
+                        target: '_blank',
+                        rel: 'noopener noreferrer',
+                      })}
                       underline="none"
                       sx={{
                         // 依 Figma node 1:63 — Inter Regular 13px #888，不換行

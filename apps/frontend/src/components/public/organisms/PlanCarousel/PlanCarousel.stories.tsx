@@ -9,7 +9,8 @@ import { plansFixture } from '@/mocks/fixtures/plans';
 import { PlanCarousel } from './PlanCarousel';
 
 /**
- * 三大計畫輪播：中央計畫卡片、左右露出相鄰計畫照片、下方指示點，支援自動輪播。
+ * 三大計畫展開／收合互動區：預設展開第一個計畫的大卡，兩側為可點的收合計畫卡，
+ * 點擊收合卡以放大淡入轉場展開該計畫；hover 卡片回報索引供主標切換 slogan。
  */
 const meta = {
   title: 'Public Scope/Organisms/PlanCarousel',
@@ -31,35 +32,16 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     plans: plansFixture,
-    activeIndex: 0,
-    onActiveIndexChange: () => {},
+    expandedIndex: null,
+    onExpandedIndexChange: () => {},
   },
   render: function CarouselWithState(args) {
-    const [active, setActive] = useState(0);
+    const [expanded, setExpanded] = useState<number | null>(null);
     return (
       <PlanCarousel
         {...args}
-        activeIndex={active}
-        onActiveIndexChange={setActive}
-      />
-    );
-  },
-};
-
-export const AutoRotateOff: Story = {
-  args: {
-    plans: plansFixture,
-    activeIndex: 0,
-    onActiveIndexChange: () => {},
-    autoRotateMs: 0,
-  },
-  render: function CarouselStatic(args) {
-    const [active, setActive] = useState(0);
-    return (
-      <PlanCarousel
-        {...args}
-        activeIndex={active}
-        onActiveIndexChange={setActive}
+        expandedIndex={expanded}
+        onExpandedIndexChange={setExpanded}
       />
     );
   },

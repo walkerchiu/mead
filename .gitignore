@@ -87,3 +87,16 @@ __pycache__/
 # SSH 私鑰 / 憑證（絕不入庫）
 *.pem
 *.key
+
+# Local screenshot / debug artifacts at repo root
+/chin_*.jpeg
+/live_*.jpeg
+/match_*.jpeg
+/mine_*.jpeg
+/second_screen_*.jpeg
+/spec_*.jpeg
+/svg_*.jpeg
+/verify_*.jpeg
+/figma_*.jpeg
+/final_*.jpeg
+/note

@@ -32,19 +32,38 @@ export interface PlanLogoProps {
   name: { zh: string; en: string | null };
   /** 計畫 id（sposad / tisdc / idc）— 決定替代徽記的圖示與色彩 */
   planId?: string;
-  /** 計畫 logo 圖片路徑；提供時優先使用 */
+  /** 計畫官方 logo（完整組合圖）路徑；提供時直接顯示，不再另列名稱文字 */
   logoSrc?: string;
-  /** 徽記尺寸（px），預設 56 */
+  /** 徽記尺寸（px），預設 56；亦作為 logo 組合圖的高度上限基準 */
   size?: number;
 }
 
 /**
- * PlanLogo — 計畫識別：徽記 + 中英文名稱。
+ * PlanLogo — 計畫識別。
  *
- * 參考資料尚未提供各計畫 logo 圖檔，未帶 `logoSrc` 時依 `planId`
- * 顯示該計畫專屬的替代徽記（不同圖示與色調）。
+ * 帶 `logoSrc` 時顯示該計畫的官方 logo 組合圖（標誌＋品牌字標已含於圖中，
+ * 故不再另列計畫名稱文字）；未帶時依 `planId` 顯示替代徽記＋中英文名稱。
  */
 export function PlanLogo({ name, planId, logoSrc, size = 56 }: PlanLogoProps) {
+  // 官方 logo 組合圖：依各計畫設計稿的橫向／直向比例自然呈現，高度依 size 等比縮放
+  if (logoSrc) {
+    return (
+      <Box
+        component="img"
+        src={logoSrc}
+        alt={name.zh}
+        sx={{
+          display: 'block',
+          width: 'auto',
+          height: 'auto',
+          // 同寬欄對齊，並限制高度避免多行 lockup（idc/tisdc）過高
+          maxWidth: size * 3.9,
+          maxHeight: size * 2.1,
+        }}
+      />
+    );
+  }
+
   const emblem = planId ? PLAN_EMBLEMS[planId] : undefined;
   const EmblemIcon = emblem?.Icon ?? PaletteOutlinedIcon;
   const emblemBg = emblem?.bg ?? portalTokens.color.brandOrange;
@@ -61,20 +80,11 @@ export function PlanLogo({ name, planId, logoSrc, size = 56 }: PlanLogoProps) {
           alignItems: 'center',
           justifyContent: 'center',
           overflow: 'hidden',
-          bgcolor: logoSrc ? 'transparent' : emblemBg,
+          bgcolor: emblemBg,
           color: portalTokens.color.surface,
         }}
       >
-        {logoSrc ? (
-          <Box
-            component="img"
-            src={logoSrc}
-            alt={name.zh}
-            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
-          />
-        ) : (
-          <EmblemIcon sx={{ fontSize: size * 0.5 }} />
-        )}
+        <EmblemIcon sx={{ fontSize: size * 0.5 }} />
       </Box>
 
       <Box sx={{ minWidth: 0 }}>

@@ -7,15 +7,15 @@
  */
 export const portalTokens = {
   color: {
-    /** 品牌橘 — 輪播指示點、強調色 */
-    brandOrange: '#EC6A1E',
+    /** 品牌橘 — 強調色（hover 強調 / 時程 highlight / 主標關鍵字 / 指示點） */
+    brandOrange: '#E84C1F',
     brandOrangeSoft: '#F4914E',
     /** hero 文字雲色塊漸層 */
     blobOrangeFrom: '#F0682A',
     blobOrangeTo: '#F7AA68',
     blobGrey: '#D7D7D7',
-    /** 頁面底色 — 溫和淺灰 */
-    pageBg: '#EAEAEA',
+    /** 頁面底色 — 依 IMPLEMENTATION.md §2 常數表 */
+    pageBg: '#E4E4E4',
     surface: '#FFFFFF',
     surfaceMuted: '#F2F2F2',
     footerBg: '#E3E3E3',
