@@ -37,6 +37,8 @@ export function PortalNarrativeSection({
 }: PortalNarrativeSectionProps) {
   return (
     <Box
+      component="section"
+      aria-labelledby={statement ? 'portal-narrative-heading' : undefined}
       sx={{
         maxWidth: portalTokens.layout.maxWidth,
         mx: 'auto',
@@ -59,10 +61,13 @@ export function PortalNarrativeSection({
           </Typography>
         )}
 
-        {/* 重點標語 — 靠右偏移、中字（Figma node 1:43） */}
+        {/* 重點標語 — 靠右偏移、中字（Figma node 1:43）。語意 h2 作為敘事
+            段落的標題，提供 section landmark 的 aria-labelledby 來源
+            （WCAG 1.3.1 / 2.4.6）。 */}
         {statement && (
           <Typography
-            component="p"
+            id="portal-narrative-heading"
+            component="h2"
             sx={{
               mt: 6,
               maxWidth: 362,

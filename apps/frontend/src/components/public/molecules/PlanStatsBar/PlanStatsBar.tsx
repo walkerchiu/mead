@@ -84,9 +84,10 @@ export function PlanStatsBar({ stats }: PlanStatsBarProps) {
             <Typography
               component="p"
               sx={{
-                fontSize: 8.3,
+                // WCAG 1.4.4 Resize Text：原 8.3px 太小、12px 為最低門檻。
+                fontSize: 12,
                 fontWeight: 400,
-                lineHeight: 'normal',
+                lineHeight: 1.3,
                 color: '#000000',
               }}
             >
@@ -95,10 +96,11 @@ export function PlanStatsBar({ stats }: PlanStatsBarProps) {
             <Typography
               component="p"
               sx={{
-                fontSize: 7.15,
+                // 原 7.15px 太小；#666 on #FFF ≈ 5.74:1 OK 但字級放大至 12。
+                fontSize: 12,
                 fontWeight: 400,
-                lineHeight: 'normal',
-                color: '#666666',
+                lineHeight: 1.4,
+                color: '#5C5C5C',
               }}
             >
               {stat.description}

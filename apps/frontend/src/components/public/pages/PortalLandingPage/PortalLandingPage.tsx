@@ -207,12 +207,35 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         },
       }}
     >
-      {/* <main> landmark — 無障礙必要結構（政府網站規範）；對應 skip-link 目標 */}
+      {/* <main> landmark — 無障礙必要結構（政府網站規範）；對應 skip-link 目標。
+          tabIndex=-1 + outline:none：讓 Safari/Firefox 在 skip-link click 後
+          focus 真的進入 <main>（部分瀏覽器不會自動把 focus 移到 hash target）。*/}
       <Box
         component="main"
         id="main-content"
-        sx={{ display: 'flex', flexDirection: 'column' }}
+        tabIndex={-1}
+        sx={{ display: 'flex', flexDirection: 'column', outline: 'none' }}
       >
+        {/* 視覺隱藏的常駐 h1（WCAG 1.3.1 / 2.4.6）：expanded 模式下
+            PortalIntroSection unmount，整頁就沒 h1；給讀屏使用者一個
+            穩定的頁面語意主標。視覺 hierarchy 仍由 PortalIntroSection
+            的 visible slogan（已改 h2）/ PlanCard 的 h2 接力呈現。*/}
+        <Box component="h1" className="visually-hidden">
+          {t('eyebrow')} | {t('footer.siteName')}
+        </Box>
+        {/* aria-live status — 計畫展開／切換時告知讀屏使用者目前查看哪個計畫
+            （WCAG 4.1.3 Status Messages）。刻意只在 expandedIndex 變動時更新，
+            不掛 hover；hover 是即時視覺回饋，無需逐次播報以免干擾。*/}
+        <Box
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          className="visually-hidden"
+        >
+          {expandedIndex !== null
+            ? t('viewingPlan', { name: activePlan.name.zh })
+            : ''}
+        </Box>
         {/* 第一屏 — 文字雲佔滿整個視窗高度 */}
         <Box
           sx={{
@@ -323,6 +346,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                 count={orderedPlans.length}
                 activeIndex={expandedIndex ?? 0}
                 onSelect={setExpandedIndex}
+                labels={orderedPlans.map((p) => p.name.zh)}
+                ariaLabel="計畫切換"
               />
             </Box>
           </Box>

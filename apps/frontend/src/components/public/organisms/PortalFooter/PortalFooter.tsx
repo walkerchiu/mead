@@ -63,18 +63,20 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   },
 ];
 
-/** Figma node 1:47 色票 */
+/** Figma node 1:47 色票 — 數值已就 WCAG 2.1 AA 對比 (≥4.5:1 normal text)
+ *  與 footerBg #E3E3E3 加深。原 #888 (≈2.95:1) / #bbb (≈1.66:1) /
+ *  #aaa (≈2.0:1) / 11px 都不符 AA。 */
 const C = {
   title: '#000000',
-  link: '#888888',
-  subline: '#bbbbbb',
-  badgeBorder: '#444444',
-  badgeText: '#aaaaaa',
-  copyright: '#666666',
+  link: '#5C5C5C', // on #E3E3E3 ≈ 6.0:1 ✓
+  subline: '#4A4A4A', // on #E3E3E3 ≈ 8.4:1 ✓
+  badgeBorder: '#1E1E1E',
+  badgeText: '#1E1E1E', // 高對比，無障礙標章須清楚
+  copyright: '#5C5C5C',
 };
 
-/** 版權文字共用樣式 */
-const copyrightSx = { fontSize: 11, color: C.copyright } as const;
+/** 版權文字共用樣式（字級提升至 12 — 1.4.4 Resize Text 友善） */
+const copyrightSx = { fontSize: 12, color: C.copyright } as const;
 
 /**
  * PortalFooter — 入口網頁尾。
@@ -161,15 +163,16 @@ export function PortalFooter({
                   {siteName}
                 </Typography>
               </Box>
-              {/* 依 Figma node 1:53 — Inter Regular 8.6px #bbb，對齊名稱左緣 */}
+              {/* 依 Figma node 1:53 — 原本 8.6px nowrap 違反 1.4.4 / 1.4.10。
+                  放寬到 12px 並允許換行，色彩加深確保 4.5:1。 */}
               <Typography
                 component="p"
                 sx={{
                   mt: 0.5,
                   ml: '50px',
-                  fontSize: 8.6,
+                  fontSize: 12,
+                  lineHeight: 1.6,
                   color: C.subline,
-                  whiteSpace: 'nowrap',
                 }}
               >
                 {BRAND_SUBLINE}
@@ -205,7 +208,7 @@ export function PortalFooter({
               <GppGoodOutlinedIcon sx={{ fontSize: 14, color: C.badgeText }} />
               <Typography
                 component="span"
-                sx={{ fontSize: 11, fontWeight: 500, color: C.badgeText }}
+                sx={{ fontSize: 12, fontWeight: 500, color: C.badgeText }}
               >
                 無障礙認證
               </Typography>
@@ -223,14 +226,18 @@ export function PortalFooter({
             </Typography>
           </Box>
 
-          {/* 三欄連結 — 各斷點皆為固定寬（73px）窄欄。
-              <834px 以 space-between 散佈於置中區塊（Figma 43:396 / 43:1142）；
-              ≥834px 為固定寬群組、欄距 64px（Figma node 1:48） */}
+          {/* 三欄連結 — 整組外包 nav landmark（WCAG 1.3.1）。
+              原本 width:73 + overflow:hidden + whiteSpace:nowrap 在 200% 縮放
+              或 320px 寬下會把連結文字裁掉（違反 1.4.4 / 1.4.10）；改用
+              min-width 並允許文字換行。欄距 ≥834px 仍維持寬鬆視覺。 */}
           <Box
+            component="nav"
+            aria-label="頁尾導覽"
             sx={{
               width: '100%',
               display: 'flex',
               justifyContent: 'space-between',
+              gap: 2,
               [portalTokens.mq.tabletUp]: {
                 flex: '0 0 auto',
                 width: 'auto',
@@ -243,19 +250,19 @@ export function PortalFooter({
               <Box
                 key={col.title}
                 sx={{
-                  // 依 Figma 欄框固定 72.97px、超出裁切（各斷點一致）
-                  width: 73,
-                  flexShrink: 0,
-                  overflow: 'hidden',
+                  minWidth: 73,
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
                 }}
               >
-                {/* 欄標題 — 依 Figma node 1:62（Inter SemiBold 12px / 字距 1px） */}
+                {/* 欄標題 — 改 h3（h1 在 PortalLandingPage、h2 在 PortalIntroSection /
+                    PortalNarrativeSection / PlanCard），語意層級連續。
+                    Figma 視覺仍為 Inter SemiBold 12px / 字距 1px。 */}
                 <Typography
-                  component="p"
+                  component="h3"
                   sx={{
+                    m: 0,
                     fontSize: 12,
                     fontWeight: 600,
                     letterSpacing: '1px',
@@ -266,9 +273,36 @@ export function PortalFooter({
                 </Typography>
                 {col.links.map((link) => {
                   // 內部路由（/plans/...）用 locale-aware 的 next-intl Link；
-                  // 外部官網（http/https）於新分頁開啟；其餘（# 佔位）用一般連結。
+                  // 外部官網（http/https）於新分頁開啟；# 佔位渲為 disabled
+                  // button + sr-only「即將上線」，避免讀屏使用者誤觸卻一無所獲。
+                  const isPlaceholder = link.href === '#';
                   const isInternal = link.href.startsWith('/');
                   const isExternal = /^https?:\/\//.test(link.href);
+                  if (isPlaceholder) {
+                    return (
+                      <Box
+                        key={link.label}
+                        component="button"
+                        type="button"
+                        disabled
+                        aria-disabled="true"
+                        sx={{
+                          background: 'transparent',
+                          border: 'none',
+                          padding: 0,
+                          textAlign: 'left',
+                          fontSize: 13,
+                          fontFamily: 'inherit',
+                          color: C.link,
+                          cursor: 'not-allowed',
+                          opacity: 0.65,
+                        }}
+                      >
+                        {link.label}
+                        <span className="visually-hidden">（即將上線）</span>
+                      </Box>
+                    );
+                  }
                   return (
                     <Link
                       key={link.label}
@@ -278,14 +312,18 @@ export function PortalFooter({
                       {...(isExternal && {
                         target: '_blank',
                         rel: 'noopener noreferrer',
+                        // 提示讀屏使用者連結會開啟新分頁（WCAG 3.2.5 / 2.4.4）
+                        'aria-label': `${link.label}（在新分頁開啟）`,
                       })}
                       underline="none"
                       sx={{
-                        // 依 Figma node 1:63 — Inter Regular 13px #888，不換行
                         fontSize: 13,
                         color: C.link,
-                        whiteSpace: 'nowrap',
                         '&:hover': { color: portalTokens.color.brandOrange },
+                        '&:focus-visible': {
+                          ...portalTokens.focusRing,
+                          borderRadius: '2px',
+                        },
                       }}
                     >
                       {link.label}

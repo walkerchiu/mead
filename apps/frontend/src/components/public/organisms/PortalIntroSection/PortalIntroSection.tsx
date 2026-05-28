@@ -118,9 +118,11 @@ export function PortalIntroSection({
       >
         {eyebrow}
       </Typography>
-      {/* 主標 — spec TYPE.slogan 48px / 700；keyword 46 由內層 span 控制 */}
+      {/* 主標 — spec TYPE.slogan 48px / 700；keyword 46 由內層 span 控制。
+          語意上改為 h2（h1 由 PortalLandingPage 的 visually-hidden 常駐主標承接），
+          確保 expanded mode 下 PortalIntroSection unmount 仍有 h1 存在。 */}
       <Typography
-        component="h1"
+        component="h2"
         sx={{
           position: 'relative',
           mt: '40px',

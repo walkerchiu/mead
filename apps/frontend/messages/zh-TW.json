@@ -1231,6 +1231,7 @@
   "portal": {
     "eyebrow": "教育部藝術設計三大計畫",
     "heading": "為台灣藝術設計開啟更多可能",
+    "viewingPlan": "目前查看：{name}",
     "learnMore": "了解更多",
     "loading": "計畫資料載入中…",
     "error": "計畫資料載入失敗，請稍後再試。",

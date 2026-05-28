@@ -1,62 +1,27 @@
-'use client';
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
-import { useTranslations } from 'next-intl';
-
-import { Button } from '@/components/atoms';
-import { PortalLandingPage } from '@/components/public';
-import { usePlans } from '@/hooks/usePlans';
+import HomeClient from './HomeClient';
 
 /**
- * 首頁 — 教育部藝術設計三大計畫入口網。
- *
- * 於 client 端載入 `public/data/plans.json`，再交由 PortalLandingPage 呈現。
+ * 設定首頁 `<title>` 與 `<meta name="description">`（WCAG 2.4.2 Page Titled）。
+ * 依當前 locale 從 next-intl 取「教育部藝術設計三大計畫」相關文案。
  */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: 'portal' });
+  const eyebrow = t('eyebrow');
+  const siteName = t('footer.siteName');
+  return {
+    title: `${eyebrow} | ${siteName}`,
+    description: t('heading'),
+  };
+}
+
 export default function Home() {
-  const t = useTranslations('portal');
-  const { plans, loading, error } = usePlans();
-
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          bgcolor: '#EAEAEA',
-        }}
-      >
-        <CircularProgress />
-        <Typography sx={{ color: '#6E6E6E' }}>{t('loading')}</Typography>
-      </Box>
-    );
-  }
-
-  if (error || plans.length === 0) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-          bgcolor: '#EAEAEA',
-        }}
-      >
-        <Typography sx={{ color: '#6E6E6E' }}>{t('error')}</Typography>
-        <Button variant="outlined" onClick={() => window.location.reload()}>
-          {t('retry')}
-        </Button>
-      </Box>
-    );
-  }
-
-  return <PortalLandingPage plans={plans} />;
+  return <HomeClient />;
 }

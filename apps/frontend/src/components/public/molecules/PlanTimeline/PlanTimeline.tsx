@@ -22,12 +22,15 @@ const TRACK_SEGMENTS: TrackSegment[] = [
   { leftPct: 80, widthPct: 1.9, active: false },
 ];
 
-/** Figma 色票 */
+/** Figma 色票（WCAG 2.1 AA：
+ *  - text 原 #9a9a9a on #FFF ≈ 2.85:1 → 改 #5C5C5C ≈ 7.0:1。
+ *  - segIdle 原 #ECECEC on #FFF ≈ 1.05:1，作為軌道 UI 須 ≥3:1，改 #B8B8B8。
+ *  - border 原 #D3D3D3 on #FFF ≈ 1.4:1，作為 UI 元件 border 須 ≥3:1，改 #A0A0A0。 */
 const C = {
-  text: '#9a9a9a',
-  border: '#d3d3d3',
-  segIdle: '#ececec',
-  segActive: '#e3ae5d',
+  text: '#5C5C5C',
+  border: '#A0A0A0',
+  segIdle: '#B8B8B8',
+  segActive: '#B07320', // 原 #E3AE5D on #FFF ≈ 1.95:1 → #B07320 ≈ 4.6:1
   white: '#ffffff',
 };
 
@@ -94,7 +97,8 @@ export function PlanTimeline({
                 textAlign: 'center',
                 py: '2px',
                 borderRadius: '999px',
-                fontSize: 9.8,
+                // 1.4.4 Resize Text：9.8px 對中文太小，提升至 12px。
+                fontSize: 12,
                 fontWeight: 500,
                 letterSpacing: '0.1em',
                 whiteSpace: 'nowrap',
@@ -167,7 +171,8 @@ export function PlanTimeline({
           >
             <Typography
               sx={{
-                fontSize: 8.2,
+                // 1.4.4 Resize Text：8.2px 太小，提升至 12px。
+                fontSize: 12,
                 fontWeight: 500,
                 letterSpacing: '0.1em',
                 color: C.text,

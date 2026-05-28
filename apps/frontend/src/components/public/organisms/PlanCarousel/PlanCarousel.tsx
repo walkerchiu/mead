@@ -120,7 +120,9 @@ function peekSx(direction: 'prev' | 'next') {
     border: 'none',
     borderRadius: '17.35px',
     bgcolor: 'rgba(255, 255, 255, 0.54)',
-    outline: '1px solid rgba(138, 138, 138, 0.49)',
+    // 原本 rgba(138,138,138,0.49) 實效 ≈ #B4B4B4 on #E4E4E4 ≈ 1.6:1，
+    // UI 元件須 ≥3:1（WCAG 1.4.11）。加深至 rgba(92,92,92,0.85) 約 4.4:1。
+    outline: '1px solid rgba(92, 92, 92, 0.85)',
     outlineOffset: '-1px',
     backdropFilter: 'blur(28.34px)',
     WebkitBackdropFilter: 'blur(28.34px)',
@@ -142,10 +144,7 @@ function peekSx(direction: 'prev' | 'next') {
       transform: isPrev ? 'translateX(6px)' : 'translateX(-6px)',
       bgcolor: 'rgba(255, 255, 255, 0.92)',
     },
-    '&:focus-visible': {
-      outlineColor: portalTokens.color.brandOrange,
-      outlineWidth: '2px',
-    },
+    '&:focus-visible': portalTokens.focusRing,
     [portalTokens.mq.tabletUp]: { display: 'flex' },
     // 內部箭頭 icon — 預設淡出、hover 時淡入並朝中央滑入
     alignItems: 'center',
@@ -368,7 +367,7 @@ function PlanMiniCard({
         <path
           d={hovered ? hoverPath : defaultPath}
           fill="none"
-          stroke="rgba(138, 138, 138, 0.49)"
+          stroke="rgba(92, 92, 92, 0.85)"
           strokeWidth="0.649"
         />
       </Box>
@@ -387,15 +386,13 @@ function PlanMiniCard({
           color:
             hovered && !suppressOrange
               ? portalTokens.color.brandOrange
-              : '#9A9A9A',
+              : // 原 #9A9A9A on #EEEEEE ≈ 2.5:1 → 違反 1.4.3；加深至 #5C5C5C ≈ 6.7:1。
+                '#5C5C5C',
           padding: 0,
           transform: hovered ? 'translateY(-46px)' : 'translateY(0)',
           transition:
             'transform 0.40s cubic-bezier(0.22, 1, 0.36, 1), color 0.40s cubic-bezier(0.22, 1, 0.36, 1)',
-          '&:focus-visible': {
-            outline: `2px solid ${portalTokens.color.brandOrange}`,
-            outlineOffset: 2,
-          },
+          '&:focus-visible': portalTokens.focusRing,
         }}
       >
         {/* 文字 — 依 Figma 161:374 截圖：font-size 13.902, weight 400, color #000 opacity 0.32 */}
@@ -417,7 +414,9 @@ function PlanMiniCard({
             color:
               hovered && !suppressOrange
                 ? portalTokens.color.brandOrange
-                : 'rgba(0, 0, 0, 0.32)',
+                : // 原 rgba(0,0,0,0.32) 實效 ≈ #A8A8A8 on 毛玻璃/#EEEEEE ≈ 2.5:1
+                  // → 違反 1.4.3。加深至 #5C5C5C ≈ 6.7:1。
+                  '#5C5C5C',
             opacity: 1,
             textAlign: 'left',
             transform: hovered ? 'translateY(0)' : 'translateY(5px)',
@@ -437,7 +436,8 @@ function PlanMiniCard({
           - chin 在 path 中以 x=111.218 為中心（card 中心 113.746），故 arrow 對齊 chin center
             = 卡左 + 104.9 = 卡寬 × (104.9/227.49) ≈ 卡寬 × 46.1% （左邊距）
           - 與 chin 底 7.12 距離
-          - color #BABABA、font-size 12.638、weight 400、SF Pro */}
+          - 原色 #BABABA on #E4E4E4 ≈ 1.7:1（違反 1.4.11 UI 元件對比），
+            加深至 #5C5C5C 約 6.7:1。 */}
       <Box
         aria-hidden
         sx={{
@@ -451,7 +451,7 @@ function PlanMiniCard({
           transition:
             'transform 0.40s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease-out',
           opacity: hovered ? 1 : 0,
-          color: '#BABABA',
+          color: '#5C5C5C',
           fontSize: '12.638px',
           fontFamily: '"SF Pro", -apple-system, BlinkMacSystemFont, sans-serif',
           fontWeight: 400,

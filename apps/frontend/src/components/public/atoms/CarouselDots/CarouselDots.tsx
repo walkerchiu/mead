@@ -45,6 +45,11 @@ export interface CarouselDotsProps {
   onSelect?: (index: number) => void;
   /** 指示點尺寸（px），預設 28（依 Figma node 1:44 Star 90/91/92） */
   size?: number;
+  /** 每個指示點對應的可讀名稱（如「教育部藝術與設計菁英海外培訓計畫」），
+   *  作為 aria-label 提供給讀屏使用者；未提供時退回「第 N 個計畫」。 */
+  labels?: readonly string[];
+  /** 整組指示點的可讀區塊標籤，作為 nav landmark 的 aria-label。 */
+  ariaLabel?: string;
 }
 
 /**
@@ -53,29 +58,36 @@ export interface CarouselDotsProps {
  * 依設計稿（node 1:2 的 Star 90/91/92），三個指示點為三種不同形狀
  * （與 hero 文字雲一致）：微鋸齒星形、近圓多邊形、六邊形。
  * 作用中為品牌橘實心、其餘為深色實心。
+ *
+ * 語意：原本套 `role="tablist"` 但沒有對應的 tabpanel 與鍵盤模式，反而不合
+ * ARIA Authoring Practices。改用 `<nav>` + `<button aria-current>`（WAI 推薦
+ * 用於非 tablist 切換器）— 讀屏會唸出「目前頁面/項目」狀態，鍵盤也走原生
+ * button 行為，毋需自訂 ←→ 處理。
  */
 export function CarouselDots({
   count,
   activeIndex,
   onSelect,
   size = 28,
+  labels,
+  ariaLabel = '計畫輪播',
 }: CarouselDotsProps) {
   return (
     <Box
-      role="tablist"
-      aria-label="計畫輪播"
+      component="nav"
+      aria-label={ariaLabel}
       sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}
     >
       {Array.from({ length: count }, (_, i) => {
         const active = i === activeIndex;
+        const label = labels?.[i] ?? `第 ${i + 1} 個計畫`;
         return (
           <Box
             key={i}
             component="button"
             type="button"
-            role="tab"
-            aria-selected={active}
-            aria-label={`第 ${i + 1} 個計畫`}
+            aria-current={active ? 'true' : undefined}
+            aria-label={label}
             onClick={() => onSelect?.(i)}
             sx={{
               p: 0,
@@ -90,10 +102,7 @@ export function CarouselDots({
                 : portalTokens.color.ink,
               transition: 'opacity 0.2s ease, transform 0.2s ease',
               '&:hover': { opacity: active ? 1 : 0.7 },
-              '&:focus-visible': {
-                outline: `2px solid ${portalTokens.color.brandOrange}`,
-                outlineOffset: 2,
-              },
+              '&:focus-visible': portalTokens.focusRing,
             }}
           />
         );

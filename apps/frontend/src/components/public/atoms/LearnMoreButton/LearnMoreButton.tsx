@@ -77,10 +77,7 @@ export const LearnMoreButton = forwardRef<
           transform: `${rotate} translateY(-1px)`.trim(),
           boxShadow: '0 10px 26px -8px rgba(0, 0, 0, 0.34)',
         },
-        '&:focus-visible': {
-          outline: `2px solid ${portalTokens.color.brandOrange}`,
-          outlineOffset: 2,
-        },
+        '&:focus-visible': portalTokens.focusRing,
       }}
     >
       {buttonLabel}

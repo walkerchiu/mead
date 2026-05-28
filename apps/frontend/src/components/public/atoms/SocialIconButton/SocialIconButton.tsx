@@ -85,10 +85,7 @@ export function SocialIconButton({
           transform: 'translateY(-1px)',
           bgcolor: portalTokens.color.brandOrange,
         },
-        '&:focus-visible': {
-          outline: `2px solid ${portalTokens.color.brandOrange}`,
-          outlineOffset: 2,
-        },
+        '&:focus-visible': portalTokens.focusRing,
       }}
     >
       <Icon sx={{ fontSize: size * 0.52 }} />

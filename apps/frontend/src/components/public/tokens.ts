@@ -24,6 +24,23 @@ export const portalTokens = {
     inkSecondary: '#6E6E6E',
     inkMuted: '#9A9A9A',
   },
+  /**
+   * WCAG 2.4.7 / 1.4.11 focus indicator —
+   * 雙環設計：內 2px 白色 halo + 外 2px 品牌橘，確保在 pageBg #E4E4E4、
+   * 卡片白底、毛玻璃半透白、footerBg #E3E3E3 等所有背景下都有 ≥3:1 對比。
+   * 用 box-shadow 而非 outline，避免 border-radius 元件的 outline 不貼合。
+   */
+  focusRing: {
+    outline: 'none',
+    boxShadow: '0 0 0 2px #FFFFFF, 0 0 0 4px #E84C1F',
+    // forced-colors 模式（高對比 / Windows 高對比主題）退回系統色，
+    // 避免 box-shadow 被忽略後完全沒 focus 提示。
+    '@media (forced-colors: active)': {
+      outline: '2px solid Highlight',
+      outlineOffset: 2,
+      boxShadow: 'none',
+    },
+  },
   radius: {
     card: 24,
     control: 12,

@@ -1231,6 +1231,7 @@
   "portal": {
     "eyebrow": "MOE Three Major Arts & Design Programs",
     "heading": "Opening more possibilities for Taiwan's arts and design",
+    "viewingPlan": "Now viewing: {name}",
     "learnMore": "Learn more",
     "loading": "Loading program data…",
     "error": "Failed to load program data. Please try again later.",
