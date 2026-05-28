@@ -421,14 +421,19 @@ export function DecorativeTextCloud({
           '16%, 62%': { opacity: 1 },
           '86%': { opacity: 0 },
         },
+        // 只在父層提供 base opacity；animation shorthand 留給 span 自己設，
+        // 否則此 selector specificity (0,2,0) 會壓過 span sx 的 (0,1,0)，把
+        // animation-name 鎖死成單一 'portalTwinkle'，導致 portalLabelEntrance
+        // 永遠不會跑（橫向「散→聚」入場失效）。
         '& .portal-twinkle': {
           opacity: 0,
-          animation: 'portalTwinkle 5s ease-in-out infinite',
         },
         // ── 裝飾文字入場 — left 百分比從外側收回到最終位置 ──
         // 用 left（layout 屬性）而非 transform，避免建立 stacking context
         // 而破壞 mix-blend-mode（base labels 已踩過這個坑）。
         // 每個文字透過 --init-left / --final-left CSS var 給自己的起點與終點。
+        // opacity 不在這支動畫處理，避免與 twinkle 撞 property 而互蓋；
+        // 第一影格全部可見的需求由 twinkle 的 delay 範圍保證（見下）。
         '@keyframes portalLabelEntrance': {
           from: { left: 'var(--init-left)' },
           to: { left: 'var(--final-left)' },
@@ -478,20 +483,22 @@ export function DecorativeTextCloud({
             '0%, 100%': { transform: 'translate(0px, 0px)' },
             '50%': { transform: 'translate(56px, -8px)' },
           },
-          // ── 主視覺入場動畫（依設計稿錄影 1.46s）──
+          // ── 主視覺入場動畫 ──
           // 左 blob 從 -300 滑入、右 blob 從 +300 滑入、中 blob 微縮放定位，
           // 三圖形同時往中央壓縮形成 metaball 連體，模擬「散→聚」的入場。
+          // duration 從 1.46s → 2.4s（中 blob 比例調至 1.95s）放慢收縮節奏，
+          // 與文字 entrance（見 portalLabelEntrance 套用處）同步。
           '& .entrance-0': {
             animation:
-              'portalHeroEntranceLeft 1.46s cubic-bezier(0.22, 1, 0.36, 1) both',
+              'portalHeroEntranceLeft 2.4s cubic-bezier(0.22, 1, 0.36, 1) both',
           },
           '& .entrance-1': {
             animation:
-              'portalHeroEntranceMid 1.20s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both',
+              'portalHeroEntranceMid 1.95s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both',
           },
           '& .entrance-2': {
             animation:
-              'portalHeroEntranceRight 1.46s cubic-bezier(0.22, 1, 0.36, 1) both',
+              'portalHeroEntranceRight 2.4s cubic-bezier(0.22, 1, 0.36, 1) both',
           },
           '@keyframes portalHeroEntranceLeft': {
             '0%': { transform: 'translateX(-300px)', opacity: 0 },
@@ -637,13 +644,20 @@ export function DecorativeTextCloud({
           twinkle 同時跑 infinite，opacity 隨閃爍變化、入場過程文字依然可見且在移動。 */}
       {positions.map((pos, i) => {
         const dur = 4.6 + ((i * 1.73) % 3.6);
-        // 還原 twinkle 為負延遲（在動畫週期中段起跳），讓文字在入場開始時就可見、
-        // 隨 blob 一起壓縮入場
-        const delay = -((i * 2.27) % 6);
-        // 入場 left：依 leftPct 與中心 50% 距離決定，外延 1.5× 後收回
+        // twinkle keyframes 在 cycle 的 16%~62% 區間 opacity=1。將 delay 設成
+        // 「該 label 自身 dur 的 0.20~0.60 倍」的負值，等於把 t=0 的播放相位
+        // 固定在 [20%, 60%] → 所有 label 第一影格全部可見（對齊設計稿
+        // 「裝飾文字平均散落」）。各 label 相位仍因 i 而錯開，後續閃爍節奏不變。
+        const delay = -(0.2 + ((i * 0.151) % 0.4)) * dur;
+        // 入場 left 起點：依設計稿第一影格「平均散落」— 上排 15 個從 5% 到 95%
+        // 均分、下排 13 個同 5% 到 95% 均分。動畫終點為 Figma 不規則 cluster 位置，
+        // 使得入場過程呈現「平均散布 → 壓縮環繞 blob」的視覺。
+        const isTopRow = i < 15;
+        const rowIdx = isTopRow ? i : i - 15;
+        const rowCount = isTopRow ? 15 : 13;
         const initLeftPct = vertical
           ? pos.leftPct
-          : Math.max(-15, Math.min(115, 50 + (pos.leftPct - 50) * 1.55));
+          : 5 + (rowIdx / Math.max(1, rowCount - 1)) * 90;
         const word = slotWords[i] ?? pos.text;
         // 含中日韓字元 → 直書；否則為英文 → 旋轉 −90°（僅橫向佈局）
         const isCJK = /[\u3000-\u9fff\uff00-\uffef]/.test(word);
@@ -680,7 +694,8 @@ export function DecorativeTextCloud({
                   }
                 : ({
                     // 兩支動畫：portalTwinkle (opacity) + portalLabelEntrance (left)
-                    animationDuration: `${dur.toFixed(2)}s, 1.46s`,
+                    // entrance 2.4s 與三個 blob entrance 同步
+                    animationDuration: `${dur.toFixed(2)}s, 2.4s`,
                     animationDelay: `${delay.toFixed(2)}s, 0s`,
                     ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
                     ['--final-left' as string]: `${pos.leftPct.toFixed(2)}%`,
@@ -699,6 +714,14 @@ export function DecorativeTextCloud({
                           textAlign: 'right',
                         }),
                     transform: 'translateY(-50%)',
+                    // 直向只跑 twinkle（無 entrance 入場動畫）。父層已移除
+                    // animation shorthand，這裡必須補齊 name/timing/iteration。
+                    animationName: 'portalTwinkle',
+                    animationTimingFunction: 'ease-in-out',
+                    animationIterationCount: 'infinite',
+                    '@media (prefers-reduced-motion: reduce)': {
+                      animationName: 'none',
+                    },
                   }
                 : {
                     // 橫向：對齊 Figma — topPct 為 text bbox 的「上緣」，
@@ -813,20 +836,12 @@ export function DecorativeTextCloud({
             left: 0,
             right: 0,
             bottom: 8,
-            // 容器自身只承載絕對定位的三塊；高度由內容決定
+            // 容器自身只承載絕對定位的三塊；高度由內容決定。
+            // 不掛入場動畫：opacity / transform / filter / will-change 等任何能
+            // 觸發 stacking context 的屬性都會讓子節點的 mix-blend-mode
+            // 失效（label 文字會直接顯示為 #fff 白色而非與背景做 difference 混色）。
+            // 故 base labels 直接隨頁面出現，由 blob 入場帶動視覺重心。
             pointerEvents: 'none',
-            // 入場：blob 落定後 (1.0s) 純 opacity 淡入。
-            // 不使用 transform，避免建立新的 stacking context 而破壞下方
-            // base labels（color: #fff + mix-blend-mode: difference）的混色。
-            animation:
-              'portalBaseLabelsIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.0s both',
-            '@keyframes portalBaseLabelsIn': {
-              from: { opacity: 0 },
-              to: { opacity: 1 },
-            },
-            '@media (prefers-reduced-motion: reduce)': {
-              animation: 'none',
-            },
           }}
         >
           {/* 左塊：ART x DESIGN / Gateway — regular weight (400)
