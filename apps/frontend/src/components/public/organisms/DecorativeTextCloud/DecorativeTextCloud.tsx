@@ -186,8 +186,23 @@ const HORIZONTAL_TEXT_SLOTS: { leftPct: number; topPct: number }[] = [
 ];
 
 /**
+ * 兩個 slot 是否「視覺相鄰」— 同排（上排 / 下排）且 leftPct 差距 < 7pp。
+ * 用於避免 twinkle 隨機切換時鄰近 slot 出現相同詞造成肉眼可見的重複叢集。
+ */
+function areSlotsAdjacent(a: number, b: number): boolean {
+  if (a === b) return false;
+  const sa = HORIZONTAL_TEXT_SLOTS[a];
+  const sb = HORIZONTAL_TEXT_SLOTS[b];
+  if (!sa || !sb) return false;
+  const sameRow = sa.topPct < 50 === sb.topPct < 50;
+  if (!sameRow) return false;
+  return Math.abs(sa.leftPct - sb.leftPct) < 7;
+}
+
+/**
  * 將裝飾文字散佈於色塊周圍。
- * - 橫向：固定 28 個 slot（依 Figma 不規則散落），文字不足時 cycle 重覆使用。
+ * - 橫向：固定 28 個 slot（依 Figma 不規則散落），文字不足時 cycle 重覆使用，
+ *   並避開「相鄰 slot 已有同詞」以免出現肉眼可見的重複叢集。
  * - 直向：左右兩欄、沿色塊兩側由上而下（正立橫書）。
  */
 function placeWords(words: string[], vertical: boolean): PlacedWord[] {
@@ -206,14 +221,36 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
       };
     });
   }
-  // 橫向：對齊 Figma 的 28 個固定 slot；words 不足時取餘數 cycle
   if (words.length === 0) return [];
-  return HORIZONTAL_TEXT_SLOTS.map((slot, i) => ({
-    text: words[i % words.length] ?? '',
-    leftPct: slot.leftPct,
-    topPct: slot.topPct,
-    side: 'left',
-  }));
+  // 橫向：逐 slot 從 pool 取詞，跳過已落在相鄰 slot 的字詞，
+  // 若整個 pool 都已用完則退回 i % length cycle（不可能完全避免，
+  // 但能保證相鄰範圍內盡量唯一）。
+  const placed: PlacedWord[] = [];
+  for (let i = 0; i < HORIZONTAL_TEXT_SLOTS.length; i++) {
+    const slot = HORIZONTAL_TEXT_SLOTS[i];
+    const usedByNeighbors = new Set<string>();
+    for (let j = 0; j < i; j++) {
+      if (areSlotsAdjacent(i, j) && placed[j]) {
+        usedByNeighbors.add(placed[j].text);
+      }
+    }
+    // 起點 index = i % pool.length 維持原本的均勻散佈；遇衝突就往後找下一個 OK 的詞
+    let chosen: string | null = null;
+    for (let k = 0; k < words.length; k++) {
+      const candidate = words[(i + k) % words.length];
+      if (candidate && !usedByNeighbors.has(candidate)) {
+        chosen = candidate;
+        break;
+      }
+    }
+    placed.push({
+      text: chosen ?? words[i % words.length] ?? '',
+      leftPct: slot.leftPct,
+      topPct: slot.topPct,
+      side: 'left',
+    });
+  }
+  return placed;
 }
 
 /** 由元素目前的 transform matrix 反推旋轉角度（度） */
@@ -388,6 +425,14 @@ export function DecorativeTextCloud({
           opacity: 0,
           animation: 'portalTwinkle 5s ease-in-out infinite',
         },
+        // ── 裝飾文字入場 — left 百分比從外側收回到最終位置 ──
+        // 用 left（layout 屬性）而非 transform，避免建立 stacking context
+        // 而破壞 mix-blend-mode（base labels 已踩過這個坑）。
+        // 每個文字透過 --init-left / --final-left CSS var 給自己的起點與終點。
+        '@keyframes portalLabelEntrance': {
+          from: { left: 'var(--init-left)' },
+          to: { left: 'var(--final-left)' },
+        },
         '@media (prefers-reduced-motion: reduce)': {
           '& .portal-twinkle': { animation: 'none', opacity: 0.9 },
         },
@@ -412,7 +457,7 @@ export function DecorativeTextCloud({
                 width: '100%',
                 height: 'auto',
               }),
-          // 漂移動畫 — 三圖形以不同週期緩慢位移，goo 濾鏡使其靠近時相連
+          // ── 漂移動畫 — 三圖形以不同週期緩慢位移，goo 濾鏡使其靠近時相連 ──
           '& .drift-0': { animation: 'portalDriftA 12s ease-in-out infinite' },
           '& .drift-1': { animation: 'portalDriftB 9.5s ease-in-out infinite' },
           '& .drift-2': {
@@ -433,8 +478,39 @@ export function DecorativeTextCloud({
             '0%, 100%': { transform: 'translate(0px, 0px)' },
             '50%': { transform: 'translate(56px, -8px)' },
           },
+          // ── 主視覺入場動畫（依設計稿錄影 1.46s）──
+          // 左 blob 從 -300 滑入、右 blob 從 +300 滑入、中 blob 微縮放定位，
+          // 三圖形同時往中央壓縮形成 metaball 連體，模擬「散→聚」的入場。
+          '& .entrance-0': {
+            animation:
+              'portalHeroEntranceLeft 1.46s cubic-bezier(0.22, 1, 0.36, 1) both',
+          },
+          '& .entrance-1': {
+            animation:
+              'portalHeroEntranceMid 1.20s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both',
+          },
+          '& .entrance-2': {
+            animation:
+              'portalHeroEntranceRight 1.46s cubic-bezier(0.22, 1, 0.36, 1) both',
+          },
+          '@keyframes portalHeroEntranceLeft': {
+            '0%': { transform: 'translateX(-300px)', opacity: 0 },
+            '40%': { opacity: 1 },
+            '100%': { transform: 'translateX(0)', opacity: 1 },
+          },
+          '@keyframes portalHeroEntranceMid': {
+            '0%': { transform: 'scale(0.92)', opacity: 0 },
+            '40%': { opacity: 1 },
+            '100%': { transform: 'scale(1)', opacity: 1 },
+          },
+          '@keyframes portalHeroEntranceRight': {
+            '0%': { transform: 'translateX(300px)', opacity: 0 },
+            '40%': { opacity: 1 },
+            '100%': { transform: 'translateX(0)', opacity: 1 },
+          },
           '@media (prefers-reduced-motion: reduce)': {
             '& [class*="drift-"]': { animation: 'none' },
+            '& [class*="entrance-"]': { animation: 'none' },
           },
         }}
       >
@@ -490,63 +566,84 @@ export function DecorativeTextCloud({
           ))}
         </defs>
 
-        {/* metaball 漸層層 — 套用 goo 濾鏡；hover 的圖形隱藏漸層底（無框線） */}
+        {/* metaball 漸層層 — 套用 goo 濾鏡；hover 的圖形隱藏漸層底（無框線）
+            外層 .entrance-{i} 負責入場動畫（從外側滑入到定位），內層 .drift-{i} 負責環境漂移 */}
         <g filter={`url(#goo-${uid})`}>
           {shapes.map((s, i) => (
-            <g key={i} className={`drift-${i}`}>
-              <polygon
-                points={s.points}
-                fill={`url(#blob-${uid})`}
-                style={{
-                  opacity: hovered === i ? 0 : 1,
-                  transition: 'opacity 0.35s ease',
-                }}
-              />
+            <g
+              key={i}
+              className={`entrance-${i}`}
+              style={{ transformOrigin: `${s.cx}px ${s.cy}px` }}
+            >
+              <g className={`drift-${i}`}>
+                <polygon
+                  points={s.points}
+                  fill={`url(#blob-${uid})`}
+                  style={{
+                    opacity: hovered === i ? 0 : 1,
+                    transition: 'opacity 0.35s ease',
+                  }}
+                />
+              </g>
             </g>
           ))}
         </g>
 
-        {/* 照片 + hover 感測層 — 跟隨漂移；hover 時遮罩（clipPath）旋轉、照片本身維持正立不轉 */}
+        {/* 照片 + hover 感測層 — 跟隨漂移與入場；hover 時遮罩（clipPath）旋轉、照片本身維持正立不轉 */}
         {shapes.map((s, i) => {
           const photo = photos.length
             ? photos[photoIdx % photos.length]
             : undefined;
           const isHovered = hovered === i;
           return (
-            <g key={i} className={`drift-${i}`}>
-              {photo && (
-                <image
-                  href={photo}
-                  x={s.cx - s.r}
-                  y={s.cy - s.r}
-                  width={s.r * 2}
-                  height={s.r * 2}
-                  preserveAspectRatio="xMidYMid slice"
-                  clipPath={`url(#clip-${uid}-${i})`}
-                  style={{
-                    opacity: isHovered ? 1 : 0,
-                    transition: 'opacity 0.4s ease',
-                    pointerEvents: 'none',
-                  }}
+            <g
+              key={i}
+              className={`entrance-${i}`}
+              style={{ transformOrigin: `${s.cx}px ${s.cy}px` }}
+            >
+              <g className={`drift-${i}`}>
+                {photo && (
+                  <image
+                    href={photo}
+                    x={s.cx - s.r}
+                    y={s.cy - s.r}
+                    width={s.r * 2}
+                    height={s.r * 2}
+                    preserveAspectRatio="xMidYMid slice"
+                    clipPath={`url(#clip-${uid}-${i})`}
+                    style={{
+                      opacity: isHovered ? 1 : 0,
+                      transition: 'opacity 0.4s ease',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                )}
+                <polygon
+                  points={s.points}
+                  fill="transparent"
+                  onMouseEnter={() => handleEnter(i)}
+                  onMouseLeave={() => handleLeave(i)}
+                  style={{ cursor: photo ? 'pointer' : 'default' }}
                 />
-              )}
-              <polygon
-                points={s.points}
-                fill="transparent"
-                onMouseEnter={() => handleEnter(i)}
-                onMouseLeave={() => handleLeave(i)}
-                style={{ cursor: photo ? 'pointer' : 'default' }}
-              />
+              </g>
             </g>
           );
         })}
       </Box>
 
       {/* 色塊周圍的裝飾文字 — 白字 + difference，閃爍淡入淡出並隨機變換詞彙。
-          橫向：上下兩排（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。 */}
+          橫向：上下兩排（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
+          入場：left 從外側 (50 + (leftPct-50)*1.5) 收回到 leftPct，與 blob 同步壓縮；
+          twinkle 同時跑 infinite，opacity 隨閃爍變化、入場過程文字依然可見且在移動。 */}
       {positions.map((pos, i) => {
         const dur = 4.6 + ((i * 1.73) % 3.6);
+        // 還原 twinkle 為負延遲（在動畫週期中段起跳），讓文字在入場開始時就可見、
+        // 隨 blob 一起壓縮入場
         const delay = -((i * 2.27) % 6);
+        // 入場 left：依 leftPct 與中心 50% 距離決定，外延 1.5× 後收回
+        const initLeftPct = vertical
+          ? pos.leftPct
+          : Math.max(-15, Math.min(115, 50 + (pos.leftPct - 50) * 1.55));
         const word = slotWords[i] ?? pos.text;
         // 含中日韓字元 → 直書；否則為英文 → 旋轉 −90°（僅橫向佈局）
         const isCJK = /[\u3000-\u9fff\uff00-\uffef]/.test(word);
@@ -559,15 +656,36 @@ export function DecorativeTextCloud({
             onAnimationIteration={() => {
               setSlotWords((prev) => {
                 if (pool.length === 0) return prev;
+                // 避開相鄰 slot 已有的詞 + 自己當前的詞，避免肉眼可見的重複叢集
+                const blocked = new Set<string>();
+                blocked.add(prev[i] ?? '');
+                if (!vertical) {
+                  for (let j = 0; j < prev.length; j++) {
+                    if (areSlotsAdjacent(i, j) && prev[j]) blocked.add(prev[j]);
+                  }
+                }
+                const candidates = pool.filter((w) => !blocked.has(w));
+                const wordPool = candidates.length > 0 ? candidates : pool;
                 const next = [...prev];
-                next[i] = pool[Math.floor(Math.random() * pool.length)];
+                next[i] =
+                  wordPool[Math.floor(Math.random() * wordPool.length)] ?? '';
                 return next;
               });
             }}
-            style={{
-              animationDuration: `${dur.toFixed(2)}s`,
-              animationDelay: `${delay.toFixed(2)}s`,
-            }}
+            style={
+              vertical
+                ? {
+                    animationDuration: `${dur.toFixed(2)}s`,
+                    animationDelay: `${delay.toFixed(2)}s`,
+                  }
+                : ({
+                    // 兩支動畫：portalTwinkle (opacity) + portalLabelEntrance (left)
+                    animationDuration: `${dur.toFixed(2)}s, 1.46s`,
+                    animationDelay: `${delay.toFixed(2)}s, 0s`,
+                    ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
+                    ['--final-left' as string]: `${pos.leftPct.toFixed(2)}%`,
+                  } as React.CSSProperties)
+            }
             sx={{
               position: 'absolute',
               top: `${pos.topPct}%`,
@@ -595,6 +713,15 @@ export function DecorativeTextCloud({
                           transform: 'translateX(-50%) rotate(-90deg)',
                           transformOrigin: 'center top',
                         }),
+                    // 兩支動畫同時跑：twinkle 控 opacity，entrance 控 left
+                    animationName: 'portalTwinkle, portalLabelEntrance',
+                    animationTimingFunction:
+                      'ease-in-out, cubic-bezier(0.22, 1, 0.36, 1)',
+                    animationIterationCount: 'infinite, 1',
+                    animationFillMode: 'none, both',
+                    '@media (prefers-reduced-motion: reduce)': {
+                      animationName: 'none',
+                    },
                   }),
               fontSize: 12.5,
               fontWeight: 500,
@@ -688,6 +815,18 @@ export function DecorativeTextCloud({
             bottom: 8,
             // 容器自身只承載絕對定位的三塊；高度由內容決定
             pointerEvents: 'none',
+            // 入場：blob 落定後 (1.0s) 純 opacity 淡入。
+            // 不使用 transform，避免建立新的 stacking context 而破壞下方
+            // base labels（color: #fff + mix-blend-mode: difference）的混色。
+            animation:
+              'portalBaseLabelsIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) 1.0s both',
+            '@keyframes portalBaseLabelsIn': {
+              from: { opacity: 0 },
+              to: { opacity: 1 },
+            },
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+            },
           }}
         >
           {/* 左塊：ART x DESIGN / Gateway — regular weight (400)
