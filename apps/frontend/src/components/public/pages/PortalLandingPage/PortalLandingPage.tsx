@@ -331,13 +331,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                 maxWidth: 760,
                 pointerEvents: 'none',
                 zIndex: 5,
-                // 主標退場 + 橘字單獨存在 + 點擊卡開始 lighten/scale/fade
-                // 都跑完一半時（≈3300ms，點擊卡淡出進度 50%）才滑出 →
-                // delay 3300ms、duration 400ms。`both` 讓 delay 期間鎖在
-                // 0% 出發位置（opacity 0、translate(-300,600)）。
-                // 視覺上：點擊卡剛淡到一半「失重」瞬間，計畫卡才從左下浮現接力。
+                // 點擊卡開始淡出的瞬間才滑出 → delay 3100ms
+                // （Phase E 快速放大 1→3 結束、opacity 開始由 1 下滑）、
+                // duration 500ms。`both` 讓 delay 期間鎖在 0% 出發位置
+                // （opacity 0、translate(-300,600)）。
+                // 視覺上：點擊卡剛要「失重消散」時，計畫卡從左下浮現接力。
                 animation:
-                  'planEnterFromBL 400ms cubic-bezier(0.22, 1, 0.36, 1) 3300ms both',
+                  'planEnterFromBL 500ms cubic-bezier(0.22, 1, 0.36, 1) 3100ms both',
                 '@keyframes planEnterFromBL': {
                   '0%': {
                     transform: 'translate(-300px, 600px)',
