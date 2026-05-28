@@ -8,12 +8,38 @@ import type { LocalizedText } from '@/types/plan';
 
 import { portalTokens } from '../../tokens';
 
-/** hero 底部的固定標語（各計畫共用，非取自 decorativeText） */
-const BASE_LABELS = [
-  'ART x DESIGN Gateway',
-  'Taiwan',
-  '台灣的創造力，',
-  '走向世界',
+/**
+ * hero 底部的固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40（各計畫共用）。
+ *
+ * 三個塊水平 space-between、top-aligned；左右塊各有兩行而中塊只有一行，
+ * 自然形成「高低落差」（第二行下沉、中塊在上方獨立浮著）。右塊的第二行
+ * 「走向世界」於 Figma 是右縮進排列，故以 alignSelf: flex-end 對齊。
+ *
+ * 直向（<834px）使用較簡化的兩欄堆疊版本（左二行 + 右二行），與設計稿
+ * 手機版邏輯一致。
+ */
+interface BaseLabelLine {
+  text: string;
+  align?: 'start' | 'end';
+}
+interface BaseLabelGroup {
+  /** flex 排列順序中的位置：左 / 中 / 右 */
+  position: 'start' | 'center' | 'end';
+  lines: BaseLabelLine[];
+}
+const BASE_LABEL_GROUPS: BaseLabelGroup[] = [
+  {
+    position: 'start',
+    lines: [{ text: 'ART x DESIGN' }, { text: 'Gateway' }],
+  },
+  {
+    position: 'center',
+    lines: [{ text: 'Taiwan' }],
+  },
+  {
+    position: 'end',
+    lines: [{ text: '台灣的創造力，' }, { text: '走向世界', align: 'end' }],
+  },
 ];
 
 /** hover 時照片隨機變換的間隔（ms） */
@@ -577,7 +603,9 @@ export function DecorativeTextCloud({
         );
       })}
 
-      {/* 底部固定標語 — 橫向為一排；直向為左右兩組堆疊 */}
+      {/* 底部固定標語 — 三群 space-between top-aligned；左/右群有第二行向下垂落，
+          中群只有一行，因此 Taiwan 浮在上層、Gateway/走向世界 在下層，自然錯落。
+          Vertical 直向佈局仍是兩欄堆疊（左頂 + 右底），手機版邏輯不變。 */}
       {vertical ? (
         <>
           <Box
@@ -592,9 +620,9 @@ export function DecorativeTextCloud({
               pointerEvents: 'none',
             }}
           >
-            {BASE_LABELS.slice(0, 2).map((label) => (
+            {BASE_LABEL_GROUPS[0].lines.map((line) => (
               <Box
-                key={label}
+                key={line.text}
                 component="span"
                 sx={{
                   fontSize: 15,
@@ -604,7 +632,7 @@ export function DecorativeTextCloud({
                   mixBlendMode: 'difference',
                 }}
               >
-                {label}
+                {line.text}
               </Box>
             ))}
           </Box>
@@ -621,9 +649,9 @@ export function DecorativeTextCloud({
               pointerEvents: 'none',
             }}
           >
-            {BASE_LABELS.slice(2).map((label) => (
+            {BASE_LABEL_GROUPS[2].lines.map((line) => (
               <Box
-                key={label}
+                key={line.text}
                 component="span"
                 sx={{
                   fontSize: 15,
@@ -631,9 +659,10 @@ export function DecorativeTextCloud({
                   whiteSpace: 'nowrap',
                   color: '#ffffff',
                   mixBlendMode: 'difference',
+                  alignSelf: line.align === 'end' ? 'flex-end' : 'flex-start',
                 }}
               >
-                {label}
+                {line.text}
               </Box>
             ))}
           </Box>
@@ -645,26 +674,42 @@ export function DecorativeTextCloud({
             position: 'absolute',
             left: '4%',
             right: '4%',
-            bottom: 0,
+            // 對齊 Figma：底邊與色塊下緣留 ~16px 緩衝；top-aligned 讓第二行自然下沉
+            bottom: 8,
             display: 'flex',
             justifyContent: 'space-between',
+            alignItems: 'flex-start',
             gap: 1,
             pointerEvents: 'none',
           }}
         >
-          {BASE_LABELS.map((label) => (
+          {BASE_LABEL_GROUPS.map((group, i) => (
             <Box
-              key={label}
-              component="span"
+              key={i}
               sx={{
-                fontSize: 15,
-                fontWeight: 600,
-                whiteSpace: 'nowrap',
-                color: '#ffffff',
-                mixBlendMode: 'difference',
+                display: 'flex',
+                flexDirection: 'column',
+                // 左群整體靠左；中群與右群在 flex 容器內，內部行寬撐到 column max
+                lineHeight: 1.2,
               }}
             >
-              {label}
+              {group.lines.map((line) => (
+                <Box
+                  key={line.text}
+                  component="span"
+                  sx={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    whiteSpace: 'nowrap',
+                    color: '#ffffff',
+                    mixBlendMode: 'difference',
+                    // 預設 column 內靠左對齊；指定 align: 'end' 的行靠右（如「走向世界」）
+                    alignSelf: line.align === 'end' ? 'flex-end' : 'flex-start',
+                  }}
+                >
+                  {line.text}
+                </Box>
+              ))}
             </Box>
           ))}
         </Box>
