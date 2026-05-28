@@ -67,16 +67,31 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 預設展開第一個計畫（依設計師需求）。改成觀察敘事段落本身（threshold 0、
   // 不縮 rootMargin），確保「視窗看到第三屏」這個事件本身就是觸發條件，不會
   // 受不同 viewport 高度影響觸發時機。
+  //
+  // 副作用：觸發時使用者捲動位置已過第二屏，expanded 切換後（layout 改變）
+  // 大卡 + 裝飾星形照片的上緣會跑到可視區外。auto-expand 後緊接做一次
+  // scrollIntoView 把第二屏 section 對齊視窗頂，讓大卡（含上緣的星形照片）
+  // 完整可見。
   const narrativeSectionRef = useRef<HTMLDivElement>(null);
+  const secondScreenRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (expandedIndex !== null) return;
     const el = narrativeSectionRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return;
     const obs = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          setExpandedIndex(0);
-        }
+        if (!entries.some((e) => e.isIntersecting)) return;
+        setExpandedIndex(0);
+        // 雙 rAF：第一次讓 React 完成 commit、第二次讓瀏覽器重新 layout
+        //（expanded 模式的 paddingTop / margin 都套用了）後再捲到正確位置。
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            secondScreenRef.current?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+          });
+        });
       },
       { threshold: 0 },
     );
@@ -221,6 +236,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               整屏；刻意不再渲染 PortalIntroSection，避免主標 + 副標仍佔位、把
               大卡擠到下方（依使用者「計劃卡片應該要佔據第二屏」要求）。 */}
         <Box
+          ref={secondScreenRef}
           sx={{
             minHeight: '100vh',
             display: 'flex',
