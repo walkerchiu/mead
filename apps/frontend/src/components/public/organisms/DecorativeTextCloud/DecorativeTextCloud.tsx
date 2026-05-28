@@ -51,8 +51,11 @@ const RELEASE_DURATION = 1600;
 /** 游標移開後逆時針再轉的角度（度，約 1.7 圈） */
 const RELEASE_DEG = 620;
 
-/** 圖形半徑（三圖等大） */
-const SHAPE_R = 178;
+/**
+ * 圖形半徑 — 依 Figma 1:2 / 23:21 / 31:215 量測：每個 blob 369.44×369.44px、半徑 184.72。
+ * 改用 Figma 原座標後，viewBox 直接以 1440-wide canvas 為單位。
+ */
+const SHAPE_R = 184.72;
 
 /**
  * hero 三圖形（依設計稿 Slide 02 與 node 1:2）— 三者形狀各異但等大：
@@ -66,17 +69,20 @@ const SHAPE_META = [
 
 /**
  * 兩種佈局：
- * - 橫向（≥834px）：三圖左中右並排（依桌機稿 node 1:2）。
+ * - 橫向（≥834px）：三圖左中右並排（依 Figma 1:2 原座標）。
+ *   viewBox 1440x620 對齊 Figma frame 寬 1440 + hero section 約 620 高（y=130~750）。
+ *   centers cy=275 對齊 Figma blob 中心 y=405、相對 hero 頂部 130 偏移 275。
+ *   三 blob 中心間距 216（重疊 152px），形成設計稿的緊密 metaball 連體。
  * - 直向（<834px）：三圖上中下堆疊（依手機／平板稿 node 43:396 / 43:1142）。
  */
 const LAYOUT = {
   h: {
-    viewW: 1000,
-    viewH: 460,
+    viewW: 1440,
+    viewH: 620,
     centers: [
-      { cx: 285, cy: 230 },
-      { cx: 512, cy: 230 },
-      { cx: 739, cy: 230 },
+      { cx: 513, cy: 275 },
+      { cx: 729, cy: 275 },
+      { cx: 947, cy: 275 },
     ],
   },
   v: {
@@ -137,9 +143,9 @@ interface PlacedWord {
  * 橫向（≥834px）28 個 hero 文字 strip 的座標 — 直接取自 Figma 1:2 / 23:21 / 31:215
  * 三張設計稿（三計畫位置完全相同，只差顯示內容）。
  *
- * leftPct 為 Figma canvas (1440 寬) 的 x 百分比；topPct 為以 hero 區 620 高估算
- * 的 y 百分比（Figma canvas y=130～750），並小幅補償我們色塊位置略偏下的差異：
- * 上排 +3%、下排 +5%。
+ * leftPct 為 Figma canvas (1440 寬) 的 x 百分比；topPct 為以 hero 區 620 高
+ * （Figma canvas y=130～750）的 y 百分比。Box maxWidth 已對齊 Figma frame 1440，
+ * 故 leftPct/topPct 對應到設計稿原座標、不再需要補償偏移。
  *
  * 排列規則來自 Figma：
  *   - 上排 15 個：左 1 (~30%) + 中段三小群 (~43% / ~50% / ~55%) + 右 2 (~66, ~70)
@@ -147,36 +153,36 @@ interface PlacedWord {
  * 對齊設計師「自然散落、環繞色塊」的意圖，避免平均間距。
  */
 const HORIZONTAL_TEXT_SLOTS: { leftPct: number; topPct: number }[] = [
-  // 上排（Figma y≈161）— 同 y、x 不規則
-  { leftPct: 30.6, topPct: 8 },
-  { leftPct: 42.5, topPct: 8 },
-  { leftPct: 43.4, topPct: 8 },
-  { leftPct: 44.4, topPct: 8 },
-  { leftPct: 49.2, topPct: 8 },
-  { leftPct: 50.1, topPct: 8 },
-  { leftPct: 51.0, topPct: 8 },
-  { leftPct: 52.0, topPct: 8 },
-  { leftPct: 52.9, topPct: 8 },
-  { leftPct: 53.9, topPct: 8 },
-  { leftPct: 55.6, topPct: 8 },
-  { leftPct: 56.5, topPct: 8 },
-  { leftPct: 57.4, topPct: 8 },
-  { leftPct: 65.8, topPct: 8 },
-  { leftPct: 70.7, topPct: 8 },
-  // 下排（Figma y 550–618）— x 與 y 皆不規則，呈高低錯落
-  { leftPct: 29.8, topPct: 73 },
-  { leftPct: 42.6, topPct: 81 },
-  { leftPct: 44.5, topPct: 75 },
-  { leftPct: 46.6, topPct: 79 },
-  { leftPct: 48.5, topPct: 77 },
-  { leftPct: 49.4, topPct: 82 },
-  { leftPct: 50.4, topPct: 81 },
-  { leftPct: 51.3, topPct: 73 },
-  { leftPct: 52.3, topPct: 74 },
-  { leftPct: 53.2, topPct: 78 },
-  { leftPct: 54.4, topPct: 81 },
-  { leftPct: 70.3, topPct: 79 },
-  { leftPct: 71.2, topPct: 84 },
+  // 上排（Figma y=161，hero-relative y=31）→ 31/620 = 5%
+  { leftPct: 30.6, topPct: 5 },
+  { leftPct: 42.5, topPct: 5 },
+  { leftPct: 43.4, topPct: 5 },
+  { leftPct: 44.4, topPct: 5 },
+  { leftPct: 49.2, topPct: 5 },
+  { leftPct: 50.1, topPct: 5 },
+  { leftPct: 51.0, topPct: 5 },
+  { leftPct: 52.0, topPct: 5 },
+  { leftPct: 52.9, topPct: 5 },
+  { leftPct: 53.9, topPct: 5 },
+  { leftPct: 55.6, topPct: 5 },
+  { leftPct: 56.5, topPct: 5 },
+  { leftPct: 57.4, topPct: 5 },
+  { leftPct: 65.8, topPct: 5 },
+  { leftPct: 70.7, topPct: 5 },
+  // 下排（Figma y=550–618，hero-relative y=420–488）→ 67.7%–78.7%
+  { leftPct: 29.8, topPct: 67.7 },
+  { leftPct: 42.6, topPct: 76.3 },
+  { leftPct: 44.5, topPct: 69.5 },
+  { leftPct: 46.6, topPct: 74.0 },
+  { leftPct: 48.5, topPct: 72.1 },
+  { leftPct: 49.4, topPct: 76.6 },
+  { leftPct: 50.4, topPct: 76.1 },
+  { leftPct: 51.3, topPct: 68.4 },
+  { leftPct: 52.3, topPct: 69.4 },
+  { leftPct: 53.2, topPct: 73.1 },
+  { leftPct: 54.4, topPct: 75.7 },
+  { leftPct: 70.3, topPct: 74.0 },
+  { leftPct: 71.2, topPct: 78.7 },
 ];
 
 /**
@@ -366,9 +372,10 @@ export function DecorativeTextCloud({
       sx={{
         position: 'relative',
         width: '100%',
-        maxWidth: 1320,
+        // 與 Figma frame 寬度一致（1440），所有 leftPct/topPct 對齊設計稿原座標
+        maxWidth: 1440,
         mx: 'auto',
-        // 直向佈局較高；橫向 ≥834px 為 620
+        // 直向佈局較高；橫向 ≥834px 為 620（對齊 Figma hero 區段 y=130~750 約 620 高）
         height: vertical ? 660 : 440,
         [portalTokens.mq.tabletUp]: { height: 620 },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
@@ -401,9 +408,9 @@ export function DecorativeTextCloud({
           ...(vertical
             ? { height: '94%', width: 'auto' }
             : {
-                width: '96%',
+                // SVG 100% 撐滿 Box，viewBox 直接對齊 Figma 1440-wide canvas，blob 落點精準
+                width: '100%',
                 height: 'auto',
-                [portalTokens.mq.tabletUp]: { width: '82%' },
               }),
           // 漂移動畫 — 三圖形以不同週期緩慢位移，goo 濾鏡使其靠近時相連
           '& .drift-0': { animation: 'portalDriftA 12s ease-in-out infinite' },
@@ -683,11 +690,12 @@ export function DecorativeTextCloud({
             pointerEvents: 'none',
           }}
         >
-          {/* 左塊：ART x DESIGN / Gateway — regular weight (400) */}
+          {/* 左塊：ART x DESIGN / Gateway — regular weight (400)
+              Figma 1:39 x=412/1440 = 28.6% */}
           <Box
             sx={{
               position: 'absolute',
-              left: '4%',
+              left: '28.6%',
               top: 0,
               display: 'flex',
               flexDirection: 'column',
@@ -711,12 +719,13 @@ export function DecorativeTextCloud({
             ))}
           </Box>
 
-          {/* 中塊：Taiwan — bold (700)，獨立浮於上層產生高低落差 */}
+          {/* 中塊：Taiwan — bold (700)，獨立浮於上層產生高低落差
+              Figma 1:40 x=567/1440 = 39.4% */}
           <Box
             component="span"
             sx={{
               position: 'absolute',
-              left: '28%',
+              left: '39.4%',
               top: 0,
               fontSize: 15,
               fontWeight: 700,
@@ -729,13 +738,14 @@ export function DecorativeTextCloud({
             Taiwan
           </Box>
 
-          {/* 右塊：台灣的創造力，/ 走向世界 — 跨越 65–96% 區間，
-              第一行靠左、第二行靠右（alignSelf flex-end）符合 Figma 縮進編排 */}
+          {/* 右塊：台灣的創造力，/ 走向世界 — 對齊 Figma 1:38
+              x=805/1440 = 55.9% 至 x=1028/1440 = 71.4%（right edge）
+              即 left=55.9%, right=28.6% from container right */}
           <Box
             sx={{
               position: 'absolute',
-              left: '65%',
-              right: '4%',
+              left: '55.9%',
+              right: '28.6%',
               top: 0,
               display: 'flex',
               flexDirection: 'column',
