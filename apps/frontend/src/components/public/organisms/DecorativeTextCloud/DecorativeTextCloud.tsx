@@ -603,8 +603,12 @@ export function DecorativeTextCloud({
         );
       })}
 
-      {/* 底部固定標語 — 三群 space-between top-aligned；左/右群有第二行向下垂落，
-          中群只有一行，因此 Taiwan 浮在上層、Gateway/走向世界 在下層，自然錯落。
+      {/* 底部固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40：
+          - 左塊（regular）：ART x DESIGN / Gateway（兩行）
+          - 中塊（bold）：Taiwan（一行，粗體強調）
+          - 右塊（regular）：台灣的創造力，（左）/ 走向世界（右靠縮進）
+          三塊以絕對定位精準錨點，而非 space-between，避免被視口寬度均勻拉開；
+          top-aligned 讓第二行自然下沉，產生高低錯落。
           Vertical 直向佈局仍是兩欄堆疊（左頂 + 右底），手機版邏輯不變。 */}
       {vertical ? (
         <>
@@ -672,46 +676,99 @@ export function DecorativeTextCloud({
           aria-hidden
           sx={{
             position: 'absolute',
-            left: '4%',
-            right: '4%',
-            // 對齊 Figma：底邊與色塊下緣留 ~16px 緩衝；top-aligned 讓第二行自然下沉
+            left: 0,
+            right: 0,
             bottom: 8,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'flex-start',
-            gap: 1,
+            // 容器自身只承載絕對定位的三塊；高度由內容決定
             pointerEvents: 'none',
           }}
         >
-          {BASE_LABEL_GROUPS.map((group, i) => (
+          {/* 左塊：ART x DESIGN / Gateway — regular weight (400) */}
+          <Box
+            sx={{
+              position: 'absolute',
+              left: '4%',
+              top: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              lineHeight: 1.2,
+            }}
+          >
+            {['ART x DESIGN', 'Gateway'].map((line) => (
+              <Box
+                key={line}
+                component="span"
+                sx={{
+                  fontSize: 15,
+                  fontWeight: 400,
+                  whiteSpace: 'nowrap',
+                  color: '#ffffff',
+                  mixBlendMode: 'difference',
+                }}
+              >
+                {line}
+              </Box>
+            ))}
+          </Box>
+
+          {/* 中塊：Taiwan — bold (700)，獨立浮於上層產生高低落差 */}
+          <Box
+            component="span"
+            sx={{
+              position: 'absolute',
+              left: '28%',
+              top: 0,
+              fontSize: 15,
+              fontWeight: 700,
+              whiteSpace: 'nowrap',
+              color: '#ffffff',
+              mixBlendMode: 'difference',
+              lineHeight: 1.2,
+            }}
+          >
+            Taiwan
+          </Box>
+
+          {/* 右塊：台灣的創造力，/ 走向世界 — 跨越 65–96% 區間，
+              第一行靠左、第二行靠右（alignSelf flex-end）符合 Figma 縮進編排 */}
+          <Box
+            sx={{
+              position: 'absolute',
+              left: '65%',
+              right: '4%',
+              top: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              lineHeight: 1.2,
+            }}
+          >
             <Box
-              key={i}
+              component="span"
               sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                // 左群整體靠左；中群與右群在 flex 容器內，內部行寬撐到 column max
-                lineHeight: 1.2,
+                alignSelf: 'flex-start',
+                fontSize: 15,
+                fontWeight: 400,
+                whiteSpace: 'nowrap',
+                color: '#ffffff',
+                mixBlendMode: 'difference',
               }}
             >
-              {group.lines.map((line) => (
-                <Box
-                  key={line.text}
-                  component="span"
-                  sx={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    color: '#ffffff',
-                    mixBlendMode: 'difference',
-                    // 預設 column 內靠左對齊；指定 align: 'end' 的行靠右（如「走向世界」）
-                    alignSelf: line.align === 'end' ? 'flex-end' : 'flex-start',
-                  }}
-                >
-                  {line.text}
-                </Box>
-              ))}
+              台灣的創造力，
             </Box>
-          ))}
+            <Box
+              component="span"
+              sx={{
+                alignSelf: 'flex-end',
+                fontSize: 15,
+                fontWeight: 400,
+                whiteSpace: 'nowrap',
+                color: '#ffffff',
+                mixBlendMode: 'difference',
+              }}
+            >
+              走向世界
+            </Box>
+          </Box>
         </Box>
       )}
     </Box>
