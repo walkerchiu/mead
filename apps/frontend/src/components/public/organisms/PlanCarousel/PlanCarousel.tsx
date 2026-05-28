@@ -260,10 +260,18 @@ interface PlanMiniCardProps {
   suppressOrange?: boolean;
   /**
    * 是否為「被點擊那張」— 退場時的動畫類型由此決定。
-   *  - true：跟主標整句一起升起 → 停 → 繼續升出視野淡出。
+   *  - true：跟主標整句一起升起 → 停 → 往畫面中央放大 ≥2x 後淡出。
    *  - false（其餘兩張）：早早輕量淡出，讓場上只剩主角卡與主標。
    */
   isExitTarget?: boolean;
+  /**
+   * 「往畫面中央放大」時要平移的 X 量（僅 row 版型 ≥834px 適用）。
+   * 由父層 PlanCarousel 依 i 與卡寬 + gap 推算：左卡 +offset 往右、
+   * 右卡 -offset 往左；中央卡為 0。column 版型一律不平移。
+   * 以 inline style 設成 CSS 變數 --exit-tx-row，sx 在 tabletUp 媒體
+   * 查詢下把 --exit-tx 接上此值，keyframes 內的 translate 才會生效。
+   */
+  exitTranslateXRow?: number;
 }
 
 /**
@@ -282,6 +290,7 @@ function PlanMiniCard({
   cardRootRef,
   suppressOrange = false,
   isExitTarget = false,
+  exitTranslateXRow = 0,
 }: PlanMiniCardProps) {
   const name = planName(plan);
   const lines = cardTitleLines(plan);
@@ -305,11 +314,22 @@ function PlanMiniCard({
       ref={cardRootRef}
       data-mini-card=""
       data-exit-target={isExitTarget ? 'true' : undefined}
+      // --exit-tx-row：父層傳進的「往畫面中央」位移；只在 tabletUp row 版型
+      // 透過 sx 接到 --exit-tx，column 版型保持 0。
+      style={
+        {
+          '--exit-tx-row': `${exitTranslateXRow}px`,
+        } as React.CSSProperties
+      }
       sx={{
         position: 'relative',
         display: 'inline-block',
         width: `${CARD_W}px`,
         height: `${TOTAL_H}px`,
+        '--exit-tx': '0px',
+        [portalTokens.mq.tabletUp]: {
+          '--exit-tx': 'var(--exit-tx-row, 0px)',
+        },
       }}
       onMouseEnter={() => {
         setHovered(true);
@@ -897,22 +917,31 @@ export function PlanCarousel({
                 {
                   animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
                 },
+              // 被點擊的卡：升起 → 停 → 在 Phase C 前段（54-62%，~225ms）
+              // 「快速」往畫面中央放大到 ≥2x，translateX 同步推到 var(--exit-tx)；
+              // 後段（62-89%，~756ms）持續略放大到 2.2x 並淡出（先放大，再淡出）。
               '@keyframes planMiniExitRiseScale': {
-                '0%': { transform: 'translateY(0) scale(1)', opacity: 1 },
+                '0%': { transform: 'translate(0, 0) scale(1)', opacity: 1 },
                 '36%': {
-                  transform: 'translateY(-120px) scale(1)',
+                  transform: 'translate(0, -120px) scale(1)',
                   opacity: 1,
                 },
                 '54%': {
-                  transform: 'translateY(-120px) scale(1)',
+                  transform: 'translate(0, -120px) scale(1)',
+                  opacity: 1,
+                },
+                '62%': {
+                  transform: 'translate(var(--exit-tx, 0px), -120px) scale(2)',
                   opacity: 1,
                 },
                 '89%': {
-                  transform: 'translateY(-120px) scale(1.5)',
+                  transform:
+                    'translate(var(--exit-tx, 0px), -120px) scale(2.2)',
                   opacity: 0,
                 },
                 '100%': {
-                  transform: 'translateY(-120px) scale(1.5)',
+                  transform:
+                    'translate(var(--exit-tx, 0px), -120px) scale(2.2)',
                   opacity: 0,
                 },
               },
@@ -930,24 +959,33 @@ export function PlanCarousel({
               },
             }}
           >
-            {plans.map((plan, i) => (
-              <PlanMiniCard
-                key={plan.id}
-                plan={plan}
-                onSelect={() => handleSelect(i)}
-                onHover={() => handleMiniHover(i)}
-                // per-card mouseleave 不參與 carousel 的 hover index 追蹤
-                // （見 handleContainerLeave 與 hoveredIndexRef 註解）。
-                // 卡片內部 visual hovered 仍由 PlanMiniCard 自己的
-                // onMouseLeave 重置。
-                onLeave={() => {}}
-                cardRootRef={(el) => {
-                  cardRootRefs.current[i] = el;
-                }}
-                suppressOrange={flightTargetIdx === i}
-                isExitTarget={exitingTo === i}
-              />
-            ))}
+            {plans.map((plan, i) => {
+              // 「往畫面中央」位移：以 cards row 中央索引為基準，
+              // 左卡 +(cardW + gap)、右卡 -(cardW + gap)、中央卡 0。
+              // 只在被點擊那張上生效（exitTranslateXRow 透過 inline CSS var
+              // 由 keyframes 在 Phase C 段套用）。
+              const mid = (plans.length - 1) / 2;
+              const exitTx = -(i - mid) * (227.492 + 43);
+              return (
+                <PlanMiniCard
+                  key={plan.id}
+                  plan={plan}
+                  onSelect={() => handleSelect(i)}
+                  onHover={() => handleMiniHover(i)}
+                  // per-card mouseleave 不參與 carousel 的 hover index 追蹤
+                  // （見 handleContainerLeave 與 hoveredIndexRef 註解）。
+                  // 卡片內部 visual hovered 仍由 PlanMiniCard 自己的
+                  // onMouseLeave 重置。
+                  onLeave={() => {}}
+                  cardRootRef={(el) => {
+                    cardRootRefs.current[i] = el;
+                  }}
+                  suppressOrange={flightTargetIdx === i}
+                  isExitTarget={exitingTo === i}
+                  exitTranslateXRow={exitTx}
+                />
+              );
+            })}
             {/* 橘字接力：游標在卡片間移動時，橘字「飄過去」的飛行覆蓋層。
                 key 用 flight.id 確保中斷重啟時 React 重新 mount，
                 FlyingTitle 的 useEffect 才會跑 requestAnimationFrame 觸發 transition。 */}
