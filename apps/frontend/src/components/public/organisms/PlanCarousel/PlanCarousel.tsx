@@ -250,6 +250,14 @@ interface PlanMiniCardProps {
   onSelect: () => void;
   onHover: () => void;
   onLeave: () => void;
+  /** 由父層注入的 callback ref，用以記錄卡片根節點供「橘字飛行」測量座標。 */
+  cardRootRef?: (el: HTMLDivElement | null) => void;
+  /**
+   * 是否抑制 hover 時的橘字色。
+   * 橘字接力動畫進行中、目標卡尚未「接到」橘字之前設為 true，
+   * 讓本體標題暫時保持灰色，待 overlay 抵達後再以 0.30s 漸入橘色。
+   */
+  suppressOrange?: boolean;
 }
 
 /**
@@ -260,7 +268,14 @@ interface PlanMiniCardProps {
  *   底部長出「圓形氣泡 + 向下箭頭」尾巴，並在卡片內呈現「字往上飄逸、
  *   原位留下橘色餘像（殘影）」的招牌動態。其他卡片不淡化（spec v2）。
  */
-function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
+function PlanMiniCard({
+  plan,
+  onSelect,
+  onHover,
+  onLeave,
+  cardRootRef,
+  suppressOrange = false,
+}: PlanMiniCardProps) {
   const name = planName(plan);
   const lines = cardTitleLines(plan);
   const [hovered, setHovered] = useState(false);
@@ -274,6 +289,7 @@ function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
   const hoverPath = `M 0 9.07945 C 0 4.065 4.06501 0 9.07946 0 H 218.412 C 223.427 0 227.492 4.06501 227.492 9.07946 V 81.9173 C 227.492 86.9317 223.427 90.9967 218.412 90.9967 H 132.361 C 128.013 90.9967 124.489 94.5212 124.489 98.8689 V 99.8437 C 124.489 107.173 118.547 113.114 111.218 113.114 C 103.889 113.114 97.9479 107.173 97.9479 99.8437 V 98.8689 C 97.9479 94.5212 94.4234 90.9967 90.0758 90.9967 H 9.07945 C 4.065 90.9967 0 86.9317 0 81.9173 V 9.07945 Z`;
   return (
     <Box
+      ref={cardRootRef}
       sx={{
         position: 'relative',
         display: 'inline-block',
@@ -352,7 +368,10 @@ function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
           background: 'transparent',
           border: 'none',
           cursor: 'pointer',
-          color: hovered ? portalTokens.color.brandOrange : '#9A9A9A',
+          color:
+            hovered && !suppressOrange
+              ? portalTokens.color.brandOrange
+              : '#9A9A9A',
           padding: 0,
           transform: hovered ? 'translateY(-46px)' : 'translateY(0)',
           transition:
@@ -376,9 +395,13 @@ function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
             fontWeight: 400,
             lineHeight: 'normal',
             // 預設：黑色透明 32%；hover：橘色實心
-            color: hovered
-              ? portalTokens.color.brandOrange
-              : 'rgba(0, 0, 0, 0.32)',
+            // suppressOrange = true 時（橘字接力動畫中、overlay 尚未抵達），
+            // 即便已 hovered 也維持灰色；待 overlay 抵達後釋放，
+            // 0.30s color transition 讓本體標題自然「染上」橘色（接住飛來的橘字）
+            color:
+              hovered && !suppressOrange
+                ? portalTokens.color.brandOrange
+                : 'rgba(0, 0, 0, 0.32)',
             opacity: 1,
             textAlign: 'left',
             transform: hovered ? 'translateY(0)' : 'translateY(5px)',
@@ -441,6 +464,119 @@ const EXIT_MS = 540;
 /** 計畫之間左右滑動切換的轉場長度（ms） */
 const SLIDE_MS = 550;
 
+/**
+ * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
+ * 飄過去；途中文字內容會從來源卡漸變成目標卡的文字；抵達後落入目標卡）。
+ *
+ * - TRAVEL：overlay 從來源卡標題位置移動到目標卡標題位置（橘字「飛過去」）。
+ * - HANDOFF：overlay 在目標卡上方淡出；同時釋放目標卡的橘字抑制，
+ *   讓目標卡本體標題以 0.30s color transition 由灰漸變為橘（接住飛來的橘字）。
+ *   此段刻意比 mini card 的 0.30s color 略短，讓接力交棒落在「同一拍」上。
+ */
+const FLIGHT_TRAVEL_MS = 460;
+const FLIGHT_HANDOFF_MS = 280;
+const FLIGHT_TOTAL_MS = FLIGHT_TRAVEL_MS + FLIGHT_HANDOFF_MS;
+/** 標題文字相對卡片根節點的水平 / 垂直 offset（hovered 狀態） */
+const FLIGHT_TEXT_LEFT = 29;
+/** 23（top）+ -46（button hovered transform）+ 0（text Box hovered transform） */
+const FLIGHT_TEXT_TOP = -23;
+/** CARD_W(227.492) - left(29) - right(30) ≈ 168.5，與 mini card 內標題 Box 同寬 */
+const FLIGHT_TEXT_WIDTH = 168.5;
+
+interface FlightState {
+  /** 每次飛行唯一 id — 用作 React key，遇到中斷重啟時強制 remount FlyingTitle */
+  id: number;
+  fromIdx: number;
+  toIdx: number;
+  /** 起點 / 終點（相對於 mini cards 容器左上的座標） */
+  fromX: number;
+  fromY: number;
+  toX: number;
+  toY: number;
+  fromLines: string[];
+  toLines: string[];
+}
+
+/**
+ * FlyingTitle — 在卡片之間飛行的「橘字接力棒」。
+ *
+ * Mount 時位於來源卡標題位置；下一個 frame 切換 transform 到目標位置，
+ * 觸發 CSS transition 平順飛過去。途中以 2 層 opacity 交叉淡化，
+ * 讓文字內容從來源計畫漸變成目標計畫。抵達後（FLIGHT_TRAVEL_MS）opacity
+ * 由 1 淡出至 0，與目標卡本體標題的灰→橘 color transition 交接。
+ */
+function FlyingTitle({ flight }: { flight: FlightState }) {
+  // 兩段 transition 的目的端：mount 時為 false（停在 from 位置、opacity 1），
+  // 下個 frame 切 true 觸發 transition 到 to 位置 + 在 HANDOFF 階段 opacity 0。
+  const [travelStarted, setTravelStarted] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setTravelStarted(true));
+    return () => cancelAnimationFrame(id);
+  }, [flight.id]);
+  const tx = travelStarted ? flight.toX : flight.fromX;
+  const ty = travelStarted ? flight.toY : flight.fromY;
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: FLIGHT_TEXT_WIDTH,
+        pointerEvents: 'none',
+        zIndex: 20,
+        willChange: 'transform, opacity',
+        transform: `translate(${tx}px, ${ty}px)`,
+        // transform：第一拍（mount 時 travelStarted=false）尚無 transition，
+        //            第二拍開啟 transition → 從 from 平順飄到 to。
+        // opacity：travel 結束後再淡出，與目標卡本體標題色彩交接。
+        transition: travelStarted
+          ? `transform ${FLIGHT_TRAVEL_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${FLIGHT_HANDOFF_MS}ms ease ${FLIGHT_TRAVEL_MS}ms`
+          : 'none',
+        opacity: travelStarted ? 0 : 1,
+        color: portalTokens.color.brandOrange,
+        fontSize: '13.902px',
+        fontFamily: 'Inter, "Noto Sans TC", sans-serif',
+        fontWeight: 400,
+        lineHeight: 'normal',
+        textAlign: 'left',
+        '@media (prefers-reduced-motion: reduce)': {
+          transition: 'none',
+          opacity: 0,
+        },
+      }}
+    >
+      {/* 兩層字疊在同位置，opacity 互換達成「文字內容漸變」 */}
+      <Box sx={{ position: 'relative' }}>
+        <Box
+          sx={{
+            transition: `opacity ${Math.round(FLIGHT_TRAVEL_MS * 0.55)}ms ease`,
+            opacity: travelStarted ? 0 : 1,
+          }}
+        >
+          {flight.fromLines.map((l, i) => (
+            <Box key={i}>{l}</Box>
+          ))}
+        </Box>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            transition: `opacity ${Math.round(FLIGHT_TRAVEL_MS * 0.55)}ms ease ${Math.round(FLIGHT_TRAVEL_MS * 0.35)}ms`,
+            opacity: travelStarted ? 1 : 0,
+          }}
+        >
+          {flight.toLines.map((l, i) => (
+            <Box key={i}>{l}</Box>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 export function PlanCarousel({
   plans,
   expandedIndex,
@@ -460,12 +596,104 @@ export function PlanCarousel({
   const slideTimerRef = useRef<number | null>(null);
   const prevExpandedIdxRef = useRef<number | null>(expandedIndex);
 
+  // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
+  const miniContainerRef = useRef<HTMLDivElement | null>(null);
+  const cardRootRefs = useRef<(HTMLDivElement | null)[]>([]);
+  /** 同步追蹤目前被 hover 的卡片索引 — 用 ref 而非 state 是因為 mouseenter
+   * handler 內需即時讀「上一張被 hover 的卡」來判定要不要起飛，state 在
+   * batch 後才更新會錯失機會。
+   *
+   * 重要：此 ref **只**在游標離開整個 mini cards 容器時才清成 null
+   * （見 onMouseLeave on miniContainerRef）。卡片之間 43px 的 gap 期間
+   * 舊卡的 mouseleave 雖然會 fire，但這裡刻意不清 ref，
+   * 才能在下一張卡 mouseenter 時偵測出「從某張飛到另一張」。 */
+  const hoveredIndexRef = useRef<number | null>(null);
+  /** 飛行階段切換 timer — 在 TRAVEL 結束時釋放目標卡 suppress，
+   * 在 TOTAL 結束時清掉 overlay。 */
+  const flightTravelTimerRef = useRef<number | null>(null);
+  const flightCleanupTimerRef = useRef<number | null>(null);
+  const flightIdRef = useRef(0);
+  const [flight, setFlight] = useState<FlightState | null>(null);
+  /** 飛行中的目標卡索引 — 用以對該卡 PlanMiniCard 套 suppressOrange，
+   * 在 overlay 抵達前壓住目標卡的橘字色，避免「橘字直接出現」。 */
+  const [flightTargetIdx, setFlightTargetIdx] = useState<number | null>(null);
+
   useEffect(() => {
     return () => {
       if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
       if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
+      if (flightTravelTimerRef.current)
+        window.clearTimeout(flightTravelTimerRef.current);
+      if (flightCleanupTimerRef.current)
+        window.clearTimeout(flightCleanupTimerRef.current);
     };
   }, []);
+
+  /** 啟動一次「橘字接力」飛行：fromIdx 卡的橘字飄到 toIdx 卡。
+   *  讀取兩張卡片根節點當下的座標，換算成 mini cards 容器內的相對位置。
+   *  prefers-reduced-motion 直接跳過、不渲染 overlay。 */
+  const startFlight = (fromIdx: number, toIdx: number) => {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    const container = miniContainerRef.current;
+    const fromCard = cardRootRefs.current[fromIdx];
+    const toCard = cardRootRefs.current[toIdx];
+    const fromPlan = plans[fromIdx];
+    const toPlan = plans[toIdx];
+    if (!container || !fromCard || !toCard || !fromPlan || !toPlan) return;
+    const cr = container.getBoundingClientRect();
+    const fr = fromCard.getBoundingClientRect();
+    const tr = toCard.getBoundingClientRect();
+    flightIdRef.current += 1;
+    setFlight({
+      id: flightIdRef.current,
+      fromIdx,
+      toIdx,
+      fromX: fr.left - cr.left + FLIGHT_TEXT_LEFT,
+      fromY: fr.top - cr.top + FLIGHT_TEXT_TOP,
+      toX: tr.left - cr.left + FLIGHT_TEXT_LEFT,
+      toY: tr.top - cr.top + FLIGHT_TEXT_TOP,
+      fromLines: cardTitleLines(fromPlan),
+      toLines: cardTitleLines(toPlan),
+    });
+    setFlightTargetIdx(toIdx);
+    if (flightTravelTimerRef.current)
+      window.clearTimeout(flightTravelTimerRef.current);
+    if (flightCleanupTimerRef.current)
+      window.clearTimeout(flightCleanupTimerRef.current);
+    // TRAVEL 結束：釋放目標卡 suppress → 本體標題以 color 0.30s 由灰漸染為橘，
+    // 與 overlay 的 HANDOFF 淡出同時進行，達成「橘字落入卡片」的接棒交接。
+    flightTravelTimerRef.current = window.setTimeout(() => {
+      setFlightTargetIdx(null);
+      flightTravelTimerRef.current = null;
+    }, FLIGHT_TRAVEL_MS);
+    flightCleanupTimerRef.current = window.setTimeout(() => {
+      setFlight(null);
+      flightCleanupTimerRef.current = null;
+    }, FLIGHT_TOTAL_MS);
+  };
+
+  /** mini card mouseenter — 串接 onHoverPlanChange + 偵測跨卡起飛 */
+  const handleMiniHover = (i: number) => {
+    const prev = hoveredIndexRef.current;
+    hoveredIndexRef.current = i;
+    onHoverPlanChange?.(i);
+    if (prev !== null && prev !== i) {
+      startFlight(prev, i);
+    }
+  };
+
+  /** mini cards 容器層 mouseleave — 游標真正離開整個三卡區域才清 hover。
+   *  per-card mouseleave 刻意不清 ref（見 hoveredIndexRef 註解），
+   *  以維持 gap 跨卡期間的連續性、讓飛行能正確偵測「從某張飛到另一張」。 */
+  const handleContainerLeave = () => {
+    hoveredIndexRef.current = null;
+    onHoverPlanChange?.(null);
+  };
 
   // 監聽 expandedIndex 變化 → 偵測切換方向、啟動左右滑動轉場。
   // prev=null（從 mini cards 首次展開）跳過 slide，沿用既有 planExpand 膨脹動畫。
@@ -551,8 +779,11 @@ export function PlanCarousel({
       <Box sx={{ position: 'relative', width: '100%' }}>
         <Box sx={outerSx}>
           <Box
+            ref={miniContainerRef}
             data-exiting={exitingTo !== null ? 'true' : 'false'}
+            onMouseLeave={handleContainerLeave}
             sx={{
+              position: 'relative', // 「橘字接力」overlay 以此為定位錨點
               display: 'flex',
               flexDirection: 'column',
               gap: 2.5,
@@ -602,10 +833,22 @@ export function PlanCarousel({
                 key={plan.id}
                 plan={plan}
                 onSelect={() => handleSelect(i)}
-                onHover={() => onHoverPlanChange?.(i)}
-                onLeave={() => onHoverPlanChange?.(null)}
+                onHover={() => handleMiniHover(i)}
+                // per-card mouseleave 不參與 carousel 的 hover index 追蹤
+                // （見 handleContainerLeave 與 hoveredIndexRef 註解）。
+                // 卡片內部 visual hovered 仍由 PlanMiniCard 自己的
+                // onMouseLeave 重置。
+                onLeave={() => {}}
+                cardRootRef={(el) => {
+                  cardRootRefs.current[i] = el;
+                }}
+                suppressOrange={flightTargetIdx === i}
               />
             ))}
+            {/* 橘字接力：游標在卡片間移動時，橘字「飄過去」的飛行覆蓋層。
+                key 用 flight.id 確保中斷重啟時 React 重新 mount，
+                FlyingTitle 的 useEffect 才會跑 requestAnimationFrame 觸發 transition。 */}
+            {flight && <FlyingTitle key={flight.id} flight={flight} />}
           </Box>
         </Box>
       </Box>

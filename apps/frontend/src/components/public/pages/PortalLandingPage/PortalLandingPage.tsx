@@ -108,8 +108,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       <>
         讓&nbsp;&nbsp;
         {/* keyword：TYPE.keyword 46px / 700 / 橘色，無 rise 動畫（spec 明定不做）。
-            data-slogan-keyword：供 PortalIntroSection 在 exiting 時對 keyword 套用獨立動畫 */}
+            data-slogan-keyword：供 PortalIntroSection 在 exiting 時對 keyword 套用獨立動畫。
+            key={hoveredPlan.id}：跨卡 hover 時 React 重新 mount 此節點，
+            觸發下方 keyword swap fade — 與 PlanCarousel 的「橘字接力」動畫同拍交換。 */}
         <Box
+          key={`kw-${hoveredPlan.id}`}
           component="span"
           data-slogan-keyword=""
           sx={{
@@ -118,6 +121,18 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             fontSize: 30,
             [portalTokens.mq.tabletUp]: { fontSize: 46 },
             fontWeight: 700,
+            // 跨卡 hover 時：前 ~45% 維持隱藏（與卡片橘字「飛行中」時間對齊），
+            // 後段淡入，與目標卡橘字「落地」同步出現。純 opacity 不縮放、不位移，
+            // 避免主標基線在切換時抖動。
+            animation: 'kwSwap 460ms cubic-bezier(0.22, 1, 0.36, 1)',
+            '@keyframes kwSwap': {
+              '0%': { opacity: 0 },
+              '45%': { opacity: 0 },
+              '100%': { opacity: 1 },
+            },
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+            },
           }}
         >
           {kw}
