@@ -133,76 +133,116 @@
       ],
       "decorativeText": [
         {
-          "zh": "數位動畫",
-          "en": "Digital Animation"
+          "zh": "越南",
+          "en": "Vietnam"
         },
         {
-          "zh": "視覺傳達設計",
-          "en": "Visual Communication Design"
-        },
-        {
-          "zh": "產品設計",
-          "en": "Product Design"
-        },
-        {
-          "zh": "建築與景觀設計",
-          "en": "Architecture and Landscape Design"
-        },
-        {
-          "zh": "時尚設計",
-          "en": "Fashion Design"
-        },
-        {
-          "zh": "美國",
-          "en": "United States"
+          "zh": "中國",
+          "en": "China"
         },
         {
           "zh": "加拿大",
           "en": "Canada"
         },
         {
-          "zh": "英國",
-          "en": "United Kingdom"
+          "zh": "柬埔寨",
+          "en": "Cambodia"
         },
         {
-          "zh": "法國",
-          "en": "France"
+          "zh": "印度",
+          "en": "India"
         },
         {
           "zh": "德國",
           "en": "Germany"
         },
         {
-          "zh": "荷蘭",
-          "en": "Netherlands"
+          "zh": "法國",
+          "en": "France"
+        },
+        {
+          "zh": "芬蘭",
+          "en": "Finland"
         },
         {
           "zh": "丹麥",
           "en": "Denmark"
         },
         {
-          "zh": "義大利",
-          "en": "Italy"
+          "zh": "捷克",
+          "en": "Czech Republic"
         },
         {
           "zh": "日本",
           "en": "Japan"
         },
         {
-          "zh": "韓國",
-          "en": "South Korea"
+          "zh": "義大利",
+          "en": "Italy"
         },
         {
-          "zh": "馬來西亞",
-          "en": "Malaysia"
+          "zh": "印尼",
+          "en": "Indonesia"
+        },
+        {
+          "zh": "奧地利",
+          "en": "Austria"
         },
         {
           "zh": "澳洲",
           "en": "Australia"
         },
         {
+          "zh": "美國",
+          "en": "United States"
+        },
+        {
+          "zh": "土耳其",
+          "en": "Turkey"
+        },
+        {
+          "zh": "韓國",
+          "en": "South Korea"
+        },
+        {
+          "zh": "泰國",
+          "en": "Thailand"
+        },
+        {
+          "zh": "新加坡",
+          "en": "Singapore"
+        },
+        {
+          "zh": "俄羅斯",
+          "en": "Russia"
+        },
+        {
+          "zh": "波蘭",
+          "en": "Poland"
+        },
+        {
           "zh": "紐西蘭",
           "en": "New Zealand"
+        },
+        {
+          "zh": "荷蘭",
+          "en": "Netherlands"
+        },
+        {
+          "zh": "緬甸",
+          "en": "Myanmar"
+        },
+        {
+          "zh": "墨西哥",
+          "en": "Mexico"
+        },
+        {
+          "zh": "馬來西亞",
+          "en": "Malaysia"
+        },
+        {
+          "zh": "寮國",
+          "en": "Laos"
         }
       ]
     },
