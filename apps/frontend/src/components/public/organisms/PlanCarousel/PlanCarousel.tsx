@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 
@@ -8,6 +8,7 @@ import type { Plan } from '@/types/plan';
 
 import { portalTokens } from '../../tokens';
 import { PlanCard } from '../PlanCard';
+import { SLOGAN_EXIT_MS } from '../PortalIntroSection/PortalIntroSection';
 
 /**
  * 卡片周圍裝飾星形照片的位置（相對卡片左上角的 px，依各計畫 Figma 桌機稿
@@ -258,6 +259,12 @@ interface PlanMiniCardProps {
    * 讓本體標題暫時保持灰色，待 overlay 抵達後再以 0.30s 漸入橘色。
    */
   suppressOrange?: boolean;
+  /**
+   * 是否為「被點擊那張」— 退場時的動畫類型由此決定。
+   *  - true：跟主標整句一起升起 → 停 → 繼續升出視野淡出。
+   *  - false（其餘兩張）：早早輕量淡出，讓場上只剩主角卡與主標。
+   */
+  isExitTarget?: boolean;
 }
 
 /**
@@ -275,10 +282,17 @@ function PlanMiniCard({
   onLeave,
   cardRootRef,
   suppressOrange = false,
+  isExitTarget = false,
 }: PlanMiniCardProps) {
   const name = planName(plan);
   const lines = cardTitleLines(plan);
-  const [hovered, setHovered] = useState(false);
+  const [internalHovered, setHovered] = useState(false);
+  // 點擊後該卡進入 EXIT（被往上抽走）；此時 pointer-events 已被父層關掉，
+  // 但若卡片移動超出原 hit area，仍會 fire mouseleave 把 internalHovered 設回 false
+  // → 尾巴（chin notch + ↓ 箭頭）會瞬間消失。
+  // 用 isExitTarget 強制鎖定為 hovered 視覺：升起過程中尾巴會一路跟著卡片移動，
+  // 直到整張卡淡出視野。
+  const hovered = isExitTarget || internalHovered;
   // 依 Figma vector 161:568 真實尺寸與 SVG path 原座標
   const CARD_W = 227.492;
   const CARD_BODY_H = 90.997;
@@ -290,6 +304,8 @@ function PlanMiniCard({
   return (
     <Box
       ref={cardRootRef}
+      data-mini-card=""
+      data-exit-target={isExitTarget ? 'true' : undefined}
       sx={{
         position: 'relative',
         display: 'inline-block',
@@ -459,10 +475,19 @@ function PlanMiniCard({
  * - 點擊卡 → 其他收合卡退場，該計畫的完整詳細卡（PlanCard）由下方滑入＋淡入。
  * 展開後可由底部 CarouselDots 切換到其他計畫詳細卡。
  */
-/** 點擊小卡到詳細卡之間的「過場」動畫長度（ms）— 殘影 title 升起需 ~550ms */
-const EXIT_MS = 540;
-/** 計畫之間左右滑動切換的轉場長度（ms） */
-const SLIDE_MS = 550;
+/**
+ * 點擊小卡到詳細卡之間的「過場」動畫長度（ms）。
+ * 與 PortalIntroSection.SLOGAN_EXIT_MS 共用同一個常數 → 主標與 mini cards
+ * 的升起 → 停 → 飛出三段節奏完全對齊。
+ */
+const EXIT_MS = SLOGAN_EXIT_MS;
+/** 計畫之間左右滑動切換的轉場長度（ms）。
+ *  原先 550ms 退出端點還留 opacity 0.25 殘影 → 整體拖太久；
+ *  改成 360ms + 退出端點 opacity 0，切換明顯俐落。 */
+const SLIDE_MS = 360;
+
+/** 點擊→展開：主標 / mini cards 退場完畢後，大卡從左下方滑入的時長（ms）。 */
+const SLIDE_UP_MS = 720;
 
 /**
  * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
@@ -596,6 +621,17 @@ export function PlanCarousel({
   const slideTimerRef = useRef<number | null>(null);
   const prevExpandedIdxRef = useRef<number | null>(expandedIndex);
 
+  /**
+   * 「點擊→展開」對應的 plan id — 用以決定展開分支的入場動畫類型：
+   *  - 該 id 就是當前展開的 activePlan → 點擊來源 → 大卡走 planSlideUpFromBL（左下滑入）
+   *  - 否則 → sentinel auto-expand → 走 planExpand 膨脹
+   * 用 state（非 ref）才能進入 useMemo 依賴；setState 與 onExpandedIndexChange
+   * 同個 React 18 batch 提交，第一次 render 即拿到正確值。
+   * 切到下一張計畫（peek / dots）時 activePlan.id 改變、走 slideDir 分支，
+   * 此 state 即便保留舊值也無妨。
+   */
+  const [clickedExpandId, setClickedExpandId] = useState<string | null>(null);
+
   // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
   const miniContainerRef = useRef<HTMLDivElement | null>(null);
   const cardRootRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -695,6 +731,26 @@ export function PlanCarousel({
     onHoverPlanChange?.(null);
   };
 
+  // ── 展開分支入場動畫選擇（鎖在 activePlan + slideDir + clickedExpandId 上，
+  //     避免 hover/其他 state 變動觸發 className 改變而重播動畫） ──
+  // 三種來源：
+  //  - slideDir 存在 → peek / dots 左右切換 → planSlideIn{Left,Right}
+  //  - clickedExpandId 等於目前展開的 plan id → 點擊→展開 → planSlideUpFromBL
+  //  - 其餘（IntersectionObserver auto-expand）→ planExpand 膨脹進場
+  const activePlanForExpand =
+    expandedIndex !== null ? (plans[expandedIndex] ?? null) : null;
+  const enterAnimation = useMemo<string | null>(() => {
+    if (!activePlanForExpand) return null;
+    if (slideDir) {
+      return slideDir === 'next'
+        ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
+        : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
+    }
+    return clickedExpandId === activePlanForExpand.id
+      ? `planSlideUpFromBL ${SLIDE_UP_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
+      : 'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both';
+  }, [activePlanForExpand, slideDir, clickedExpandId]);
+
   // 監聽 expandedIndex 變化 → 偵測切換方向、啟動左右滑動轉場。
   // prev=null（從 mini cards 首次展開）跳過 slide，沿用既有 planExpand 膨脹動畫。
   useEffect(() => {
@@ -729,8 +785,11 @@ export function PlanCarousel({
     setExitingTo(i);
     if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
     exitTimerRef.current = window.setTimeout(() => {
-      // React 會把這兩個 setState 一起 batch，下次 render 同時擁有
-      // exitingTo=null 與 expandedIndex=i → 直接走展開分支、不會閃回靜止態。
+      // React 會把三個 setState 一起 batch，下次 render 同時擁有
+      // exitingTo=null、expandedIndex=i、clickedExpandId=被點的 plan.id
+      // → 直接走展開分支、enterAnimation 走 planSlideUpFromBL 而非 planExpand。
+      const targetPlan = plans[i];
+      if (targetPlan) setClickedExpandId(targetPlan.id);
       setExitingTo(null);
       onExpandedIndexChange(i);
       exitTimerRef.current = null;
@@ -797,31 +856,57 @@ export function PlanCarousel({
                 gap: '43px', // Figma 161:374 量測：cards 間距 43px
               },
               // 註：依 spec v4「其他兩張卡片維持原樣不變淡」，且卡片固定寬 367、不 flex。
-              '& > button': {
+              // data-mini-card：選擇器精準鎖定 PlanMiniCard 的根 div，
+              // 不會誤中同層的 FlyingTitle overlay（後者是 aria-hidden div）。
+              '& > [data-mini-card]': {
                 // 載入入場：由下方淡入上升，三張錯開時間呈現；用 backwards 而非 both，
                 // 避免動畫結束後 transform 仍被釘住、擋掉 hover 的 translateY/scale。
                 animation:
                   'planMiniIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards',
                 flexShrink: 0,
               },
-              '& > button:nth-of-type(2)': { animationDelay: '0.08s' },
-              '& > button:nth-of-type(3)': { animationDelay: '0.16s' },
+              '& > [data-mini-card]:nth-of-type(2)': {
+                animationDelay: '0.08s',
+              },
+              '& > [data-mini-card]:nth-of-type(3)': {
+                animationDelay: '0.16s',
+              },
               '@keyframes planMiniIn': {
                 from: { opacity: 0, transform: 'translateY(20px)' },
                 to: { opacity: 1, transform: 'translateY(0)' },
               },
-              // 點擊後的退場：三張卡同步淡出 + 微微下沉
-              '&[data-exiting="true"] > button': {
-                animation: `planMiniExit ${EXIT_MS}ms ease-in forwards`,
+              // 點擊後的退場分兩種：
+              //  1) 被點擊的卡（data-exit-target="true"）跟主標整句同節奏：
+              //     升起 → 停 1s → 繼續升出視野淡出。百分比節點與
+              //     PortalIntroSection.sloganExitRiseFly 完全對齊（47/78/91）。
+              //  2) 其餘兩張卡：早早輕量淡出（0–20%），把舞台讓給主角卡 + 主標 +
+              //     從左下滑入的大卡。
+              '&[data-exiting="true"] > [data-mini-card]': {
                 pointerEvents: 'none',
               },
-              '@keyframes planMiniExit': {
-                from: { opacity: 1, transform: 'translateY(0)' },
-                to: { opacity: 0, transform: 'translateY(12px)' },
+              '&[data-exiting="true"] > [data-mini-card][data-exit-target="true"]':
+                {
+                  animation: `planMiniExitRiseFly ${EXIT_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                },
+              '&[data-exiting="true"] > [data-mini-card]:not([data-exit-target])':
+                {
+                  animation: `planMiniExitFade ${EXIT_MS}ms ease-out forwards`,
+                },
+              '@keyframes planMiniExitRiseFly': {
+                '0%': { transform: 'translateY(0)', opacity: 1 },
+                '36%': { transform: 'translateY(-120px)', opacity: 1 },
+                '54%': { transform: 'translateY(-120px)', opacity: 1 },
+                '89%': { transform: 'translateY(-380px)', opacity: 0 },
+                '100%': { transform: 'translateY(-380px)', opacity: 0 },
+              },
+              '@keyframes planMiniExitFade': {
+                '0%': { opacity: 1, transform: 'translateY(0)' },
+                '20%': { opacity: 0, transform: 'translateY(8px)' },
+                '100%': { opacity: 0, transform: 'translateY(8px)' },
               },
               '@media (prefers-reduced-motion: reduce)': {
-                '& > button': { animation: 'none' },
-                '&[data-exiting="true"] > button': {
+                '& > [data-mini-card]': { animation: 'none' },
+                '&[data-exiting="true"] > [data-mini-card]': {
                   animation: 'none',
                   opacity: 0,
                 },
@@ -843,6 +928,7 @@ export function PlanCarousel({
                   cardRootRefs.current[i] = el;
                 }}
                 suppressOrange={flightTargetIdx === i}
+                isExitTarget={exitingTo === i}
               />
             ))}
             {/* 橘字接力：游標在卡片間移動時，橘字「飄過去」的飛行覆蓋層。
@@ -862,20 +948,21 @@ export function PlanCarousel({
   // emotion 會以名稱 dedupe，不會重複注入 CSS。
   const slideKeyframes = {
     '@keyframes planSlideInRight': {
-      from: { transform: 'translateX(120%)', opacity: 0.25 },
+      from: { transform: 'translateX(120%)', opacity: 0 },
       to: { transform: 'translateX(0)', opacity: 1 },
     },
     '@keyframes planSlideInLeft': {
-      from: { transform: 'translateX(-120%)', opacity: 0.25 },
+      from: { transform: 'translateX(-120%)', opacity: 0 },
       to: { transform: 'translateX(0)', opacity: 1 },
     },
+    // 退出端點 opacity 直接收到 0（原本是 0.25 → 半透明殘影看起來拖很久）。
     '@keyframes planSlideOutLeft': {
       from: { transform: 'translateX(0)', opacity: 1 },
-      to: { transform: 'translateX(-120%)', opacity: 0.25 },
+      to: { transform: 'translateX(-120%)', opacity: 0 },
     },
     '@keyframes planSlideOutRight': {
       from: { transform: 'translateX(0)', opacity: 1 },
-      to: { transform: 'translateX(120%)', opacity: 0.25 },
+      to: { transform: 'translateX(120%)', opacity: 0 },
     },
   } as const;
 
@@ -975,8 +1062,11 @@ export function PlanCarousel({
             </Box>
           )}
 
-          {/* 入場新卡 — key 變動觸發 React remount、播放對應 in 動畫。
-              slideDir 存在時走左/右滑入；否則（從 mini cards 首次展開）走 planExpand 膨脹。*/}
+          {/* 入場新卡 — key 變動觸發 React remount、播放 enterAnimation（由上方
+              useMemo 依 source 決定）。三種來源：
+                - slideDir → planSlideInLeft / planSlideInRight（peek / dots 切換）
+                - click → planSlideUpFromBL（主標退場後，大卡從左下方滑入）
+                - 其餘 → planExpand 膨脹（IntersectionObserver auto-expand） */}
           <Box
             key={activePlan.id}
             onMouseEnter={() => onHoverPlanChange?.(expandedIndex)}
@@ -986,24 +1076,19 @@ export function PlanCarousel({
               width: '100%',
               maxWidth: 760,
               zIndex: 1,
-              ...(slideDir
-                ? {
-                    animation:
-                      slideDir === 'next'
-                        ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
-                        : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
-                  }
-                : {
-                    // 首次從 mini cards 展開：膨脹進場（依故事第 7 幕 morph）
-                    animation:
-                      'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both',
-                    transformOrigin: 'top center',
-                  }),
+              transformOrigin: 'top center',
+              animation: enterAnimation ?? undefined,
               ...slideKeyframes,
               '@keyframes planExpand': {
                 '0%': { opacity: 0, transform: 'scale(0.55)' },
                 '40%': { opacity: 0.7 },
                 '100%': { opacity: 1, transform: 'scale(1)' },
+              },
+              // 大卡從左下方滑入 — 從視窗左下方往中央上推、不旋轉，
+              // 與主標 Phase D 結束銜接（主標已淡出、舞台清空後大卡才上場）。
+              '@keyframes planSlideUpFromBL': {
+                '0%': { transform: 'translate(-220px, 280px)', opacity: 0 },
+                '100%': { transform: 'translate(0, 0)', opacity: 1 },
               },
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}

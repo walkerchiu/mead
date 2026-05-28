@@ -31,6 +31,18 @@ let LAYER_ID = 0;
 const TRANSITION_MS = 420;
 
 /**
+ * Slogan 退場動畫總時長（ms）— 點擊計畫卡到大卡完整就位的整段過渡：
+ *  - Phase A 0–36%（0–1000ms）：被點擊的卡 + 主標整句（黑字 + 橘字 + 小標）一起
+ *    往上抽離（1.0s 的「整句往上飄」）。
+ *  - Phase B 36–54%（1000–1500ms）：停 0.5s（橘字「抓住一下」的停頓）。
+ *  - Phase C 54–89%（1500–2500ms）：黑字 + 小標 + 被點擊的卡繼續上升 1s、淡出視野。
+ *                                     橘字保持在 phase A 落點不動。
+ *  - Phase D 89–100%（2500–2800ms）：橘字短暫停留後淡出（強調其「主角」身分）。
+ *  此值會被 PlanCarousel.EXIT_MS 引用，確保兩邊節奏完全同步。
+ */
+export const SLOGAN_EXIT_MS = 2800;
+
+/**
  * PortalIntroSection — 入口網主標題區塊。
  *
  * 置中的小標 + 大標題，承接 hero 文字雲、引出下方計畫卡片。
@@ -74,6 +86,8 @@ export function PortalIntroSection({
     return () => window.clearTimeout(t);
   }, [layers]);
 
+  // 共用 ease — 與 PlanCarousel 退場動畫對齊
+  const exitEase = 'cubic-bezier(0.22, 1, 0.36, 1)';
   return (
     <Box sx={{ textAlign: 'center', px: 3 }}>
       {/* 小標（spec TYPE.smallHeading 22px / 700） */}
@@ -85,6 +99,21 @@ export function PortalIntroSection({
           lineHeight: 1.6,
           color: '#1A1A1A',
           [portalTokens.mq.tabletUp]: { fontSize: 22 },
+          // 小標跟著黑字整句一起升起、暫停、再繼續上升淡出（同 keyframes）。
+          ...(exiting && {
+            animation: `sloganExitRiseFly ${SLOGAN_EXIT_MS}ms ${exitEase} forwards`,
+            willChange: 'transform, opacity',
+          }),
+          '@keyframes sloganExitRiseFly': {
+            '0%': { transform: 'translateY(0)', opacity: 1 },
+            '36%': { transform: 'translateY(-120px)', opacity: 1 },
+            '54%': { transform: 'translateY(-120px)', opacity: 1 },
+            '89%': { transform: 'translateY(-380px)', opacity: 0 },
+            '100%': { transform: 'translateY(-380px)', opacity: 0 },
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            animation: 'none',
+          },
         }}
       >
         {eyebrow}
@@ -101,29 +130,44 @@ export function PortalIntroSection({
           letterSpacing: '0.02em',
           color: '#1A1A1A',
           [portalTokens.mq.tabletUp]: { mt: '77px', fontSize: 48 },
-          // ★ Slogan exit on expand（IMPLEMENTATION.md §4.1）：
-          //  - 黑字 y 0 → -180 / 0.5s（快、先消失）
-          //  - 橘色 keyword 由內層 span 控制（不在這層做）
-          // 這裡作為「黑字層」整體先升離。
+          // ★ Slogan exit on click（依使用者描述）：
+          //  - 整句先一起向上抽離 0 → -120px（Phase A 0–38%）。
+          //  - 在第二屏邊緣停 0.5s（Phase B 38–68%）。
+          //  - 黑字（「讓」/「被看見」）繼續上升至 -380px 並淡出（Phase C 68–88%）。
+          //  - 橘字（keyword）守在 -120px 不動，直到 Phase D（88–100%）才淡出。
+          // 父層 h1 不套 transform，動畫掛在內層黑字 / 橘字 span 上，避免 nested
+          // transform 互相覆寫造成橘字被父層的 -380 帶走。
           ...(exiting && {
-            animation:
-              'sloganExitBlack 0.50s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-          }),
-          // 橘 keyword：y 0 → -40 後 opacity → 0（spec sloganExit.orange）
-          '@keyframes sloganExitBlack': {
-            '0%': { transform: 'translateY(0)', opacity: 1 },
-            '100%': { transform: 'translateY(-180px)', opacity: 0 },
-          },
-          ...(exiting && {
+            '& span[data-slogan-black]': {
+              display: 'inline-block',
+              animation: `sloganExitRiseFly ${SLOGAN_EXIT_MS}ms ${exitEase} forwards`,
+              willChange: 'transform, opacity',
+            },
             '& span[data-slogan-keyword]': {
-              animation:
-                'sloganExitOrange 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+              animation: `sloganExitKeywordGrip ${SLOGAN_EXIT_MS}ms ${exitEase} forwards`,
+              willChange: 'transform, opacity',
             },
           }),
-          '@keyframes sloganExitOrange': {
+          // 黑字 / 小標：升 → 停 → 繼續升 + 淡出。
+          '@keyframes sloganExitRiseFly': {
             '0%': { transform: 'translateY(0)', opacity: 1 },
-            '60%': { transform: 'translateY(-40px)', opacity: 1 },
-            '100%': { transform: 'translateY(-40px)', opacity: 0 },
+            '36%': { transform: 'translateY(-120px)', opacity: 1 },
+            '54%': { transform: 'translateY(-120px)', opacity: 1 },
+            '89%': { transform: 'translateY(-380px)', opacity: 0 },
+            '100%': { transform: 'translateY(-380px)', opacity: 0 },
+          },
+          // 橘字：升起跟著大家 → 停 → 繼續停（讓黑字先離開）→ 最後才淡出。
+          // 「抓住一下才放手」— 強調 keyword 是這頁的主角。
+          '@keyframes sloganExitKeywordGrip': {
+            '0%': { transform: 'translateY(0)', opacity: 1 },
+            '36%': { transform: 'translateY(-120px)', opacity: 1 },
+            '89%': { transform: 'translateY(-120px)', opacity: 1 },
+            '100%': { transform: 'translateY(-120px)', opacity: 0 },
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            '& span[data-slogan-black], & span[data-slogan-keyword]': {
+              animation: 'none',
+            },
           },
         }}
       >

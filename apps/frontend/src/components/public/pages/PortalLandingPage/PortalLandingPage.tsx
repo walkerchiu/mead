@@ -47,6 +47,22 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   // hover 計畫卡片時，主標切換為該計畫對應的關鍵字 slogan（依設計稿過場效果說明）
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  // 點擊卡片到計畫詳細卡完整入場的過渡期：
+  //  - 其他 mini cards 淡出，被點的卡與主標「整句一起往上抽離 → 停 0.5s →
+  //    黑字繼續上升淡出 → 橘字守住短暫停留後淡出」
+  //  - 主標退場結束後，大卡才從左下方滑入（onExpandedIndexChange 由
+  //    PlanCarousel.EXIT_MS timer 觸發）。
+  //
+  // 故意「不」在 onExpandedIndexChange 清掉 isExiting：CSS animation 的
+  // forwards 終態（橘字 opacity=0）只在 animation declaration 還在時才會
+  // 維持。一旦清掉，元素會「彈回」base style → 主標瞬間又出現在原位閃一下。
+  // 保持 isExiting=true 讓退場動畫終態鎖在那裡，expanded 模式下主標保持
+  // 不可見，視覺上和「整句被抽走」的故事一致。
+  const [isExiting, setIsExiting] = useState(false);
+  const handleSelectStart = () => setIsExiting(true);
+  const handleExpandedIndexChange = (i: number) => {
+    setExpandedIndex(i);
+  };
   // 三張卡下方的觀察點 — 使用者捲動到此（看完三卡）且尚未點擊 → 預設展開第一個計畫
   const expandSentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -99,16 +115,27 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   //   - 「關鍵字不做下方升起進場」→ keyword 僅換字、不獨立動畫
   //   - 同 hover 跨卡：headingKey 統一 → 不重新 cross-fade、只換 keyword 文字
   const hoveredPlan = hoverIndex != null ? orderedPlans[hoverIndex] : undefined;
-  let heading: ReactNode = t('heading');
+  // 主標黑字節點都包成 data-slogan-black span，讓 PortalIntroSection 在 exiting
+  // 時能對黑字（讓 / 被看見）與橘字（keyword）套用不同 keyframes：黑字升高
+  // 後繼續飄出視窗、橘字升高後守住原處短暫停留再淡出（依使用者「橘色關鍵字
+  // 抓住一下才放手」的描述）。
+  let heading: ReactNode = (
+    <Box component="span" data-slogan-black="">
+      {t('heading')}
+    </Box>
+  );
   let headingKey = 'default';
   if (hoveredPlan) {
     headingKey = 'hover';
     const kw = language === 'zh' ? HOVER_KEYWORD[hoveredPlan.id] : undefined;
     heading = kw ? (
       <>
-        讓&nbsp;&nbsp;
-        {/* keyword：TYPE.keyword 46px / 700 / 橘色，無 rise 動畫（spec 明定不做）。
-            data-slogan-keyword：供 PortalIntroSection 在 exiting 時對 keyword 套用獨立動畫。
+        <Box component="span" data-slogan-black="">
+          讓&nbsp;&nbsp;
+        </Box>
+        {/* keyword：TYPE.keyword 46px / 700 / 橘色。
+            data-slogan-keyword：PortalIntroSection 在 exiting 時對 keyword 套
+            sloganExitKeywordGrip（升高後守住原處、最後才淡出）。
             key={hoveredPlan.id}：跨卡 hover 時 React 重新 mount 此節點，
             觸發下方 keyword swap fade — 與 PlanCarousel 的「橘字接力」動畫同拍交換。 */}
         <Box
@@ -137,10 +164,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         >
           {kw}
         </Box>
-        &nbsp;&nbsp;被看見
+        <Box component="span" data-slogan-black="">
+          &nbsp;&nbsp;被看見
+        </Box>
       </>
     ) : (
-      sloganOf(hoveredPlan)
+      <Box component="span" data-slogan-black="">
+        {sloganOf(hoveredPlan)}
+      </Box>
     );
   }
 
@@ -182,40 +213,55 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           />
         </Box>
 
-        {/* 第二屏 — default 用 100vh + 卡貼底；expanded 用固定間距讓 slogan 與詳細卡有空間 */}
+        {/* 第二屏 —
+            - static / EXIT 中（expandedIndex === null）：100vh 容器、頂部 33vh 留白，
+              下方 PortalIntroSection（eyebrow + slogan），最底放 mini cards。
+            - expanded（expandedIndex !== null）：100vh 容器，計畫大卡置中佔滿
+              整屏；刻意不再渲染 PortalIntroSection，避免主標 + 副標仍佔位、把
+              大卡擠到下方（依使用者「計劃卡片應該要佔據第二屏」要求）。 */}
         <Box
           sx={{
-            // default 狀態：100vh 容器、卡片貼底；expanded 狀態：自然流，slogan→卡 280px 間距
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
             ...(expandedIndex === null
               ? {
-                  minHeight: '100vh',
-                  display: 'flex',
-                  flexDirection: 'column',
                   paddingTop: '33vh',
                 }
               : {
-                  // expanded：依 Figma 31:215 eyebrow 距 section 頂 ~75px、slogan 距 eyebrow 77、卡距 slogan 280
-                  paddingTop: '75px',
+                  // expanded：留 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112）
+                  // 不被視窗上緣切掉，照片離 viewport 頂緣約 28px 透氣間距。
+                  paddingTop: '140px',
                 }),
           }}
         >
-          <PortalIntroSection
-            eyebrow={t('eyebrow')}
-            heading={heading}
-            headingKey={headingKey}
-          />
+          {/* 主標 / 副標只在 static / EXIT 期間渲染；expanded 後直接 unmount，
+              讓位給計畫大卡佔滿整屏。EXIT 動畫已在 unmount 前完整跑完
+              （PlanCarousel.EXIT_MS 結束才 setExpandedIndex），所以不會看到
+              「動畫沒跑完就被 unmount」造成的跳動。 */}
+          {expandedIndex === null && (
+            <PortalIntroSection
+              eyebrow={t('eyebrow')}
+              heading={heading}
+              headingKey={headingKey}
+              exiting={isExiting}
+            />
+          )}
           <Box
             sx={{
               ...(expandedIndex === null
                 ? { marginTop: 'auto' }
-                : { marginTop: '280px' }),
+                : {
+                    width: '100%',
+                  }),
             }}
           >
             <PlanCarousel
               plans={orderedPlans}
               expandedIndex={expandedIndex}
-              onExpandedIndexChange={setExpandedIndex}
+              onExpandedIndexChange={handleExpandedIndexChange}
               onHoverPlanChange={setHoverIndex}
+              onSelectStart={handleSelectStart}
             />
             <Box
               ref={expandSentinelRef}
