@@ -63,11 +63,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const handleExpandedIndexChange = (i: number) => {
     setExpandedIndex(i);
   };
-  // 三張卡下方的觀察點 — 使用者捲動到此（看完三卡）且尚未點擊 → 預設展開第一個計畫
-  const expandSentinelRef = useRef<HTMLDivElement>(null);
+  // 第三屏（敘事段落）的觀察點 — 使用者未點選任何卡、直接往下滑到第三屏時
+  // 預設展開第一個計畫（依設計師需求）。改成觀察敘事段落本身（threshold 0、
+  // 不縮 rootMargin），確保「視窗看到第三屏」這個事件本身就是觸發條件，不會
+  // 受不同 viewport 高度影響觸發時機。
+  const narrativeSectionRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (expandedIndex !== null) return;
-    const el = expandSentinelRef.current;
+    const el = narrativeSectionRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return;
     const obs = new IntersectionObserver(
       (entries) => {
@@ -75,9 +78,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           setExpandedIndex(0);
         }
       },
-      // rootMargin 下緣縮 50% → sentinel 進入視窗上半部才觸發；
-      // 給使用者足夠時間看完三張卡，再「往下滑」時才自動展開第一個計畫。
-      { threshold: 0, rootMargin: '0px 0px -50% 0px' },
+      { threshold: 0 },
     );
     obs.observe(el);
     return () => obs.disconnect();
@@ -263,16 +264,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               onHoverPlanChange={setHoverIndex}
               onSelectStart={handleSelectStart}
             />
-            <Box
-              ref={expandSentinelRef}
-              aria-hidden
-              sx={{ height: 1, width: '100%' }}
-            />
           </Box>
         </Box>
 
-        {/* 敘事段落 */}
-        <Box sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}>
+        {/* 敘事段落（第三屏） — ref 由 IntersectionObserver 監聽：使用者
+            未點任何卡、第一次滑到此段落時自動展開第一個計畫。*/}
+        <Box
+          ref={narrativeSectionRef}
+          sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}
+        >
           <PortalNarrativeSection
             leadParagraph={t('narrative.lead')}
             statement={t('narrative.statement')}
