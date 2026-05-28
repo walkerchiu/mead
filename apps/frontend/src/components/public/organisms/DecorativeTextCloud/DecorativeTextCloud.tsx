@@ -108,8 +108,54 @@ interface PlacedWord {
 }
 
 /**
+ * 橫向（≥834px）28 個 hero 文字 strip 的座標 — 直接取自 Figma 1:2 / 23:21 / 31:215
+ * 三張設計稿（三計畫位置完全相同，只差顯示內容）。
+ *
+ * leftPct 為 Figma canvas (1440 寬) 的 x 百分比；topPct 為以 hero 區 620 高估算
+ * 的 y 百分比（Figma canvas y=130～750），並小幅補償我們色塊位置略偏下的差異：
+ * 上排 +3%、下排 +5%。
+ *
+ * 排列規則來自 Figma：
+ *   - 上排 15 個：左 1 (~30%) + 中段三小群 (~43% / ~50% / ~55%) + 右 2 (~66, ~70)
+ *   - 下排 13 個：左 1 (~30%) + 中段大密集 (~43〜54%) y 有高低錯落 + 右 2 (~70, ~71)
+ * 對齊設計師「自然散落、環繞色塊」的意圖，避免平均間距。
+ */
+const HORIZONTAL_TEXT_SLOTS: { leftPct: number; topPct: number }[] = [
+  // 上排（Figma y≈161）— 同 y、x 不規則
+  { leftPct: 30.6, topPct: 8 },
+  { leftPct: 42.5, topPct: 8 },
+  { leftPct: 43.4, topPct: 8 },
+  { leftPct: 44.4, topPct: 8 },
+  { leftPct: 49.2, topPct: 8 },
+  { leftPct: 50.1, topPct: 8 },
+  { leftPct: 51.0, topPct: 8 },
+  { leftPct: 52.0, topPct: 8 },
+  { leftPct: 52.9, topPct: 8 },
+  { leftPct: 53.9, topPct: 8 },
+  { leftPct: 55.6, topPct: 8 },
+  { leftPct: 56.5, topPct: 8 },
+  { leftPct: 57.4, topPct: 8 },
+  { leftPct: 65.8, topPct: 8 },
+  { leftPct: 70.7, topPct: 8 },
+  // 下排（Figma y 550–618）— x 與 y 皆不規則，呈高低錯落
+  { leftPct: 29.8, topPct: 73 },
+  { leftPct: 42.6, topPct: 81 },
+  { leftPct: 44.5, topPct: 75 },
+  { leftPct: 46.6, topPct: 79 },
+  { leftPct: 48.5, topPct: 77 },
+  { leftPct: 49.4, topPct: 82 },
+  { leftPct: 50.4, topPct: 81 },
+  { leftPct: 51.3, topPct: 73 },
+  { leftPct: 52.3, topPct: 74 },
+  { leftPct: 53.2, topPct: 78 },
+  { leftPct: 54.4, topPct: 81 },
+  { leftPct: 70.3, topPct: 79 },
+  { leftPct: 71.2, topPct: 84 },
+];
+
+/**
  * 將裝飾文字散佈於色塊周圍。
- * - 橫向：上下兩排、貼著色塊上下緣（直書 −90°）。
+ * - 橫向：固定 28 個 slot（依 Figma 不規則散落），文字不足時 cycle 重覆使用。
  * - 直向：左右兩欄、沿色塊兩側由上而下（正立橫書）。
  */
 function placeWords(words: string[], vertical: boolean): PlacedWord[] {
@@ -128,19 +174,14 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
       };
     });
   }
-  const topCount = Math.ceil(words.length / 2);
-  return words.map((text, i) => {
-    const onTop = i < topCount;
-    const idx = onTop ? i : i - topCount;
-    const len = onTop ? topCount : Math.max(1, words.length - topCount);
-    const t = len <= 1 ? 0.5 : idx / (len - 1);
-    return {
-      text,
-      leftPct: 7 + t * 86,
-      topPct: onTop ? 17 + (idx % 2) * 5 : 79 - (idx % 2) * 5,
-      side: 'left',
-    };
-  });
+  // 橫向：對齊 Figma 的 28 個固定 slot；words 不足時取餘數 cycle
+  if (words.length === 0) return [];
+  return HORIZONTAL_TEXT_SLOTS.map((slot, i) => ({
+    text: words[i % words.length] ?? '',
+    leftPct: slot.leftPct,
+    topPct: slot.topPct,
+    side: 'left',
+  }));
 }
 
 /** 由元素目前的 transform matrix 反推旋轉角度（度） */
@@ -499,7 +540,7 @@ export function DecorativeTextCloud({
               top: `${pos.topPct}%`,
               ...(vertical
                 ? {
-                    // 直向：靠左／右欄，正立橫書
+                    // 直向：靠左／右欄，正立橫書（保留垂直置中對齊）
                     ...(pos.side === 'left'
                       ? { left: `${pos.leftPct}%` }
                       : {
@@ -509,14 +550,17 @@ export function DecorativeTextCloud({
                     transform: 'translateY(-50%)',
                   }
                 : {
+                    // 橫向：對齊 Figma — topPct 為 text bbox 的「上緣」，
+                    // 故只水平置中、垂直頂端錨定，讓 strip 由錨點向下生長。
                     left: `${pos.leftPct}%`,
                     ...(isCJK
                       ? {
                           writingMode: 'vertical-rl',
-                          transform: 'translate(-50%, -50%)',
+                          transform: 'translateX(-50%)',
                         }
                       : {
-                          transform: 'translate(-50%, -50%) rotate(-90deg)',
+                          transform: 'translateX(-50%) rotate(-90deg)',
+                          transformOrigin: 'center top',
                         }),
                   }),
               fontSize: 12.5,
