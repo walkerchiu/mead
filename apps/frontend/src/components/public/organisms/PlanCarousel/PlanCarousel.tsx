@@ -317,7 +317,6 @@ function PlanMiniCard({ plan, onSelect, onHover, onLeave }: PlanMiniCardProps) {
         {/* backdrop blur via foreignObject — 用 HTML div + clip-path */}
         <foreignObject x="0" y="0" width={CARD_W} height={TOTAL_H}>
           <div
-            xmlns="http://www.w3.org/1999/xhtml"
             style={{
               width: '100%',
               height: '100%',
