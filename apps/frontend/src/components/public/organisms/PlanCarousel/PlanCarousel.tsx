@@ -97,31 +97,80 @@ function localPhotos(plan: Plan): string[] {
  * 兩側豎立的相鄰計畫預覽矩形 — 半透明毛玻璃。
  * 依舊版（commit 110588f）設計：760 寬、left/right: -720px 讓多數寬度溢出
  * 畫面，僅露出 ~40px 在視窗左右側緣。點擊以橫向滑動切換上/下計畫。
+ *
+ * peekSx() 回傳完整 sx — direction 控制：
+ *  - 自訂方向游標（左 / 右箭頭，與 portal-cursor.svg 同風格）
+ *  - hover 時整塊向視窗中央輕推、背景加深、邊框變實，露出更多寬度
+ *  - 內部箭頭 icon 預設淡出、hover 時淡入並向中央微滑（強化方向感）
+ *  - 用 `&&` 雙重 class 提高特異性，覆蓋 PortalLandingPage 對 `button` 的 cursor 規則
  */
-const PEEK_BASE = {
-  display: 'none',
-  position: 'absolute',
-  top: 0,
-  bottom: 0,
-  width: 760,
-  p: 0,
-  borderRadius: '17.35px',
-  bgcolor: 'rgba(255, 255, 255, 0.54)',
-  border: '1px solid rgba(138, 138, 138, 0.49)',
-  backdropFilter: 'blur(28.34px)',
-  WebkitBackdropFilter: 'blur(28.34px)',
-  cursor: 'pointer',
-  zIndex: 5,
-  transition: 'background-color 0.25s ease',
-  '&:hover': {
-    bgcolor: 'rgba(255, 255, 255, 0.72)',
-  },
-  '&:focus-visible': {
-    outline: `2px solid ${portalTokens.color.brandOrange}`,
-    outlineOffset: 2,
-  },
-  [portalTokens.mq.tabletUp]: { display: 'block' },
-} as const;
+function peekSx(direction: 'prev' | 'next') {
+  const isPrev = direction === 'prev';
+  const cursorUrl = isPrev
+    ? 'url("/cursors/portal-cursor-left.svg") 4 17, pointer'
+    : 'url("/cursors/portal-cursor-right.svg") 30 17, pointer';
+  return {
+    display: 'none',
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 760,
+    p: 0,
+    border: 'none',
+    borderRadius: '17.35px',
+    bgcolor: 'rgba(255, 255, 255, 0.54)',
+    outline: '1px solid rgba(138, 138, 138, 0.49)',
+    outlineOffset: '-1px',
+    backdropFilter: 'blur(28.34px)',
+    WebkitBackdropFilter: 'blur(28.34px)',
+    zIndex: 5,
+    // 對齊 portal cursor 風格的方向箭頭 cursor（雙重 class 覆蓋父層 button 規則）
+    '&&': { cursor: cursorUrl },
+    // 平滑過渡：背景、邊框、位移、陰影
+    transition:
+      'background-color 0.28s ease, outline-color 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
+    [isPrev ? 'left' : 'right']: -720,
+    '&:hover': {
+      bgcolor: 'rgba(255, 255, 255, 0.85)',
+      outlineColor: 'rgba(138, 138, 138, 0.85)',
+      // 往視窗中央輕推 12px，露出更多寬度暗示「可拉出」
+      transform: isPrev ? 'translateX(12px)' : 'translateX(-12px)',
+      boxShadow: '0 18px 40px -22px rgba(0, 0, 0, 0.28)',
+    },
+    '&:active': {
+      transform: isPrev ? 'translateX(6px)' : 'translateX(-6px)',
+      bgcolor: 'rgba(255, 255, 255, 0.92)',
+    },
+    '&:focus-visible': {
+      outlineColor: portalTokens.color.brandOrange,
+      outlineWidth: '2px',
+    },
+    [portalTokens.mq.tabletUp]: { display: 'flex' },
+    // 內部箭頭 icon — 預設淡出、hover 時淡入並朝中央滑入
+    alignItems: 'center',
+    justifyContent: isPrev ? 'flex-end' : 'flex-start',
+    // 箭頭預留邊距：靠近視窗中央那一側
+    px: '10px',
+    '& .peek-arrow': {
+      width: 22,
+      height: 22,
+      color: '#1A1A1A',
+      opacity: 0,
+      transform: isPrev ? 'translateX(8px)' : 'translateX(-8px)',
+      transition:
+        'opacity 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
+    },
+    '&:hover .peek-arrow': {
+      opacity: 0.7,
+      transform: 'translateX(0)',
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      transition: 'none',
+      '&:hover': { transform: 'none' },
+      '& .peek-arrow': { transition: 'none' },
+    },
+  } as const;
+}
 
 /**
  * PlanCardWithStars — 展開大卡 + 周圍裝飾星形照片的組合單元。
@@ -434,8 +483,11 @@ export function PlanCarousel({
     setSlideDir(dir);
     setExitingPlan(plans[prev] ?? null);
     if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
+    // 只清退場舊卡；slideDir 刻意保留：清掉會讓新卡的 animation 從
+    // `planSlideIn*` 切回 `planExpand`，瀏覽器會把它視為新動畫重新從
+    // scale(0.55) 播放、造成切換完成後「跳一下」。下次 expandedIndex
+    // 變動時 useEffect 會把 slideDir 改成新方向，key 變動再觸發動畫。
     slideTimerRef.current = window.setTimeout(() => {
-      setSlideDir(null);
       setExitingPlan(null);
       slideTimerRef.current = null;
     }, SLIDE_MS);
@@ -458,14 +510,34 @@ export function PlanCarousel({
     }, EXIT_MS);
   };
 
-  // peek 點擊 — 切到上 / 下一個計畫（環狀 wrap-around）
+  /**
+   * peek 點擊 — 切到上 / 下一個計畫（環狀 wrap-around）。
+   *
+   * 同步先 setSlideDir + setExitingPlan 再呼叫 onExpandedIndexChange，三個
+   * setState 由 React 18 自動 batch 為單次 render，讓新卡一掛上就走滑動動畫，
+   * 避免使用 useEffect 偵測時介於兩次 render 之間先以 planExpand 短暫渲染、
+   * useEffect commit 後再切到 planSlideIn 的「先膨脹再滑入」閃動。
+   * 也提前更新 prevExpandedIdxRef 讓 useEffect fallback 偵測為 no-op。
+   */
+  const startSlide = (newIdx: number, dir: 'prev' | 'next') => {
+    if (expandedIndex === null) return;
+    setSlideDir(dir);
+    setExitingPlan(plans[expandedIndex] ?? null);
+    if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
+    slideTimerRef.current = window.setTimeout(() => {
+      setExitingPlan(null);
+      slideTimerRef.current = null;
+    }, SLIDE_MS);
+    prevExpandedIdxRef.current = newIdx;
+    onExpandedIndexChange(newIdx);
+  };
   const goPrev = () => {
     if (expandedIndex === null) return;
-    onExpandedIndexChange((expandedIndex - 1 + count) % count);
+    startSlide((expandedIndex - 1 + count) % count, 'prev');
   };
   const goNext = () => {
     if (expandedIndex === null) return;
-    onExpandedIndexChange((expandedIndex + 1) % count);
+    startSlide((expandedIndex + 1) % count, 'next');
   };
 
   const outerSx = {
@@ -569,7 +641,8 @@ export function PlanCarousel({
     <Box sx={{ position: 'relative', width: '100%' }}>
       {/* 左右兩側豎立的相鄰計畫預覽矩形 — 點擊以橫向滑動切換上 / 下計畫。
           760 寬 + left/right: -720px 讓多數寬度溢出畫面、僅露 40px 在視窗邊緣。
-          頁面外層已 overflow-x: clip，溢出部分自然裁切。*/}
+          頁面外層已 overflow-x: clip，溢出部分自然裁切。
+          hover：自訂方向 cursor、整塊向中央輕推、背景加深、露出方向箭頭。*/}
       {count > 1 && (
         <>
           <Box
@@ -577,15 +650,45 @@ export function PlanCarousel({
             type="button"
             aria-label="上一個計畫"
             onClick={goPrev}
-            sx={[PEEK_BASE, { left: -720 }]}
-          />
+            sx={peekSx('prev')}
+          >
+            {/* 箭頭 icon — 靠 peek 右側（即視窗左側可見區），hover 才淡入 */}
+            <Box
+              aria-hidden
+              className="peek-arrow"
+              component="svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M15 6 L9 12 L15 18" />
+            </Box>
+          </Box>
           <Box
             component="button"
             type="button"
             aria-label="下一個計畫"
             onClick={goNext}
-            sx={[PEEK_BASE, { right: -720 }]}
-          />
+            sx={peekSx('next')}
+          >
+            {/* 箭頭 icon — 靠 peek 左側（即視窗右側可見區），hover 才淡入 */}
+            <Box
+              aria-hidden
+              className="peek-arrow"
+              component="svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M9 6 L15 12 L9 18" />
+            </Box>
+          </Box>
         </>
       )}
 
