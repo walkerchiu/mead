@@ -200,7 +200,7 @@ function areSlotsAdjacent(a: number, b: number): boolean {
 }
 
 /**
- * 將裝飾文字散佈於色塊周圍。
+ * 將「目前作用中計畫」的裝飾文字散佈於色塊周圍（整片雲為同一計畫）。
  * - 橫向：固定 28 個 slot（依 Figma 不規則散落），文字不足時 cycle 重覆使用，
  *   並避開「相鄰 slot 已有同詞」以免出現肉眼可見的重複叢集。
  * - 直向：左右兩欄、沿色塊兩側由上而下（正立橫書）。
@@ -222,9 +222,6 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
     });
   }
   if (words.length === 0) return [];
-  // 橫向：逐 slot 從 pool 取詞，跳過已落在相鄰 slot 的字詞，
-  // 若整個 pool 都已用完則退回 i % length cycle（不可能完全避免，
-  // 但能保證相鄰範圍內盡量唯一）。
   const placed: PlacedWord[] = [];
   for (let i = 0; i < HORIZONTAL_TEXT_SLOTS.length; i++) {
     const slot = HORIZONTAL_TEXT_SLOTS[i];
@@ -234,7 +231,6 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
         usedByNeighbors.add(placed[j].text);
       }
     }
-    // 起點 index = i % pool.length 維持原本的均勻散佈；遇衝突就往後找下一個 OK 的詞
     let chosen: string | null = null;
     for (let k = 0; k < words.length; k++) {
       const candidate = words[(i + k) % words.length];
@@ -269,11 +265,23 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-export interface DecorativeTextCloudProps {
-  /** 裝飾性文字（取自 plans.json 的 decorativeText） */
+/** 單一色塊（= 單一計畫）的內容：裝飾文字 + 本機照片。 */
+export interface ShapeContent {
+  /** 該計畫的裝飾文字（取自 plans.json 的 decorativeText） */
   words: LocalizedText[];
-  /** 計畫的本機照片路徑 — hover 圖形時於該圖形內隨機循環顯示 */
-  photos?: string[];
+  /** 該計畫的本機照片路徑 — hover 此色塊時於塊內隨機循環顯示 */
+  photos: string[];
+}
+
+export interface DecorativeTextCloudProps {
+  /**
+   * 三個計畫各自的內容（順序由上層 PortalLandingPage 依 PLAN_ORDER
+   * sposad→idc→tisdc 傳入，對應左/中/右色塊）。整片文字雲一次只顯示「目前
+   * 作用中計畫」的裝飾文字；hover 某色塊即切換成該計畫的文字並於塊內顯示其照片。
+   */
+  shapeContents: ShapeContent[];
+  /** 未 hover 時整片雲顯示的計畫索引（作用中計畫），預設 0（菁培） */
+  defaultIndex?: number;
   /** 文字語言偏好，預設優先英文 */
   language?: 'en' | 'zh';
 }
@@ -293,13 +301,23 @@ export interface DecorativeTextCloudProps {
  * 動畫均尊重 `prefers-reduced-motion`。
  */
 export function DecorativeTextCloud({
-  words,
-  photos = [],
+  shapeContents,
+  defaultIndex = 0,
   language = 'en',
 }: DecorativeTextCloudProps) {
   const uid = useId().replace(/[:]/g, '');
   const [hovered, setHovered] = useState<number | null>(null);
   const [photoIdx, setPhotoIdx] = useState(0);
+
+  // 整片雲一律反映「目前作用中計畫」（由下方計畫卡決定）；hover 不切換計畫，
+  // 只是把該色塊的照片顯示出來。切換計畫卡 → defaultIndex 變 → 文字與照片跟著換。
+  const displayedIndex = defaultIndex;
+
+  // 各計畫的照片陣列（index 對應計畫）；hero 三塊都取「當前計畫」displayedIndex 的照片。
+  const photosByShape = useMemo(
+    () => [0, 1, 2].map((i) => shapeContents[i]?.photos ?? []),
+    [shapeContents],
+  );
 
   // 直向佈局判斷 — SSR 與首次 client render 皆為橫向，掛載後再依視窗校正，
   // 避免 hydration 不一致。
@@ -319,12 +337,13 @@ export function DecorativeTextCloud({
   const spinRefs = useRef<(SVGPolygonElement | null)[]>([null, null, null]);
   const animRefs = useRef<(Animation | null)[]>([null, null, null]);
 
+  // 整片雲顯示「目前作用中計畫」的詞池（hover 切換 → displayedIndex 改變 → 重算）
   const { positions, pool } = useMemo(() => {
-    const texts = words
+    const texts = (shapeContents[displayedIndex]?.words ?? [])
       .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
       .filter((t): t is string => Boolean(t));
     return { positions: placeWords(texts, vertical), pool: texts };
-  }, [words, language, vertical]);
+  }, [shapeContents, displayedIndex, language, vertical]);
 
   // 各文字槽目前顯示的詞 — 隨閃爍動畫每輪結束時隨機變換
   const [slotWords, setSlotWords] = useState<string[]>(() =>
@@ -334,20 +353,21 @@ export function DecorativeTextCloud({
     setSlotWords(positions.map((p) => p.text));
   }, [positions]);
 
-  // hover 期間，照片快速、隨機變換
+  // hover 期間，照片快速、隨機變換（取「當前作用中計畫」displayedIndex 的照片）
+  const currentPhotoCount = photosByShape[displayedIndex]?.length ?? 0;
   useEffect(() => {
-    if (hovered === null || photos.length < 2) return;
+    if (hovered === null || currentPhotoCount < 2) return;
     const id = window.setInterval(() => {
       setPhotoIdx((prev) => {
         let next = prev;
         while (next === prev) {
-          next = Math.floor(Math.random() * photos.length);
+          next = Math.floor(Math.random() * currentPhotoCount);
         }
         return next;
       });
     }, PHOTO_INTERVAL);
     return () => window.clearInterval(id);
-  }, [hovered, photos.length]);
+  }, [hovered, currentPhotoCount]);
 
   // 卸載時清除旋轉動畫
   useEffect(() => {
@@ -391,8 +411,9 @@ export function DecorativeTextCloud({
 
   const handleEnter = (i: number) => {
     setHovered(i);
-    if (photos.length) {
-      setPhotoIdx(Math.floor(Math.random() * photos.length));
+    const count = photosByShape[displayedIndex]?.length ?? 0;
+    if (count) {
+      setPhotoIdx(Math.floor(Math.random() * count));
     }
     startSpin(i);
   };
@@ -573,7 +594,7 @@ export function DecorativeTextCloud({
           ))}
         </defs>
 
-        {/* metaball 漸層層 — 套用 goo 濾鏡；hover 的圖形隱藏漸層底（無框線）
+        {/* metaball 漸層層 — 套用 goo 濾鏡；只有被 hover 的圖形隱藏漸層底（露出照片）。
             外層 .entrance-{i} 負責入場動畫（從外側滑入到定位），內層 .drift-{i} 負責環境漂移 */}
         <g filter={`url(#goo-${uid})`}>
           {shapes.map((s, i) => (
@@ -596,10 +617,13 @@ export function DecorativeTextCloud({
           ))}
         </g>
 
-        {/* 照片 + hover 感測層 — 跟隨漂移與入場；hover 時遮罩（clipPath）旋轉、照片本身維持正立不轉 */}
+        {/* 照片 + hover 感測層 — 跟隨漂移與入場；hover 時遮罩（clipPath）旋轉、照片本身維持正立不轉。
+            三塊都取「當前作用中計畫」（displayedIndex）的照片、各塊以 +i 取不同張；
+            只有游標 hover 的那一塊才把照片顯示出來。 */}
         {shapes.map((s, i) => {
-          const photo = photos.length
-            ? photos[photoIdx % photos.length]
+          const currentPhotos = photosByShape[displayedIndex];
+          const photo = currentPhotos.length
+            ? currentPhotos[(photoIdx + i) % currentPhotos.length]
             : undefined;
           const isHovered = hovered === i;
           return (
@@ -669,6 +693,7 @@ export function DecorativeTextCloud({
             aria-hidden
             onAnimationIteration={() => {
               setSlotWords((prev) => {
+                // 換詞時從「目前作用中計畫」的詞池取（整片雲同一計畫）
                 if (pool.length === 0) return prev;
                 // 避開相鄰 slot 已有的詞 + 自己當前的詞，避免肉眼可見的重複叢集
                 const blocked = new Set<string>();

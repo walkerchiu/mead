@@ -70,13 +70,13 @@ const C = {
   title: '#000000',
   link: '#5C5C5C', // on #E3E3E3 ≈ 6.0:1 ✓
   subline: '#4A4A4A', // on #E3E3E3 ≈ 8.4:1 ✓
-  badgeBorder: '#1E1E1E',
-  badgeText: '#1E1E1E', // 高對比，無障礙標章須清楚
+  badgeBorder: '#444444', // 依設計稿 #444；on #E3E3E3 ≈ 8.9:1 ✓（UI 邊框 ≥3:1）
+  badgeText: '#5C5C5C', // 依設計稿偏淺灰，但保 AA：on #E3E3E3 ≈ 6.0:1 ✓（圖示與文字共用）
   copyright: '#5C5C5C',
 };
 
-/** 版權文字共用樣式（字級提升至 12 — 1.4.4 Resize Text 友善） */
-const copyrightSx = { fontSize: 12, color: C.copyright } as const;
+/** 版權文字共用樣式（字級依設計稿 11px；色彩 #5C5C5C 維持 AA） */
+const copyrightSx = { fontSize: 11, color: C.copyright } as const;
 
 /**
  * PortalFooter — 入口網頁尾。
@@ -107,15 +107,17 @@ export function PortalFooter({
     >
       <Box
         sx={{
-          // <834px 內容約 458px 置中；≥834px 約 772px 置中
-          // （依 Figma node 1:48 — 品牌 360 + 三欄各 73 + 間距 64）
+          // <834px 內容約 458px 置中；≥834px 內容 996px 置中
+          // （依 Figma node 1:48 — 品牌 360 + 三欄各 148 + 間距 64
+          //  = 360 + 64 + 148×3 + 64×2 = 996；mx:auto 置中，視窗更寬時兩側留白
+          //  自動加大、整體仍置中）。
           maxWidth: 458,
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
           [portalTokens.mq.tabletUp]: {
-            maxWidth: 772,
+            maxWidth: 996,
           },
         }}
       >
@@ -131,7 +133,9 @@ export function PortalFooter({
             [portalTokens.mq.tabletUp]: {
               pt: 8,
               flexDirection: 'row',
-              flexWrap: 'wrap',
+              // nowrap：品牌 + nav 維持同一列（內容剛好填滿 996，若允許 wrap 會
+              // 因次像素進位把 nav 擠到換行、三欄掉到品牌下方靠左）。
+              flexWrap: 'nowrap',
               gap: 8,
             },
           }}
@@ -143,7 +147,8 @@ export function PortalFooter({
               display: 'flex',
               flexDirection: 'column',
               gap: 2.5,
-              [portalTokens.mq.tabletUp]: { width: 360 },
+              // 品牌區固定 360、不縮（依 Figma node 1:49），其餘空間給三欄分配
+              [portalTokens.mq.tabletUp]: { width: 360, flexShrink: 0 },
             }}
           >
             {/* 教育部識別 + 名稱 + 副標 */}
@@ -163,14 +168,14 @@ export function PortalFooter({
                   {siteName}
                 </Typography>
               </Box>
-              {/* 依 Figma node 1:53 — 原本 8.6px nowrap 違反 1.4.4 / 1.4.10。
-                  放寬到 12px 並允許換行，色彩加深確保 4.5:1。 */}
+              {/* 依 Figma node 1:53 — 字級照設計稿 8.6px；色彩維持 AA（#4A4A4A
+                  on #E3E3E3 ≈ 8.4:1）並允許換行（不 nowrap），兼顧 1.4.4 / 1.4.10。 */}
               <Typography
                 component="p"
                 sx={{
                   mt: 0.5,
                   ml: '50px',
-                  fontSize: 12,
+                  fontSize: 8.6,
                   lineHeight: 1.6,
                   color: C.subline,
                 }}
@@ -208,7 +213,7 @@ export function PortalFooter({
               <GppGoodOutlinedIcon sx={{ fontSize: 14, color: C.badgeText }} />
               <Typography
                 component="span"
-                sx={{ fontSize: 12, fontWeight: 500, color: C.badgeText }}
+                sx={{ fontSize: 11, fontWeight: 500, color: C.badgeText }}
               >
                 無障礙認證
               </Typography>
@@ -238,10 +243,11 @@ export function PortalFooter({
               display: 'flex',
               justifyContent: 'space-between',
               gap: 2,
+              // ≥834px：nav 佔滿品牌右側剩餘空間（flex:1），三欄以 space-between
+              // 平均分散、最後一欄貼齊內容右緣；gap:8(64px) 為欄間最小間距，
+              // 恰等於設計稿欄距。
               [portalTokens.mq.tabletUp]: {
-                flex: '0 0 auto',
-                width: 'auto',
-                justifyContent: 'flex-start',
+                flex: '1 1 auto',
                 gap: 8,
               },
             }}
@@ -254,6 +260,9 @@ export function PortalFooter({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
+                  // ≥834px：固定 148（依 Figma 欄寬），minWidth:0 允許視窗極窄時
+                  // 縮排換行，避免擠爆版面
+                  [portalTokens.mq.tabletUp]: { width: 148, minWidth: 0 },
                 }}
               >
                 {/* 欄標題 — 改 h3（h1 在 PortalLandingPage、h2 在 PortalIntroSection /

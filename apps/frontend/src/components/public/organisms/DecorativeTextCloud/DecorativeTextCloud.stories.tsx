@@ -4,16 +4,19 @@ import { getLocalPhotos } from '@/lib/portal/plans';
 import { idcPlan, sposadPlan, tisdcPlan } from '@/mocks/fixtures/plans';
 import type { Plan } from '@/types/plan';
 
-import { DecorativeTextCloud } from './DecorativeTextCloud';
+import { DecorativeTextCloud, type ShapeContent } from './DecorativeTextCloud';
 
-const photoSrcs = (plan: Plan): string[] =>
-  getLocalPhotos(plan)
+const contentOf = (plan: Plan): ShapeContent => ({
+  words: plan.decorativeText,
+  photos: getLocalPhotos(plan)
     .map((p) => p.src)
-    .filter((s): s is string => Boolean(s));
+    .filter((s): s is string => Boolean(s)),
+});
 
 /**
  * 入口網 hero 文字雲：三圖形組合的橘色色塊 + 環繞裝飾性文字。
- * hover 任一圖形會在該圖形內顯示計畫照片。
+ * 整片雲一次顯示「目前作用中計畫」的裝飾文字（預設菁培）；hover 某色塊
+ * （左/中/右 = 菁培 / 設計戰國策 / 創意設計大賽）即切換成該計畫的文字並於塊內顯示其照片。
  */
 const meta = {
   title: 'Public Scope/Organisms/DecorativeTextCloud',
@@ -25,23 +28,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Sposad: Story = {
+/** 三計畫並陳（依 PLAN_ORDER sposad → idc → tisdc 對應左/中/右）。 */
+export const Default: Story = {
   args: {
-    words: sposadPlan.decorativeText,
-    photos: photoSrcs(sposadPlan),
-  },
-};
-
-export const Tisdc: Story = {
-  args: {
-    words: tisdcPlan.decorativeText,
-    photos: photoSrcs(tisdcPlan),
-  },
-};
-
-export const Idc: Story = {
-  args: {
-    words: idcPlan.decorativeText,
-    photos: photoSrcs(idcPlan),
+    shapeContents: [
+      contentOf(sposadPlan),
+      contentOf(idcPlan),
+      contentOf(tisdcPlan),
+    ],
   },
 };

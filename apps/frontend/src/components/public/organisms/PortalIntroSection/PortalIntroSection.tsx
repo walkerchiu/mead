@@ -94,15 +94,15 @@ export function PortalIntroSection({
   const exitEase = 'cubic-bezier(0.22, 1, 0.36, 1)';
   return (
     <Box sx={{ textAlign: 'center', px: 3 }}>
-      {/* 小標（spec TYPE.smallHeading 22px / 700） */}
+      {/* 小標 — 依設計稿：14px / 500 / line-height 180% / letter-spacing 0 */}
       <Typography
         component="p"
         sx={{
-          fontSize: 18,
-          fontWeight: 700,
-          lineHeight: 1.6,
+          fontSize: 14,
+          fontWeight: 500,
+          lineHeight: 1.8,
+          letterSpacing: 0,
           color: '#1A1A1A',
-          [portalTokens.mq.tabletUp]: { fontSize: 22 },
           // 小標跟著黑字整句一起升起、暫停、再繼續上升淡出（同 keyframes）。
           ...(exiting && {
             animation: `sloganExitRiseFly ${SLOGAN_EXIT_MS}ms ${exitEase} forwards`,
@@ -122,20 +122,21 @@ export function PortalIntroSection({
       >
         {eyebrow}
       </Typography>
-      {/* 主標 — spec TYPE.slogan 48px / 700；keyword 46 由內層 span 控制。
-          語意上改為 h2（h1 由 PortalLandingPage 的 visually-hidden 常駐主標承接），
+      {/* 主標 — 依設計稿：24px / 500 / line-height 180% / letter-spacing 14%；
+          keyword 橘字由內層 span 控制。
+          語意上為 h2（h1 由 PortalLandingPage 的 visually-hidden 常駐主標承接），
           確保 expanded mode 下 PortalIntroSection unmount 仍有 h1 存在。 */}
       <Typography
         component="h2"
         sx={{
           position: 'relative',
           mt: '40px',
-          fontSize: 32,
-          fontWeight: 700,
-          lineHeight: 1.35,
-          letterSpacing: '0.02em',
+          fontSize: 24,
+          fontWeight: 500,
+          lineHeight: 1.8,
+          letterSpacing: '0.14em',
           color: '#1A1A1A',
-          [portalTokens.mq.tabletUp]: { mt: '77px', fontSize: 48 },
+          [portalTokens.mq.tabletUp]: { mt: '77px' },
           // ★ Slogan exit on click（依使用者描述）：
           //  - 整句先一起向上抽離 0 → -120px（Phase A 0–38%）。
           //  - 在第二屏邊緣停 0.5s（Phase B 38–68%）。

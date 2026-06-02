@@ -72,41 +72,71 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     setExpandedIndex(i);
     setPendingPlanIndex(null);
   };
-  // 第三屏（敘事段落）的觀察點 — 使用者未點選任何卡、直接往下滑到第三屏時
-  // 預設展開第一個計畫（依設計師需求）。改成觀察敘事段落本身（threshold 0、
-  // 不縮 rootMargin），確保「視窗看到第三屏」這個事件本身就是觸發條件，不會
-  // 受不同 viewport 高度影響觸發時機。
-  //
-  // 副作用：觸發時使用者捲動位置已過第二屏，expanded 切換後（layout 改變）
-  // 大卡 + 裝飾星形照片的上緣會跑到可視區外。auto-expand 後緊接做一次
-  // scrollIntoView 把第二屏 section 對齊視窗頂，讓大卡（含上緣的星形照片）
-  // 完整可見。
-  const narrativeSectionRef = useRef<HTMLDivElement>(null);
+  // sticky 軌道容器與其釘住的第二屏內層 — 供 scrub 計算捲動進度、寫入 --scrub。
   const secondScreenRef = useRef<HTMLDivElement>(null);
+  const stickyInnerRef = useRef<HTMLDivElement>(null);
+
+  // 漸進 scrub：使用者未點任何卡、往下捲過 sticky 軌道前段 50vh 的 scrub 區時，
+  // 把進度 p(0→1) 寫進內層的 --scrub CSS 變數，驅動主標與三張卡片跟著捲動逐步
+  // 淡出 / 上移 / 微放大（以 CSS 變數而非 React state 驅動，避免每幀 re-render）。
+  // p 抵達 ~0.9 時 commit 展開第一個計畫，讓互動式大卡接手；之後軌道仍有約 50vh
+  // pin（停留區）讓展開大卡完整停在畫面中，不會一展開就被捲出視窗。
   useEffect(() => {
     if (expandedIndex !== null) return;
-    const el = narrativeSectionRef.current;
-    if (!el || typeof IntersectionObserver === 'undefined') return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting)) return;
-        setExpandedIndex(0);
-        // 雙 rAF：第一次讓 React 完成 commit、第二次讓瀏覽器重新 layout
-        //（expanded 模式的 paddingTop / margin 都套用了）後再捲到正確位置。
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            secondScreenRef.current?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          });
-        });
-      },
-      { threshold: 0 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
+    const track = secondScreenRef.current;
+    if (!track) return;
+    const inner = stickyInnerRef.current;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      // scrub 區 = 軌道前 50vh；track 頂上移多少（相對此 50vh）即進度。
+      const denom = Math.max(1, 0.5 * window.innerHeight);
+      const p = Math.min(
+        1,
+        Math.max(0, -track.getBoundingClientRect().top / denom),
+      );
+      inner?.style.setProperty('--scrub', p.toFixed(4));
+      if (p >= 0.9) setExpandedIndex(0);
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, [expandedIndex]);
+
+  // 展開模式自動輪播：展開計畫大卡後，若使用者沒有 hover 在卡片上，每隔
+  // AUTO_ADVANCE_MS 自動切到下一個計畫（環狀）；hover 任一卡時暫停，讓使用者
+  // 安心閱讀內容與操作按鈕。
+  //  - 外部改變 expandedIndex 會被 PlanCarousel 偵測並播放左右滑動轉場（與 dots
+  //    點擊同一條路徑），所以這裡只需推進索引。
+  //  - 暫停條件：hoverIndex !== null（hover 大卡時 onHoverPlanChange 會回報索引）。
+  //  - prefers-reduced-motion 時完全停用：尊重減少動態偏好，並符合 WCAG 2.2.2
+  //    「自動更新內容需可暫停」的精神（peek 與 dots 仍提供手動切換）。
+  useEffect(() => {
+    if (expandedIndex === null) return; // 僅展開模式才輪播
+    if (hoverIndex !== null) return; // hover 卡片 → 暫停自動輪播
+    if (plans.length <= 1) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    const AUTO_ADVANCE_MS = 6000; // 6s／張 — 足夠閱讀，不致「太快切換」
+    const id = window.setInterval(() => {
+      setExpandedIndex((cur) =>
+        cur === null ? cur : (cur + 1) % plans.length,
+      );
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearInterval(id);
+  }, [expandedIndex, hoverIndex, plans.length]);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -116,14 +146,20 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     ...plans.filter((p) => !PLAN_ORDER.includes(p.id)),
   ];
 
-  // hero 文字雲與指示點對應的計畫：靜止時為第一個，展開後為該計畫
+  // 指示點 / aria-live 對應的計畫：靜止時為第一個，展開後為該計畫
   const activePlan = orderedPlans[expandedIndex ?? 0] ?? orderedPlans[0];
 
   if (!activePlan) return null;
 
-  const heroPhotos = getLocalPhotos(activePlan)
-    .map((p) => p.src)
-    .filter((s): s is string => Boolean(s));
+  // hero 文字雲：整片雲一次顯示「目前作用中計畫」的裝飾文字（defaultIndex =
+  // expandedIndex ?? 0）；hover 某色塊即切換成該計畫的文字並於塊內顯示其照片。
+  // 順序依 orderedPlans（sposad → idc → tisdc）對應左/中/右（直向為上/中/下）。
+  const heroShapeContents = orderedPlans.slice(0, 3).map((plan) => ({
+    words: plan.decorativeText,
+    photos: getLocalPhotos(plan)
+      .map((p) => p.src)
+      .filter((s): s is string => Boolean(s)),
+  }));
 
   // 計畫 fallback slogan（非 zh 語系或無關鍵字對應時使用）
   const sloganOf = (plan: Plan) =>
@@ -170,8 +206,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           sx={{
             display: 'inline-block',
             color: portalTokens.color.brandOrange,
-            fontSize: 30,
-            [portalTokens.mq.tabletUp]: { fontSize: 46 },
+            fontSize: 24,
             fontWeight: 700,
             // 跨卡 hover 時：前 ~45% 維持隱藏（與卡片橘字「飛行中」時間對齊），
             // 後段淡入，與目標卡橘字「落地」同步出現。純 opacity 不縮放、不位移，
@@ -207,8 +242,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         bgcolor: portalTokens.color.pageBg,
         display: 'flex',
         flexDirection: 'column',
-        // hover 浮出時側邊圖片會略微溢出，裁掉水平方向避免出現捲軸
-        overflowX: 'clip',
+        // 注意：水平裁切不放在這層 —— overflow-x:clip 會讓此元素成為下方第二屏
+        //   sticky 的 containing block，使 position:sticky 失效（內層會跟著捲走、
+        //   釘不住）。水平裁切放在「第一屏」與「sticky 內層」各自身上：元素自身
+        //   的 overflow 不會破壞它自己的 sticky；overflow-x:clip 也保留
+        //   overflow-y:visible，主標往上飛出視窗的退場動畫不受影響。
         // ★ 自訂游標（依使用者圖示） — 32x38 SVG 黑底白邊指標、hotspot 在 (5,5)
         cursor: 'url("/cursors/portal-cursor.svg") 5 5, auto',
         '& button, & a, & [role="button"]': {
@@ -252,115 +290,156 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            // 文字雲側邊圖片略微溢出時裁掉水平方向，避免出現橫向捲軸
+            overflowX: 'clip',
           }}
         >
           <DecorativeTextCloud
-            words={activePlan.decorativeText}
-            photos={heroPhotos}
+            shapeContents={heroShapeContents}
+            defaultIndex={expandedIndex ?? 0}
             language={language}
           />
         </Box>
 
-        {/* 第二屏 —
-            - static / EXIT 中（expandedIndex === null）：100vh 容器、頂部 33vh 留白，
-              下方 PortalIntroSection（eyebrow + slogan），最底放 mini cards。
-            - expanded（expandedIndex !== null）：100vh 容器，計畫大卡置中佔滿
-              整屏；刻意不再渲染 PortalIntroSection，避免主標 + 副標仍佔位、把
-              大卡擠到下方（依使用者「計劃卡片應該要佔據第二屏」要求）。 */}
+        {/* 第二屏軌道 —
+            - static（expandedIndex === null）：軌道 150vh，內層 position:sticky 釘在
+              畫面頂端、釘住約 50vh 的 scrub 區；主標與 mini cards 跟著捲動進度逐步
+              展開，捲到底（p≈0.9）commit 展開第一個計畫。
+            - expanded（expandedIndex !== null）：軌道高度 auto，內層改為一般流並以
+              marginTop 45vh 起始，讓展開大卡「剛好落在使用者捲到的位置」（接續 scrub
+              結束點、不跳），之後隨頁面自然往下捲動、完整看完整張大卡。 */}
         <Box
           ref={secondScreenRef}
           sx={{
             position: 'relative',
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            ...(expandedIndex === null
-              ? {
-                  paddingTop: '33vh',
-                }
-              : {
-                  // expanded：留 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112）
-                  // 不被視窗上緣切掉，照片離 viewport 頂緣約 28px 透氣間距。
-                  paddingTop: '140px',
-                }),
+            height: expandedIndex === null ? '150vh' : 'auto',
           }}
         >
-          {/* 主標 / 副標只在 static / EXIT 期間渲染；expanded 後直接 unmount，
-              讓位給計畫大卡佔滿整屏。EXIT 動畫已在 unmount 前完整跑完
-              （PlanCarousel.EXIT_MS 結束才 setExpandedIndex），所以不會看到
-              「動畫沒跑完就被 unmount」造成的跳動。 */}
-          {expandedIndex === null && (
-            <PortalIntroSection
-              eyebrow={t('eyebrow')}
-              heading={heading}
-              headingKey={headingKey}
-              exiting={isExiting}
-            />
-          )}
           <Box
+            ref={stickyInnerRef}
             sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              // scrub 進度（0→1）由捲動監聽寫入；主標與卡片以 calc(var(--scrub)) 取用
+              '--scrub': '0',
+              // hover 浮出時側邊圖片會略微溢出，裁掉水平方向避免出現捲軸。
+              // overflow-x:clip 保留 overflow-y:visible，主標往上飛出視窗的退場動畫照常顯示。
+              overflowX: 'clip',
               ...(expandedIndex === null
-                ? { marginTop: 'auto' }
+                ? {
+                    // scrub 期間釘住內層；overflow 放自身不影響 sticky
+                    position: 'sticky',
+                    top: 0,
+                    minHeight: '100vh',
+                    paddingTop: '33vh',
+                  }
                 : {
-                    width: '100%',
+                    // expanded：一般流，marginTop 接續 scrub 結束點；
+                    // 留 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112）。
+                    position: 'static',
+                    marginTop: '45vh',
+                    paddingTop: '140px',
                   }),
             }}
           >
-            <PlanCarousel
-              plans={orderedPlans}
-              expandedIndex={expandedIndex}
-              onExpandedIndexChange={handleExpandedIndexChange}
-              onHoverPlanChange={setHoverIndex}
-              onSelectStart={handleSelectStart}
-            />
-          </Box>
-          {/* 計畫大卡「從左下方滑入」overlay — 與 PlanCarousel 點擊卡的升起
+            {/* 主標 / 副標只在 static / EXIT 期間渲染；expanded 後直接 unmount，
+              讓位給計畫大卡佔滿整屏。EXIT 動畫已在 unmount 前完整跑完
+              （PlanCarousel.EXIT_MS 結束才 setExpandedIndex），所以不會看到
+              「動畫沒跑完就被 unmount」造成的跳動。 */}
+            {expandedIndex === null && (
+              <Box
+                sx={{
+                  // 漸進 scrub：主標跟著捲動進度淡出（p 0→0.5）+ 上移。
+                  opacity: 'calc(1 - var(--scrub, 0) * 2)',
+                  transform: 'translateY(calc(var(--scrub, 0) * -40px))',
+                  '@media (prefers-reduced-motion: reduce)': {
+                    opacity: 1,
+                    transform: 'none',
+                  },
+                }}
+              >
+                <PortalIntroSection
+                  eyebrow={t('eyebrow')}
+                  heading={heading}
+                  headingKey={headingKey}
+                  exiting={isExiting}
+                />
+              </Box>
+            )}
+            <Box
+              sx={{
+                ...(expandedIndex === null
+                  ? {
+                      marginTop: 'auto',
+                      // 漸進 scrub：三張卡片跟著捲動進度上移 + 微放大（往大卡尺度
+                      // 趨近），接近 pin 範圍底（p 0.7→0.9）時淡出，交棒給展開大卡。
+                      transformOrigin: 'center bottom',
+                      transform:
+                        'translateY(calc(var(--scrub, 0) * -24px)) scale(calc(1 + var(--scrub, 0) * 0.06))',
+                      opacity: 'calc(1 - (var(--scrub, 0) - 0.7) * 5)',
+                      '@media (prefers-reduced-motion: reduce)': {
+                        transform: 'none',
+                        opacity: 1,
+                      },
+                    }
+                  : {
+                      width: '100%',
+                    }),
+              }}
+            >
+              <PlanCarousel
+                plans={orderedPlans}
+                expandedIndex={expandedIndex}
+                onExpandedIndexChange={handleExpandedIndexChange}
+                onHoverPlanChange={setHoverIndex}
+                onSelectStart={handleSelectStart}
+              />
+            </Box>
+            {/* 計畫大卡「從左下方滑入」overlay — 與 PlanCarousel 點擊卡的升起
               同拍進行（Phase A+B 期間滑入到位）。top:140 對齊 expanded 模式
               下大卡的最終位置，EXIT 結束時 PlanCarousel 展開分支以同樣位置
               無動畫接手渲染，視覺上沒有跳動。 */}
-          {pendingPlanIndex !== null && orderedPlans[pendingPlanIndex] && (
-            <Box
-              aria-hidden
-              sx={{
-                position: 'absolute',
-                top: '140px',
-                left: 0,
-                right: 0,
-                mx: 'auto',
-                width: '100%',
-                maxWidth: 760,
-                pointerEvents: 'none',
-                zIndex: 5,
-                // 點擊卡 opacity ≈ 0.5（視覺淡出一半、計畫卡開始接力）時才滑出
-                // → delay 3150ms。實測 cubic-bezier(0.22,1,0.36,1) 套在 Phase E
-                // fade（82.6→89%）下，opacity 0.5 的時刻落在 ~3150ms。
-                // `both` 讓 delay 期間鎖在 0% 出發位置（opacity 0、translate(-300,600)）。
-                animation:
-                  'planEnterFromBL 500ms cubic-bezier(0.22, 1, 0.36, 1) 3150ms both',
-                '@keyframes planEnterFromBL': {
-                  '0%': {
-                    transform: 'translate(-300px, 600px)',
-                    opacity: 0,
+            {pendingPlanIndex !== null && orderedPlans[pendingPlanIndex] && (
+              <Box
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  top: '140px',
+                  left: 0,
+                  right: 0,
+                  mx: 'auto',
+                  width: '100%',
+                  maxWidth: 760,
+                  pointerEvents: 'none',
+                  zIndex: 5,
+                  // 點擊卡 opacity ≈ 0.5（視覺淡出一半、計畫卡開始接力）時才滑出
+                  // → delay 3150ms。實測 cubic-bezier(0.22,1,0.36,1) 套在 Phase E
+                  // fade（82.6→89%）下，opacity 0.5 的時刻落在 ~3150ms。
+                  // `both` 讓 delay 期間鎖在 0% 出發位置（opacity 0、translate(-300,600)）。
+                  animation:
+                    'planEnterFromBL 500ms cubic-bezier(0.22, 1, 0.36, 1) 3150ms both',
+                  '@keyframes planEnterFromBL': {
+                    '0%': {
+                      transform: 'translate(-300px, 600px)',
+                      opacity: 0,
+                    },
+                    '100%': { transform: 'translate(0, 0)', opacity: 1 },
                   },
-                  '100%': { transform: 'translate(0, 0)', opacity: 1 },
-                },
-                '@media (prefers-reduced-motion: reduce)': {
-                  animation: 'none',
-                  opacity: 1,
-                },
-              }}
-            >
-              <PlanCardWithStars plan={orderedPlans[pendingPlanIndex]} />
-            </Box>
-          )}
+                  '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                    opacity: 1,
+                  },
+                }}
+              >
+                <PlanCardWithStars plan={orderedPlans[pendingPlanIndex]} />
+              </Box>
+            )}
+          </Box>
         </Box>
 
-        {/* 敘事段落（第三屏） — ref 由 IntersectionObserver 監聽：使用者
-            未點任何卡、第一次滑到此段落時自動展開第一個計畫。*/}
-        <Box
-          ref={narrativeSectionRef}
-          sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}
-        >
+        {/* 敘事段落（第三屏）。展開第一個計畫由上方 sticky scrub 在捲到 pin
+            範圍底時完成，使用者抵達此段時計畫已展開。*/}
+        <Box sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}>
           <PortalNarrativeSection
             leadParagraph={t('narrative.lead')}
             statement={t('narrative.statement')}
