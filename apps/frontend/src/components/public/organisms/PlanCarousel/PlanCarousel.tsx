@@ -9,6 +9,7 @@ import type { Plan } from '@/types/plan';
 import { portalTokens } from '../../tokens';
 import { PlanCard } from '../PlanCard';
 import { SLOGAN_EXIT_MS } from '../PortalIntroSection/PortalIntroSection';
+import { PaperFlipStar } from './PaperFlipStar';
 
 /**
  * 卡片周圍裝飾星形照片的位置（相對卡片左上角的 px，依各計畫 Figma 桌機稿
@@ -33,23 +34,6 @@ const DECOR_STARS: Record<string, { x: number; y: number }[]> = {
 };
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
-
-/** 卡片中心 x（相對 760px 寬卡片框）— 用以判斷照片落在左 / 右側 */
-const CARD_CENTER_X = 380;
-
-/** 靜止時各裝飾照片的微傾角度（deg，依 index 循環）— 形成散落層疊的紙堆感 */
-const REST_TILT = [-6, 5, -4];
-
-/** 鋸齒星形 clip-path（12 角，淺鋸齒 — 依設計稿卡片周圍照片） */
-const STAR_CLIP = (() => {
-  const n = 24;
-  const pts = Array.from({ length: n }, (_, i) => {
-    const r = i % 2 === 0 ? 50 : 45;
-    const a = ((-90 + (i * 360) / n) * Math.PI) / 180;
-    return `${(50 + r * Math.cos(a)).toFixed(1)}% ${(50 + r * Math.sin(a)).toFixed(1)}%`;
-  });
-  return `polygon(${pts.join(', ')})`;
-})();
 
 export interface PlanCarouselProps {
   /** 三大計畫（已依設計稿順序排好） */
@@ -184,60 +168,22 @@ export function PlanCardWithStars({ plan }: { plan: Plan }) {
   const stars = DECOR_STARS[plan.id] ?? [];
   return (
     <>
-      {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示。
-          靜止時微傾、略縮並淡化，像散落半掩在卡片後方的紙堆；hover 時以底邊
-          為軸向觀者翻起、沿 Z 軸前移上抬放大，配合尾段輕微過衝，營造照片
-          「從後方翻出／被抽出」的立體手感（依設計稿 HOVER 說明）。 */}
-      {stars.map((s, i) => {
-        if (!photos[i]) return null;
-        const restTilt = REST_TILT[i % REST_TILT.length];
-        // hover 時依照片落在卡片左 / 右側朝外側微傾，強化「往外抽出」的方向感
-        const leanOut = s.x + STAR_SIZE / 2 < CARD_CENTER_X ? -3 : 3;
-        return (
-          <Box
+      {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示（PaperFlipStar 內部以
+          mq.tabletUp 控制）。平常以星形小尺寸藏在卡片後方；hover 時以紙張翻折
+          物理向觀者翻出、放大、上抬到卡片前方（依設計師 WebGL prototype）。 */}
+      {stars.map((s, i) =>
+        photos[i] ? (
+          <PaperFlipStar
             key={i}
-            aria-hidden
-            component="img"
             src={photos[i]}
-            alt=""
-            sx={{
-              display: 'none',
-              [portalTokens.mq.tabletUp]: { display: 'block' },
-              position: 'absolute',
-              left: `${s.x}px`,
-              top: `${s.y}px`,
-              width: STAR_SIZE,
-              height: STAR_SIZE,
-              objectFit: 'cover',
-              clipPath: STAR_CLIP,
-              zIndex: 0,
-              transformOrigin: 'center bottom',
-              willChange: 'transform, filter',
-              transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
-              filter:
-                'brightness(0.94) saturate(0.95) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.14))',
-              transition:
-                'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
-              '&:hover': {
-                transform: `perspective(900px) rotateX(-12deg) rotateZ(${leanOut}deg) translateY(-24px) translateZ(52px) scale(1.16)`,
-                zIndex: 3,
-                filter:
-                  'brightness(1.03) saturate(1.05) drop-shadow(0 30px 46px rgba(0, 0, 0, 0.34))',
-              },
-              '@media (prefers-reduced-motion: reduce)': {
-                transform: 'none',
-                transition: 'none',
-                filter: 'none',
-                '&:hover': {
-                  transform: 'none',
-                  zIndex: 3,
-                  filter: 'drop-shadow(0 16px 28px rgba(0, 0, 0, 0.28))',
-                },
-              },
-            }}
+            size={STAR_SIZE}
+            leftPx={s.x}
+            topPx={s.y}
+            // 星形中心在 760 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
+            flipDir={s.x + STAR_SIZE / 2 < 380 ? -1 : 1}
           />
-        );
-      })}
+        ) : null,
+      )}
       {/* 作用中的計畫卡片 */}
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <PlanCard plan={plan} />
