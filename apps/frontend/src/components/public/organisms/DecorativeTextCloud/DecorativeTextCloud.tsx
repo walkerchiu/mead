@@ -47,9 +47,9 @@ const PHOTO_INTERVAL = 420;
 /** hover 旋轉一圈的時間（ms）— 順時針 */
 const SPIN_PERIOD = 2000;
 /** 游標移開後的逆時針減速時間（ms） */
-const RELEASE_DURATION = 1600;
-/** 游標移開後逆時針再轉的角度（度，約 1.7 圈） */
-const RELEASE_DEG = 620;
+const RELEASE_DURATION = 1300;
+/** 游標移開後逆時針再轉的角度（度）— 夠明顯但不過度甩轉 */
+const RELEASE_DEG = 330;
 
 /**
  * 圖形半徑 — 依 Figma 1:2 / 23:21 / 31:215 量測：每個 blob 369.44×369.44px、半徑 184.72。
@@ -58,11 +58,11 @@ const RELEASE_DEG = 620;
 const SHAPE_R = 184.72;
 
 /**
- * hero 三圖形（依設計稿 Slide 02 與 node 1:2）— 三者形狀各異但等大：
- * 第一＝微鋸齒星形、第二＝平滑多邊形、第三＝六邊形。
+ * hero 三圖形（依設計稿 node 1:2）— 三者形狀各異但等大：
+ * 第一＝深鋸齒星形（齒輪狀，依設計稿明顯尖齒）、第二＝平滑多邊形、第三＝六邊形。
  */
 const SHAPE_META = [
-  { rotation: 8, sides: 16, innerRatio: 0.93 },
+  { rotation: 8, sides: 11, innerRatio: 0.89 },
   { rotation: 14, sides: 13, innerRatio: 1 },
   { rotation: 0, sides: 6, innerRatio: 1 },
 ] as const;
@@ -390,7 +390,7 @@ export function DecorativeTextCloud({
     );
   };
 
-  /** 移開後：逆時針減速再轉幾圈後停住 */
+  /** 移開後：逆時針反轉，初速約為順轉的 2 倍（明顯但不暴衝），再減速停住 */
   const releaseSpin = (i: number) => {
     const el = spinRefs.current[i];
     if (!el || prefersReducedMotion()) return;
@@ -403,7 +403,8 @@ export function DecorativeTextCloud({
       ],
       {
         duration: RELEASE_DURATION,
-        easing: 'cubic-bezier(0.17, 0.84, 0.44, 1)',
+        // 初速適中（約順轉 2 倍、明顯反轉但不暴衝）、末段減速到停，無硬反轉急甩。
+        easing: 'cubic-bezier(0.4, 0.6, 0.5, 1)',
         fill: 'forwards',
       },
     );
@@ -556,27 +557,6 @@ export function DecorativeTextCloud({
             <stop offset="74%" stopColor={portalTokens.color.blobGrey} />
             <stop offset="100%" stopColor="#E6E6E6" />
           </linearGradient>
-          {/* goo 濾鏡 — 模糊後銳化 alpha，使靠近的圖形產生液體般橋接 */}
-          <filter
-            id={`goo-${uid}`}
-            x="-20%"
-            y="-30%"
-            width="140%"
-            height="160%"
-          >
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="20"
-              result="blur"
-            />
-            <feColorMatrix
-              in="blur"
-              type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -8"
-              result="goo"
-            />
-            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-          </filter>
           {shapes.map((s, i) => (
             <clipPath key={i} id={`clip-${uid}-${i}`}>
               {/* 此多邊形為「外框遮罩」，hover 時旋轉的就是它（照片本身不轉） */}
@@ -594,9 +574,11 @@ export function DecorativeTextCloud({
           ))}
         </defs>
 
-        {/* metaball 漸層層 — 套用 goo 濾鏡；只有被 hover 的圖形隱藏漸層底（露出照片）。
-            外層 .entrance-{i} 負責入場動畫（從外側滑入到定位），內層 .drift-{i} 負責環境漂移 */}
-        <g filter={`url(#goo-${uid})`}>
+        {/* 漸層色塊層 — 三圖以同一漸層重疊相連（依設計稿：邊緣清晰鋸齒、色塊間
+            自然凹陷，非液態橋接，故不套 goo 濾鏡，讓圖塊與 hover 露出的照片
+            邊緣形狀完全一致）。hover 的圖形隱藏漸層底以露出照片。
+            外層 .entrance-{i} 負責入場動畫，內層 .drift-{i} 負責環境漂移。 */}
+        <g>
           {shapes.map((s, i) => (
             <g
               key={i}
