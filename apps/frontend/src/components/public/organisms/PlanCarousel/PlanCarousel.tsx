@@ -163,9 +163,23 @@ function peekSx(direction: 'prev' | 'next') {
  * 抽出此 helper 是為了讓「退場舊卡」和「入場新卡」共用同一份星形渲染邏輯，
  * 在左右滑動轉場期間兩張卡（含其周邊星形）能一起滑動，避免星形與卡片脫節。
  */
-export function PlanCardWithStars({ plan }: { plan: Plan }) {
+export function PlanCardWithStars({
+  plan,
+  showStars = true,
+}: {
+  plan: Plan;
+  /**
+   * 是否渲染周圍裝飾星形照片。點擊展開的左下滑入過場 overlay 設為 false：
+   * 星形（PaperFlipStar）是 WebGL，掛載要建 context + 載貼圖才會顯示，過場
+   * overlay 與 commit 後的正式卡片是兩棵不同子樹，若兩邊都渲染星形，handoff
+   * 時 overlay 星形卸載、正式卡星形重新掛載重載，中間一段空白會造成「照片
+   * 消失再冒出」的閃跳。過場不畫星形，讓星形只在正式卡片掛載一次（與捲動
+   * 展開路徑一致），即可消除閃跳。
+   */
+  showStars?: boolean;
+}) {
   const photos = localPhotos(plan);
-  const stars = DECOR_STARS[plan.id] ?? [];
+  const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
   return (
     <>
       {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示（PaperFlipStar 內部以

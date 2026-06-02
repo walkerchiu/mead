@@ -1,6 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 import Box from '@mui/material/Box';
 import { useLocale, useTranslations } from 'next-intl';
@@ -68,13 +74,33 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     setIsExiting(true);
     setPendingPlanIndex(i);
   };
-  const handleExpandedIndexChange = (i: number) => {
-    setExpandedIndex(i);
-    setPendingPlanIndex(null);
-  };
   // sticky 軌道容器與其釘住的第二屏內層 — 供 scrub 計算捲動進度、寫入 --scrub。
   const secondScreenRef = useRef<HTMLDivElement>(null);
   const stickyInnerRef = useRef<HTMLDivElement>(null);
+  // 展開那一刻把第二屏軌道頂端對齊視窗頂，讓計畫大卡頂端（含上緣裝飾星形）貼齊
+  // 視窗、上半完整可見，其餘隨頁面自然往下捲。
+  //  - 雙 rAF：先讓 React 完成 commit、再等瀏覽器重新 layout（軌道由 150vh 收成
+  //    auto、expanded 版型的 paddingTop 已套用）後才對齊。
+  //  - 用即時對齊（非 smooth）：軌道收縮會觸發瀏覽器 scroll anchoring，與 smooth
+  //    捲動相互拉扯會讓卡片中途亂跳；即時對齊一步到位，落點穩定。
+  const reframeToCard = useCallback(() => {
+    // commit 後軌道由 150vh 收成 auto、WebGL 星形畫布陸續掛載，layout 會分多幀
+    // 才穩定；單次對齊容易被後續位移蓋掉，故在數幀間重試把軌道頂對齊視窗頂。
+    let tries = 0;
+    const align = () => {
+      const track = secondScreenRef.current;
+      if (track) window.scrollTo({ top: track.offsetTop, behavior: 'auto' });
+      if (tries++ < 6) setTimeout(align, 50);
+    };
+    setTimeout(align, 0);
+  }, []);
+  const handleExpandedIndexChange = (i: number) => {
+    const wasCollapsed = expandedIndex === null;
+    setExpandedIndex(i);
+    setPendingPlanIndex(null);
+    // 僅「收合 → 首次展開」需要對齊；展開後切換計畫（dots / peek）不重新捲動。
+    if (wasCollapsed) reframeToCard();
+  };
 
   // 漸進 scrub：使用者未點任何卡、往下捲過 sticky 軌道前段 50vh 的 scrub 區時，
   // 把進度 p(0→1) 寫進內層的 --scrub CSS 變數，驅動主標與三張卡片跟著捲動逐步
@@ -96,7 +122,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         Math.max(0, -track.getBoundingClientRect().top / denom),
       );
       inner?.style.setProperty('--scrub', p.toFixed(4));
-      if (p >= 0.9) setExpandedIndex(0);
+      if (p >= 0.9) {
+        setExpandedIndex(0);
+        reframeToCard();
+      }
     };
     const onScroll = () => {
       if (!raf) raf = window.requestAnimationFrame(update);
@@ -109,7 +138,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       window.removeEventListener('resize', onScroll);
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [expandedIndex]);
+  }, [expandedIndex, reframeToCard]);
 
   // 展開模式自動輪播：展開計畫大卡後，若使用者沒有 hover 在卡片上，每隔
   // AUTO_ADVANCE_MS 自動切到下一個計畫（環狀）；hover 任一卡時暫停，讓使用者
@@ -137,6 +166,21 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     }, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
   }, [expandedIndex, hoverIndex, plans.length]);
+
+  // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
+  // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，展開卡片時星形貼圖即可即時
+  // 取用、與卡片同時出現，不會「卡片先到、照片晚一拍才冒出」。
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    plans.forEach((plan) => {
+      getLocalPhotos(plan).forEach((photo) => {
+        if (photo.src) {
+          const img = new Image();
+          img.src = photo.src;
+        }
+      });
+    });
+  }, [plans]);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -242,6 +286,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         bgcolor: portalTokens.color.pageBg,
         display: 'flex',
         flexDirection: 'column',
+        // 展開計畫時第二屏軌道由 150vh 收成 auto、WebGL 星形畫布陸續掛載，會造成
+        // 版面位移；瀏覽器的 scroll anchoring 會為此自動回補捲動位置，與 reframeToCard
+        // 的對齊互相拉扯。停用本頁子樹的 anchoring，讓對齊一步到位、落點穩定。
+        overflowAnchor: 'none',
         // 注意：水平裁切不放在這層 —— overflow-x:clip 會讓此元素成為下方第二屏
         //   sticky 的 containing block，使 position:sticky 失效（內層會跟著捲走、
         //   釘不住）。水平裁切放在「第一屏」與「sticky 內層」各自身上：元素自身
@@ -305,9 +353,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             - static（expandedIndex === null）：軌道 150vh，內層 position:sticky 釘在
               畫面頂端、釘住約 50vh 的 scrub 區；主標與 mini cards 跟著捲動進度逐步
               展開，捲到底（p≈0.9）commit 展開第一個計畫。
-            - expanded（expandedIndex !== null）：軌道高度 auto，內層改為一般流並以
-              marginTop 45vh 起始，讓展開大卡「剛好落在使用者捲到的位置」（接續 scrub
-              結束點、不跳），之後隨頁面自然往下捲動、完整看完整張大卡。 */}
+            - expanded（expandedIndex !== null）：軌道高度 auto，內層改為一般流；展開
+              那刻 reframeToCard 把軌道頂端對齊視窗頂，大卡頂端（含上緣裝飾星形）貼齊
+              視窗、上半完整可見，其餘隨頁面自然往下捲動看完整張大卡。 */}
         <Box
           ref={secondScreenRef}
           sx={{
@@ -334,10 +382,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                     paddingTop: '33vh',
                   }
                 : {
-                    // expanded：一般流，marginTop 接續 scrub 結束點；
-                    // 留 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112）。
+                    // expanded：一般流。展開那刻 reframeToCard 會把軌道頂端對齊
+                    // 視窗頂，故大卡頂端貼齊視窗、上半完整可見；paddingTop 留
+                    // 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112，距視窗
+                    // 頂約 28px 透氣間距），其餘隨頁面自然往下捲。
                     position: 'static',
-                    marginTop: '45vh',
                     paddingTop: '140px',
                   }),
             }}
@@ -431,7 +480,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                   },
                 }}
               >
-                <PlanCardWithStars plan={orderedPlans[pendingPlanIndex]} />
+                {/* 過場只滑入卡片本體、不畫裝飾星形：星形是 WebGL，與 commit
+                    後正式卡片是兩棵子樹，兩邊都畫會在 handoff 時卸載重載造成
+                    照片閃跳。星形交由正式卡片掛載一次（同捲動展開路徑）。 */}
+                <PlanCardWithStars
+                  plan={orderedPlans[pendingPlanIndex]}
+                  showStars={false}
+                />
               </Box>
             )}
           </Box>
