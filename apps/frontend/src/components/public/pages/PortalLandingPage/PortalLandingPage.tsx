@@ -39,6 +39,17 @@ const HOVER_KEYWORD: Record<string, string> = {
 };
 
 /**
+ * 往下捲展開的 scrub 轉場滾動距離（以屏數計）。越大，主標與三張卡片淡出 / 上移的
+ * 鋪陳越長、捲到底 commit 展開大卡時越不突然。
+ */
+const SCRUB_SCREENS = 1;
+/**
+ * sticky 軌道總高（屏數）= scrub 區 + 1 屏停留；內層 minHeight 100vh，故 sticky 的
+ * pin 範圍 = 軌道高 − 1 屏 = SCRUB_SCREENS 屏，剛好涵蓋整段 scrub。
+ */
+const TRACK_SCREENS = SCRUB_SCREENS + 1;
+
+/**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
  *
  * 由上而下：hero 文字雲 → 主標題 → 三大計畫展開／收合互動區 → 敘事 → 頁尾。
@@ -102,11 +113,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     if (wasCollapsed) reframeToCard();
   };
 
-  // 漸進 scrub：使用者未點任何卡、往下捲過 sticky 軌道前段 50vh 的 scrub 區時，
-  // 把進度 p(0→1) 寫進內層的 --scrub CSS 變數，驅動主標與三張卡片跟著捲動逐步
+  // 漸進 scrub：使用者未點任何卡、往下捲過 sticky 軌道前段 SCRUB_SCREENS 屏的 scrub
+  // 區時，把進度 p(0→1) 寫進內層的 --scrub CSS 變數，驅動主標與三張卡片跟著捲動逐步
   // 淡出 / 上移 / 微放大（以 CSS 變數而非 React state 驅動，避免每幀 re-render）。
-  // p 抵達 ~0.9 時 commit 展開第一個計畫，讓互動式大卡接手；之後軌道仍有約 50vh
-  // pin（停留區）讓展開大卡完整停在畫面中，不會一展開就被捲出視窗。
+  // p 抵達 ~0.9 時 commit 展開第一個計畫，讓互動式大卡接手。scrub 區越長（SCRUB_SCREENS
+  // 越大）轉場越從容、切換越不突然。
   useEffect(() => {
     if (expandedIndex !== null) return;
     const track = secondScreenRef.current;
@@ -115,8 +126,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     let raf = 0;
     const update = () => {
       raf = 0;
-      // scrub 區 = 軌道前 50vh；track 頂上移多少（相對此 50vh）即進度。
-      const denom = Math.max(1, 0.5 * window.innerHeight);
+      // scrub 區 = 軌道前 SCRUB_SCREENS 屏；track 頂上移多少（相對此距離）即進度。
+      const denom = Math.max(1, SCRUB_SCREENS * window.innerHeight);
       const p = Math.min(
         1,
         Math.max(0, -track.getBoundingClientRect().top / denom),
@@ -350,9 +361,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         </Box>
 
         {/* 第二屏軌道 —
-            - static（expandedIndex === null）：軌道 150vh，內層 position:sticky 釘在
-              畫面頂端、釘住約 50vh 的 scrub 區；主標與 mini cards 跟著捲動進度逐步
-              展開，捲到底（p≈0.9）commit 展開第一個計畫。
+            - static（expandedIndex === null）：軌道 TRACK_SCREENS 屏，內層 position:sticky
+              釘在畫面頂端、釘住 SCRUB_SCREENS 屏的 scrub 區；主標與 mini cards 跟著捲動
+              進度逐步展開，捲到底（p≈0.9）commit 展開第一個計畫。
             - expanded（expandedIndex !== null）：軌道高度 auto，內層改為一般流；展開
               那刻 reframeToCard 把軌道頂端對齊視窗頂，大卡頂端（含上緣裝飾星形）貼齊
               視窗、上半完整可見，其餘隨頁面自然往下捲動看完整張大卡。 */}
@@ -360,7 +371,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           ref={secondScreenRef}
           sx={{
             position: 'relative',
-            height: expandedIndex === null ? '150vh' : 'auto',
+            height:
+              expandedIndex === null ? `${TRACK_SCREENS * 100}vh` : 'auto',
           }}
         >
           <Box
