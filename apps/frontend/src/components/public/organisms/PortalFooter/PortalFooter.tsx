@@ -93,17 +93,16 @@ export function PortalFooter({
     >
       <Box
         sx={{
-          // <834px 內容約 458px 置中；≥834px 內容 840px 置中
-          // （依 Figma node 1:47 — 品牌 360 + 兩欄各 148 + 欄距 92
-          //  = 360 + 92 + 148 + 92 + 148 = 840；mx:auto 置中，視窗更寬時兩側
-          //  留白自動加大、整體仍置中）。
+          // <834px 內容約 458px 置中；≥834px 內容比照頁面寬度（maxWidth），品牌
+          // 靠左、兩欄沿寬度分散（依設計稿 — 品牌左、計畫連結置中、關於我們偏右），
+          // 與其他區塊左右對齊。
           maxWidth: 458,
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
           [portalTokens.mq.tabletUp]: {
-            maxWidth: 840,
+            maxWidth: portalTokens.layout.maxWidth,
           },
         }}
       >
@@ -119,11 +118,13 @@ export function PortalFooter({
             [portalTokens.mq.tabletUp]: {
               pt: 8,
               flexDirection: 'row',
-              // nowrap：品牌 + nav 維持同一列（內容剛好填滿 840，若允許 wrap 會
-              // 因次像素進位把 nav 擠到換行、兩欄掉到品牌下方靠左）。
               flexWrap: 'nowrap',
-              // 品牌與 nav 之間的欄距，與 nav 內兩欄間距一致（依 Figma 均為 92px）
-              gap: '92px',
+              alignItems: 'flex-start',
+              // 品牌、計畫連結、關於我們三者沿內容寬度分散（依設計稿）。nav 於此
+              // 斷點設 display:contents，使兩欄成為本列的直接 flex 項，space-between
+              // 才會把三者平均分散（品牌左、計畫連結中、關於我們右）。
+              justifyContent: 'space-between',
+              gap: 4,
             },
           }}
         >
@@ -230,13 +231,10 @@ export function PortalFooter({
               display: 'flex',
               justifyContent: 'space-between',
               gap: 2,
-              // ≥834px：兩欄依 Figma 以固定欄距（92px）並排、不撐滿，整列
-              // （品牌 + nav）共 840 由外層 mx:auto 置中；故 nav 不 flex 拉伸、
-              // 也不 space-between（兩欄時會被推到最右）。
+              // ≥834px：display:contents 讓兩欄上浮為 Footer Main 的直接 flex 項，
+              // 與品牌一起被 space-between 平均分散（nav landmark 語意仍保留）。
               [portalTokens.mq.tabletUp]: {
-                flex: '0 0 auto',
-                justifyContent: 'flex-start',
-                gap: '92px',
+                display: 'contents',
               },
             }}
           >

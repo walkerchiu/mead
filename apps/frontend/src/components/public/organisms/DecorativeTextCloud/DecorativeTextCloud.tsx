@@ -674,6 +674,10 @@ export function DecorativeTextCloud({
             className="portal-twinkle"
             aria-hidden
             onAnimationIteration={() => {
+              // 直向（手機 / 平板）：詞數與槽數一對一，換任一詞都會與其他槽
+              // 重複，故只保留 opacity 閃爍、不換詞，讓兩側國名維持各自唯一、
+              // 依序排列（對齊設計稿乾淨的清單）。
+              if (vertical) return;
               setSlotWords((prev) => {
                 // 換詞時從「目前作用中計畫」的詞池取（整片雲同一計畫）
                 if (pool.length === 0) return prev;
