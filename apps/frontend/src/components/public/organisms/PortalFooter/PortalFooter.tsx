@@ -93,16 +93,15 @@ export function PortalFooter({
     >
       <Box
         sx={{
-          // <834px 內容約 458px 置中；≥834px 內容比照頁面寬度（maxWidth），品牌
-          // 靠左、兩欄沿寬度分散（依設計稿 — 品牌左、計畫連結置中、關於我們偏右），
-          // 與其他區塊左右對齊。
+          // <834px 內容約 458px 置中；≥834px 內容 948 置中（依 Figma footer
+          // auto-layout：frame 寬 ~947、左右內距各 88、欄距 92，內容區 771）。
           maxWidth: 458,
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
           [portalTokens.mq.tabletUp]: {
-            maxWidth: portalTokens.layout.maxWidth,
+            maxWidth: 948,
           },
         }}
       >
@@ -116,15 +115,16 @@ export function PortalFooter({
             flexDirection: 'column-reverse',
             gap: '77px',
             [portalTokens.mq.tabletUp]: {
-              pt: 8,
               flexDirection: 'row',
               flexWrap: 'nowrap',
               alignItems: 'flex-start',
-              // 品牌、計畫連結、關於我們三者沿內容寬度分散（依設計稿）。nav 於此
-              // 斷點設 display:contents，使兩欄成為本列的直接 flex 項，space-between
-              // 才會把三者平均分散（品牌左、計畫連結中、關於我們右）。
-              justifyContent: 'space-between',
-              gap: 4,
+              // 依 Figma footer auto-layout：上內距 64、左右內距各 88、項目間距 92，
+              // 三項（品牌 / 計畫連結 / 關於我們）水平排列。品牌以 flex 撐滿剩餘空間，
+              // 把兩欄推到右側（欄距固定 92），形成「品牌左、兩欄靠右」的版型。
+              // nav 於此斷點 display:contents，使兩欄成為本列直接 flex 項。
+              pt: '64px',
+              px: '88px',
+              gap: '92px',
             },
           }}
         >
@@ -135,8 +135,8 @@ export function PortalFooter({
               display: 'flex',
               flexDirection: 'column',
               gap: 2.5,
-              // 品牌區固定 360、不縮（依 Figma node 1:49），其餘空間給三欄分配
-              [portalTokens.mq.tabletUp]: { width: 360, flexShrink: 0 },
+              // 品牌以 flex 撐滿剩餘空間（把兩欄推到右側）；品牌文字仍靠左對齊
+              [portalTokens.mq.tabletUp]: { flex: '1 1 auto', width: 'auto' },
             }}
           >
             {/* 教育部識別 + 名稱 + 副標 */}
