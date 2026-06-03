@@ -76,7 +76,10 @@ export function PlanCard({ plan }: PlanCardProps) {
         sx={{
           ...FROSTED,
           position: 'relative',
-          p: 4,
+          // <834px 依 Figma node 43:400：左右 24、上 28、下 42
+          pt: '28px',
+          pb: '42px',
+          px: '24px',
           [portalTokens.mq.tabletUp]: { p: 6 },
         }}
       >
@@ -130,10 +133,12 @@ export function PlanCard({ plan }: PlanCardProps) {
             <Typography
               component="p"
               sx={{
-                // 依 Figma node 1:115 — Inter Regular 14px / line-height 1.8
-                fontSize: 14,
+                // <834px 依 Figma node 43:406 為 12px；≥834px 依 node 1:115 為 14px
+                // （皆 Inter Regular / line-height 1.8）
+                fontSize: 12,
                 lineHeight: 1.8,
                 color: '#000000',
+                [portalTokens.mq.tabletUp]: { fontSize: 14 },
               }}
             >
               {plan.intro}
