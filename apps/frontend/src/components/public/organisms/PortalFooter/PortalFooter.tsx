@@ -246,9 +246,10 @@ export function PortalFooter({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
-                  // ≥834px：固定 148（依 Figma 欄寬），minWidth:0 允許視窗極窄時
-                  // 縮排換行，避免擠爆版面
-                  [portalTokens.mq.tabletUp]: { width: 148, minWidth: 0 },
+                  // ≥834px：欄寬依設計稿，使「台灣國際學生創意設計大賽」折成
+                  // 兩行（台灣國際學生創 / 意設計大賽）。minWidth:0 允許視窗極窄
+                  // 時縮排換行，避免擠爆版面。
+                  [portalTokens.mq.tabletUp]: { width: 100, minWidth: 0 },
                 }}
               >
                 {/* 欄標題 — 改 h3（h1 在 PortalLandingPage、h2 在 PortalIntroSection /
