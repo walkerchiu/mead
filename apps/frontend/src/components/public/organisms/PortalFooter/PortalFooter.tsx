@@ -33,6 +33,7 @@ export interface PortalFooterProps {
 /** 品牌副標 — 三大計畫名（依 Figma node 1:53） */
 const BRAND_SUBLINE = '菁培計畫｜設計戰國策｜台灣國際學生創意設計大賽';
 
+/** 連結欄位（依 Figma node 1:47）：計畫連結三個計畫官網 + 關於我們教育部官網。 */
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: '計畫連結',
@@ -40,26 +41,11 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
       { label: '菁培計畫', href: 'https://www.animlab.yuntech.edu.tw/sposad/' },
       { label: '設計戰國策', href: 'https://www.moe-idc.org/' },
       { label: '台灣國際學生創意設計大賽', href: 'https://www.tisdc.org/' },
-      { label: '歷年成果', href: '#' },
     ],
   },
   {
     title: '關於我們',
-    links: [
-      { label: '計畫緣起', href: '#' },
-      { label: '教育部官網', href: 'https://www.edu.tw/Default.aspx' },
-      { label: '隱私權政策', href: '#' },
-      { label: '網站導覽', href: '#' },
-      { label: '無障礙聲明', href: '#' },
-    ],
-  },
-  {
-    title: '聯絡資訊',
-    links: [
-      { label: '聯絡我們', href: '#' },
-      { label: '常見問題', href: '#' },
-      { label: '訂閱電子報', href: '#' },
-    ],
+    links: [{ label: '教育部官網', href: 'https://www.edu.tw/Default.aspx' }],
   },
 ];
 
@@ -107,17 +93,17 @@ export function PortalFooter({
     >
       <Box
         sx={{
-          // <834px 內容約 458px 置中；≥834px 內容 996px 置中
-          // （依 Figma node 1:48 — 品牌 360 + 三欄各 148 + 間距 64
-          //  = 360 + 64 + 148×3 + 64×2 = 996；mx:auto 置中，視窗更寬時兩側留白
-          //  自動加大、整體仍置中）。
+          // <834px 內容約 458px 置中；≥834px 內容 840px 置中
+          // （依 Figma node 1:47 — 品牌 360 + 兩欄各 148 + 欄距 92
+          //  = 360 + 92 + 148 + 92 + 148 = 840；mx:auto 置中，視窗更寬時兩側
+          //  留白自動加大、整體仍置中）。
           maxWidth: 458,
           mx: 'auto',
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
           [portalTokens.mq.tabletUp]: {
-            maxWidth: 996,
+            maxWidth: 840,
           },
         }}
       >
@@ -133,10 +119,11 @@ export function PortalFooter({
             [portalTokens.mq.tabletUp]: {
               pt: 8,
               flexDirection: 'row',
-              // nowrap：品牌 + nav 維持同一列（內容剛好填滿 996，若允許 wrap 會
-              // 因次像素進位把 nav 擠到換行、三欄掉到品牌下方靠左）。
+              // nowrap：品牌 + nav 維持同一列（內容剛好填滿 840，若允許 wrap 會
+              // 因次像素進位把 nav 擠到換行、兩欄掉到品牌下方靠左）。
               flexWrap: 'nowrap',
-              gap: 8,
+              // 品牌與 nav 之間的欄距，與 nav 內兩欄間距一致（依 Figma 均為 92px）
+              gap: '92px',
             },
           }}
         >
@@ -243,12 +230,13 @@ export function PortalFooter({
               display: 'flex',
               justifyContent: 'space-between',
               gap: 2,
-              // ≥834px：nav 佔滿品牌右側剩餘空間（flex:1），三欄以 space-between
-              // 平均分散、最後一欄貼齊內容右緣；gap:8(64px) 為欄間最小間距，
-              // 恰等於設計稿欄距。
+              // ≥834px：兩欄依 Figma 以固定欄距（92px）並排、不撐滿，整列
+              // （品牌 + nav）共 840 由外層 mx:auto 置中；故 nav 不 flex 拉伸、
+              // 也不 space-between（兩欄時會被推到最右）。
               [portalTokens.mq.tabletUp]: {
-                flex: '1 1 auto',
-                gap: 8,
+                flex: '0 0 auto',
+                justifyContent: 'flex-start',
+                gap: '92px',
               },
             }}
           >
