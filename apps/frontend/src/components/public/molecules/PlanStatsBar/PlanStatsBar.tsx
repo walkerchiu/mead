@@ -75,7 +75,10 @@ export function PlanStatsBar({ stats }: PlanStatsBarProps) {
               sx={{
                 fontSize: 24,
                 fontWeight: 800,
-                lineHeight: 'normal',
+                // 固定行高：含中文的數值（如「160萬」「400萬」）在 lineHeight:normal
+                // 下行盒會比純數字（如「445」）高，把同列的標籤、說明往下推而沒對齊。
+                // 用固定行高讓所有數值行盒一致，標籤與說明跨欄水平對齊。
+                lineHeight: 1.2,
                 color: '#000000',
               }}
             >
