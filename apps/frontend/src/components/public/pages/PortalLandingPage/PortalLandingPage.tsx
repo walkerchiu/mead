@@ -34,12 +34,12 @@ const PLAN_ORDER: string[] = ['sposad', 'idc', 'tisdc'];
 /**
  * hero 各計畫色塊 hover 時輪換的照片（依設計稿選用，非全部）。
  * 值為該計畫 local 照片陣列（getLocalPhotos 順序 = photo_01.. 檔名序）的索引：
- *  - sposad（菁培）：photo_01 / 02 / 04 / 05
+ *  - sposad（菁培）：photo_02 / 03 / 04 / 05
  *  - idc（設計戰國策）：photo_01 / 02 / 03 / 05
  *  - tisdc（創意設計大賽）：photo_01 / 02 / 03（共三張，全用）
  */
 const HERO_PHOTO_INDICES: Record<string, number[]> = {
-  sposad: [0, 1, 3, 4],
+  sposad: [1, 2, 3, 4],
   idc: [0, 1, 2, 4],
   tisdc: [0, 1, 2],
 };
