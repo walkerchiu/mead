@@ -142,69 +142,51 @@ interface PlacedWord {
 }
 
 /**
- * 橫向（≥834px）28 個 hero 文字 strip 的座標 — 直接取自 Figma 1:2 / 23:21 / 31:215
- * 三張設計稿（三計畫位置完全相同，只差顯示內容）。
- *
- * leftPct 為 Figma canvas (1440 寬) 的 x 百分比；topPct 為以 hero 區 620 高
- * （Figma canvas y=130～750）的 y 百分比。Box maxWidth 已對齊 Figma frame 1440，
- * 故 leftPct/topPct 對應到設計稿原座標、不再需要補償偏移。
- *
- * 排列規則來自 Figma：
- *   - 上排 15 個：左 1 (~30%) + 中段三小群 (~43% / ~50% / ~55%) + 右 2 (~66, ~70)
- *   - 下排 13 個：左 1 (~30%) + 中段大密集 (~43〜54%) y 有高低錯落 + 右 2 (~70, ~71)
- * 對齊設計師「自然散落、環繞色塊」的意圖，避免平均間距。
+ * 橫向（≥834px）hero 文字 strip 的座標 —「自然散落、環繞色塊」。文字為垂直字條
+ * （中文 vertical-rl、英文 rotate -90°），沿色塊群外圍繞一圈散布：上緣、右側、
+ * 下緣、左側。leftPct 與 topPct 都帶不規則變化（非整齊兩排），但相鄰仍保持足夠
+ * 間距避免字條相疊。陣列順序沿外圈順時針排列，故文字數較少時取均勻子集仍能環繞。
+ * leftPct 為 1440 寬 canvas 的 x 百分比；topPct 為 hero 區 620 高的 y 百分比。
  */
 const HORIZONTAL_TEXT_SLOTS: { leftPct: number; topPct: number }[] = [
-  // 上排（Figma y=161，hero-relative y=31）→ 31/620 = 5%
-  { leftPct: 30.6, topPct: 5 },
-  { leftPct: 42.5, topPct: 5 },
-  { leftPct: 43.4, topPct: 5 },
-  { leftPct: 44.4, topPct: 5 },
-  { leftPct: 49.2, topPct: 5 },
-  { leftPct: 50.1, topPct: 5 },
-  { leftPct: 51.0, topPct: 5 },
-  { leftPct: 52.0, topPct: 5 },
-  { leftPct: 52.9, topPct: 5 },
-  { leftPct: 53.9, topPct: 5 },
-  { leftPct: 55.6, topPct: 5 },
-  { leftPct: 56.5, topPct: 5 },
-  { leftPct: 57.4, topPct: 5 },
-  { leftPct: 65.8, topPct: 5 },
-  { leftPct: 70.7, topPct: 5 },
-  // 下排（Figma y=550–618，hero-relative y=420–488）→ 67.7%–78.7%
-  { leftPct: 29.8, topPct: 67.7 },
-  { leftPct: 42.6, topPct: 76.3 },
-  { leftPct: 44.5, topPct: 69.5 },
-  { leftPct: 46.6, topPct: 74.0 },
-  { leftPct: 48.5, topPct: 72.1 },
-  { leftPct: 49.4, topPct: 76.6 },
-  { leftPct: 50.4, topPct: 76.1 },
-  { leftPct: 51.3, topPct: 68.4 },
-  { leftPct: 52.3, topPct: 69.4 },
-  { leftPct: 53.2, topPct: 73.1 },
-  { leftPct: 54.4, topPct: 75.7 },
-  { leftPct: 70.3, topPct: 74.0 },
-  { leftPct: 71.2, topPct: 78.7 },
+  // 上緣（由左而右）— topPct 不規則起伏
+  { leftPct: 25, topPct: 7 },
+  { leftPct: 31, topPct: 3 },
+  { leftPct: 38, topPct: 11 },
+  { leftPct: 45, topPct: 5 },
+  { leftPct: 51, topPct: 9 },
+  { leftPct: 58, topPct: 2 },
+  { leftPct: 64, topPct: 8 },
+  { leftPct: 70, topPct: 4 },
+  { leftPct: 76, topPct: 10 },
+  // 右側（由上而下）
+  { leftPct: 83, topPct: 18 },
+  { leftPct: 89, topPct: 31 },
+  { leftPct: 95, topPct: 47 },
+  { leftPct: 86, topPct: 60 },
+  // 下緣（由右而左）— topPct 不規則起伏
+  { leftPct: 78, topPct: 76 },
+  { leftPct: 72, topPct: 82 },
+  { leftPct: 66, topPct: 74 },
+  { leftPct: 59, topPct: 81 },
+  { leftPct: 53, topPct: 83 },
+  { leftPct: 47, topPct: 75 },
+  { leftPct: 40, topPct: 82 },
+  { leftPct: 34, topPct: 77 },
+  { leftPct: 28, topPct: 83 },
+  // 左側（由下而上）
+  { leftPct: 14, topPct: 64 },
+  { leftPct: 6, topPct: 50 },
+  { leftPct: 13, topPct: 36 },
+  { leftPct: 4, topPct: 24 },
+  { leftPct: 18, topPct: 46 },
+  { leftPct: 9, topPct: 18 },
 ];
 
 /**
- * 兩個 slot 是否「視覺相鄰」— 同排（上排 / 下排）且 leftPct 差距 < 7pp。
- * 用於避免 twinkle 隨機切換時鄰近 slot 出現相同詞造成肉眼可見的重複叢集。
- */
-function areSlotsAdjacent(a: number, b: number): boolean {
-  if (a === b) return false;
-  const sa = HORIZONTAL_TEXT_SLOTS[a];
-  const sb = HORIZONTAL_TEXT_SLOTS[b];
-  if (!sa || !sb) return false;
-  const sameRow = sa.topPct < 50 === sb.topPct < 50;
-  if (!sameRow) return false;
-  return Math.abs(sa.leftPct - sb.leftPct) < 7;
-}
-
-/**
  * 將「目前作用中計畫」的裝飾文字散佈於色塊周圍（整片雲為同一計畫）。
- * - 橫向：固定 28 個 slot（依 Figma 不規則散落），文字不足時 cycle 重覆使用，
- *   並避開「相鄰 slot 已有同詞」以免出現肉眼可見的重複叢集。
+ * - 橫向：每個字「只出現一組」（不重複、不 cycle 補滿）。文字數少於 slot 數時，
+ *   取均勻分布的 slot 子集，讓較少的字仍分散整個畫面、不擠在一側。
  * - 直向：左右兩欄、沿色塊兩側由上而下（正立橫書）。
  */
 function placeWords(words: string[], vertical: boolean): PlacedWord[] {
@@ -224,31 +206,18 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
     });
   }
   if (words.length === 0) return [];
-  const placed: PlacedWord[] = [];
-  for (let i = 0; i < HORIZONTAL_TEXT_SLOTS.length; i++) {
-    const slot = HORIZONTAL_TEXT_SLOTS[i];
-    const usedByNeighbors = new Set<string>();
-    for (let j = 0; j < i; j++) {
-      if (areSlotsAdjacent(i, j) && placed[j]) {
-        usedByNeighbors.add(placed[j].text);
-      }
-    }
-    let chosen: string | null = null;
-    for (let k = 0; k < words.length; k++) {
-      const candidate = words[(i + k) % words.length];
-      if (candidate && !usedByNeighbors.has(candidate)) {
-        chosen = candidate;
-        break;
-      }
-    }
-    placed.push({
-      text: chosen ?? words[i % words.length] ?? '',
+  const slotCount = HORIZONTAL_TEXT_SLOTS.length;
+  const count = Math.min(words.length, slotCount);
+  return Array.from({ length: count }, (_, i) => {
+    // 取均勻分布的 slot 索引，讓不足 slot 數的字仍散落整個寬度
+    const slot = HORIZONTAL_TEXT_SLOTS[Math.floor((i * slotCount) / count)];
+    return {
+      text: words[i] ?? '',
       leftPct: slot.leftPct,
       topPct: slot.topPct,
       side: 'left',
-    });
-  }
-  return placed;
+    };
+  });
 }
 
 /** 由元素目前的 transform matrix 反推旋轉角度（度） */
@@ -340,21 +309,14 @@ export function DecorativeTextCloud({
   const spinRefs = useRef<(SVGPolygonElement | null)[]>([null, null, null]);
   const animRefs = useRef<(Animation | null)[]>([null, null, null]);
 
-  // 整片雲顯示「目前作用中計畫」的詞池（hover 切換 → displayedIndex 改變 → 重算）
-  const { positions, pool } = useMemo(() => {
+  // 整片雲顯示「目前作用中計畫」的裝飾文字位置（hover 切換 → displayedIndex 改變
+  // → 重算）。每個字只出現一組、不重複、不隨機換詞。
+  const positions = useMemo(() => {
     const texts = (shapeContents[displayedIndex]?.words ?? [])
       .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
       .filter((t): t is string => Boolean(t));
-    return { positions: placeWords(texts, vertical), pool: texts };
+    return placeWords(texts, vertical);
   }, [shapeContents, displayedIndex, language, vertical]);
-
-  // 各文字槽目前顯示的詞 — 隨閃爍動畫每輪結束時隨機變換
-  const [slotWords, setSlotWords] = useState<string[]>(() =>
-    positions.map((p) => p.text),
-  );
-  useEffect(() => {
-    setSlotWords(positions.map((p) => p.text));
-  }, [positions]);
 
   // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
   // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
@@ -652,27 +614,21 @@ export function DecorativeTextCloud({
         })}
       </Box>
 
-      {/* 色塊周圍的裝飾文字 — 白字 + difference，閃爍淡入淡出並隨機變換詞彙。
-          橫向：上下兩排（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
-          入場：left 從外側 (50 + (leftPct-50)*1.5) 收回到 leftPct，與 blob 同步壓縮；
-          twinkle 同時跑 infinite，opacity 隨閃爍變化、入場過程文字依然可見且在移動。 */}
+      {/* 色塊周圍的裝飾文字 — 白字 + difference，每詞只出現一次、繞色塊自然散布。
+          橫向：散布於色塊上、下、左右周圍（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
+          一開始即全部可見（twinkle 負延遲鎖在 opacity=1 相位），之後緩慢閃爍；
+          入場 left 從外側 (50 + (leftPct-50)*1.5) 收回到 leftPct，與三個色塊同步往內擠。 */}
       {positions.map((pos, i) => {
         const dur = 4.6 + ((i * 1.73) % 3.6);
-        // twinkle keyframes 在 cycle 的 16%~62% 區間 opacity=1。將 delay 設成
-        // 「該 label 自身 dur 的 0.20~0.60 倍」的負值，等於把 t=0 的播放相位
-        // 固定在 [20%, 60%] → 所有 label 第一影格全部可見（對齊設計稿
-        // 「裝飾文字平均散落」）。各 label 相位仍因 i 而錯開，後續閃爍節奏不變。
+        // 一開始就全部出現：負延遲把 twinkle 相位固定在 opacity=1 區間（16~62%），
+        // 第一影格即可見，之後緩慢閃爍（不做漸次淡入）。
         const delay = -(0.2 + ((i * 0.151) % 0.4)) * dur;
-        // 入場 left 起點：依設計稿第一影格「平均散落」— 上排 15 個從 5% 到 95%
-        // 均分、下排 13 個同 5% 到 95% 均分。動畫終點為 Figma 不規則 cluster 位置，
-        // 使得入場過程呈現「平均散布 → 壓縮環繞 blob」的視覺。
-        const isTopRow = i < 15;
-        const rowIdx = isTopRow ? i : i - 15;
-        const rowCount = isTopRow ? 15 : 13;
+        // 入場：文字從更外側（距中心 1.5×）隨色塊壓縮往內擠回最終散布位置。
+        // 擠前（外側 1.5×）與擠後（最終散布）相鄰間距都足夠、不會太近。
         const initLeftPct = vertical
           ? pos.leftPct
-          : 5 + (rowIdx / Math.max(1, rowCount - 1)) * 90;
-        const word = slotWords[i] ?? pos.text;
+          : 50 + (pos.leftPct - 50) * 1.5;
+        const word = pos.text;
         // 含中日韓字元 → 直書；否則為英文 → 旋轉 −90°（僅橫向佈局）
         const isCJK = /[\u3000-\u9fff\uff00-\uffef]/.test(word);
         return (
@@ -681,30 +637,6 @@ export function DecorativeTextCloud({
             component="span"
             className="portal-twinkle"
             aria-hidden
-            onAnimationIteration={() => {
-              // 直向（手機 / 平板）：詞數與槽數一對一，換任一詞都會與其他槽
-              // 重複，故只保留 opacity 閃爍、不換詞，讓兩側國名維持各自唯一、
-              // 依序排列（對齊設計稿乾淨的清單）。
-              if (vertical) return;
-              setSlotWords((prev) => {
-                // 換詞時從「目前作用中計畫」的詞池取（整片雲同一計畫）
-                if (pool.length === 0) return prev;
-                // 避開相鄰 slot 已有的詞 + 自己當前的詞，避免肉眼可見的重複叢集
-                const blocked = new Set<string>();
-                blocked.add(prev[i] ?? '');
-                if (!vertical) {
-                  for (let j = 0; j < prev.length; j++) {
-                    if (areSlotsAdjacent(i, j) && prev[j]) blocked.add(prev[j]);
-                  }
-                }
-                const candidates = pool.filter((w) => !blocked.has(w));
-                const wordPool = candidates.length > 0 ? candidates : pool;
-                const next = [...prev];
-                next[i] =
-                  wordPool[Math.floor(Math.random() * wordPool.length)] ?? '';
-                return next;
-              });
-            }}
             style={
               vertical
                 ? {
@@ -712,8 +644,8 @@ export function DecorativeTextCloud({
                     animationDelay: `${delay.toFixed(2)}s`,
                   }
                 : ({
-                    // 兩支動畫：portalTwinkle (opacity) + portalLabelEntrance (left)
-                    // entrance 2.4s 與三個 blob entrance 同步
+                    // 兩支動畫：twinkle(opacity) + entrance(left 壓縮)，
+                    // entrance 2.4s 與三個色塊入場同步，文字隨色塊往內擠。
                     animationDuration: `${dur.toFixed(2)}s, 2.4s`,
                     animationDelay: `${delay.toFixed(2)}s, 0s`,
                     ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
@@ -725,7 +657,7 @@ export function DecorativeTextCloud({
               top: `${pos.topPct}%`,
               ...(vertical
                 ? {
-                    // 直向：靠左／右欄，正立橫書（保留垂直置中對齊）
+                    // 直向：靠左／右欄，正立橫書（垂直置中對齊）
                     ...(pos.side === 'left'
                       ? { left: `${pos.leftPct}%` }
                       : {
@@ -733,8 +665,7 @@ export function DecorativeTextCloud({
                           textAlign: 'right',
                         }),
                     transform: 'translateY(-50%)',
-                    // 直向只跑 twinkle（無 entrance 入場動畫）。父層已移除
-                    // animation shorthand，這裡必須補齊 name/timing/iteration。
+                    // 直向只跑 twinkle（opacity），不做水平壓縮入場。
                     animationName: 'portalTwinkle',
                     animationTimingFunction: 'ease-in-out',
                     animationIterationCount: 'infinite',
@@ -743,8 +674,7 @@ export function DecorativeTextCloud({
                     },
                   }
                 : {
-                    // 橫向：對齊 Figma — topPct 為 text bbox 的「上緣」，
-                    // 故只水平置中、垂直頂端錨定，讓 strip 由錨點向下生長。
+                    // 橫向：水平置中於 leftPct、頂端錨定（中文直書、英文 −90°）
                     left: `${pos.leftPct}%`,
                     ...(isCJK
                       ? {
@@ -755,7 +685,7 @@ export function DecorativeTextCloud({
                           transform: 'translateX(-50%) rotate(-90deg)',
                           transformOrigin: 'center top',
                         }),
-                    // 兩支動畫同時跑：twinkle 控 opacity，entrance 控 left
+                    // twinkle 控 opacity（一開始即可見）、entrance 控 left（隨色塊往內擠）
                     animationName: 'portalTwinkle, portalLabelEntrance',
                     animationTimingFunction:
                       'ease-in-out, cubic-bezier(0.22, 1, 0.36, 1)',
@@ -766,7 +696,7 @@ export function DecorativeTextCloud({
                     },
                   }),
               fontSize: 12.5,
-              fontWeight: 500,
+              fontWeight: 400,
               letterSpacing: '0.02em',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
