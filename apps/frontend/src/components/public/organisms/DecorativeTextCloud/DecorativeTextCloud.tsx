@@ -139,6 +139,8 @@ interface PlacedWord {
   leftPct: number;
   topPct: number;
   side: 'left' | 'right';
+  /** 補齊用的隱藏佔位（詞數少於最大值時常駐但不顯示） */
+  hidden?: boolean;
 }
 
 /**
@@ -309,14 +311,38 @@ export function DecorativeTextCloud({
   const spinRefs = useRef<(SVGPolygonElement | null)[]>([null, null, null]);
   const animRefs = useRef<(Animation | null)[]>([null, null, null]);
 
+  // 各計畫詞數最大值 — 用來固定渲染的 span 數量。三計畫詞數不同，若依當前詞數
+  // 增減 span，切換計畫時新掛載的 span 會重跑入場動畫（left 由外往內位移），
+  // 造成只有某些色塊出現「左到右」位移、行為不一致。固定為最大詞數常駐後，
+  // hover 只更新文字／位置／顯隱，入場動畫只在首次載入跑一次。
+  const maxWords = useMemo(
+    () => Math.max(1, ...shapeContents.map((c) => c?.words?.length ?? 0)),
+    [shapeContents],
+  );
+
   // 整片雲顯示「目前作用中計畫」的裝飾文字位置（hover 切換 → displayedIndex 改變
-  // → 重算）。每個字只出現一組、不重複、不隨機換詞。
+  // → 重算）。每個字只出現一組、不重複、不隨機換詞。詞數少於 maxWords 時，
+  // 以隱藏佔位補齊到固定長度（沿用最後一個位置、visibility 控制顯隱）。
   const positions = useMemo(() => {
     const texts = (shapeContents[displayedIndex]?.words ?? [])
       .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
       .filter((t): t is string => Boolean(t));
-    return placeWords(texts, vertical);
-  }, [shapeContents, displayedIndex, language, vertical]);
+    const placed = placeWords(texts, vertical);
+    if (placed.length >= maxWords) return placed;
+    const anchor = placed[placed.length - 1] ?? {
+      leftPct: 50,
+      topPct: 50,
+      side: 'left' as const,
+    };
+    const padded = Array.from({ length: maxWords - placed.length }, () => ({
+      text: '',
+      leftPct: anchor.leftPct,
+      topPct: anchor.topPct,
+      side: anchor.side,
+      hidden: true,
+    }));
+    return [...placed, ...padded];
+  }, [shapeContents, displayedIndex, language, vertical, maxWords]);
 
   // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
   // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
@@ -695,6 +721,9 @@ export function DecorativeTextCloud({
                       animationName: 'none',
                     },
                   }),
+              // 隱藏佔位：常駐掛載（避免 hover 切換時重掛載而重跑入場），
+              // 僅以 visibility 隱藏；不動 animationName，故不會重觸發入場動畫。
+              visibility: pos.hidden ? 'hidden' : 'visible',
               fontSize: 12.5,
               fontWeight: 400,
               letterSpacing: '0.02em',
