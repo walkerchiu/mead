@@ -1,10 +1,17 @@
 import { ReactNode } from 'react';
-import { Noto_Sans_TC, Roboto, Roboto_Mono } from 'next/font/google';
+import { Inter, Noto_Sans_TC, Roboto, Roboto_Mono } from 'next/font/google';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { GlobalLoadingProgress } from '@/components/atoms/GlobalLoadingProgress';
 import { ClientErrorBoundary } from '@/components/errors';
 import { headers } from 'next/headers';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-inter',
+});
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -54,7 +61,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${roboto.variable} ${notoSansTc.variable} ${robotoMono.variable}`}
+      className={`${inter.variable} ${roboto.variable} ${notoSansTc.variable} ${robotoMono.variable}`}
     >
       <head>
         {/*

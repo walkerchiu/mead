@@ -1,6 +1,7 @@
 export const typography = {
   fontFamily: [
-    'var(--font-roboto, Roboto)',
+    // 拉丁字主字體依設計稿為 Inter；中日文字落到 Noto Sans TC
+    'var(--font-inter, Inter)',
     'var(--font-noto-sans-tc, "Noto Sans TC")',
     'sans-serif',
   ].join(','),
