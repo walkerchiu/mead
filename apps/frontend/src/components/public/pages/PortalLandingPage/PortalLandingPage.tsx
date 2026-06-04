@@ -31,6 +31,13 @@ export interface PortalLandingPageProps {
 /** 過場區卡片顯示順序（依設計稿：菁培 → 設計戰國策 → 創意設計大賽） */
 const PLAN_ORDER: string[] = ['sposad', 'idc', 'tisdc'];
 
+/** hero 各計畫色塊 hover 時輪換的照片張數（依設計稿） */
+const HERO_PHOTO_COUNT: Record<string, number> = {
+  sposad: 4,
+  idc: 4,
+  tisdc: 3,
+};
+
 /** hover 計畫卡時主標「讓 ___ 被看見」的橘色關鍵字（依設計稿過場效果） */
 const HOVER_KEYWORD: Record<string, string> = {
   sposad: '人',
@@ -213,7 +220,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     words: plan.decorativeText,
     photos: getLocalPhotos(plan)
       .map((p) => p.src)
-      .filter((s): s is string => Boolean(s)),
+      .filter((s): s is string => Boolean(s))
+      .slice(0, HERO_PHOTO_COUNT[plan.id]),
   }));
 
   // 計畫 fallback slogan（非 zh 語系或無關鍵字對應時使用）
