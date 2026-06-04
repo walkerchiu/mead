@@ -32,6 +32,19 @@ const FROSTED = {
   borderRadius: '17.35px',
 } as const;
 
+/**
+ * 各計畫主標的文字框寬度（≥834px，依 Figma 各卡標題節點：
+ * sposad 1:117 / idc 23:134 = 194.82、tisdc 31:329 = 249）。
+ * 控制主標斷行與設計稿一致：sposad「值得你期待的設計公／費留學品牌」兩行、
+ * tisdc「全球最大規模學生設計競賽」一行。tisdc 249 比左欄寬，會溢入 logo 與
+ * 描述欄之間的 gap（該處無其他內容、不衝突）。
+ */
+const HEADLINE_WIDTH: Record<string, number> = {
+  sposad: 195,
+  idc: 195,
+  tisdc: 249,
+};
+
 /** 計畫主標：優先 slogan，其次以裝飾性文字首句替代 */
 function getHeadline(plan: Plan): string {
   return (
@@ -123,7 +136,13 @@ export function PlanCard({ plan }: PlanCardProps) {
                 fontWeight: 500,
                 lineHeight: 1.8,
                 color: '#000000',
-                [portalTokens.mq.tabletUp]: { mt: '104px' },
+                [portalTokens.mq.tabletUp]: {
+                  mt: '104px',
+                  // 依設計稿給定的主標框寬，決定斷行點（見 HEADLINE_WIDTH）
+                  ...(HEADLINE_WIDTH[plan.id]
+                    ? { width: `${HEADLINE_WIDTH[plan.id]}px` }
+                    : {}),
+                },
               }}
             >
               <AnimatedSlogan key={sloganNonce} text={headline} />
