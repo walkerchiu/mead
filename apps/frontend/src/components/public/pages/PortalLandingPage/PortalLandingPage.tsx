@@ -38,8 +38,13 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
 
 /** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
 const PIN_TOP_PAD = 140;
-/** 大卡完整捲完後、切換到下一計畫前的緩衝（佔該段比例），讓卡底停留一下再 snap */
-const SWITCH_ZONE = 0.18;
+/** 每個計畫在釘住期間分到的捲動距離（以視窗高為單位）。>1 讓捲動更從容。 */
+const SCROLL_PER_PLAN = 1.4;
+/**
+ * 大卡完整捲完後、切換到下一計畫前的緩衝（佔該段比例）：卡片捲到底後仍要再捲過
+ * 這段距離才 snap 切換，避免一到卡底就立刻跳下一計畫。
+ */
+const SWITCH_ZONE = 0.34;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -106,7 +111,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     const update = () => {
       raf = 0;
       const vh = window.innerHeight;
-      const pinDistance = Math.max(1, planCount * vh);
+      const pinDistance = Math.max(1, planCount * vh * SCROLL_PER_PLAN);
       const p = Math.min(
         1,
         Math.max(0, -track.getBoundingClientRect().top / pinDistance),
@@ -149,18 +154,34 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     });
   }, [plans]);
 
-  // 指示點點選：捲動驅動時捲到該計畫所在的軌道段落；否則直接切 activeIndex。
+  // 捲動驅動時，某計畫段落起點的捲動 y（reveal 歸零、卡頂對齊）。
+  const planScrollTop = useCallback((i: number) => {
+    const track = planTrackRef.current;
+    if (!track) return null;
+    return track.offsetTop + i * window.innerHeight * SCROLL_PER_PLAN;
+  }, []);
+
+  // 指示點點選：捲動驅動時平順捲到該計畫段落；否則直接切 activeIndex。
   const handleDotSelect = useCallback(
     (i: number) => {
-      const track = planTrackRef.current;
-      if (scrollDriven && track) {
-        const vh = window.innerHeight;
-        window.scrollTo({ top: track.offsetTop + i * vh, behavior: 'smooth' });
+      const top = scrollDriven ? planScrollTop(i) : null;
+      if (top !== null) {
+        window.scrollTo({ top, behavior: 'smooth' });
         return;
       }
       setActiveIndex(i);
     },
-    [scrollDriven],
+    [scrollDriven, planScrollTop],
+  );
+
+  // 兩側 peek 點擊（捲動驅動）：即時捲到目標計畫段落起點，由捲動進度觸發左右滑動，
+  // 卡片即在頂端切換、無停頓（不直接改 index 以免與捲動位置脫鉤）。
+  const handlePeekNavigate = useCallback(
+    (targetIndex: number) => {
+      const top = planScrollTop(targetIndex);
+      if (top !== null) window.scrollTo({ top, behavior: 'auto' });
+    },
+    [planScrollTop],
   );
 
   // 指示點 / aria-live 對應目前查看的計畫
@@ -189,6 +210,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       plans={orderedPlans}
       expandedIndex={activeIndex}
       onExpandedIndexChange={setActiveIndex}
+      onPeekNavigate={scrollDriven ? handlePeekNavigate : undefined}
     />
   );
 
@@ -261,7 +283,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           // 跨段 snap 切換到下一計畫，捲完最後一計畫即釋放、繼續往下到 Footer。
           <Box
             ref={planTrackRef}
-            sx={{ position: 'relative', height: `${(planCount + 1) * 100}vh` }}
+            sx={{
+              position: 'relative',
+              height: `${(planCount * SCROLL_PER_PLAN + 1) * 100}vh`,
+            }}
           >
             <Box
               sx={{

@@ -50,6 +50,12 @@ export interface PlanCarouselProps {
   /** 點擊發生時觸發；參數為被點擊的計畫索引，供上層在 EXIT 期間同步渲染
    *  「計畫大卡從左下方滑入」的覆蓋層（與點擊卡的升起同拍）。 */
   onSelectStart?: (index: number) => void;
+  /**
+   * 兩側 peek 點擊時，改由上層接管導覽（捲動驅動模式用）。提供時 peek 不走內部
+   * startSlide，而是回報目標索引與方向，讓上層捲到對應段落、由捲動進度觸發切換，
+   * 避免內部直接改 index 與捲動位置脫鉤。未提供時 peek 走內部左右滑動。
+   */
+  onPeekNavigate?: (targetIndex: number, dir: 'prev' | 'next') => void;
 }
 
 /**
@@ -584,6 +590,7 @@ export function PlanCarousel({
   onExpandedIndexChange,
   onHoverPlanChange,
   onSelectStart,
+  onPeekNavigate,
 }: PlanCarouselProps) {
   // 內部「退場中」狀態：使用者點擊收合卡後、實際切到展開狀態之前的過渡期。
   // 期間三張收合卡先以淡出/壓縮動畫退場，再交由父層更新 expandedIndex、展開大卡。
@@ -797,11 +804,21 @@ export function PlanCarousel({
   };
   const goPrev = () => {
     if (expandedIndex === null) return;
-    startSlide((expandedIndex - 1 + count) % count, 'prev');
+    const target = (expandedIndex - 1 + count) % count;
+    if (onPeekNavigate) {
+      onPeekNavigate(target, 'prev');
+      return;
+    }
+    startSlide(target, 'prev');
   };
   const goNext = () => {
     if (expandedIndex === null) return;
-    startSlide((expandedIndex + 1) % count, 'next');
+    const target = (expandedIndex + 1) % count;
+    if (onPeekNavigate) {
+      onPeekNavigate(target, 'next');
+      return;
+    }
+    startSlide(target, 'next');
   };
 
   const outerSx = {
