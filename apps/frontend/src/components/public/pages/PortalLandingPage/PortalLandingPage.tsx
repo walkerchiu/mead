@@ -38,13 +38,13 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
 
 /** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
 const PIN_TOP_PAD = 140;
-/** 每個計畫在釘住期間分到的捲動距離（以視窗高為單位）。>1 讓捲動更從容。 */
-const SCROLL_PER_PLAN = 1.4;
 /**
- * 大卡完整捲完後、切換到下一計畫前的緩衝（佔該段比例）：卡片捲到底後仍要再捲過
- * 這段距離才 snap 切換，避免一到卡底就立刻跳下一計畫。
+ * 每個計畫在釘住期間分到的捲動距離（以視窗高為單位）。卡片以 1:1 隨捲動往上露出
+ * （約 0.38 屏即露完整張），其餘距離即為「捲完後、切換前的緩衝」：
+ *   緩衝 ≈ SCROLL_PER_PLAN − 卡片溢出高 ≈ 0.9 − 0.38 ≈ 0.5 屏。
+ * 想加大兩計畫間距就調大此值。
  */
-const SWITCH_ZONE = 0.34;
+const SCROLL_PER_PLAN = 0.9;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -76,9 +76,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   ];
   const planCount = orderedPlans.length;
 
-  // 釘住軌道（撐出捲動距離）與其內捲動的大卡包裝層（套 translateY 露出整張卡）。
+  // 釘住軌道（撐出捲動距離）與承載 reveal CSS 變數的包裝層。
   const planTrackRef = useRef<HTMLDivElement>(null);
   const cardWrapRef = useRef<HTMLDivElement>(null);
+  // 追蹤上一影格的計畫段與 reveal 位移：切換瞬間用「離開那一刻的 reveal」凍結退場卡
+  // （--exit-reveal-y），讓退場卡與入場卡各自垂直定位、不會瞬間跳回頂端。
+  const lastIdxRef = useRef(0);
+  const lastRevealRef = useRef(0);
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
@@ -119,11 +123,20 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const planFloat = Math.min(planCount - 1e-6, p * planCount);
       const idx = Math.min(planCount - 1, Math.floor(planFloat));
       const intra = planFloat - idx;
-      // 段內前 (1 - SWITCH_ZONE) 把卡片捲完，末段 SWITCH_ZONE 卡底停留待切換。
-      const revealRatio = Math.min(1, intra / (1 - SWITCH_ZONE));
+      // 段內捲動距離；卡片 1:1 隨捲動往上露出（到卡底為止），其餘為切換前的緩衝。
+      const segLen = vh * SCROLL_PER_PLAN;
+      const scrolledInSeg = intra * segLen;
       // 可捲距離 = 卡片總高 − 釘住可視高度（扣掉上方星形內距）。
       const maxY = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
-      wrap.style.transform = `translateY(-${(revealRatio * maxY).toFixed(2)}px)`;
+      const reveal = Math.min(scrolledInSeg, maxY);
+      // 切換到新計畫段：把「離開那一刻的 reveal」凍進 --exit-reveal-y 給退場卡，
+      // 入場卡則用即時的 --reveal-y（新段約為 0、卡頂對齊）。
+      if (idx !== lastIdxRef.current) {
+        wrap.style.setProperty('--exit-reveal-y', `${lastRevealRef.current}px`);
+        lastIdxRef.current = idx;
+      }
+      wrap.style.setProperty('--reveal-y', `${reveal.toFixed(2)}px`);
+      lastRevealRef.current = reveal;
       setActiveIndex((cur) => (cur === idx ? cur : idx));
     };
     const onScroll = () => {
@@ -298,10 +311,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                 boxSizing: 'border-box',
               }}
             >
-              <Box
-                ref={cardWrapRef}
-                sx={{ width: '100%', willChange: 'transform' }}
-              >
+              {/* 承載 --reveal-y / --exit-reveal-y：reveal 位移由 PlanCarousel 內部
+                  只套在卡片上（不影響兩側 peek，peek 因此固定不隨卡片上移）。 */}
+              <Box ref={cardWrapRef} sx={{ width: '100%' }}>
                 {planCarousel}
               </Box>
             </Box>

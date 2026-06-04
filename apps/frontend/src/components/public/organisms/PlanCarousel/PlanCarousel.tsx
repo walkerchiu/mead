@@ -87,8 +87,8 @@ function localPhotos(plan: Plan): string[] {
 
 /**
  * 兩側豎立的相鄰計畫預覽矩形 — 半透明毛玻璃。
- * 依舊版（commit 110588f）設計：760 寬、left/right: -720px 讓多數寬度溢出
- * 畫面，僅露出 ~40px 在視窗左右側緣。點擊以橫向滑動切換上/下計畫。
+ * 760 寬、left/right: -700px 讓多數寬度溢出畫面，露出約 60px 在視窗左右側緣
+ * （右側預留足夠可點區避免被捲軸擋住）。點擊以橫向滑動切換上/下計畫。
  *
  * peekSx() 回傳完整 sx — direction 控制：
  *  - 自訂方向游標（左 / 右箭頭，與 portal-cursor.svg 同風格）
@@ -123,7 +123,8 @@ function peekSx(direction: 'prev' | 'next') {
     // 平滑過渡：背景、邊框、位移、陰影
     transition:
       'background-color 0.28s ease, outline-color 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
-    [isPrev ? 'left' : 'right']: -720,
+    // 露出約 60px 在視窗邊緣（含右側捲軸仍留足夠可點區）。
+    [isPrev ? 'left' : 'right']: -700,
     '&:hover': {
       bgcolor: 'rgba(255, 255, 255, 0.85)',
       outlineColor: 'rgba(138, 138, 138, 0.85)',
@@ -724,8 +725,25 @@ export function PlanCarousel({
     expandedIndex !== null ? (plans[expandedIndex] ?? null) : null;
   const enterAnimation = useMemo<string | null>(() => {
     if (!activePlanForExpand) return null;
-    if (slideDir) {
-      return slideDir === 'next'
+    // slideDir 由下方 useEffect 設定，會晚一個 render；外部（捲動 / peek）改變
+    // expandedIndex 時若只看 slideDir，第一影格會落回 planExpand 膨脹、下一影格才
+    // 切成滑動，形成「先膨脹一下再滑入」的閃動。這裡同步比對 prev↔curr 先推算方向，
+    // 讓新卡一掛上就直接滑入。
+    let dir = slideDir;
+    const prevIdx = prevExpandedIdxRef.current;
+    if (
+      !dir &&
+      prevIdx !== null &&
+      expandedIndex !== null &&
+      prevIdx !== expandedIndex
+    ) {
+      const total = plans.length;
+      dir = expandedIndex > prevIdx ? 'next' : 'prev';
+      if (prevIdx === total - 1 && expandedIndex === 0) dir = 'next';
+      if (prevIdx === 0 && expandedIndex === total - 1) dir = 'prev';
+    }
+    if (dir) {
+      return dir === 'next'
         ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
         : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
     }
@@ -734,7 +752,13 @@ export function PlanCarousel({
     return clickedExpandId === activePlanForExpand.id
       ? 'none'
       : 'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both';
-  }, [activePlanForExpand, slideDir, clickedExpandId]);
+  }, [
+    activePlanForExpand,
+    slideDir,
+    clickedExpandId,
+    expandedIndex,
+    plans.length,
+  ]);
 
   // 監聽 expandedIndex 變化 → 偵測切換方向、啟動左右滑動轉場。
   // prev=null（從 mini cards 首次展開）跳過 slide，沿用既有 planExpand 膨脹動畫。
@@ -1016,7 +1040,7 @@ export function PlanCarousel({
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
       {/* 左右兩側豎立的相鄰計畫預覽矩形 — 點擊以橫向滑動切換上 / 下計畫。
-          760 寬 + left/right: -720px 讓多數寬度溢出畫面、僅露 40px 在視窗邊緣。
+          760 寬 + left/right: -700px 讓多數寬度溢出畫面、露約 60px 在視窗邊緣。
           頁面外層已 overflow-x: clip，溢出部分自然裁切。
           hover：自訂方向 cursor、整塊向中央輕推、背景加深、露出方向箭頭。*/}
       {count > 1 && (
@@ -1082,7 +1106,6 @@ export function PlanCarousel({
               key 用 plan.id 確保 React 重新掛載播放動畫；slideDir 控制方向。*/}
           {exitingPlan && slideDir && (
             <Box
-              key={`exit-${exitingPlan.id}`}
               aria-hidden
               sx={{
                 position: 'absolute',
@@ -1094,18 +1117,27 @@ export function PlanCarousel({
                 maxWidth: 760,
                 pointerEvents: 'none',
                 zIndex: 0,
-                animation:
-                  slideDir === 'next'
-                    ? `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
-                    : `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
-                ...slideKeyframes,
-                '@media (prefers-reduced-motion: reduce)': {
-                  animation: 'none',
-                  opacity: 0,
-                },
+                // 凍結在切換當下的 reveal 位移，與入場新卡各自垂直定位，避免兩卡
+                // 共用單一位移導致退場卡瞬間跳回頂端（先前的「頓一下」）。
+                transform: 'translateY(calc(var(--exit-reveal-y, 0px) * -1))',
               }}
             >
-              <PlanCardWithStars plan={exitingPlan} />
+              <Box
+                key={`exit-${exitingPlan.id}`}
+                sx={{
+                  animation:
+                    slideDir === 'next'
+                      ? `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
+                      : `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                  ...slideKeyframes,
+                  '@media (prefers-reduced-motion: reduce)': {
+                    animation: 'none',
+                    opacity: 0,
+                  },
+                }}
+              >
+                <PlanCardWithStars plan={exitingPlan} />
+              </Box>
             </Box>
           )}
 
@@ -1115,32 +1147,41 @@ export function PlanCarousel({
                 - click → planSlideUpFromBL（主標退場後，大卡從左下方滑入）
                 - 其餘 → planExpand 膨脹（IntersectionObserver auto-expand） */}
           <Box
-            key={activePlan.id}
-            onMouseEnter={() => onHoverPlanChange?.(expandedIndex)}
-            onMouseLeave={() => onHoverPlanChange?.(null)}
             sx={{
               position: 'relative',
               width: '100%',
               maxWidth: 760,
               zIndex: 1,
-              transformOrigin: 'top center',
-              animation: enterAnimation ?? undefined,
-              ...slideKeyframes,
-              '@keyframes planExpand': {
-                '0%': { opacity: 0, transform: 'scale(0.55)' },
-                '40%': { opacity: 0.7 },
-                '100%': { opacity: 1, transform: 'scale(1)' },
-              },
-              // 大卡從左下方滑入 — 從視窗左下方往中央上推、不旋轉，
-              // 與主標 Phase D 結束銜接（主標已淡出、舞台清空後大卡才上場）。
-              '@keyframes planSlideUpFromBL': {
-                '0%': { transform: 'translate(-220px, 280px)', opacity: 0 },
-                '100%': { transform: 'translate(0, 0)', opacity: 1 },
-              },
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+              // 段內捲動露出整張卡的 reveal 位移 — 只套在卡片上，兩側 peek 不受影響。
+              transform: 'translateY(calc(var(--reveal-y, 0px) * -1))',
             }}
           >
-            <PlanCardWithStars plan={activePlan} />
+            <Box
+              key={activePlan.id}
+              onMouseEnter={() => onHoverPlanChange?.(expandedIndex)}
+              onMouseLeave={() => onHoverPlanChange?.(null)}
+              sx={{
+                transformOrigin: 'top center',
+                animation: enterAnimation ?? undefined,
+                ...slideKeyframes,
+                '@keyframes planExpand': {
+                  '0%': { opacity: 0, transform: 'scale(0.55)' },
+                  '40%': { opacity: 0.7 },
+                  '100%': { opacity: 1, transform: 'scale(1)' },
+                },
+                // 大卡從左下方滑入 — 從視窗左下方往中央上推、不旋轉，
+                // 與主標 Phase D 結束銜接（主標已淡出、舞台清空後大卡才上場）。
+                '@keyframes planSlideUpFromBL': {
+                  '0%': { transform: 'translate(-220px, 280px)', opacity: 0 },
+                  '100%': { transform: 'translate(0, 0)', opacity: 1 },
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  animation: 'none',
+                },
+              }}
+            >
+              <PlanCardWithStars plan={activePlan} />
+            </Box>
           </Box>
         </Box>
       </Box>
