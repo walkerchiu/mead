@@ -39,12 +39,11 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
 /** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
 const PIN_TOP_PAD = 140;
 /**
- * 每個計畫在釘住期間分到的捲動距離（以視窗高為單位）。卡片以 1:1 隨捲動往上露出
- * （約 0.38 屏即露完整張），其餘距離即為「捲完後、切換前的緩衝」：
- *   緩衝 ≈ SCROLL_PER_PLAN − 卡片溢出高 ≈ 0.9 − 0.38 ≈ 0.5 屏。
- * 想加大兩計畫間距就調大此值。
+ * 卡片完整捲完後、切換前露出的「少量空白」距離（以視窗高為單位）。
+ * 每個計畫的捲動段長 = 卡片實測可捲距離 + 此空白，故不論視窗高矮、卡片高低，
+ * 空白都維持這一小段（不會在高螢幕上爆量）。想加大／縮小兩計畫間距就調此值。
  */
-const SCROLL_PER_PLAN = 0.9;
+const DWELL_VH = 0.12;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -66,6 +65,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   // 是否啟用「sticky 釘住 + 滾動驅動切換」：桌機且未開啟減少動態偏好。
   const [scrollDriven, setScrollDriven] = useState(false);
+  // 每個計畫段的捲動距離（px）= 卡片實測可捲距離 + 少量空白（DWELL_VH）。
+  // 用實測值而非固定屏數，確保高螢幕（卡片幾乎塞得下）也只留少量空白。
+  const [segPx, setSegPx] = useState(0);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -100,22 +102,44 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, []);
 
+  // 量測每段捲動距離 segPx = 卡片可捲距離（總高 − 釘住可視高）+ 少量空白。
+  // mount、視窗縮放、與圖片載入後（延遲再量一次）各量一次；不隨切換卡片重量，
+  // 維持軌道高度穩定（三張卡高度相近，差異可忽略）。
+  useEffect(() => {
+    if (!scrollDriven) {
+      setSegPx(0);
+      return;
+    }
+    const measure = () => {
+      const wrap = cardWrapRef.current;
+      if (!wrap) return;
+      const vh = window.innerHeight;
+      const maxY = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
+      setSegPx(maxY + DWELL_VH * vh);
+    };
+    measure();
+    const t = window.setTimeout(measure, 400); // 待 banner 圖等載入後再量
+    window.addEventListener('resize', measure);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('resize', measure);
+    };
+  }, [scrollDriven]);
+
   // 捲動驅動：把釘住軌道的捲動進度 p(0→1) 拆成「目前計畫段 + 段內進度」。
-  //  - 段內前段：把大卡 translateY 往上捲，露出整張卡（KPI、banner）。
-  //  - 段內末段（SWITCH_ZONE）：卡片已捲到底、停留一下，跨入下一段時 snap 切換
-  //    activeIndex（PlanCarousel 接手播左右滑動）。
-  // translateY 直接寫進 DOM style（不經 React state）以免每幀 re-render；只有
+  // 卡片整段都 1:1 隨捲動往上移（reveal = 段內捲動量），捲過卡底後下方露出 DWELL_VH
+  // 的少量空白，再跨入下一段時 snap 切換 activeIndex（PlanCarousel 接手左右滑動）。
+  // reveal 直接寫進 DOM CSS 變數（不經 React state）以免每幀 re-render；只有
   // activeIndex 改變（跨段）時才 setState 觸發滑動。
   useEffect(() => {
-    if (!scrollDriven) return;
+    if (!scrollDriven || segPx <= 0) return;
     const track = planTrackRef.current;
     const wrap = cardWrapRef.current;
     if (!track || !wrap) return;
     let raf = 0;
     const update = () => {
       raf = 0;
-      const vh = window.innerHeight;
-      const pinDistance = Math.max(1, planCount * vh * SCROLL_PER_PLAN);
+      const pinDistance = Math.max(1, planCount * segPx);
       const p = Math.min(
         1,
         Math.max(0, -track.getBoundingClientRect().top / pinDistance),
@@ -123,11 +147,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const planFloat = Math.min(planCount - 1e-6, p * planCount);
       const idx = Math.min(planCount - 1, Math.floor(planFloat));
       const intra = planFloat - idx;
-      // 段內捲動：卡片「整段」都 1:1 隨捲動往上移（不在卡底封頂凍結）。捲過卡底後
-      // 下方自然露出一段空白，再捲過這段空白才切換 — 緩衝是「看得見的空白」而非
-      // 卡片停住不動。空白量 ≈ segLen − 卡片溢出高 ≈ 0.9 − 0.38 ≈ 0.5 屏。
-      const segLen = vh * SCROLL_PER_PLAN;
-      const reveal = intra * segLen;
+      const reveal = intra * segPx;
       // 切換到新計畫段：把「離開那一刻的 reveal」凍進 --exit-reveal-y 給退場卡，
       // 入場卡則用即時的 --reveal-y（新段約為 0、卡頂對齊）。
       if (idx !== lastIdxRef.current) {
@@ -149,7 +169,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       window.removeEventListener('resize', onScroll);
       if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [scrollDriven, planCount]);
+  }, [scrollDriven, planCount, segPx]);
 
   // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
   // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，切換計畫時星形貼圖即可即時
@@ -167,11 +187,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   }, [plans]);
 
   // 捲動驅動時，某計畫段落起點的捲動 y（reveal 歸零、卡頂對齊）。
-  const planScrollTop = useCallback((i: number) => {
-    const track = planTrackRef.current;
-    if (!track) return null;
-    return track.offsetTop + i * window.innerHeight * SCROLL_PER_PLAN;
-  }, []);
+  const planScrollTop = useCallback(
+    (i: number) => {
+      const track = planTrackRef.current;
+      if (!track || segPx <= 0) return null;
+      return track.offsetTop + i * segPx;
+    },
+    [segPx],
+  );
 
   // 指示點點選：捲動驅動時平順捲到該計畫段落；否則直接切 activeIndex。
   const handleDotSelect = useCallback(
@@ -290,14 +313,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
         {/* 計畫介紹大卡 */}
         {scrollDriven ? (
-          // 桌機：sticky 釘住 + 滾動驅動。軌道高 = 釘住捲動距離(planCount 屏) + 1 屏，
-          // 內層 sticky 釘在畫面頂；段內捲動把大卡 translateY 往上捲看完整張，
+          // 桌機：sticky 釘住 + 滾動驅動。軌道高 = 釘住捲動距離(planCount × segPx) + 1 屏，
+          // 內層 sticky 釘在畫面頂；段內捲動把大卡往上捲看完整張 + 少量空白，
           // 跨段 snap 切換到下一計畫，捲完最後一計畫即釋放、繼續往下到 Footer。
           <Box
             ref={planTrackRef}
             sx={{
               position: 'relative',
-              height: `${(planCount * SCROLL_PER_PLAN + 1) * 100}vh`,
+              height: `calc(${planCount * segPx}px + 100vh)`,
             }}
           >
             <Box
