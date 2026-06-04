@@ -732,14 +732,13 @@ export function PlanCarousel({
     expandedIndex !== null ? (plans[expandedIndex] ?? null) : null;
   const enterAnimation = useMemo<string | null>(() => {
     if (!activePlanForExpand) return null;
-    // slideDir 由下方 useEffect 設定，會晚一個 render；外部（捲動 / peek）改變
-    // expandedIndex 時若只看 slideDir，第一影格會落回 planExpand 膨脹、下一影格才
-    // 切成滑動，形成「先膨脹一下再滑入」的閃動。這裡同步比對 prev↔curr 先推算方向，
-    // 讓新卡一掛上就直接滑入。
-    let dir = slideDir;
+    // slideDir 由下方 useEffect 設定，會晚一個 render。外部（捲動 / peek）改變
+    // expandedIndex 時，第一影格一律「以索引差直接推算方向」——不可沿用殘留的
+    // slideDir（那是上一次切換的方向；若上次往下這次往上，會先朝錯邊滑一下再更正，
+    // 看起來「先往右再往左」）。索引已同步（prev===curr）時才用 slideDir。
     const prevIdx = prevExpandedIdxRef.current;
+    let dir: 'prev' | 'next' | null;
     if (
-      !dir &&
       prevIdx !== null &&
       expandedIndex !== null &&
       prevIdx !== expandedIndex
@@ -748,11 +747,15 @@ export function PlanCarousel({
       dir = expandedIndex > prevIdx ? 'next' : 'prev';
       if (prevIdx === total - 1 && expandedIndex === 0) dir = 'next';
       if (prevIdx === 0 && expandedIndex === total - 1) dir = 'prev';
+    } else {
+      dir = slideDir;
     }
     if (dir) {
+      // 方向（依使用者偏好）：next（往下 / 右 peek）新卡從左滑入；prev（往上 /
+      // 左 peek）新卡從右滑入。
       return dir === 'next'
-        ? `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
-        : `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
+        ? `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
+        : `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
     }
     // click 來源：滑入動畫已在 PortalLandingPage 的 overlay 於 EXIT 期間
     // 完整跑完，這裡接手時大卡已到定位，用 'none' 避免再播一次造成閃動。
@@ -1135,10 +1138,11 @@ export function PlanCarousel({
               <Box
                 key={`exit-${exitingPlan.id}`}
                 sx={{
+                  // 與入場方向成對：next 新卡從左進、舊卡往右出；prev 反之。
                   animation:
                     slideDir === 'next'
-                      ? `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
-                      : `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                      ? `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
+                      : `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
                   ...slideKeyframes,
                   '@media (prefers-reduced-motion: reduce)': {
                     animation: 'none',
