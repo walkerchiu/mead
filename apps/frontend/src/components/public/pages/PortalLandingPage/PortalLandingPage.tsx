@@ -39,42 +39,36 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
 /** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
 const PIN_TOP_PAD = 140;
 /**
- * 卡片完整捲完後、切換前露出的「少量空白」距離（以視窗高為單位）。
- * 每個計畫的捲動段長 = 卡片實測可捲距離 + 此空白，故不論視窗高矮、卡片高低，
- * 空白都維持這一小段（不會在高螢幕上爆量）。想加大／縮小兩計畫間距就調此值。
+ * 卡片完整露出後、切換前還要再往下捲過的「一小段空白」距離（以視窗高為單位）。
+ * 即每張卡的捲動量 = 卡片可捲距離 + 此空白；捲超過後才切下一張並回到頂端。
  */
-const DWELL_VH = 0.06;
-/**
- * 切換遲滯（佔一段的比例）：必須越過段界 SWITCH_MARGIN 才提交切換到新計畫，反向同理。
- * 與 SWITCH_COOLDOWN_MS 一起避免真實滑動慣性在段界附近抖動造成快速左右來回切換。
- */
-const SWITCH_MARGIN = 0.1;
-/** 切換後在此時間內擋下「反方向」切換（ms）；同方向（快速連翻）不受限。 */
-const SWITCH_COOLDOWN_MS = 350;
+const DWELL_VH = 0.2;
+/** 自動輪播間隔（手機 / 非捲動驅動時） */
+const AUTO_ADVANCE_MS = 6000;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
  *
- * 由上而下：hero 文字雲（佔滿首屏）→ 計畫介紹大卡（桌機：sticky 釘住、滾動驅動）
- * → 敘事 → 指示點 → 頁尾。
+ * 由上而下：hero 文字雲（佔滿首屏）→ 計畫介紹大卡 → 敘事 → 指示點 → 頁尾。
  *
- * 計畫介紹區（≥834px）：捲到該段時 sticky 釘在畫面中；段內滾動先把當前計畫大卡
- * 往上捲、看完整張（KPI、banner），捲到卡底再 snap 左右切換到下一個計畫（沿用
- * PlanCarousel 的左右滑動轉場）。三個計畫依序看完後，繼續往下滑進入 Footer。
- * <834px 或 prefers-reduced-motion：不劫持捲動，改為原生捲動 + 指示點手動切換。
+ * 計畫介紹區（≥834px、非減少動態）採「釘住 + 滾輪驅動」的離散切換：
+ *  - 捲到該區即釘住、鎖住頁面捲動，改由滾輪累積驅動目前卡片往上露出。
+ *  - 捲超過「卡片 + 一小段空白」後 → 切換到下一張，並把卡片重置回頂端（重新往下捲）。
+ *  - 往回捲到卡頂後 → 倒退回上一張（切換觸發區在上方），可反向看完三張。
+ *  - 三張都看過後，往下捲才放行到敘事 / 頁尾；往上捲到第一張頂端則回到 hero。
+ *  - 兩側 peek 隨時可切換（會記入「已看過」）。因為要捲超過一整張卡才切換，慣性
+ *    微抖動遠不及一張卡的量，故不會誤觸左右切換。
+ * <834px 或 prefers-reduced-motion：不劫持捲動，原生捲動 + 自動輪播 + 指示點切換。
  */
 export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const t = useTranslations('portal');
   const locale = useLocale();
   const language = locale.startsWith('zh') ? 'zh' : 'en';
 
-  // 目前顯示的計畫索引（首屏之後即直接展示完整計畫大卡，預設第一個計畫）。
+  // 目前顯示的計畫索引（供渲染）。互動狀態另以 ref 同步追蹤，供事件處理即時讀取。
   const [activeIndex, setActiveIndex] = useState(0);
-  // 是否啟用「sticky 釘住 + 滾動驅動切換」：桌機且未開啟減少動態偏好。
+  // 桌機 + 非減少動態 → 啟用「釘住 + 滾輪驅動」。
   const [scrollDriven, setScrollDriven] = useState(false);
-  // 每個計畫段的捲動距離（px）= 卡片實測可捲距離 + 少量空白（DWELL_VH）。
-  // 用實測值而非固定屏數，確保高螢幕（卡片幾乎塞得下）也只留少量空白。
-  const [segPx, setSegPx] = useState(0);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -85,16 +79,18 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   ];
   const planCount = orderedPlans.length;
 
-  // 釘住軌道（撐出捲動距離）與承載 reveal CSS 變數的包裝層。
-  const planTrackRef = useRef<HTMLDivElement>(null);
+  // 釘住區塊與承載 reveal CSS 變數的卡片包裝層。
+  const planSectionRef = useRef<HTMLDivElement>(null);
   const cardWrapRef = useRef<HTMLDivElement>(null);
-  // 目前已提交的計畫段（含遲滯）與上一影格 reveal 位移：切換瞬間用「離開那一刻的
-  // reveal」凍結退場卡（--exit-reveal-y），讓退場卡與入場卡各自垂直定位、不跳回頂端。
-  const committedIdxRef = useRef(0);
-  const lastRevealRef = useRef(0);
-  // 最近一次切換的方向與時間 — 供方向冷卻擋下段界抖動造成的反向快速切換。
-  const lastSwitchDirRef = useRef(0);
-  const lastSwitchAtRef = useRef(0);
+
+  // ── 滾輪狀態機的即時狀態（用 ref 以免事件處理讀到舊值）──
+  const engagedRef = useRef(false); // 是否釘住、攔截滾輪中
+  const idxRef = useRef(0); // 目前卡片索引
+  const offsetRef = useRef(0); // 目前卡片的捲動位移（0 = 卡頂；= 卡片露出量）
+  const seenRef = useRef<Set<number>>(new Set([0])); // 已看過的卡片
+  const cardMaxRef = useRef(0); // 卡片可捲距離（卡高 − 釘住可視高）
+  const segLenRef = useRef(0); // 每張卡的捲動量 = cardMax + 空白
+  const prevYRef = useRef(0); // 上一次捲動位置（判斷進入方向）
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
@@ -112,96 +108,170 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, []);
 
-  // 量測每段捲動距離 segPx = 卡片可捲距離（總高 − 釘住可視高）+ 少量空白。
-  // mount、視窗縮放、與圖片載入後（延遲再量一次）各量一次；不隨切換卡片重量，
-  // 維持軌道高度穩定（三張卡高度相近，差異可忽略）。
-  useEffect(() => {
-    if (!scrollDriven) {
-      setSegPx(0);
-      return;
+  // 把目前 offset 寫進 CSS 變數，驅動卡片往上露出（reveal 只套在卡片、不動 peek）。
+  const applyReveal = useCallback(() => {
+    const wrap = cardWrapRef.current;
+    if (wrap)
+      wrap.style.setProperty('--reveal-y', `${offsetRef.current.toFixed(2)}px`);
+  }, []);
+
+  // 切換到另一張卡：凍結退場卡在「離開那一刻」的位移（--exit-reveal-y），新卡以
+  // enterOffset 進場（往下切 = 0 卡頂；往上倒退 = cardMax 卡底），並記入已看過。
+  const commitSwitch = useCallback((target: number, enterOffset: number) => {
+    const wrap = cardWrapRef.current;
+    if (wrap) {
+      wrap.style.setProperty(
+        '--exit-reveal-y',
+        `${offsetRef.current.toFixed(2)}px`,
+      );
+      wrap.style.setProperty('--reveal-y', `${enterOffset.toFixed(2)}px`);
     }
+    offsetRef.current = enterOffset;
+    idxRef.current = target;
+    seenRef.current.add(target);
+    setActiveIndex(target);
+  }, []);
+
+  // 釘住並切到指定卡片（dots / 由上下進入時用）：鎖住捲動於本區、設好卡片與位移。
+  const engageAt = useCallback((index: number, offset: number) => {
+    engagedRef.current = true;
+    idxRef.current = index;
+    seenRef.current.add(index);
+    offsetRef.current = offset;
+    const wrap = cardWrapRef.current;
+    if (wrap) wrap.style.setProperty('--reveal-y', `${offset.toFixed(2)}px`);
+    setActiveIndex(index);
+    const top = planSectionRef.current?.offsetTop ?? 0;
+    window.scrollTo(0, top);
+  }, []);
+
+  // 量測 cardMax / segLen（mount、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
+  useEffect(() => {
+    if (!scrollDriven) return;
     const measure = () => {
       const wrap = cardWrapRef.current;
       if (!wrap) return;
       const vh = window.innerHeight;
-      const maxY = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
-      setSegPx(maxY + DWELL_VH * vh);
+      const cardMax = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
+      cardMaxRef.current = cardMax;
+      segLenRef.current = cardMax + DWELL_VH * vh;
     };
     measure();
-    const t = window.setTimeout(measure, 400); // 待 banner 圖等載入後再量
+    const tid = window.setTimeout(measure, 400);
     window.addEventListener('resize', measure);
     return () => {
-      window.clearTimeout(t);
+      window.clearTimeout(tid);
       window.removeEventListener('resize', measure);
     };
   }, [scrollDriven]);
 
-  // 捲動驅動：把釘住軌道的捲動進度 p(0→1) 拆成「目前計畫段 + 段內進度」。
-  // 卡片整段都 1:1 隨捲動往上移（reveal = 段內捲動量），捲過卡底後下方露出 DWELL_VH
-  // 的少量空白，再跨入下一段時 snap 切換 activeIndex（PlanCarousel 接手左右滑動）。
-  // reveal 直接寫進 DOM CSS 變數（不經 React state）以免每幀 re-render；只有
-  // activeIndex 改變（跨段）時才 setState 觸發滑動。
+  // 滾輪驅動的離散狀態機 + 釘住期間鎖住頁面捲動。
   useEffect(() => {
-    if (!scrollDriven || segPx <= 0) return;
-    const track = planTrackRef.current;
-    const wrap = cardWrapRef.current;
-    if (!track || !wrap) return;
-    let raf = 0;
-    const update = () => {
-      raf = 0;
-      const pinDistance = Math.max(1, planCount * segPx);
-      const p = Math.min(
-        1,
-        Math.max(0, -track.getBoundingClientRect().top / pinDistance),
-      );
-      const planFloat = Math.min(planCount - 1e-6, p * planCount);
-      // 遲滯 + 方向冷卻：越過段界 SWITCH_MARGIN 才考慮切換；且剛切換後短時間內
-      // 擋下反方向切換。兩者一起避免段界附近的慣性抖動造成快速左右來回切換。
-      const committed = committedIdxRef.current;
-      const target = Math.min(planCount - 1, Math.floor(planFloat));
-      let idx = committed;
-      if (target !== committed) {
-        const intraOfTarget = planFloat - target;
-        const dir = target > committed ? 1 : -1;
-        const enoughMargin =
-          dir === 1
-            ? intraOfTarget >= SWITCH_MARGIN
-            : intraOfTarget <= 1 - SWITCH_MARGIN;
-        const now = typeof performance !== 'undefined' ? performance.now() : 0;
-        const reverseLocked =
-          dir !== lastSwitchDirRef.current &&
-          now - lastSwitchAtRef.current < SWITCH_COOLDOWN_MS;
-        if (enoughMargin && !reverseLocked) {
-          idx = target;
-          lastSwitchDirRef.current = dir;
-          lastSwitchAtRef.current = now;
+    if (!scrollDriven) return;
+    prevYRef.current = window.scrollY;
+    const blockTop = () => planSectionRef.current?.offsetTop ?? 0;
+
+    const onWheel = (e: WheelEvent) => {
+      if (!engagedRef.current) return;
+      const seg = segLenRef.current;
+      if (seg <= 0) return;
+      // 行模式（部分瀏覽器）換算成像素，避免一次只動幾 px。
+      const dy = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
+      if (!dy) return;
+      const i = idxRef.current;
+      if (dy > 0) {
+        const next = offsetRef.current + dy;
+        if (next < seg) {
+          e.preventDefault();
+          offsetRef.current = next;
+          applyReveal();
+          return;
+        }
+        // 捲超過整張卡 → 切下一張（回頂端）
+        if (i < planCount - 1) {
+          e.preventDefault();
+          commitSwitch(i + 1, 0);
+          return;
+        }
+        // 已在最後一張：三張都看過 → 放行往下（不攔截，原生捲動進入敘事 / 頁尾）
+        if (seenRef.current.size >= planCount) {
+          engagedRef.current = false;
+          return;
+        }
+        // 尚未看完（例如用 peek 跳著看）→ 切到第一張還沒看過的，強制看完才放行
+        let unseen = -1;
+        for (let k = 0; k < planCount; k += 1) {
+          if (!seenRef.current.has(k)) {
+            unseen = k;
+            break;
+          }
+        }
+        e.preventDefault();
+        if (unseen >= 0) commitSwitch(unseen, 0);
+        else engagedRef.current = false;
+        return;
+      }
+      // dy < 0：往上
+      const next = offsetRef.current + dy;
+      if (next > 0) {
+        e.preventDefault();
+        offsetRef.current = next;
+        applyReveal();
+        return;
+      }
+      // 捲到卡頂上方 → 倒退上一張（從卡底進場，反向看）
+      if (i > 0) {
+        e.preventDefault();
+        commitSwitch(i - 1, cardMaxRef.current);
+        return;
+      }
+      // 第一張卡頂 → 放行往上（回到 hero）
+      engagedRef.current = false;
+    };
+
+    const onScroll = () => {
+      const y = window.scrollY;
+      const bt = blockTop();
+      if (engagedRef.current) {
+        // 釘住期間鎖住捲動（攔截滾輪外的捲動來源：鍵盤 / 捲軸）。
+        if (Math.abs(y - bt) > 1) window.scrollTo(0, bt);
+        prevYRef.current = bt;
+        return;
+      }
+      // 未釘住：偵測捲動跨越本區頂端 → 釘住並依方向進場。
+      if (segLenRef.current > 0) {
+        if (prevYRef.current < bt && y >= bt) {
+          engageAt(0, 0); // 由上往下進入 → 第一張、卡頂
+        } else if (prevYRef.current > bt && y <= bt) {
+          engageAt(planCount - 1, cardMaxRef.current); // 由下往上進入 → 最後一張、卡底
         }
       }
-      // reveal 以「已提交段」為基準（遲滯/冷卻期間 idx 落後 planFloat，卡片續捲、
-      // 空白略增）。夾在 0 以上，避免反向鎖住時 reveal 變負把卡片往下推。
-      const reveal = Math.max(0, (planFloat - idx) * segPx);
-      // 切換到新計畫段：把「離開那一刻的 reveal」凍進 --exit-reveal-y 給退場卡，
-      // 入場卡則用即時的 --reveal-y（新段約為 0、卡頂對齊）。
-      if (idx !== committed) {
-        wrap.style.setProperty('--exit-reveal-y', `${lastRevealRef.current}px`);
-        committedIdxRef.current = idx;
-      }
-      wrap.style.setProperty('--reveal-y', `${reveal.toFixed(2)}px`);
-      lastRevealRef.current = reveal;
-      setActiveIndex((cur) => (cur === idx ? cur : idx));
+      prevYRef.current = y;
     };
-    const onScroll = () => {
-      if (!raf) raf = window.requestAnimationFrame(update);
-    };
-    update();
+
+    window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
     return () => {
+      window.removeEventListener('wheel', onWheel);
       window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (raf) window.cancelAnimationFrame(raf);
     };
-  }, [scrollDriven, planCount, segPx]);
+  }, [scrollDriven, planCount, applyReveal, commitSwitch, engageAt]);
+
+  // 自動輪播：僅在「非捲動驅動」（手機 / 減少動態）時啟用。
+  useEffect(() => {
+    if (scrollDriven) return;
+    if (planCount <= 1) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    const id = window.setInterval(() => {
+      setActiveIndex((cur) => (cur + 1) % planCount);
+    }, AUTO_ADVANCE_MS);
+    return () => window.clearInterval(id);
+  }, [scrollDriven, planCount]);
 
   // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
   // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，切換計畫時星形貼圖即可即時
@@ -218,44 +288,22 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     });
   }, [plans]);
 
-  // 捲動驅動時，某計畫段落起點的捲動 y（reveal 歸零、卡頂對齊）。
-  const planScrollTop = useCallback(
-    (i: number) => {
-      const track = planTrackRef.current;
-      if (!track || segPx <= 0) return null;
-      return track.offsetTop + i * segPx;
-    },
-    [segPx],
-  );
-
-  // 指示點點選：捲動驅動時平順捲到該計畫段落；否則直接切 activeIndex。
+  // 指示點點選：捲動驅動時釘住並切到該卡；否則直接切 activeIndex。
   const handleDotSelect = useCallback(
     (i: number) => {
-      const top = scrollDriven ? planScrollTop(i) : null;
-      if (top !== null) {
-        window.scrollTo({ top, behavior: 'smooth' });
-        return;
-      }
-      setActiveIndex(i);
+      if (scrollDriven) engageAt(i, 0);
+      else setActiveIndex(i);
     },
-    [scrollDriven, planScrollTop],
+    [scrollDriven, engageAt],
   );
 
-  // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接強制提交目標索引（繞過遲滯與方向
-  // 冷卻，故循環時的反向大跳不會被擋），同時即時把捲動對齊到該段起點，使捲動位置
-  // 與目前計畫一致、卡頂對齊。
+  // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端、記入已看過），
+  // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
   const handlePeekNavigate = useCallback(
     (targetIndex: number) => {
-      const top = planScrollTop(targetIndex);
-      if (top === null) return;
-      committedIdxRef.current = targetIndex;
-      lastSwitchDirRef.current = 0;
-      lastSwitchAtRef.current = 0;
-      lastRevealRef.current = 0;
-      setActiveIndex(targetIndex);
-      window.scrollTo({ top, behavior: 'auto' });
+      commitSwitch(targetIndex, 0);
     },
-    [planScrollTop],
+    [commitSwitch],
   );
 
   // 指示點 / aria-live 對應目前查看的計畫
@@ -295,8 +343,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         bgcolor: portalTokens.color.pageBg,
         display: 'flex',
         flexDirection: 'column',
-        // 釘住軌道收放與 WebGL 星形陸續掛載會造成版面位移；停用本頁子樹的 scroll
-        // anchoring，避免瀏覽器自動回補捲動與釘住對齊互相拉扯。
+        // WebGL 星形陸續掛載會造成版面位移；停用本頁子樹的 scroll anchoring，避免
+        // 瀏覽器自動回補捲動與釘住鎖捲互相拉扯。
         overflowAnchor: 'none',
         // ★ 自訂游標（依使用者圖示） — 32x38 SVG 黑底白邊指標、hotspot 在 (5,5)
         cursor: 'url("/cursors/portal-cursor.svg") 5 5, auto',
@@ -352,31 +400,19 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
         {/* 計畫介紹大卡 */}
         {scrollDriven ? (
-          // 桌機：sticky 釘住 + 滾動驅動。軌道高 = 釘住捲動距離(planCount × segPx) + 1 屏，
-          // 內層 sticky 釘在畫面頂；段內捲動把大卡往上捲看完整張 + 少量空白，
-          // 跨段 snap 切換到下一計畫，捲完最後一計畫即釋放、繼續往下到 Footer。
+          // 桌機：釘住一屏（鎖住捲動），滾輪驅動卡片露出與離散切換；reveal 位移由
+          // PlanCarousel 內部只套在卡片上（不影響兩側固定的 peek）。
           <Box
-            ref={planTrackRef}
+            ref={planSectionRef}
             sx={{
-              position: 'relative',
-              height: `calc(${planCount * segPx}px + 100vh)`,
+              height: '100vh',
+              overflow: 'hidden',
+              pt: `${PIN_TOP_PAD}px`,
+              boxSizing: 'border-box',
             }}
           >
-            <Box
-              sx={{
-                position: 'sticky',
-                top: 0,
-                height: '100vh',
-                overflow: 'hidden',
-                pt: `${PIN_TOP_PAD}px`,
-                boxSizing: 'border-box',
-              }}
-            >
-              {/* 承載 --reveal-y / --exit-reveal-y：reveal 位移由 PlanCarousel 內部
-                  只套在卡片上（不影響兩側 peek，peek 因此固定不隨卡片上移）。 */}
-              <Box ref={cardWrapRef} sx={{ width: '100%' }}>
-                {planCarousel}
-              </Box>
+            <Box ref={cardWrapRef} sx={{ width: '100%' }}>
+              {planCarousel}
             </Box>
           </Box>
         ) : (
