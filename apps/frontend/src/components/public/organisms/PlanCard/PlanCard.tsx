@@ -116,8 +116,12 @@ export function PlanCard({ plan }: PlanCardProps) {
           <Box
             sx={{
               minWidth: 0,
-              // 左欄固定 logo 寬 218px（依 Figma node 1:2）；窄於卡片時才收縮
-              [portalTokens.mq.tabletUp]: { flex: '0 1 218px' },
+              // 左欄固定 logo 寬 218px（依 Figma node 1:2）；窄於卡片時才收縮。
+              // relative 作為主標絕對定位的錨點（主標 y 需與 logo 高度脫鉤）。
+              [portalTokens.mq.tabletUp]: {
+                flex: '0 1 218px',
+                position: 'relative',
+              },
             }}
           >
             <PlanLogo
@@ -137,10 +141,19 @@ export function PlanCard({ plan }: PlanCardProps) {
                 lineHeight: 1.8,
                 color: '#000000',
                 [portalTokens.mq.tabletUp]: {
-                  // 依 Figma node 1:2：logo 與主標間距約 87px（主標對齊到比右欄
-                  // 「執行單位」高約 17px 處）。logo 實高 80px → mt 86 使主標頂端
-                  // 落在描述頂端下方 166px，與設計稿一致。
-                  mt: '86px',
+                  // 依 Figma node 1:2 / 23:21 / 31:215：三卡主標的「垂直中心」皆
+                  // 對齊到描述頂端下方約 202px 處（sposad 兩行 top≈166；單行的
+                  // idc/tisdc 置中後 top≈184）。各卡 logo 高度不同，故主標改用相對
+                  // 左欄頂端的絕對定位（top 166 = 槽頂、+72px 槽垂直置中 → 中心 202），
+                  // 與 logo 高度脫鉤；left 0 對齊 logo 左緣。
+                  mt: 0,
+                  position: 'absolute',
+                  top: '166px',
+                  left: 0,
+                  minHeight: '72px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
                   // 依設計稿給定的主標框寬，決定斷行點（見 HEADLINE_WIDTH）
                   ...(HEADLINE_WIDTH[plan.id]
                     ? { width: `${HEADLINE_WIDTH[plan.id]}px` }
