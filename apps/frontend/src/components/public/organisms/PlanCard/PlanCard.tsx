@@ -133,7 +133,7 @@ export function PlanCard({ plan }: PlanCardProps) {
               // h2 — 首頁標題層級（h1 為頁面主標）；維持原視覺樣式
               component="h2"
               sx={{
-                // 依 Figma：logo 與主標間距 <834px 約 47px、≥834px 約 104px
+                // <834px：logo 與主標間距約 47px（≥834px 改絕對定位，見下方 tabletUp）
                 mt: '47px',
                 // 依 Figma node 1:117 — Inter Medium 20px / line-height 1.8
                 fontSize: 20,
