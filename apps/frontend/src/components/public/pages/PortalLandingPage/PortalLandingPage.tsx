@@ -160,31 +160,24 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   }, []);
 
   // 釘住並切到指定卡片（dots / 由上下進入時用）：卡片從卡頂進場、鎖住捲動於本區。
-  // lock：是否上鎖吸收入場慣性。往「上」進入需上鎖（否則入場的往上慣性會立刻把最後
-  // 一張倒退掉）；往「下」進入不上鎖 —— 入場慣性只會接著露出第一張卡，不需鎖，
-  // 否則一進到第一張就往下捲會被鎖住「頓一下」。
-  const engageAt = useCallback(
-    (index: number, lock = false) => {
-      engagedRef.current = true;
-      if (lock) lockGesture();
-      else {
-        lockedRef.current = false;
-        if (lockTimerRef.current) {
-          window.clearTimeout(lockTimerRef.current);
-          lockTimerRef.current = null;
-        }
-      }
-      idxRef.current = index;
-      seenRef.current.add(index);
-      offsetRef.current = 0;
-      const wrap = cardWrapRef.current;
-      if (wrap) wrap.style.setProperty('--reveal-y', '0px');
-      setActiveIndex(index);
-      const top = planSectionRef.current?.offsetTop ?? 0;
-      window.scrollTo(0, top);
-    },
-    [lockGesture],
-  );
+  // 進入時「不」上鎖 —— 上鎖會讓剛進來就想繼續捲（上或下）被卡住「頓一下」。入場
+  // 慣性的吸收交給「切換後的鎖」即可（見 onWheel 的 lockGesture）。
+  const engageAt = useCallback((index: number) => {
+    engagedRef.current = true;
+    lockedRef.current = false;
+    if (lockTimerRef.current) {
+      window.clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = null;
+    }
+    idxRef.current = index;
+    seenRef.current.add(index);
+    offsetRef.current = 0;
+    const wrap = cardWrapRef.current;
+    if (wrap) wrap.style.setProperty('--reveal-y', '0px');
+    setActiveIndex(index);
+    const top = planSectionRef.current?.offsetTop ?? 0;
+    window.scrollTo(0, top);
+  }, []);
 
   // 量測 cardMax / segLen（mount、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
   useEffect(() => {
@@ -312,7 +305,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         if (prevYRef.current < bt && y >= bt) {
           engageAt(0); // 由上往下進入 → 第一張（不上鎖，入場即可順順往下露出）
         } else if (prevYRef.current > bt && y <= bt) {
-          engageAt(planCount - 1, true); // 由下往上進入 → 最後一張（上鎖吸收往上慣性）
+          engageAt(planCount - 1); // 由下往上進入 → 最後一張
         }
       }
       prevYRef.current = y;
