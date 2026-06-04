@@ -86,12 +86,14 @@ const LAYOUT = {
     ],
   },
   v: {
-    viewW: 460,
-    viewH: 1020,
+    // 依手機稿 node 43:396：frame 寬 402、Union x=19 寬 365.5（填滿寬），三星
+    // 中心 cy≈92 / 363 / 651（頂塊上緣超出、上方切齊），半徑 ~183（沿用 SHAPE_R）。
+    viewW: 402,
+    viewH: 836,
     centers: [
-      { cx: 230, cy: 262 },
-      { cx: 230, cy: 510 },
-      { cx: 230, cy: 758 },
+      { cx: 201, cy: 92 },
+      { cx: 201, cy: 363 },
+      { cx: 201, cy: 651 },
     ],
   },
 } as const;
@@ -431,8 +433,9 @@ export function DecorativeTextCloud({
         // 與 Figma frame 寬度一致（1440），所有 leftPct/topPct 對齊設計稿原座標
         maxWidth: 1440,
         mx: 'auto',
-        // 直向佈局較高；橫向 ≥834px 為 620（對齊 Figma hero 區段 y=130~750 約 620 高）
-        height: vertical ? 660 : 440,
+        // 直向佈局：高度對齊手機稿 hero 區（viewBox 402×836，色塊填滿寬、靠頂）；
+        // 橫向 ≥834px 為 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
+        height: vertical ? 836 : 440,
         [portalTokens.mq.tabletUp]: { height: 620 },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
         '@keyframes portalTwinkle': {
@@ -471,13 +474,21 @@ export function DecorativeTextCloud({
         preserveAspectRatio="xMidYMid meet"
         sx={{
           position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
           ...(vertical
-            ? { height: '94%', width: 'auto' }
+            ? {
+                // 直向：SVG 填滿容器寬、靠頂對齊（依手機稿 — 色塊填滿寬、頂塊上緣
+                // 切齊視窗）。viewBox 402×836 對齊 node 43:396 的 hero 區座標。
+                top: 0,
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '100%',
+                height: 'auto',
+              }
             : {
-                // SVG 100% 撐滿 Box，viewBox 直接對齊 Figma 1440-wide canvas，blob 落點精準
+                // 橫向：SVG 100% 撐滿 Box 並置中，viewBox 對齊 Figma 1440-wide canvas。
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
                 width: '100%',
                 height: 'auto',
               }),

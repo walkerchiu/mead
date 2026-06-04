@@ -366,8 +366,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           sx={{
             minHeight: '100vh',
             display: 'flex',
-            alignItems: 'center',
+            // <834px（手機）：靠頂對齊，讓 hero 色塊頂塊上緣切齊視窗頂（依手機稿）；
+            // ≥834px（桌機）：維持垂直置中。
+            alignItems: 'flex-start',
             justifyContent: 'center',
+            [portalTokens.mq.tabletUp]: { alignItems: 'center' },
             // 文字雲側邊圖片略微溢出時裁掉水平方向，避免出現橫向捲軸
             overflowX: 'clip',
           }}
