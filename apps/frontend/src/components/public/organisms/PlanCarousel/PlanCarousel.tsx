@@ -1038,6 +1038,12 @@ export function PlanCarousel({
       from: { transform: 'translateX(0)', opacity: 1 },
       to: { transform: 'translateX(120%)', opacity: 0 },
     },
+    // 退場舊卡「停在原位」只淡出（不位移）：新卡滑入疊在上層覆蓋它，舊卡同時淡出
+    // 避免半透明毛玻璃疊影。
+    '@keyframes planFadeOut': {
+      from: { opacity: 1 },
+      to: { opacity: 0 },
+    },
   } as const;
 
   return (
@@ -1128,11 +1134,9 @@ export function PlanCarousel({
               <Box
                 key={`exit-${exitingPlan.id}`}
                 sx={{
-                  // 與入場方向成對：next 新卡從左進、舊卡往右出；prev 反之。
-                  animation:
-                    slideDir === 'next'
-                      ? `planSlideOutRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`
-                      : `planSlideOutLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+                  // 退場舊卡停在原位、只淡出（不位移）；新卡滑入疊在上層覆蓋。
+                  // 淡出比滑入快，舊卡早早消失、不殘留。
+                  animation: `planFadeOut ${Math.round(SLIDE_MS * 0.55)}ms ease forwards`,
                   ...slideKeyframes,
                   '@media (prefers-reduced-motion: reduce)': {
                     animation: 'none',

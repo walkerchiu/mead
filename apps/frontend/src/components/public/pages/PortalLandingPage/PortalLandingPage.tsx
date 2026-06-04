@@ -147,12 +147,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     }
   }, []);
 
-  // 切換到另一張卡：退場舊卡與入場新卡都對齊到「卡頂」（--exit-reveal-y = 0、
-  // --reveal-y = enterOffset≈0），兩卡在同一垂直基準上一進一出對滑，乾淨不錯位。
+  // 切換到另一張卡：退場舊卡「停在原位不動」（--exit-reveal-y 凍結在離開那一刻的
+  // 捲動位移，不滑出、不跳動），新卡從側邊滑入並疊在上層覆蓋它（見 PlanCarousel）。
   const commitSwitch = useCallback((target: number, enterOffset: number) => {
     const wrap = cardWrapRef.current;
     if (wrap) {
-      wrap.style.setProperty('--exit-reveal-y', '0px');
+      wrap.style.setProperty(
+        '--exit-reveal-y',
+        `${offsetRef.current.toFixed(2)}px`,
+      );
       wrap.style.setProperty('--reveal-y', `${enterOffset.toFixed(2)}px`);
     }
     offsetRef.current = enterOffset;
