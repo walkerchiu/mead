@@ -151,10 +151,10 @@ export function PlanCard({ plan }: PlanCardProps) {
                   [portalTokens.mq.tabletUp]: { mt: '34px' },
                 }}
               >
-                {/* 依 Figma node 1:116 — Inter Regular 10px / line-height 1.8 */}
+                {/* 依設計師最新稿（heroSubtitle）— Inter Regular 12px / line-height 1.8 */}
                 <Typography
                   component="p"
-                  sx={{ fontSize: 10, lineHeight: 1.8, color: '#000000' }}
+                  sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
                 >
                   執行單位：
                 </Typography>
@@ -162,7 +162,7 @@ export function PlanCard({ plan }: PlanCardProps) {
                   <Typography
                     key={org}
                     component="p"
-                    sx={{ fontSize: 10, lineHeight: 1.8, color: '#000000' }}
+                    sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
                   >
                     {org}
                   </Typography>
