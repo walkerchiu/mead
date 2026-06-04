@@ -1123,7 +1123,7 @@ export function PlanCarousel({
                 right: 0,
                 mx: 'auto',
                 width: '100%',
-                maxWidth: 760,
+                maxWidth: 772,
                 pointerEvents: 'none',
                 zIndex: 0,
                 // 凍結在切換當下的 reveal 位移，與入場新卡各自垂直定位，避免兩卡
@@ -1158,7 +1158,7 @@ export function PlanCarousel({
             sx={{
               position: 'relative',
               width: '100%',
-              maxWidth: 760,
+              maxWidth: 772,
               zIndex: 1,
               // 段內捲動露出整張卡的 reveal 位移 — 只套在卡片上，兩側 peek 不受影響。
               transform: 'translateY(calc(var(--reveal-y, 0px) * -1))',

@@ -80,7 +80,13 @@ export function PlanCard({ plan }: PlanCardProps) {
           pt: '28px',
           pb: '42px',
           px: '24px',
-          [portalTokens.mq.tabletUp]: { p: 6 },
+          // ≥834px 依 Figma node 1:2：上 44、左 27、右 24、下 48
+          [portalTokens.mq.tabletUp]: {
+            pt: '44px',
+            pr: '24px',
+            pb: '48px',
+            pl: '27px',
+          },
         }}
       >
         <Box
@@ -89,15 +95,16 @@ export function PlanCard({ plan }: PlanCardProps) {
             flexDirection: 'column',
             // <834px 單欄堆疊，各區塊間距約 47px（依 Figma node 43:1142）
             gap: '47px',
-            // ≥834px 左欄窄、右欄寬（約 1:2），欄距約 104px（依 node 1:2）
-            [portalTokens.mq.tabletUp]: { flexDirection: 'row', gap: 13 },
+            // ≥834px 左欄 logo 218、右欄描述 411，欄距 92px（依 Figma node 1:2）
+            [portalTokens.mq.tabletUp]: { flexDirection: 'row', gap: '92px' },
           }}
         >
           {/* 左欄：識別 + 主標（窄欄） */}
           <Box
             sx={{
               minWidth: 0,
-              [portalTokens.mq.tabletUp]: { flex: '1 1 0' },
+              // 左欄固定 logo 寬 218px（依 Figma node 1:2）；窄於卡片時才收縮
+              [portalTokens.mq.tabletUp]: { flex: '0 1 218px' },
             }}
           >
             <PlanLogo
@@ -127,7 +134,8 @@ export function PlanCard({ plan }: PlanCardProps) {
           <Box
             sx={{
               minWidth: 0,
-              [portalTokens.mq.tabletUp]: { flex: '2 1 0' },
+              // 右欄固定描述寬 411px（依 Figma node 1:2 heroSubtitle）；窄於卡片時才收縮
+              [portalTokens.mq.tabletUp]: { flex: '0 1 411px' },
             }}
           >
             <Typography
@@ -138,6 +146,8 @@ export function PlanCard({ plan }: PlanCardProps) {
                 fontSize: 12,
                 lineHeight: 1.8,
                 color: '#000000',
+                // 全形標點不擠壓（與 Figma 同），斷行點才會與設計稿一致
+                textSpacingTrim: 'space-all',
                 [portalTokens.mq.tabletUp]: { fontSize: 14 },
               }}
             >
