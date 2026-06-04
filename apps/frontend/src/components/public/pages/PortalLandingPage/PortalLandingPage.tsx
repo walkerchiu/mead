@@ -441,6 +441,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       expandedIndex={activeIndex}
       onExpandedIndexChange={setActiveIndex}
       onPeekNavigate={scrollDriven ? handlePeekNavigate : undefined}
+      suppressSlideOut={scrollDriven}
     />
   );
 

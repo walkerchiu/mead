@@ -56,6 +56,12 @@ export interface PlanCarouselProps {
    * 避免內部直接改 index 與捲動位置脫鉤。未提供時 peek 走內部左右滑動。
    */
   onPeekNavigate?: (targetIndex: number, dir: 'prev' | 'next') => void;
+  /**
+   * 切換時是否不渲染「退場舊卡」的滑出。捲動驅動模式設 true：退場卡會被凍結在切換
+   * 當下的捲動位置、與進場卡垂直錯位，慢慢滑出時看起來像殘影；關掉它只讓新卡滑入，
+   * 切換更乾淨。未設（dots / peek 在原生模式）時維持兩卡左右滑動。
+   */
+  suppressSlideOut?: boolean;
 }
 
 /**
@@ -589,6 +595,7 @@ export function PlanCarousel({
   plans,
   expandedIndex,
   onExpandedIndexChange,
+  suppressSlideOut = false,
   onHoverPlanChange,
   onSelectStart,
   onPeekNavigate,
@@ -773,17 +780,20 @@ export function PlanCarousel({
     if (prev === total - 1 && curr === 0) dir = 'next';
     if (prev === 0 && curr === total - 1) dir = 'prev';
     setSlideDir(dir);
-    setExitingPlan(plans[prev] ?? null);
-    if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
-    // 只清退場舊卡；slideDir 刻意保留：清掉會讓新卡的 animation 從
-    // `planSlideIn*` 切回 `planExpand`，瀏覽器會把它視為新動畫重新從
-    // scale(0.55) 播放、造成切換完成後「跳一下」。下次 expandedIndex
-    // 變動時 useEffect 會把 slideDir 改成新方向，key 變動再觸發動畫。
-    slideTimerRef.current = window.setTimeout(() => {
-      setExitingPlan(null);
-      slideTimerRef.current = null;
-    }, SLIDE_MS);
-  }, [expandedIndex, plans]);
+    // 捲動驅動模式不渲染退場卡（避免錯位殘影）；只讓新卡滑入。
+    if (!suppressSlideOut) {
+      setExitingPlan(plans[prev] ?? null);
+      if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
+      // 只清退場舊卡；slideDir 刻意保留：清掉會讓新卡的 animation 從
+      // `planSlideIn*` 切回 `planExpand`，瀏覽器會把它視為新動畫重新從
+      // scale(0.55) 播放、造成切換完成後「跳一下」。下次 expandedIndex
+      // 變動時 useEffect 會把 slideDir 改成新方向，key 變動再觸發動畫。
+      slideTimerRef.current = window.setTimeout(() => {
+        setExitingPlan(null);
+        slideTimerRef.current = null;
+      }, SLIDE_MS);
+    }
+  }, [expandedIndex, plans, suppressSlideOut]);
 
   const count = plans.length;
   if (count === 0) return null;
