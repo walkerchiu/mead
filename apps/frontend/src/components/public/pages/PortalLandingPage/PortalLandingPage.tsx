@@ -159,12 +159,21 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     setActiveIndex(target);
   }, []);
 
-  // 釘住並切到指定卡片（dots / 由上下進入時用）：卡片從卡頂進場、鎖住捲動於本區，
-  // 並上鎖吸收入場慣性（避免進入時的動量立刻又切換）。
+  // 釘住並切到指定卡片（dots / 由上下進入時用）：卡片從卡頂進場、鎖住捲動於本區。
+  // lock：是否上鎖吸收入場慣性。往「上」進入需上鎖（否則入場的往上慣性會立刻把最後
+  // 一張倒退掉）；往「下」進入不上鎖 —— 入場慣性只會接著露出第一張卡，不需鎖，
+  // 否則一進到第一張就往下捲會被鎖住「頓一下」。
   const engageAt = useCallback(
-    (index: number) => {
+    (index: number, lock = false) => {
       engagedRef.current = true;
-      lockGesture();
+      if (lock) lockGesture();
+      else {
+        lockedRef.current = false;
+        if (lockTimerRef.current) {
+          window.clearTimeout(lockTimerRef.current);
+          lockTimerRef.current = null;
+        }
+      }
       idxRef.current = index;
       seenRef.current.add(index);
       offsetRef.current = 0;
@@ -301,9 +310,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       // 未釘住：偵測捲動跨越本區頂端 → 釘住並依方向進場（皆從卡頂進場、上半不被截）。
       if (segLenRef.current > 0) {
         if (prevYRef.current < bt && y >= bt) {
-          engageAt(0); // 由上往下進入 → 第一張
+          engageAt(0); // 由上往下進入 → 第一張（不上鎖，入場即可順順往下露出）
         } else if (prevYRef.current > bt && y <= bt) {
-          engageAt(planCount - 1); // 由下往上進入 → 最後一張
+          engageAt(planCount - 1, true); // 由下往上進入 → 最後一張（上鎖吸收往上慣性）
         }
       }
       prevYRef.current = y;
