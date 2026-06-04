@@ -137,7 +137,10 @@ export function PlanCard({ plan }: PlanCardProps) {
                 lineHeight: 1.8,
                 color: '#000000',
                 [portalTokens.mq.tabletUp]: {
-                  mt: '104px',
+                  // 依 Figma node 1:2：logo 與主標間距約 87px（主標對齊到比右欄
+                  // 「執行單位」高約 17px 處）。logo 實高 80px → mt 86 使主標頂端
+                  // 落在描述頂端下方 166px，與設計稿一致。
+                  mt: '86px',
                   // 依設計稿給定的主標框寬，決定斷行點（見 HEADLINE_WIDTH）
                   ...(HEADLINE_WIDTH[plan.id]
                     ? { width: `${HEADLINE_WIDTH[plan.id]}px` }
