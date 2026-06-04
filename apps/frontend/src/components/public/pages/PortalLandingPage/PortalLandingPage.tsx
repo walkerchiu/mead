@@ -36,13 +36,19 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
   tisdc: [0, 1, 2],
 };
 
-/** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
-const PIN_TOP_PAD = 140;
+/** 釘住區大卡上方留給裝飾星形照片的內距（≈100px；DECOR_STARS 最高 y≈-112，略入此區） */
+const PIN_TOP_PAD = 110;
 /**
- * 卡片完整露出後、切換前還要再往下捲過的「一小段空白」距離（以視窗高為單位）。
- * 即每張卡的捲動量 = 卡片可捲距離 + 此空白；捲超過後才切下一張並回到頂端。
+ * 卡片完整露出後、切換前還要再往下捲過的「一小段距離」（px）。
+ * 即每張卡的捲動量 = 卡片可捲距離 + 此距離；捲超過後才切下一張並回到頂端。
  */
-const DWELL_VH = 0.2;
+const DWELL_PX = 100;
+/**
+ * 切換後鎖住滾輪的時間（ms）：吸收觸控板 / 滑鼠的慣性殘餘 wheel 事件，確保「一次
+ * 手勢只切一張」。沒有這道鎖，一次快速滑動的動量會連續累加、一口氣衝過好幾張卡，
+ * 看起來就是「意外的快速左右切換」。
+ */
+const GESTURE_LOCK_MS = 700;
 /** 自動輪播間隔（手機 / 非捲動驅動時） */
 const AUTO_ADVANCE_MS = 6000;
 
@@ -89,8 +95,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const offsetRef = useRef(0); // 目前卡片的捲動位移（0 = 卡頂；= 卡片露出量）
   const seenRef = useRef<Set<number>>(new Set([0])); // 已看過的卡片
   const cardMaxRef = useRef(0); // 卡片可捲距離（卡高 − 釘住可視高）
-  const segLenRef = useRef(0); // 每張卡的捲動量 = cardMax + 空白
+  const segLenRef = useRef(0); // 每張卡的捲動量 = cardMax + DWELL_PX
   const prevYRef = useRef(0); // 上一次捲動位置（判斷進入方向）
+  const lockedRef = useRef(false); // 切換後鎖住滾輪中（吸收慣性殘餘）
+  const lockTimerRef = useRef<number | null>(null);
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
@@ -135,6 +143,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 釘住並切到指定卡片（dots / 由上下進入時用）：鎖住捲動於本區、設好卡片與位移。
   const engageAt = useCallback((index: number, offset: number) => {
     engagedRef.current = true;
+    lockedRef.current = false;
+    if (lockTimerRef.current) {
+      window.clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = null;
+    }
     idxRef.current = index;
     seenRef.current.add(index);
     offsetRef.current = offset;
@@ -154,7 +167,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const vh = window.innerHeight;
       const cardMax = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
       cardMaxRef.current = cardMax;
-      segLenRef.current = cardMax + DWELL_VH * vh;
+      segLenRef.current = cardMax + DWELL_PX;
     };
     measure();
     const tid = window.setTimeout(measure, 400);
@@ -171,8 +184,32 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     prevYRef.current = window.scrollY;
     const blockTop = () => planSectionRef.current?.offsetTop ?? 0;
 
+    // 切換後上鎖一段時間，吸收觸控板 / 滑鼠的慣性殘餘（固定時長，不被後續事件延長），
+    // 確保「一次手勢只切一張」；連續按住拖曳則每 GESTURE_LOCK_MS 推進一張。
+    const lockGesture = () => {
+      lockedRef.current = true;
+      if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
+      lockTimerRef.current = window.setTimeout(() => {
+        lockedRef.current = false;
+        lockTimerRef.current = null;
+      }, GESTURE_LOCK_MS);
+    };
+    const release = () => {
+      engagedRef.current = false;
+      lockedRef.current = false;
+      if (lockTimerRef.current) {
+        window.clearTimeout(lockTimerRef.current);
+        lockTimerRef.current = null;
+      }
+    };
+
     const onWheel = (e: WheelEvent) => {
       if (!engagedRef.current) return;
+      // 鎖定中（剛切換）：吃掉所有 wheel（含慣性殘餘），不累加、不再切換。
+      if (lockedRef.current) {
+        e.preventDefault();
+        return;
+      }
       const seg = segLenRef.current;
       if (seg <= 0) return;
       // 行模式（部分瀏覽器）換算成像素，避免一次只動幾 px。
@@ -187,15 +224,16 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           applyReveal();
           return;
         }
-        // 捲超過整張卡 → 切下一張（回頂端）
+        // 捲超過整張卡 → 切下一張（回頂端），並上鎖吸收慣性殘餘
         if (i < planCount - 1) {
           e.preventDefault();
           commitSwitch(i + 1, 0);
+          lockGesture();
           return;
         }
         // 已在最後一張：三張都看過 → 放行往下（不攔截，原生捲動進入敘事 / 頁尾）
         if (seenRef.current.size >= planCount) {
-          engagedRef.current = false;
+          release();
           return;
         }
         // 尚未看完（例如用 peek 跳著看）→ 切到第一張還沒看過的，強制看完才放行
@@ -206,9 +244,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             break;
           }
         }
-        e.preventDefault();
-        if (unseen >= 0) commitSwitch(unseen, 0);
-        else engagedRef.current = false;
+        if (unseen >= 0) {
+          e.preventDefault();
+          commitSwitch(unseen, 0);
+          lockGesture();
+        } else {
+          release();
+        }
         return;
       }
       // dy < 0：往上
@@ -219,14 +261,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         applyReveal();
         return;
       }
-      // 捲到卡頂上方 → 倒退上一張（從卡底進場，反向看）
+      // 捲到卡頂上方 → 倒退上一張（從卡底進場，反向看），並上鎖
       if (i > 0) {
         e.preventDefault();
         commitSwitch(i - 1, cardMaxRef.current);
+        lockGesture();
         return;
       }
       // 第一張卡頂 → 放行往上（回到 hero）
-      engagedRef.current = false;
+      release();
     };
 
     const onScroll = () => {
@@ -254,6 +297,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     return () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('scroll', onScroll);
+      if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
     };
   }, [scrollDriven, planCount, applyReveal, commitSwitch, engageAt]);
 
