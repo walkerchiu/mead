@@ -31,11 +31,17 @@ export interface PortalLandingPageProps {
 /** 過場區卡片顯示順序（依設計稿：菁培 → 設計戰國策 → 創意設計大賽） */
 const PLAN_ORDER: string[] = ['sposad', 'idc', 'tisdc'];
 
-/** hero 各計畫色塊 hover 時輪換的照片張數（依設計稿） */
-const HERO_PHOTO_COUNT: Record<string, number> = {
-  sposad: 4,
-  idc: 4,
-  tisdc: 3,
+/**
+ * hero 各計畫色塊 hover 時輪換的照片（依設計稿選用，非全部）。
+ * 值為該計畫 local 照片陣列（getLocalPhotos 順序 = photo_01.. 檔名序）的索引：
+ *  - sposad（菁培）：photo_01 / 02 / 04 / 05
+ *  - idc（設計戰國策）：photo_01 / 02 / 03 / 05
+ *  - tisdc（創意設計大賽）：photo_01 / 02 / 03（共三張，全用）
+ */
+const HERO_PHOTO_INDICES: Record<string, number[]> = {
+  sposad: [0, 1, 3, 4],
+  idc: [0, 1, 2, 4],
+  tisdc: [0, 1, 2],
 };
 
 /** hover 計畫卡時主標「讓 ___ 被看見」的橘色關鍵字（依設計稿過場效果） */
@@ -216,13 +222,18 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // hero 文字雲：整片雲一次顯示「目前作用中計畫」的裝飾文字（defaultIndex =
   // expandedIndex ?? 0）；hover 某色塊即切換成該計畫的文字並於塊內顯示其照片。
   // 順序依 orderedPlans（sposad → idc → tisdc）對應左/中/右（直向為上/中/下）。
-  const heroShapeContents = orderedPlans.slice(0, 3).map((plan) => ({
-    words: plan.decorativeText,
-    photos: getLocalPhotos(plan)
+  const heroShapeContents = orderedPlans.slice(0, 3).map((plan) => {
+    const allPhotos = getLocalPhotos(plan)
       .map((p) => p.src)
-      .filter((s): s is string => Boolean(s))
-      .slice(0, HERO_PHOTO_COUNT[plan.id]),
-  }));
+      .filter((s): s is string => Boolean(s));
+    const indices = HERO_PHOTO_INDICES[plan.id] ?? allPhotos.map((_, i) => i);
+    return {
+      words: plan.decorativeText,
+      photos: indices
+        .map((i) => allPhotos[i])
+        .filter((s): s is string => Boolean(s)),
+    };
+  });
 
   // 計畫 fallback slogan（非 zh 語系或無關鍵字對應時使用）
   const sloganOf = (plan: Plan) =>
