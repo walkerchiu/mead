@@ -40,8 +40,6 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
 const PIN_TOP_PAD = 140;
 /** 大卡完整捲完後、切換到下一計畫前的緩衝（佔該段比例），讓卡底停留一下再 snap */
 const SWITCH_ZONE = 0.18;
-/** 自動輪播間隔（手機 / 無捲動劫持時） */
-const AUTO_ADVANCE_MS = 6000;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -52,7 +50,7 @@ const AUTO_ADVANCE_MS = 6000;
  * 計畫介紹區（≥834px）：捲到該段時 sticky 釘在畫面中；段內滾動先把當前計畫大卡
  * 往上捲、看完整張（KPI、banner），捲到卡底再 snap 左右切換到下一個計畫（沿用
  * PlanCarousel 的左右滑動轉場）。三個計畫依序看完後，繼續往下滑進入 Footer。
- * <834px 或 prefers-reduced-motion：不劫持捲動，改為自動輪播 + 指示點手動切換。
+ * <834px 或 prefers-reduced-motion：不劫持捲動，改為原生捲動 + 指示點手動切換。
  */
 export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const t = useTranslations('portal');
@@ -61,8 +59,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
   // 目前顯示的計畫索引（首屏之後即直接展示完整計畫大卡，預設第一個計畫）。
   const [activeIndex, setActiveIndex] = useState(0);
-  // hover 計畫大卡時暫停自動輪播（hoverIndex !== null 即暫停）。
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   // 是否啟用「sticky 釘住 + 滾動驅動切換」：桌機且未開啟減少動態偏好。
   const [scrollDriven, setScrollDriven] = useState(false);
 
@@ -138,24 +134,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, [scrollDriven, planCount]);
 
-  // 自動輪播：僅在「非捲動驅動」（手機 / 減少動態）時啟用 — 桌機改由滾動切換。
-  // hover 任一卡時暫停（WCAG 2.2.2）。
-  useEffect(() => {
-    if (scrollDriven) return;
-    if (hoverIndex !== null) return;
-    if (planCount <= 1) return;
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return;
-    }
-    const id = window.setInterval(() => {
-      setActiveIndex((cur) => (cur + 1) % planCount);
-    }, AUTO_ADVANCE_MS);
-    return () => window.clearInterval(id);
-  }, [scrollDriven, hoverIndex, planCount]);
-
   // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
   // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，切換計畫時星形貼圖即可即時
   // 取用、與卡片同時出現，不會「卡片先到、照片晚一拍才冒出」。
@@ -211,7 +189,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       plans={orderedPlans}
       expandedIndex={activeIndex}
       onExpandedIndexChange={setActiveIndex}
-      onHoverPlanChange={setHoverIndex}
     />
   );
 

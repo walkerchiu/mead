@@ -462,10 +462,8 @@ function PlanMiniCard({
  * 的升起 → 停 → 飛出三段節奏完全對齊。
  */
 const EXIT_MS = SLOGAN_EXIT_MS;
-/** 計畫之間左右滑動切換的轉場長度（ms）。
- *  原先 550ms 退出端點還留 opacity 0.25 殘影 → 整體拖太久；
- *  改成 360ms + 退出端點 opacity 0，切換明顯俐落。 */
-const SLIDE_MS = 360;
+/** 計畫之間左右滑動切換的轉場長度（ms）— 從容不急促，退出端點 opacity 0 不留殘影。 */
+const SLIDE_MS = 640;
 
 /**
  * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
