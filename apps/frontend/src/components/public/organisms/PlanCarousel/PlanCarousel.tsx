@@ -470,7 +470,7 @@ function PlanMiniCard({
  */
 const EXIT_MS = SLOGAN_EXIT_MS;
 /** 計畫之間左右滑動切換的轉場長度（ms）— 放慢、從容，退出端點 opacity 0 不留殘影。 */
-const SLIDE_MS = 900;
+const SLIDE_MS = 1000;
 
 /**
  * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
