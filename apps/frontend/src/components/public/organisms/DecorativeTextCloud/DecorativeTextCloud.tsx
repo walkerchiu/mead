@@ -309,11 +309,12 @@ export function DecorativeTextCloud({
   const [hovered, setHovered] = useState<number | null>(null);
   const [photoIdx, setPhotoIdx] = useState(0);
 
-  // 整片雲一律反映「目前作用中計畫」（由下方計畫卡決定）；hover 不切換計畫，
-  // 只是把該色塊的照片顯示出來。切換計畫卡 → defaultIndex 變 → 文字與照片跟著換。
-  const displayedIndex = defaultIndex;
+  // hero 三色塊各自對應一個計畫（色塊 i ↔ shapeContents[i]）。hover 某色塊時，
+  // 整片雲的裝飾文字切換為「該色塊計畫」的詞、該色塊翻出「該色塊計畫」的照片；
+  // 未 hover 時裝飾文字回到 defaultIndex（目前作用中計畫）。
+  const displayedIndex = hovered ?? defaultIndex;
 
-  // 各計畫的照片陣列（index 對應計畫）；hero 三塊都取「當前計畫」displayedIndex 的照片。
+  // 各色塊對應計畫的照片陣列（index 對應色塊 = 計畫）。
   const photosByShape = useMemo(
     () => [0, 1, 2].map((i) => shapeContents[i]?.photos ?? []),
     [shapeContents],
@@ -600,12 +601,12 @@ export function DecorativeTextCloud({
         </g>
 
         {/* 照片 + hover 感測層 — 跟隨漂移與入場；hover 時遮罩（clipPath）旋轉、照片本身維持正立不轉。
-            三塊都取「當前作用中計畫」（displayedIndex）的照片、各塊以 +i 取不同張；
-            只有游標 hover 的那一塊才把照片顯示出來。 */}
+            每塊取「自身對應計畫」（photosByShape[i]）的照片，hover 時於該塊翻出（並隨
+            photoIdx 在該計畫的照片組內輪換）；只有游標 hover 的那一塊才顯示照片。 */}
         {shapes.map((s, i) => {
-          const currentPhotos = photosByShape[displayedIndex];
+          const currentPhotos = photosByShape[i];
           const photo = currentPhotos.length
-            ? currentPhotos[(photoIdx + i) % currentPhotos.length]
+            ? currentPhotos[photoIdx % currentPhotos.length]
             : undefined;
           const isHovered = hovered === i;
           return (
