@@ -101,7 +101,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const seenRef = useRef<Set<number>>(new Set([0])); // 已看過的卡片
   const segLenRef = useRef(0); // 每張卡往下的捲動量 = 卡片可捲距離 + DWELL_PX
   const prevYRef = useRef(0); // 上一次捲動位置（判斷進入方向）
-  const lockedRef = useRef(false); // 切換後鎖住滾輪中（吸收慣性殘餘）
+  const lockedDirRef = useRef(0); // 切換後鎖住的方向（1=往下、-1=往上、0=未鎖）；
+  // 只擋同方向的慣性殘餘，反方向（刻意反轉）立即放行。
   const lockTimerRef = useRef<number | null>(null);
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
@@ -122,11 +123,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
   // 切換 / 進入後上鎖一段固定時間，吸收觸控板 / 滑鼠的慣性殘餘 wheel，確保
   // 「一次手勢只切一張」；連續按住拖曳則每 GESTURE_LOCK_MS 推進一張。
-  const lockGesture = useCallback(() => {
-    lockedRef.current = true;
+  const lockGesture = useCallback((dir: number) => {
+    lockedDirRef.current = dir;
     if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
     lockTimerRef.current = window.setTimeout(() => {
-      lockedRef.current = false;
+      lockedDirRef.current = 0;
       lockTimerRef.current = null;
     }, GESTURE_LOCK_MS);
   }, []);
@@ -165,7 +166,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // （往上由下方進入時用，讓卡片從 native 捲入的位置順順往上收回卡頂、不瞬間跳動）。
   const engageAt = useCallback((index: number, atTop = true) => {
     engagedRef.current = true;
-    lockedRef.current = false;
+    lockedDirRef.current = 0;
     if (lockTimerRef.current) {
       window.clearTimeout(lockTimerRef.current);
       lockTimerRef.current = null;
@@ -209,7 +210,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
     const release = () => {
       engagedRef.current = false;
-      lockedRef.current = false;
+      lockedDirRef.current = 0;
       if (lockTimerRef.current) {
         window.clearTimeout(lockTimerRef.current);
         lockTimerRef.current = null;
@@ -218,16 +219,25 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
     const onWheel = (e: WheelEvent) => {
       if (!engagedRef.current) return;
-      // 鎖定中（剛切換）：吃掉所有 wheel（含慣性殘餘），不累加、不再切換。
-      if (lockedRef.current) {
-        e.preventDefault();
-        return;
-      }
       const seg = segLenRef.current;
       if (seg <= 0) return;
       // 行模式（部分瀏覽器）換算成像素，避免一次只動幾 px。
       const dy = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
       if (!dy) return;
+      const dir = dy > 0 ? 1 : -1;
+      // 方向性鎖（剛切換）：只吃掉「同方向」的慣性殘餘；反方向是刻意反轉 → 解鎖放行，
+      // 不再「頓一下」。
+      if (lockedDirRef.current !== 0) {
+        if (lockedDirRef.current === dir) {
+          e.preventDefault();
+          return;
+        }
+        lockedDirRef.current = 0;
+        if (lockTimerRef.current) {
+          window.clearTimeout(lockTimerRef.current);
+          lockTimerRef.current = null;
+        }
+      }
       const i = idxRef.current;
       if (dy > 0) {
         const next = offsetRef.current + dy;
@@ -241,7 +251,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         if (i < planCount - 1) {
           e.preventDefault();
           commitSwitch(i + 1, 0);
-          lockGesture();
+          lockGesture(1);
           return;
         }
         // 已在最後一張：三張都看過 → 放行往下（不攔截，原生捲動進入敘事 / 頁尾）
@@ -260,7 +270,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         if (unseen >= 0) {
           e.preventDefault();
           commitSwitch(unseen, 0);
-          lockGesture();
+          lockGesture(1);
         } else {
           release();
         }
@@ -291,7 +301,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       }
       e.preventDefault();
       commitSwitch(i - 1, 0);
-      lockGesture();
+      lockGesture(-1);
     };
 
     const onScroll = () => {
