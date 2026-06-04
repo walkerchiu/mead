@@ -480,11 +480,17 @@ export function DecorativeTextCloud({
                 width: '100%',
                 height: 'auto',
               }),
-          // ── 漂移動畫 — 三圖形以不同週期緩慢位移，goo 濾鏡使其靠近時相連 ──
-          '& .drift-0': { animation: 'portalDriftA 12s ease-in-out infinite' },
-          '& .drift-1': { animation: 'portalDriftB 9.5s ease-in-out infinite' },
+          // ── 漂移動畫 — 三圖形以不同週期緩慢位移、靠近時相連 ──
+          // 延後 2.4s（= 入場時長）才開始：入場期間每個色塊只跑「入場位移」一個
+          // transform，不和漂移疊加，減少重繪、讓壓縮更順。
+          '& .drift-0': {
+            animation: 'portalDriftA 12s ease-in-out 2.4s infinite',
+          },
+          '& .drift-1': {
+            animation: 'portalDriftB 9.5s ease-in-out 2.4s infinite',
+          },
           '& .drift-2': {
-            animation: 'portalDriftC 13.5s ease-in-out infinite',
+            animation: 'portalDriftC 13.5s ease-in-out 2.4s infinite',
           },
           '& .drift-0, & .drift-1, & .drift-2': {
             animationPlayState: driftState,

@@ -80,6 +80,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   // 桌機 + 非減少動態 → 啟用「釘住 + 滾輪驅動」。
   const [scrollDriven, setScrollDriven] = useState(false);
+  // 延後掛載下方計畫區（含 WebGL 星形與 banner 圖）：首屏 hero 入場那幾秒不掛載，
+  // 避免 Three.js / 圖片在主執行緒初始化卡住入場動畫（壓縮會頓成「跳一段」）。
+  // 使用者一開始捲動或入場結束後才掛載。
+  const [mountPlans, setMountPlans] = useState(false);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -183,9 +187,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     window.scrollTo(0, top);
   }, []);
 
-  // 量測 cardMax / segLen（mount、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
+  // 量測 cardMax / segLen（計畫區掛載後、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
   useEffect(() => {
-    if (!scrollDriven) return;
+    if (!scrollDriven || !mountPlans) return;
     const measure = () => {
       const wrap = cardWrapRef.current;
       if (!wrap) return;
@@ -200,7 +204,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       window.clearTimeout(tid);
       window.removeEventListener('resize', measure);
     };
-  }, [scrollDriven]);
+  }, [scrollDriven, mountPlans]);
 
   // 滾輪驅動的離散狀態機 + 釘住期間鎖住頁面捲動。
   useEffect(() => {
@@ -358,11 +362,30 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     return () => window.clearInterval(id);
   }, [scrollDriven, planCount]);
 
-  // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
-  // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，切換計畫時星形貼圖即可即時
-  // 取用、與卡片同時出現，不會「卡片先到、照片晚一拍才冒出」。
+  // 延後掛載觸發：使用者一開始捲動 / 滾輪，或入場結束（fallback timeout）後，才掛載
+  // 下方計畫區。如此 hero 入場那幾秒主執行緒淨空、壓縮動畫順暢。
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (mountPlans) return;
+    const trigger = () => setMountPlans(true);
+    // 用 wheel / touchstart（真正的使用者捲動意圖）而非通用 scroll —— scroll 會在
+    // 載入時因捲動還原 / 版面而誤觸，讓延後失效。fallback timeout 在入場後掛載。
+    const t = window.setTimeout(trigger, 2600); // 入場約 2.4s 後再掛載
+    window.addEventListener('wheel', trigger, { once: true, passive: true });
+    window.addEventListener('touchstart', trigger, {
+      once: true,
+      passive: true,
+    });
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener('wheel', trigger);
+      window.removeEventListener('touchstart', trigger);
+    };
+  }, [mountPlans]);
+
+  // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
+  // 載完才顯示。延到計畫區掛載後才預載，避免和 hero 入場搶主執行緒。
+  useEffect(() => {
+    if (typeof window === 'undefined' || !mountPlans) return;
     plans.forEach((plan) => {
       getLocalPhotos(plan).forEach((photo) => {
         if (photo.src) {
@@ -371,7 +394,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         }
       });
     });
-  }, [plans]);
+  }, [plans, mountPlans]);
 
   // 指示點點選：捲動驅動時釘住並切到該卡；否則直接切 activeIndex。
   const handleDotSelect = useCallback(
@@ -497,7 +520,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             }}
           >
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>
-              {planCarousel}
+              {mountPlans && planCarousel}
             </Box>
           </Box>
         ) : (
@@ -505,7 +528,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           <Box
             sx={{ width: '100%', pt: `${PIN_TOP_PAD}px`, overflowX: 'clip' }}
           >
-            {planCarousel}
+            {mountPlans && planCarousel}
           </Box>
         )}
 
