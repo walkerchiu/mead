@@ -87,7 +87,7 @@ function localPhotos(plan: Plan): string[] {
 
 /**
  * 兩側豎立的相鄰計畫預覽矩形 — 半透明毛玻璃。
- * 760 寬、left/right: -700px 讓多數寬度溢出畫面，露出約 60px 在視窗左右側緣
+ * 760 寬、left/right: -680px 讓多數寬度溢出畫面，露出約 80px 在視窗左右側緣
  * （右側預留足夠可點區避免被捲軸擋住）。點擊以橫向滑動切換上/下計畫。
  *
  * peekSx() 回傳完整 sx — direction 控制：
@@ -123,8 +123,8 @@ function peekSx(direction: 'prev' | 'next') {
     // 平滑過渡：背景、邊框、位移、陰影
     transition:
       'background-color 0.28s ease, outline-color 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
-    // 露出約 60px 在視窗邊緣（含右側捲軸仍留足夠可點區）。
-    [isPrev ? 'left' : 'right']: -700,
+    // 露出約 80px 在視窗邊緣（即便右側被 macOS 捲軸蓋住約 15px 仍留足夠可點區）。
+    [isPrev ? 'left' : 'right']: -680,
     '&:hover': {
       bgcolor: 'rgba(255, 255, 255, 0.85)',
       outlineColor: 'rgba(138, 138, 138, 0.85)',
@@ -1040,7 +1040,7 @@ export function PlanCarousel({
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
       {/* 左右兩側豎立的相鄰計畫預覽矩形 — 點擊以橫向滑動切換上 / 下計畫。
-          760 寬 + left/right: -700px 讓多數寬度溢出畫面、露約 60px 在視窗邊緣。
+          760 寬 + left/right: -680px 讓多數寬度溢出畫面、露約 80px 在視窗邊緣。
           頁面外層已 overflow-x: clip，溢出部分自然裁切。
           hover：自訂方向 cursor、整塊向中央輕推、背景加深、露出方向箭頭。*/}
       {count > 1 && (

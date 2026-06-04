@@ -123,12 +123,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const planFloat = Math.min(planCount - 1e-6, p * planCount);
       const idx = Math.min(planCount - 1, Math.floor(planFloat));
       const intra = planFloat - idx;
-      // 段內捲動距離；卡片 1:1 隨捲動往上露出（到卡底為止），其餘為切換前的緩衝。
+      // 段內捲動：卡片「整段」都 1:1 隨捲動往上移（不在卡底封頂凍結）。捲過卡底後
+      // 下方自然露出一段空白，再捲過這段空白才切換 — 緩衝是「看得見的空白」而非
+      // 卡片停住不動。空白量 ≈ segLen − 卡片溢出高 ≈ 0.9 − 0.38 ≈ 0.5 屏。
       const segLen = vh * SCROLL_PER_PLAN;
-      const scrolledInSeg = intra * segLen;
-      // 可捲距離 = 卡片總高 − 釘住可視高度（扣掉上方星形內距）。
-      const maxY = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
-      const reveal = Math.min(scrolledInSeg, maxY);
+      const reveal = intra * segLen;
       // 切換到新計畫段：把「離開那一刻的 reveal」凍進 --exit-reveal-y 給退場卡，
       // 入場卡則用即時的 --reveal-y（新段約為 0、卡頂對齊）。
       if (idx !== lastIdxRef.current) {
