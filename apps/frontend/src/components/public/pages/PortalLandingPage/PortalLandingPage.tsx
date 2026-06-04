@@ -44,6 +44,11 @@ const PIN_TOP_PAD = 110;
  */
 const DWELL_PX = 100;
 /**
+ * 往上倒退的觸發距離（px）：捲到卡頂後，還要再往上捲過此距離（卡片往下滑、上方露出
+ * 空隙）才倒退上一張。上一張從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距）。
+ */
+const UP_THRESHOLD = 200;
+/**
  * 切換後鎖住滾輪的時間（ms）：吸收觸控板 / 滑鼠的慣性殘餘 wheel 事件，確保「一次
  * 手勢只切一張」。沒有這道鎖，一次快速滑動的動量會連續累加、一口氣衝過好幾張卡，
  * 看起來就是「意外的快速左右切換」。
@@ -94,8 +99,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const idxRef = useRef(0); // 目前卡片索引
   const offsetRef = useRef(0); // 目前卡片的捲動位移（0 = 卡頂；= 卡片露出量）
   const seenRef = useRef<Set<number>>(new Set([0])); // 已看過的卡片
-  const cardMaxRef = useRef(0); // 卡片可捲距離（卡高 − 釘住可視高）
-  const segLenRef = useRef(0); // 每張卡的捲動量 = cardMax + DWELL_PX
+  const segLenRef = useRef(0); // 每張卡往下的捲動量 = 卡片可捲距離 + DWELL_PX
   const prevYRef = useRef(0); // 上一次捲動位置（判斷進入方向）
   const lockedRef = useRef(false); // 切換後鎖住滾輪中（吸收慣性殘餘）
   const lockTimerRef = useRef<number | null>(null);
@@ -116,15 +120,26 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, []);
 
-  // 把目前 offset 寫進 CSS 變數，驅動卡片往上露出（reveal 只套在卡片、不動 peek）。
+  // 切換 / 進入後上鎖一段固定時間，吸收觸控板 / 滑鼠的慣性殘餘 wheel，確保
+  // 「一次手勢只切一張」；連續按住拖曳則每 GESTURE_LOCK_MS 推進一張。
+  const lockGesture = useCallback(() => {
+    lockedRef.current = true;
+    if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = window.setTimeout(() => {
+      lockedRef.current = false;
+      lockTimerRef.current = null;
+    }, GESTURE_LOCK_MS);
+  }, []);
+
+  // 把目前 offset 寫進 CSS 變數，驅動卡片露出（reveal 只套在卡片、不動 peek）。
   const applyReveal = useCallback(() => {
     const wrap = cardWrapRef.current;
     if (wrap)
       wrap.style.setProperty('--reveal-y', `${offsetRef.current.toFixed(2)}px`);
   }, []);
 
-  // 切換到另一張卡：凍結退場卡在「離開那一刻」的位移（--exit-reveal-y），新卡以
-  // enterOffset 進場（往下切 = 0 卡頂；往上倒退 = cardMax 卡底），並記入已看過。
+  // 切換到另一張卡：凍結退場卡在「離開那一刻」的位移（--exit-reveal-y），新卡一律
+  // 以 enterOffset=0 從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距），並記入已看過。
   const commitSwitch = useCallback((target: number, enterOffset: number) => {
     const wrap = cardWrapRef.current;
     if (wrap) {
@@ -140,23 +155,23 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     setActiveIndex(target);
   }, []);
 
-  // 釘住並切到指定卡片（dots / 由上下進入時用）：鎖住捲動於本區、設好卡片與位移。
-  const engageAt = useCallback((index: number, offset: number) => {
-    engagedRef.current = true;
-    lockedRef.current = false;
-    if (lockTimerRef.current) {
-      window.clearTimeout(lockTimerRef.current);
-      lockTimerRef.current = null;
-    }
-    idxRef.current = index;
-    seenRef.current.add(index);
-    offsetRef.current = offset;
-    const wrap = cardWrapRef.current;
-    if (wrap) wrap.style.setProperty('--reveal-y', `${offset.toFixed(2)}px`);
-    setActiveIndex(index);
-    const top = planSectionRef.current?.offsetTop ?? 0;
-    window.scrollTo(0, top);
-  }, []);
+  // 釘住並切到指定卡片（dots / 由上下進入時用）：卡片從卡頂進場、鎖住捲動於本區，
+  // 並上鎖吸收入場慣性（避免進入時的動量立刻又切換）。
+  const engageAt = useCallback(
+    (index: number) => {
+      engagedRef.current = true;
+      lockGesture();
+      idxRef.current = index;
+      seenRef.current.add(index);
+      offsetRef.current = 0;
+      const wrap = cardWrapRef.current;
+      if (wrap) wrap.style.setProperty('--reveal-y', '0px');
+      setActiveIndex(index);
+      const top = planSectionRef.current?.offsetTop ?? 0;
+      window.scrollTo(0, top);
+    },
+    [lockGesture],
+  );
 
   // 量測 cardMax / segLen（mount、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
   useEffect(() => {
@@ -166,7 +181,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       if (!wrap) return;
       const vh = window.innerHeight;
       const cardMax = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
-      cardMaxRef.current = cardMax;
       segLenRef.current = cardMax + DWELL_PX;
     };
     measure();
@@ -184,16 +198,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     prevYRef.current = window.scrollY;
     const blockTop = () => planSectionRef.current?.offsetTop ?? 0;
 
-    // 切換後上鎖一段時間，吸收觸控板 / 滑鼠的慣性殘餘（固定時長，不被後續事件延長），
-    // 確保「一次手勢只切一張」；連續按住拖曳則每 GESTURE_LOCK_MS 推進一張。
-    const lockGesture = () => {
-      lockedRef.current = true;
-      if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
-      lockTimerRef.current = window.setTimeout(() => {
-        lockedRef.current = false;
-        lockTimerRef.current = null;
-      }, GESTURE_LOCK_MS);
-    };
     const release = () => {
       engagedRef.current = false;
       lockedRef.current = false;
@@ -253,22 +257,23 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         }
         return;
       }
-      // dy < 0：往上
+      // dy < 0：往上。offset 可降到 0 以下（卡片往下滑、上方露出空隙）作為「往上捲過」
+      // 的回饋，捲過 UP_THRESHOLD 才倒退。
       const next = offsetRef.current + dy;
-      if (next > 0) {
+      if (next > -UP_THRESHOLD) {
         e.preventDefault();
         offsetRef.current = next;
         applyReveal();
         return;
       }
-      // 捲到卡頂上方 → 倒退上一張（從卡底進場，反向看），並上鎖
+      // 往上捲過 UP_THRESHOLD → 倒退上一張，從卡頂進場（上半不被截、留上方間距），並上鎖
       if (i > 0) {
         e.preventDefault();
-        commitSwitch(i - 1, cardMaxRef.current);
+        commitSwitch(i - 1, 0);
         lockGesture();
         return;
       }
-      // 第一張卡頂 → 放行往上（回到 hero）
+      // 第一張：往上捲過門檻 → 放行往上（回到 hero）
       release();
     };
 
@@ -281,12 +286,12 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         prevYRef.current = bt;
         return;
       }
-      // 未釘住：偵測捲動跨越本區頂端 → 釘住並依方向進場。
+      // 未釘住：偵測捲動跨越本區頂端 → 釘住並依方向進場（皆從卡頂進場、上半不被截）。
       if (segLenRef.current > 0) {
         if (prevYRef.current < bt && y >= bt) {
-          engageAt(0, 0); // 由上往下進入 → 第一張、卡頂
+          engageAt(0); // 由上往下進入 → 第一張
         } else if (prevYRef.current > bt && y <= bt) {
-          engageAt(planCount - 1, cardMaxRef.current); // 由下往上進入 → 最後一張、卡底
+          engageAt(planCount - 1); // 由下往上進入 → 最後一張
         }
       }
       prevYRef.current = y;
@@ -299,7 +304,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       window.removeEventListener('scroll', onScroll);
       if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
     };
-  }, [scrollDriven, planCount, applyReveal, commitSwitch, engageAt]);
+  }, [
+    scrollDriven,
+    planCount,
+    applyReveal,
+    commitSwitch,
+    engageAt,
+    lockGesture,
+  ]);
 
   // 自動輪播：僅在「非捲動驅動」（手機 / 減少動態）時啟用。
   useEffect(() => {
@@ -335,7 +347,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 指示點點選：捲動驅動時釘住並切到該卡；否則直接切 activeIndex。
   const handleDotSelect = useCallback(
     (i: number) => {
-      if (scrollDriven) engageAt(i, 0);
+      if (scrollDriven) engageAt(i);
       else setActiveIndex(i);
     },
     [scrollDriven, engageAt],
