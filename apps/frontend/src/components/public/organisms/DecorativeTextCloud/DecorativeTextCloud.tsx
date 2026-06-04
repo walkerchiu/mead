@@ -518,20 +518,19 @@ export function DecorativeTextCloud({
             animation:
               'portalHeroEntranceRight 2.4s cubic-bezier(0.22, 1, 0.36, 1) both',
           },
+          // 色塊「一開始就可見」（不從 opacity 0 淡入，避免重整時先消失一陣子），
+          // 僅以位移 / 縮放從外側往中央壓縮（散→聚）。
           '@keyframes portalHeroEntranceLeft': {
-            '0%': { transform: 'translateX(-300px)', opacity: 0 },
-            '40%': { opacity: 1 },
-            '100%': { transform: 'translateX(0)', opacity: 1 },
+            '0%': { transform: 'translateX(-300px)' },
+            '100%': { transform: 'translateX(0)' },
           },
           '@keyframes portalHeroEntranceMid': {
-            '0%': { transform: 'scale(0.92)', opacity: 0 },
-            '40%': { opacity: 1 },
-            '100%': { transform: 'scale(1)', opacity: 1 },
+            '0%': { transform: 'scale(0.92)' },
+            '100%': { transform: 'scale(1)' },
           },
           '@keyframes portalHeroEntranceRight': {
-            '0%': { transform: 'translateX(300px)', opacity: 0 },
-            '40%': { opacity: 1 },
-            '100%': { transform: 'translateX(0)', opacity: 1 },
+            '0%': { transform: 'translateX(300px)' },
+            '100%': { transform: 'translateX(0)' },
           },
           '@media (prefers-reduced-motion: reduce)': {
             '& [class*="drift-"]': { animation: 'none' },
