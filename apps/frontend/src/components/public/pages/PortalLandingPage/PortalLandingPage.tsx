@@ -36,8 +36,8 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
   tisdc: [0, 1, 2],
 };
 
-/** 釘住區大卡上方留給裝飾星形照片的內距（≈100px；DECOR_STARS 最高 y≈-112，略入此區） */
-const PIN_TOP_PAD = 110;
+/** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS 最高 y≈-112，需略大於此以免被切） */
+const PIN_TOP_PAD = 120;
 /**
  * 卡片完整露出後、切換前還要再往下捲過的「一小段距離」（px）。
  * 即每張卡的捲動量 = 卡片可捲距離 + 此距離；捲超過後才切下一張並回到頂端。
@@ -159,10 +159,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     setActiveIndex(target);
   }, []);
 
-  // 釘住並切到指定卡片（dots / 由上下進入時用）：卡片從卡頂進場、鎖住捲動於本區。
-  // 進入時「不」上鎖 —— 上鎖會讓剛進來就想繼續捲（上或下）被卡住「頓一下」。入場
-  // 慣性的吸收交給「切換後的鎖」即可（見 onWheel 的 lockGesture）。
-  const engageAt = useCallback((index: number) => {
+  // 釘住並切到指定卡片（dots / 由上下進入時用）：鎖住捲動於本區。進入時「不」上鎖
+  // ——上鎖會讓剛進來就想繼續捲被卡住「頓一下」。入場慣性的吸收交給「切換後的鎖」。
+  // atTop：true → 卡片重置到卡頂（往下 / dots 進入）；false → 保留目前露出位置
+  // （往上由下方進入時用，讓卡片從 native 捲入的位置順順往上收回卡頂、不瞬間跳動）。
+  const engageAt = useCallback((index: number, atTop = true) => {
     engagedRef.current = true;
     lockedRef.current = false;
     if (lockTimerRef.current) {
@@ -171,9 +172,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     }
     idxRef.current = index;
     seenRef.current.add(index);
-    offsetRef.current = 0;
-    const wrap = cardWrapRef.current;
-    if (wrap) wrap.style.setProperty('--reveal-y', '0px');
+    if (atTop) {
+      offsetRef.current = 0;
+      const wrap = cardWrapRef.current;
+      if (wrap) wrap.style.setProperty('--reveal-y', '0px');
+    }
     setActiveIndex(index);
     const top = planSectionRef.current?.offsetTop ?? 0;
     window.scrollTo(0, top);
@@ -305,7 +308,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         if (prevYRef.current < bt && y >= bt) {
           engageAt(0); // 由上往下進入 → 第一張（不上鎖，入場即可順順往下露出）
         } else if (prevYRef.current > bt && y <= bt) {
-          engageAt(planCount - 1); // 由下往上進入 → 最後一張
+          // 由下往上進入 → 最後一張；保留 native 捲入時的露出位置，讓它順順往上
+          // 收回卡頂、不瞬間跳動。
+          engageAt(planCount - 1, false);
         }
       }
       prevYRef.current = y;
