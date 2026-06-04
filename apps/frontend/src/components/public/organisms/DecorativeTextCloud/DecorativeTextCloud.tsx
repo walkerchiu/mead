@@ -354,18 +354,14 @@ export function DecorativeTextCloud({
     setSlotWords(positions.map((p) => p.text));
   }, [positions]);
 
-  // hover 期間，照片快速、隨機變換（取「當前作用中計畫」displayedIndex 的照片）
+  // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
+  // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
   const currentPhotoCount = photosByShape[displayedIndex]?.length ?? 0;
   useEffect(() => {
     if (hovered === null || currentPhotoCount < 2) return;
+    setPhotoIdx(0);
     const id = window.setInterval(() => {
-      setPhotoIdx((prev) => {
-        let next = prev;
-        while (next === prev) {
-          next = Math.floor(Math.random() * currentPhotoCount);
-        }
-        return next;
-      });
+      setPhotoIdx((prev) => (prev + 1) % currentPhotoCount);
     }, PHOTO_INTERVAL);
     return () => window.clearInterval(id);
   }, [hovered, currentPhotoCount]);
