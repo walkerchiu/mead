@@ -43,7 +43,14 @@ const PIN_TOP_PAD = 140;
  * 每個計畫的捲動段長 = 卡片實測可捲距離 + 此空白，故不論視窗高矮、卡片高低，
  * 空白都維持這一小段（不會在高螢幕上爆量）。想加大／縮小兩計畫間距就調此值。
  */
-const DWELL_VH = 0.12;
+const DWELL_VH = 0.06;
+/**
+ * 切換遲滯（佔一段的比例）：必須越過段界 SWITCH_MARGIN 才提交切換到新計畫，反向同理。
+ * 與 SWITCH_COOLDOWN_MS 一起避免真實滑動慣性在段界附近抖動造成快速左右來回切換。
+ */
+const SWITCH_MARGIN = 0.1;
+/** 切換後在此時間內擋下「反方向」切換（ms）；同方向（快速連翻）不受限。 */
+const SWITCH_COOLDOWN_MS = 350;
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -81,10 +88,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 釘住軌道（撐出捲動距離）與承載 reveal CSS 變數的包裝層。
   const planTrackRef = useRef<HTMLDivElement>(null);
   const cardWrapRef = useRef<HTMLDivElement>(null);
-  // 追蹤上一影格的計畫段與 reveal 位移：切換瞬間用「離開那一刻的 reveal」凍結退場卡
-  // （--exit-reveal-y），讓退場卡與入場卡各自垂直定位、不會瞬間跳回頂端。
-  const lastIdxRef = useRef(0);
+  // 目前已提交的計畫段（含遲滯）與上一影格 reveal 位移：切換瞬間用「離開那一刻的
+  // reveal」凍結退場卡（--exit-reveal-y），讓退場卡與入場卡各自垂直定位、不跳回頂端。
+  const committedIdxRef = useRef(0);
   const lastRevealRef = useRef(0);
+  // 最近一次切換的方向與時間 — 供方向冷卻擋下段界抖動造成的反向快速切換。
+  const lastSwitchDirRef = useRef(0);
+  const lastSwitchAtRef = useRef(0);
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
@@ -145,14 +155,36 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         Math.max(0, -track.getBoundingClientRect().top / pinDistance),
       );
       const planFloat = Math.min(planCount - 1e-6, p * planCount);
-      const idx = Math.min(planCount - 1, Math.floor(planFloat));
-      const intra = planFloat - idx;
-      const reveal = intra * segPx;
+      // 遲滯 + 方向冷卻：越過段界 SWITCH_MARGIN 才考慮切換；且剛切換後短時間內
+      // 擋下反方向切換。兩者一起避免段界附近的慣性抖動造成快速左右來回切換。
+      const committed = committedIdxRef.current;
+      const target = Math.min(planCount - 1, Math.floor(planFloat));
+      let idx = committed;
+      if (target !== committed) {
+        const intraOfTarget = planFloat - target;
+        const dir = target > committed ? 1 : -1;
+        const enoughMargin =
+          dir === 1
+            ? intraOfTarget >= SWITCH_MARGIN
+            : intraOfTarget <= 1 - SWITCH_MARGIN;
+        const now = typeof performance !== 'undefined' ? performance.now() : 0;
+        const reverseLocked =
+          dir !== lastSwitchDirRef.current &&
+          now - lastSwitchAtRef.current < SWITCH_COOLDOWN_MS;
+        if (enoughMargin && !reverseLocked) {
+          idx = target;
+          lastSwitchDirRef.current = dir;
+          lastSwitchAtRef.current = now;
+        }
+      }
+      // reveal 以「已提交段」為基準（遲滯/冷卻期間 idx 落後 planFloat，卡片續捲、
+      // 空白略增）。夾在 0 以上，避免反向鎖住時 reveal 變負把卡片往下推。
+      const reveal = Math.max(0, (planFloat - idx) * segPx);
       // 切換到新計畫段：把「離開那一刻的 reveal」凍進 --exit-reveal-y 給退場卡，
       // 入場卡則用即時的 --reveal-y（新段約為 0、卡頂對齊）。
-      if (idx !== lastIdxRef.current) {
+      if (idx !== committed) {
         wrap.style.setProperty('--exit-reveal-y', `${lastRevealRef.current}px`);
-        lastIdxRef.current = idx;
+        committedIdxRef.current = idx;
       }
       wrap.style.setProperty('--reveal-y', `${reveal.toFixed(2)}px`);
       lastRevealRef.current = reveal;
@@ -209,12 +241,19 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     [scrollDriven, planScrollTop],
   );
 
-  // 兩側 peek 點擊（捲動驅動）：即時捲到目標計畫段落起點，由捲動進度觸發左右滑動，
-  // 卡片即在頂端切換、無停頓（不直接改 index 以免與捲動位置脫鉤）。
+  // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接強制提交目標索引（繞過遲滯與方向
+  // 冷卻，故循環時的反向大跳不會被擋），同時即時把捲動對齊到該段起點，使捲動位置
+  // 與目前計畫一致、卡頂對齊。
   const handlePeekNavigate = useCallback(
     (targetIndex: number) => {
       const top = planScrollTop(targetIndex);
-      if (top !== null) window.scrollTo({ top, behavior: 'auto' });
+      if (top === null) return;
+      committedIdxRef.current = targetIndex;
+      lastSwitchDirRef.current = 0;
+      lastSwitchAtRef.current = 0;
+      lastRevealRef.current = 0;
+      setActiveIndex(targetIndex);
+      window.scrollTo({ top, behavior: 'auto' });
     },
     [planScrollTop],
   );
