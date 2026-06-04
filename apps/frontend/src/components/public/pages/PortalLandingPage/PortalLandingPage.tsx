@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import { useLocale, useTranslations } from 'next-intl';
@@ -36,41 +36,125 @@ const HERO_PHOTO_INDICES: Record<string, number[]> = {
   tisdc: [0, 1, 2],
 };
 
+/** 釘住區大卡上方留給裝飾星形照片的內距（DECOR_STARS y≈-112） */
+const PIN_TOP_PAD = 140;
+/** 大卡完整捲完後、切換到下一計畫前的緩衝（佔該段比例），讓卡底停留一下再 snap */
+const SWITCH_ZONE = 0.18;
+/** 自動輪播間隔（手機 / 無捲動劫持時） */
+const AUTO_ADVANCE_MS = 6000;
+
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
  *
- * 由上而下：hero 文字雲（佔滿首屏）→ 計畫介紹大卡 → 敘事 → 指示點 → 頁尾。
- * 計畫大卡為輪播：未 hover 時每 AUTO_ADVANCE_MS 自動切到下一個計畫，hover 時暫停；
- * 指示點與兩側 peek 亦可手動切換。文字雲與大卡共用 activeIndex。
+ * 由上而下：hero 文字雲（佔滿首屏）→ 計畫介紹大卡（桌機：sticky 釘住、滾動驅動）
+ * → 敘事 → 指示點 → 頁尾。
+ *
+ * 計畫介紹區（≥834px）：捲到該段時 sticky 釘在畫面中；段內滾動先把當前計畫大卡
+ * 往上捲、看完整張（KPI、banner），捲到卡底再 snap 左右切換到下一個計畫（沿用
+ * PlanCarousel 的左右滑動轉場）。三個計畫依序看完後，繼續往下滑進入 Footer。
+ * <834px 或 prefers-reduced-motion：不劫持捲動，改為自動輪播 + 指示點手動切換。
  */
 export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const t = useTranslations('portal');
   const locale = useLocale();
   const language = locale.startsWith('zh') ? 'zh' : 'en';
 
-  // 目前顯示的計畫索引（首頁即直接展示完整計畫大卡，預設第一個計畫）。
+  // 目前顯示的計畫索引（首屏之後即直接展示完整計畫大卡，預設第一個計畫）。
   const [activeIndex, setActiveIndex] = useState(0);
   // hover 計畫大卡時暫停自動輪播（hoverIndex !== null 即暫停）。
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+  // 是否啟用「sticky 釘住 + 滾動驅動切換」：桌機且未開啟減少動態偏好。
+  const [scrollDriven, setScrollDriven] = useState(false);
 
-  // 自動輪播：未 hover 時每 AUTO_ADVANCE_MS 自動切到下一個計畫（環狀）；
-  // hover 任一卡時暫停，讓使用者安心閱讀。prefers-reduced-motion 時停用，
-  // 符合 WCAG 2.2.2「自動更新內容需可暫停」（指示點與 peek 仍提供手動切換）。
+  // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
+  const orderedPlans: Plan[] = [
+    ...PLAN_ORDER.map((id) => plans.find((p) => p.id === id)).filter(
+      (p): p is Plan => Boolean(p),
+    ),
+    ...plans.filter((p) => !PLAN_ORDER.includes(p.id)),
+  ];
+  const planCount = orderedPlans.length;
+
+  // 釘住軌道（撐出捲動距離）與其內捲動的大卡包裝層（套 translateY 露出整張卡）。
+  const planTrackRef = useRef<HTMLDivElement>(null);
+  const cardWrapRef = useRef<HTMLDivElement>(null);
+
+  // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mqDesktop = window.matchMedia('(min-width:834px)');
+    const mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () =>
+      setScrollDriven(mqDesktop.matches && !mqMotion.matches);
+    update();
+    mqDesktop.addEventListener('change', update);
+    mqMotion.addEventListener('change', update);
+    return () => {
+      mqDesktop.removeEventListener('change', update);
+      mqMotion.removeEventListener('change', update);
+    };
+  }, []);
+
+  // 捲動驅動：把釘住軌道的捲動進度 p(0→1) 拆成「目前計畫段 + 段內進度」。
+  //  - 段內前段：把大卡 translateY 往上捲，露出整張卡（KPI、banner）。
+  //  - 段內末段（SWITCH_ZONE）：卡片已捲到底、停留一下，跨入下一段時 snap 切換
+  //    activeIndex（PlanCarousel 接手播左右滑動）。
+  // translateY 直接寫進 DOM style（不經 React state）以免每幀 re-render；只有
+  // activeIndex 改變（跨段）時才 setState 觸發滑動。
+  useEffect(() => {
+    if (!scrollDriven) return;
+    const track = planTrackRef.current;
+    const wrap = cardWrapRef.current;
+    if (!track || !wrap) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const vh = window.innerHeight;
+      const pinDistance = Math.max(1, planCount * vh);
+      const p = Math.min(
+        1,
+        Math.max(0, -track.getBoundingClientRect().top / pinDistance),
+      );
+      const planFloat = Math.min(planCount - 1e-6, p * planCount);
+      const idx = Math.min(planCount - 1, Math.floor(planFloat));
+      const intra = planFloat - idx;
+      // 段內前 (1 - SWITCH_ZONE) 把卡片捲完，末段 SWITCH_ZONE 卡底停留待切換。
+      const revealRatio = Math.min(1, intra / (1 - SWITCH_ZONE));
+      // 可捲距離 = 卡片總高 − 釘住可視高度（扣掉上方星形內距）。
+      const maxY = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
+      wrap.style.transform = `translateY(-${(revealRatio * maxY).toFixed(2)}px)`;
+      setActiveIndex((cur) => (cur === idx ? cur : idx));
+    };
+    const onScroll = () => {
+      if (!raf) raf = window.requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [scrollDriven, planCount]);
+
+  // 自動輪播：僅在「非捲動驅動」（手機 / 減少動態）時啟用 — 桌機改由滾動切換。
+  // hover 任一卡時暫停（WCAG 2.2.2）。
+  useEffect(() => {
+    if (scrollDriven) return;
     if (hoverIndex !== null) return;
-    if (plans.length <= 1) return;
+    if (planCount <= 1) return;
     if (
       typeof window !== 'undefined' &&
       window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     ) {
       return;
     }
-    const AUTO_ADVANCE_MS = 6000; // 6s／張 — 足夠閱讀，不致「太快切換」
     const id = window.setInterval(() => {
-      setActiveIndex((cur) => (cur + 1) % plans.length);
+      setActiveIndex((cur) => (cur + 1) % planCount);
     }, AUTO_ADVANCE_MS);
     return () => window.clearInterval(id);
-  }, [hoverIndex, plans.length]);
+  }, [scrollDriven, hoverIndex, planCount]);
 
   // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
   // 載完才顯示。先在首頁掛載時把這些照片放進瀏覽器快取，切換計畫時星形貼圖即可即時
@@ -87,13 +171,19 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     });
   }, [plans]);
 
-  // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
-  const orderedPlans: Plan[] = [
-    ...PLAN_ORDER.map((id) => plans.find((p) => p.id === id)).filter(
-      (p): p is Plan => Boolean(p),
-    ),
-    ...plans.filter((p) => !PLAN_ORDER.includes(p.id)),
-  ];
+  // 指示點點選：捲動驅動時捲到該計畫所在的軌道段落；否則直接切 activeIndex。
+  const handleDotSelect = useCallback(
+    (i: number) => {
+      const track = planTrackRef.current;
+      if (scrollDriven && track) {
+        const vh = window.innerHeight;
+        window.scrollTo({ top: track.offsetTop + i * vh, behavior: 'smooth' });
+        return;
+      }
+      setActiveIndex(i);
+    },
+    [scrollDriven],
+  );
 
   // 指示點 / aria-live 對應目前查看的計畫
   const activePlan = orderedPlans[activeIndex] ?? orderedPlans[0];
@@ -116,6 +206,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   });
 
+  const planCarousel = (
+    <PlanCarousel
+      plans={orderedPlans}
+      expandedIndex={activeIndex}
+      onExpandedIndexChange={setActiveIndex}
+      onHoverPlanChange={setHoverIndex}
+    />
+  );
+
   return (
     <Box
       sx={{
@@ -123,6 +222,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         bgcolor: portalTokens.color.pageBg,
         display: 'flex',
         flexDirection: 'column',
+        // 釘住軌道收放與 WebGL 星形陸續掛載會造成版面位移；停用本頁子樹的 scroll
+        // anchoring，避免瀏覽器自動回補捲動與釘住對齊互相拉扯。
+        overflowAnchor: 'none',
         // ★ 自訂游標（依使用者圖示） — 32x38 SVG 黑底白邊指標、hotspot 在 (5,5)
         cursor: 'url("/cursors/portal-cursor.svg") 5 5, auto',
         '& button, & a, & [role="button"]': {
@@ -175,16 +277,41 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           />
         </Box>
 
-        {/* 計畫介紹大卡 — 往下捲過首屏即直接呈現完整計畫卡。
-            paddingTop 留 140px 給大卡上方的裝飾星形照片（DECOR_STARS y≈-112）。 */}
-        <Box sx={{ width: '100%', pt: '140px', overflowX: 'clip' }}>
-          <PlanCarousel
-            plans={orderedPlans}
-            expandedIndex={activeIndex}
-            onExpandedIndexChange={setActiveIndex}
-            onHoverPlanChange={setHoverIndex}
-          />
-        </Box>
+        {/* 計畫介紹大卡 */}
+        {scrollDriven ? (
+          // 桌機：sticky 釘住 + 滾動驅動。軌道高 = 釘住捲動距離(planCount 屏) + 1 屏，
+          // 內層 sticky 釘在畫面頂；段內捲動把大卡 translateY 往上捲看完整張，
+          // 跨段 snap 切換到下一計畫，捲完最後一計畫即釋放、繼續往下到 Footer。
+          <Box
+            ref={planTrackRef}
+            sx={{ position: 'relative', height: `${(planCount + 1) * 100}vh` }}
+          >
+            <Box
+              sx={{
+                position: 'sticky',
+                top: 0,
+                height: '100vh',
+                overflow: 'hidden',
+                pt: `${PIN_TOP_PAD}px`,
+                boxSizing: 'border-box',
+              }}
+            >
+              <Box
+                ref={cardWrapRef}
+                sx={{ width: '100%', willChange: 'transform' }}
+              >
+                {planCarousel}
+              </Box>
+            </Box>
+          </Box>
+        ) : (
+          // 手機 / 減少動態：不劫持捲動，原生流；自動輪播 + 指示點切換。
+          <Box
+            sx={{ width: '100%', pt: `${PIN_TOP_PAD}px`, overflowX: 'clip' }}
+          >
+            {planCarousel}
+          </Box>
+        )}
 
         {/* 敘事段落 */}
         <Box sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}>
@@ -221,7 +348,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               <CarouselDots
                 count={orderedPlans.length}
                 activeIndex={activeIndex}
-                onSelect={setActiveIndex}
+                onSelect={handleDotSelect}
                 labels={orderedPlans.map((p) => p.name.zh)}
                 ariaLabel="計畫切換"
               />
