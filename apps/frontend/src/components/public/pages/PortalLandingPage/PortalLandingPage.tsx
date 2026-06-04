@@ -147,15 +147,12 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     }
   }, []);
 
-  // 切換到另一張卡：凍結退場卡在「離開那一刻」的位移（--exit-reveal-y），新卡一律
-  // 以 enterOffset=0 從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距），並記入已看過。
+  // 切換到另一張卡：退場舊卡與入場新卡都對齊到「卡頂」（--exit-reveal-y = 0、
+  // --reveal-y = enterOffset≈0），兩卡在同一垂直基準上一進一出對滑，乾淨不錯位。
   const commitSwitch = useCallback((target: number, enterOffset: number) => {
     const wrap = cardWrapRef.current;
     if (wrap) {
-      wrap.style.setProperty(
-        '--exit-reveal-y',
-        `${offsetRef.current.toFixed(2)}px`,
-      );
+      wrap.style.setProperty('--exit-reveal-y', '0px');
       wrap.style.setProperty('--reveal-y', `${enterOffset.toFixed(2)}px`);
     }
     offsetRef.current = enterOffset;
@@ -441,7 +438,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       expandedIndex={activeIndex}
       onExpandedIndexChange={setActiveIndex}
       onPeekNavigate={scrollDriven ? handlePeekNavigate : undefined}
-      suppressSlideOut={scrollDriven}
     />
   );
 
