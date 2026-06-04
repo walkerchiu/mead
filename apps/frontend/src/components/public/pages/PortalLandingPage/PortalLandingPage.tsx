@@ -132,10 +132,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   }, []);
 
   // 把目前 offset 寫進 CSS 變數，驅動卡片露出（reveal 只套在卡片、不動 peek）。
+  // 夾在 ≥0：往上越過卡頂時 offset 會記為負（供觸發門檻計算），但卡片停在頂端、
+  // 不往下滑，避免在上方露出空白凹槽。
   const applyReveal = useCallback(() => {
     const wrap = cardWrapRef.current;
-    if (wrap)
-      wrap.style.setProperty('--reveal-y', `${offsetRef.current.toFixed(2)}px`);
+    if (wrap) {
+      const r = Math.max(0, offsetRef.current);
+      wrap.style.setProperty('--reveal-y', `${r.toFixed(2)}px`);
+    }
   }, []);
 
   // 切換到另一張卡：凍結退場卡在「離開那一刻」的位移（--exit-reveal-y），新卡一律
@@ -257,24 +261,32 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         }
         return;
       }
-      // dy < 0：往上。offset 可降到 0 以下（卡片往下滑、上方露出空隙）作為「往上捲過」
-      // 的回饋，捲過 UP_THRESHOLD 才倒退。
+      // dy < 0：往上
       const next = offsetRef.current + dy;
+      if (i === 0) {
+        // 第一張：往上把卡片收回卡頂後即釋放回 hero（offset 不往負、上方無凹槽、不需門檻）。
+        if (next > 0) {
+          e.preventDefault();
+          offsetRef.current = next;
+          applyReveal();
+          return;
+        }
+        offsetRef.current = 0;
+        applyReveal();
+        release();
+        return;
+      }
+      // 非第一張：捲到卡頂後再往上累積（offset 記為負、但卡片停在頂端不露凹槽），
+      // 過 UP_THRESHOLD 才倒退上一張（從卡頂進場），並上鎖。
       if (next > -UP_THRESHOLD) {
         e.preventDefault();
         offsetRef.current = next;
         applyReveal();
         return;
       }
-      // 往上捲過 UP_THRESHOLD → 倒退上一張，從卡頂進場（上半不被截、留上方間距），並上鎖
-      if (i > 0) {
-        e.preventDefault();
-        commitSwitch(i - 1, 0);
-        lockGesture();
-        return;
-      }
-      // 第一張：往上捲過門檻 → 放行往上（回到 hero）
-      release();
+      e.preventDefault();
+      commitSwitch(i - 1, 0);
+      lockGesture();
     };
 
     const onScroll = () => {
