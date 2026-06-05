@@ -43,6 +43,10 @@ const PIN_TOP_PAD = 120;
  * 即每張卡的捲動量 = 卡片可捲距離 + 此距離；捲超過後才切下一張並回到頂端。
  */
 const DWELL_PX = 100;
+/** 自適應第二屏：卡片底部留白（px）；可用高 = 視窗高 − PIN_TOP_PAD − 此值。 */
+const PIN_BOTTOM_PAD = 24;
+/** 自適應縮放下限：避免極矮視窗把卡片縮到難以閱讀。 */
+const MIN_CARD_SCALE = 0.55;
 /**
  * 往上倒退的觸發距離（px）：捲到卡頂後，還要再往上捲過此距離（卡片往下滑、上方露出
  * 空隙）才倒退上一張。上一張從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距）。
@@ -84,6 +88,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 避免 Three.js / 圖片在主執行緒初始化卡住入場動畫（壓縮會頓成「跳一段」）。
   // 使用者一開始捲動或入場結束後才掛載。
   const [mountPlans, setMountPlans] = useState(false);
+  // 自適應第二屏：卡片內容高於一屏時的等比縮放倍率（≤1）；量測後設定。
+  const [cardScale, setCardScale] = useState(1);
+  // 目前已套用的縮放倍率（用 zoom 實作，zoom 會影響 scrollHeight）；量測時用它把
+  // 讀到的（已縮放）高度還原成自然高度，避免「量到縮放後高度 → 再算縮放」的回饋。
+  const appliedScaleRef = useRef(1);
 
   // 卡片顯示順序：依設計稿固定為 sposad → idc → tisdc；任何未列入者補在後面
   const orderedPlans: Plan[] = [
@@ -97,6 +106,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 釘住區塊與承載 reveal CSS 變數的卡片包裝層。
   const planSectionRef = useRef<HTMLDivElement>(null);
   const cardWrapRef = useRef<HTMLDivElement>(null);
+  // 第三屏（資訊區）的容器：供「最後一張卡往下 → 整頁切到資訊區」的離散 snap。
+  const infoSectionRef = useRef<HTMLDivElement>(null);
 
   // ── 滾輪狀態機的即時狀態（用 ref 以免事件處理讀到舊值）──
   const engagedRef = useRef(false); // 是否釘住、攔截滾輪中
@@ -198,7 +209,17 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const wrap = cardWrapRef.current;
       if (!wrap) return;
       const vh = window.innerHeight;
-      const cardMax = Math.max(0, wrap.scrollHeight - (vh - PIN_TOP_PAD));
+      // 還原自然高度：zoom 會讓 scrollHeight 變成縮放後高度，除以目前已套用倍率還原。
+      const natural = wrap.scrollHeight / (appliedScaleRef.current || 1);
+      // 自適應第二屏：可用高 = 視窗 − 上方星形內距 − 底部留白；超出才等比縮小。
+      const avail = vh - PIN_TOP_PAD - PIN_BOTTOM_PAD;
+      const scale =
+        natural > avail ? Math.max(MIN_CARD_SCALE, avail / natural) : 1;
+      appliedScaleRef.current = scale;
+      setCardScale(scale);
+      // 縮放後的視覺高；填入一屏後 cardMax≈0，段內 reveal 自然停用、捲動僅切換卡片。
+      const scaledH = natural * scale;
+      const cardMax = Math.max(0, scaledH - (vh - PIN_TOP_PAD));
       segLenRef.current = cardMax + DWELL_PX;
     };
     measure();
@@ -223,6 +244,21 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         window.clearTimeout(lockTimerRef.current);
         lockTimerRef.current = null;
       }
+    };
+
+    // 整頁切到第三屏（資訊區）：解除釘住、平滑捲到資訊區頂端。
+    const goToInfo = () => {
+      release();
+      const info = infoSectionRef.current;
+      if (info) window.scrollTo({ top: info.offsetTop, behavior: 'smooth' });
+    };
+
+    // 整頁切回第一屏（hero）：卡片收回卡頂、解除釘住、平滑捲到頁頂。
+    const goToHero = () => {
+      offsetRef.current = 0;
+      applyReveal();
+      release();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     const onWheel = (e: WheelEvent) => {
@@ -281,9 +317,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           lockGesture(1);
           return;
         }
-        // 已在最後一張：三張都看過 → 放行往下（不攔截，原生捲動進入敘事 / 頁尾）
+        // 已在最後一張且三張都看過 → 整頁切到第三屏（資訊區）。
         if (seenRef.current.size >= planCount) {
-          release();
+          e.preventDefault();
+          goToInfo();
           return;
         }
         // 尚未看完（例如用 peek 跳著看）→ 切到第一張還沒看過的，強制看完才放行
@@ -299,7 +336,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           commitSwitch(unseen, 0);
           lockGesture(1);
         } else {
-          release();
+          e.preventDefault();
+          goToInfo();
         }
         return;
       }
@@ -353,11 +391,88 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       prevYRef.current = y;
     };
 
+    // 鍵盤整頁導覽：PageDown / PageUp（含 Space、上下方向鍵）以「一鍵一步」推進，
+    // 與滾輪共用同一套離散步進（hero → 三張卡 → 資訊區，反向亦然）。
+    const onKeyDown = (e: KeyboardEvent) => {
+      let dir = 0;
+      if (e.key === 'PageDown' || e.key === 'ArrowDown') dir = 1;
+      else if (e.key === 'PageUp' || e.key === 'ArrowUp') dir = -1;
+      else if (e.key === ' ' || e.key === 'Spacebar') dir = e.shiftKey ? -1 : 1;
+      else return;
+
+      // 表單 / 可編輯元素聚焦時不攔截，維持原生行為。
+      const el = e.target as HTMLElement | null;
+      if (
+        el &&
+        (el.tagName === 'INPUT' ||
+          el.tagName === 'TEXTAREA' ||
+          el.tagName === 'SELECT' ||
+          el.isContentEditable)
+      ) {
+        return;
+      }
+
+      const bt = blockTop();
+      const y = window.scrollY;
+
+      if (!engagedRef.current) {
+        if (dir > 0 && y < bt - 4) {
+          // 第一屏（hero）往下 → 平滑跳到計畫區並釘住第一張。
+          e.preventDefault();
+          if (heroSnappingRef.current) return;
+          heroSnappingRef.current = true;
+          window.scrollTo({ top: bt, behavior: 'smooth' });
+          window.setTimeout(() => {
+            if (!engagedRef.current) engageAt(0);
+            heroSnappingRef.current = false;
+          }, 700);
+        } else if (dir < 0 && y > bt + 4) {
+          // 第三屏（資訊區）往上 → 回計畫區最後一張（從卡頂釘住）。
+          e.preventDefault();
+          engageAt(planCount - 1, true);
+        }
+        return;
+      }
+
+      // 釘住於計畫區：離散切換目前卡片，邊界則整頁切到 hero / 資訊區。
+      const i = idxRef.current;
+      e.preventDefault();
+      if (dir > 0) {
+        if (i < planCount - 1) {
+          commitSwitch(i + 1, 0);
+          lockGesture(1);
+        } else if (seenRef.current.size >= planCount) {
+          goToInfo();
+        } else {
+          let unseen = -1;
+          for (let k = 0; k < planCount; k += 1) {
+            if (!seenRef.current.has(k)) {
+              unseen = k;
+              break;
+            }
+          }
+          if (unseen >= 0) {
+            commitSwitch(unseen, 0);
+            lockGesture(1);
+          } else {
+            goToInfo();
+          }
+        }
+      } else if (i === 0) {
+        goToHero();
+      } else {
+        commitSwitch(i - 1, 0);
+        lockGesture(-1);
+      }
+    };
+
     window.addEventListener('wheel', onWheel, { passive: false });
     window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('wheel', onWheel);
       window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('keydown', onKeyDown);
       if (lockTimerRef.current) window.clearTimeout(lockTimerRef.current);
     };
   }, [
@@ -464,6 +579,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       expandedIndex={activeIndex}
       onExpandedIndexChange={setActiveIndex}
       onPeekNavigate={scrollDriven ? handlePeekNavigate : undefined}
+      cardScale={scrollDriven ? cardScale : 1}
     />
   );
 
@@ -555,8 +671,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           </Box>
         )}
 
-        {/* 敘事段落 */}
-        <Box sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}>
+        {/* 敘事段落（第三屏 / 資訊區）*/}
+        <Box
+          ref={infoSectionRef}
+          sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}
+        >
           <PortalNarrativeSection
             leadParagraph={t('narrative.lead')}
             statement={t('narrative.statement')}

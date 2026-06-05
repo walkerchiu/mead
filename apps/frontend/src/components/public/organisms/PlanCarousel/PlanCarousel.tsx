@@ -56,6 +56,11 @@ export interface PlanCarouselProps {
    * 避免內部直接改 index 與捲動位置脫鉤。未提供時 peek 走內部左右滑動。
    */
   onPeekNavigate?: (targetIndex: number, dir: 'prev' | 'next') => void;
+  /**
+   * 卡片自適應第二屏的縮放倍率（≤1）。由上層依視窗高與卡片內容高量算，超過一屏時
+   * 等比縮小整張卡填入一屏。只套在卡片容器（不含兩側 peek，peek 以視窗高定位）。
+   */
+  cardScale?: number;
 }
 
 /**
@@ -105,7 +110,11 @@ function peekSx(direction: 'prev' | 'next') {
     display: 'none',
     position: 'absolute',
     top: 0,
-    bottom: 0,
+    // peek 是固定不隨 reveal 平移的邊緣預覽條；卡片區本身高於視窗（靠捲動 reveal
+    // 逐段露出），若用 bottom:0 撐滿整個卡片區，peek 底部圓角會落在釘住視窗
+    // （100vh）之外被裁掉。改以視窗高度收斂高度，讓上下圓角框線都在可見範圍內。
+    // 160 = 頂部 PIN_TOP_PAD(120) + 底部留白(40)。
+    height: 'calc(100vh - 160px)',
     width: 760,
     p: 0,
     border: 'none',
@@ -592,6 +601,7 @@ export function PlanCarousel({
   onHoverPlanChange,
   onSelectStart,
   onPeekNavigate,
+  cardScale = 1,
 }: PlanCarouselProps) {
   // 內部「退場中」狀態：使用者點擊收合卡後、實際切到展開狀態之前的過渡期。
   // 期間三張收合卡先以淡出/壓縮動畫退場，再交由父層更新 expandedIndex、展開大卡。
@@ -1101,7 +1111,15 @@ export function PlanCarousel({
         </>
       )}
 
-      <Box sx={outerSx}>
+      <Box
+        sx={{
+          ...outerSx,
+          // 自適應第二屏：卡片內容高於一屏時等比縮小填入（只縮卡片，不含兩側 peek）。
+          // 用 zoom 而非 transform:scale —— zoom 會以最終尺寸重新排版／重繪，SVG logo
+          // 與文字維持銳利；transform:scale 會把已點陣化的 SVG 再縮放而變糊。
+          zoom: cardScale < 1 ? cardScale : undefined,
+        }}
+      >
         <Box
           sx={{
             position: 'relative',
