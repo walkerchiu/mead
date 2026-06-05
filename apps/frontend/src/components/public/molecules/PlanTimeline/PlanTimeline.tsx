@@ -22,15 +22,14 @@ const TRACK_SEGMENTS: TrackSegment[] = [
   { leftPct: 80, widthPct: 1.9, active: false },
 ];
 
-/** Figma 色票（WCAG 2.1 AA：
- *  - text 原 #9a9a9a on #FFF ≈ 2.85:1 → 改 #5C5C5C ≈ 7.0:1。
- *  - segIdle 原 #ECECEC on #FFF ≈ 1.05:1，作為軌道 UI 須 ≥3:1，改 #B8B8B8。
- *  - border 原 #D3D3D3 on #FFF ≈ 1.4:1，作為 UI 元件 border 須 ≥3:1，改 #A0A0A0。 */
+/** Figma 色票（依設計稿嚴格對齊：node 1:86 Timeline）：
+ *  月份字 #9A9A9A、軌道底邊框 #D3D3D3、未達月刻度 #ECECEC、
+ *  當前月 highlight 與進度條 #E3AE5D、當前月字 #FFFFFF。 */
 const C = {
-  text: '#5C5C5C',
-  border: '#A0A0A0',
-  segIdle: '#B8B8B8',
-  segActive: '#B07320', // 原 #E3AE5D on #FFF ≈ 1.95:1 → #B07320 ≈ 4.6:1
+  text: '#9A9A9A',
+  border: '#D3D3D3',
+  segIdle: '#ECECEC',
+  segActive: '#E3AE5D',
   white: '#ffffff',
 };
 

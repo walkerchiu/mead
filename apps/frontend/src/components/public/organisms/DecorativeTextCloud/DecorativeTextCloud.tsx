@@ -556,7 +556,8 @@ export function DecorativeTextCloud({
             <stop offset="0%" stopColor={portalTokens.color.blobOrangeFrom} />
             <stop offset="44%" stopColor={portalTokens.color.blobOrangeTo} />
             <stop offset="74%" stopColor={portalTokens.color.blobGrey} />
-            <stop offset="100%" stopColor="#E6E6E6" />
+            {/* 依 Figma Union radial 終點 #D6D6D6 */}
+            <stop offset="100%" stopColor="#D6D6D6" />
           </linearGradient>
           {shapes.map((s, i) => (
             <clipPath key={i} id={`clip-${uid}-${i}`}>

@@ -49,16 +49,14 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   },
 ];
 
-/** Figma node 1:47 色票 — 數值已就 WCAG 2.1 AA 對比 (≥4.5:1 normal text)
- *  與 footerBg #E3E3E3 加深。原 #888 (≈2.95:1) / #bbb (≈1.66:1) /
- *  #aaa (≈2.0:1) / 11px 都不符 AA。 */
+/** Figma node 1:47 色票 — 嚴格對齊設計稿（依業主要求，文字採設計稿淺灰）。 */
 const C = {
-  title: '#000000',
-  link: '#5C5C5C', // on #E3E3E3 ≈ 6.0:1 ✓
-  subline: '#4A4A4A', // on #E3E3E3 ≈ 8.4:1 ✓
-  badgeBorder: '#444444', // 依設計稿 #444；on #E3E3E3 ≈ 8.9:1 ✓（UI 邊框 ≥3:1）
-  badgeText: '#5C5C5C', // 依設計稿偏淺灰，但保 AA：on #E3E3E3 ≈ 6.0:1 ✓（圖示與文字共用）
-  copyright: '#5C5C5C',
+  title: '#000000', // node 1:51 / 1:62
+  link: '#888888', // node 1:54 簡述 / 1:63-65 連結
+  subline: '#BBBBBB', // node 1:53 菁培｜設計戰國策｜…
+  badgeBorder: '#444444', // node 1:56 徽章邊框
+  badgeText: '#AAAAAA', // node 1:60 徽章字 + 圖示
+  copyright: '#666666', // node 1:80
 };
 
 /** 版權文字共用樣式（字級依設計稿 11px；色彩 #5C5C5C 維持 AA） */

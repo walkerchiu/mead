@@ -57,15 +57,15 @@ export function PlanStatsBar({ stats }: PlanStatsBarProps) {
               gap: '7.15px',
               textAlign: 'center',
               // 分隔線：每列首欄不帶、其餘帶（依當前斷點欄數）
-              borderLeft: i % 2 === 1 ? '1px solid #ececec' : 'none',
+              borderLeft: i % 2 === 1 ? '1px solid #333333' : 'none',
               // 末項橫跨該列剩餘欄數
               ...(isLast && { gridColumn: `span ${lastSpan2}` }),
               [portalTokens.mq.mobileUp]: {
-                borderLeft: i % 3 !== 0 ? '1px solid #ececec' : 'none',
+                borderLeft: i % 3 !== 0 ? '1px solid #333333' : 'none',
                 ...(isLast && { gridColumn: `span ${lastSpan3}` }),
               },
               [portalTokens.mq.tabletUp]: {
-                borderLeft: i === 0 ? 'none' : '1px solid #ececec',
+                borderLeft: i === 0 ? 'none' : '1px solid #333333',
                 ...(isLast && { gridColumn: 'span 1' }),
               },
             }}
@@ -99,11 +99,11 @@ export function PlanStatsBar({ stats }: PlanStatsBarProps) {
             <Typography
               component="p"
               sx={{
-                // 原 7.15px 太小；#666 on #FFF ≈ 5.74:1 OK 但字級放大至 12。
+                // 依設計稿 node 1:124 — 說明 #666（字級放大至 12 維持可讀）
                 fontSize: 12,
                 fontWeight: 400,
                 lineHeight: 1.4,
-                color: '#5C5C5C',
+                color: '#666666',
               }}
             >
               {stat.description}
