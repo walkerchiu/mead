@@ -80,7 +80,10 @@ function buildStarTexture(img: HTMLImageElement): THREE.CanvasTexture | null {
   ctx.drawImage(img, dx, dy, dw, dh);
   ctx.restore();
   const texture = new THREE.CanvasTexture(tc);
-  texture.colorSpace = THREE.SRGBColorSpace;
+  // 不要標成 SRGB：自訂 ShaderMaterial 直通輸出、Three.js 不會對其再做 linear→sRGB
+  // 編碼；若標 SRGB 會讓取樣時硬體先 sRGB→linear 解碼一次卻不回編 → 畫面變暗（≈原值
+  // ^2.2、偏濃）。標為 Linear（不解碼）讓 texture2D 回傳原始 sRGB 值直通，色彩與原圖一致。
+  texture.colorSpace = THREE.LinearSRGBColorSpace;
   return texture;
 }
 
@@ -191,37 +194,20 @@ const VERTEX_SHADER = `
   }
 `;
 
-// 忠實移植 prototype 的片段 shader：背面灰階、摺痕陰影、流動高光（加 uHasMap 守門）。
+// 片段 shader：忠實輸出原圖色彩，正反面皆呈現照片本色，不做灰階、明暗或高光等
+// 色調處理；翻折立體感全由頂點 shader 的幾何形變表現，照片色與原素材一致。
 const FRAGMENT_SHADER = `
   uniform sampler2D uMap;
-  uniform float uProgress;
   uniform float uHasMap;
 
   varying vec2 vUv;
-  varying float vShade;
-  varying float vCurl;
-  varying float vCrease;
-  varying float vBackSide;
 
   void main() {
     if (uHasMap < 0.5) discard;
     vec4 tex = texture2D(uMap, vUv);
     if (tex.a < 0.04) discard;
 
-    vec3 gray = vec3(dot(tex.rgb, vec3(0.299, 0.587, 0.114)));
-    vec3 backColor = mix(vec3(0.84), gray, 0.24);
-    vec3 faceColor = tex.rgb * vShade;
-
-    float backMix = (gl_FrontFacing ? 0.0 : 1.0) * (1.0 - smoothstep(0.62, 0.95, uProgress));
-    backMix = clamp(backMix + vBackSide * 0.72, 0.0, 0.82);
-    float sheen = smoothstep(0.0, 0.42, vUv.x + vUv.y + uProgress * 0.62) * (1.0 - smoothstep(0.44, 0.82, vUv.x + vUv.y + uProgress * 0.62));
-
-    vec3 color = mix(faceColor, backColor, backMix);
-    color *= 1.0 - vCrease * 0.28;
-    color += vec3(0.2) * sheen * vCurl * 0.22;
-    color += vec3(0.18) * vCrease * (1.0 - backMix) * 0.18;
-
-    gl_FragColor = vec4(color, tex.a);
+    gl_FragColor = vec4(tex.rgb, tex.a);
   }
 `;
 

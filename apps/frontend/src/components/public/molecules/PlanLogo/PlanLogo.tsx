@@ -1,6 +1,9 @@
 'use client';
 
 import type { ComponentType } from 'react';
+import { useEffect, useState } from 'react';
+
+import DOMPurify from 'dompurify';
 
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import FlightTakeoffOutlinedIcon from '@mui/icons-material/FlightTakeoffOutlined';
@@ -39,6 +42,71 @@ export interface PlanLogoProps {
 }
 
 /**
+ * 官方 logo 圖。SVG 來源改以「內聯（inline）」渲染：直接成為 DOM 向量節點，瀏覽器
+ * 會以裝置實際解析度重繪，故在卡片 zoom 自適應或高 DPI（Retina）下都維持銳利；
+ * 若用 `<img src=.svg>`，SVG 會先被點陣化成 bitmap，縮放時會發糊。
+ * 載入前（SSR / 抓取中）與非 SVG 來源則以 `<img>` 後備，避免版位跳動。
+ */
+function PlanLogoImage({
+  src,
+  label,
+  size,
+}: {
+  src: string;
+  label: string;
+  size: number;
+}) {
+  // 僅內聯「同源站內」的 SVG 資產（單一前導斜線的相對路徑、副檔名 .svg）；排除外部
+  // 或 protocol-relative（//）URL，避免抓取／內聯非受控來源。
+  const isInternalSvg = /^\/(?!\/)/.test(src) && /\.svg(\?|$)/i.test(src);
+  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isInternalSvg) return;
+    let cancelled = false;
+    fetch(src)
+      .then((r) => (r.ok ? r.text() : null))
+      .then((text) => {
+        if (cancelled || !text || !text.includes('<svg')) return;
+        // 縱深防禦：即便來源為自家資產，仍以 DOMPurify（SVG 設定）淨化，移除
+        // <script>、事件處理屬性、javascript: 連結等可能的注入向量後才內聯。
+        const clean = DOMPurify.sanitize(text, {
+          USE_PROFILES: { svg: true, svgFilters: true },
+        });
+        if (clean.includes('<svg')) setSvgMarkup(clean);
+      })
+      .catch(() => {
+        /* 後備保留 <img> */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [src, isInternalSvg]);
+
+  // 同寬欄對齊，並限制高度避免多行 lockup（idc/tisdc）過高
+  const sizing = {
+    display: 'block',
+    width: 'auto',
+    height: 'auto',
+    maxWidth: size * 3.9,
+    maxHeight: size * 2.1,
+  } as const;
+
+  if (isInternalSvg && svgMarkup) {
+    return (
+      <Box
+        role="img"
+        aria-label={label}
+        dangerouslySetInnerHTML={{ __html: svgMarkup }}
+        sx={{ ...sizing, '& svg': { ...sizing } }}
+      />
+    );
+  }
+
+  return <Box component="img" src={src} alt={label} sx={sizing} />;
+}
+
+/**
  * PlanLogo — 計畫識別。
  *
  * 帶 `logoSrc` 時顯示該計畫的官方 logo 組合圖（標誌＋品牌字標已含於圖中，
@@ -47,21 +115,7 @@ export interface PlanLogoProps {
 export function PlanLogo({ name, planId, logoSrc, size = 56 }: PlanLogoProps) {
   // 官方 logo 組合圖：依各計畫設計稿的橫向／直向比例自然呈現，高度依 size 等比縮放
   if (logoSrc) {
-    return (
-      <Box
-        component="img"
-        src={logoSrc}
-        alt={name.zh}
-        sx={{
-          display: 'block',
-          width: 'auto',
-          height: 'auto',
-          // 同寬欄對齊，並限制高度避免多行 lockup（idc/tisdc）過高
-          maxWidth: size * 3.9,
-          maxHeight: size * 2.1,
-        }}
-      />
-    );
+    return <PlanLogoImage src={logoSrc} label={name.zh} size={size} />;
   }
 
   const emblem = planId ? PLAN_EMBLEMS[planId] : undefined;
