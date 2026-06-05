@@ -108,6 +108,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const lockedDirRef = useRef(0); // 切換後鎖住的方向（1=往下、-1=往上、0=未鎖）；
   // 只擋同方向的慣性殘餘，反方向（刻意反轉）立即放行。
   const lockTimerRef = useRef<number | null>(null);
+  // hero → 計畫區「滾一下即一次性平滑跳轉」進行中旗標：吸收動畫期間的後續 wheel，
+  // 確保一次手勢只觸發一次跳轉（依業主需求：第一屏滾一下直接到計畫卡片區）。
+  const heroSnappingRef = useRef(false);
 
   // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
   useEffect(() => {
@@ -170,6 +173,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // （往上由下方進入時用，讓卡片從 native 捲入的位置順順往上收回卡頂、不瞬間跳動）。
   const engageAt = useCallback((index: number, atTop = true) => {
     engagedRef.current = true;
+    heroSnappingRef.current = false;
     lockedDirRef.current = 0;
     if (lockTimerRef.current) {
       window.clearTimeout(lockTimerRef.current);
@@ -222,7 +226,26 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
 
     const onWheel = (e: WheelEvent) => {
-      if (!engagedRef.current) return;
+      if (!engagedRef.current) {
+        // 在 hero（計畫區之上）往下滾一下 → 一次性平滑跳到計畫區並釘住第一張，
+        // 不讓使用者慢慢手動往下捲（依業主需求）。抵達由 onScroll 跨越偵測釘住，
+        // 700ms timeout 為後備（涵蓋 segLen 尚未量到、跨越事件未觸發的情況）。
+        const bt = blockTop();
+        if (window.scrollY < bt - 4) {
+          const dySnap = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
+          if (dySnap > 0) {
+            e.preventDefault();
+            if (heroSnappingRef.current) return;
+            heroSnappingRef.current = true;
+            window.scrollTo({ top: bt, behavior: 'smooth' });
+            window.setTimeout(() => {
+              if (!engagedRef.current) engageAt(0);
+              heroSnappingRef.current = false;
+            }, 700);
+          }
+        }
+        return;
+      }
       const seg = segLenRef.current;
       if (seg <= 0) return;
       // 行模式（部分瀏覽器）換算成像素，避免一次只動幾 px。
