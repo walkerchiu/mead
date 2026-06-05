@@ -1,38 +1,25 @@
 import { ReactNode } from 'react';
-import { Inter, Noto_Sans_TC, Roboto, Roboto_Mono } from 'next/font/google';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { GlobalLoadingProgress } from '@/components/atoms/GlobalLoadingProgress';
 import { ClientErrorBoundary } from '@/components/errors';
 import { headers } from 'next/headers';
+// 自帶字體（@fontsource，從 npm 取得、隨映像打包）：Docker build 不向 fonts.gstatic.com
+// 抓取字體子集，避免在受限網路 / 模擬建置下因 gstatic 連線失敗導致 build 中斷。
+// 字族名（Inter / Roboto / Roboto Mono / Noto Sans TC）對應 globals.css 與 theme
+// typography 的 --font-* 變數。權重 400 / 500 / 700 與原設定一致。
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import '@fontsource/roboto-mono/400.css';
+import '@fontsource/roboto-mono/500.css';
+import '@fontsource/roboto-mono/700.css';
+import '@fontsource/noto-sans-tc/400.css';
+import '@fontsource/noto-sans-tc/500.css';
+import '@fontsource/noto-sans-tc/700.css';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-  variable: '--font-inter',
-});
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-  variable: '--font-roboto',
-});
-
-const notoSansTc = Noto_Sans_TC({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-  variable: '--font-noto-sans-tc',
-});
-
-const robotoMono = Roboto_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  display: 'swap',
-  variable: '--font-roboto-mono',
-});
 
 export default async function RootLayout({
   children,
@@ -59,10 +46,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html
-      lang={locale}
-      className={`${inter.variable} ${roboto.variable} ${notoSansTc.variable} ${robotoMono.variable}`}
-    >
+    <html lang={locale}>
       <head>
         {/*
           Blocking script to prevent theme flashing (FOUC)

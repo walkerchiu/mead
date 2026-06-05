@@ -12,7 +12,11 @@ FROM base AS builder
 # 複製整個 workspace（monorepo 建置需要 lockfile、workspace 設定、共用 packages）
 COPY . .
 RUN pnpm install --frozen-lockfile --filter @mead/frontend...
-RUN pnpm --filter @mead/frontend build
+# 快取 Next 建置快取（含 next/font/google 抓取的字體子集）：gstatic 對上百個
+# Noto Sans TC 子集的並發請求偶有節流／丟包，掛載快取讓已抓到的子集跨建置累積，
+# 避免每次都得一次抓齊、降低字體抓取失敗導致 build 中斷的機率。
+RUN --mount=type=cache,target=/app/apps/frontend/.next/cache \
+  pnpm --filter @mead/frontend build
 
 # ---- 執行階段（最小映像）----
 FROM base AS runner

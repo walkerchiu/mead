@@ -4,6 +4,15 @@
   margin: 0;
 }
 
+:root {
+  /* 自帶字體字族名（對應 layout.tsx 的 @fontsource import）；供下方 font-family
+     與 theme typography 的 var(--font-*) 解析，取代原 next/font 注入的變數。 */
+  --font-inter: 'Inter';
+  --font-roboto: 'Roboto';
+  --font-noto-sans-tc: 'Noto Sans TC';
+  --font-roboto-mono: 'Roboto Mono';
+}
+
 html,
 body {
   max-width: 100vw;
