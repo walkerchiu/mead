@@ -38,7 +38,7 @@ const BASE_LABEL_GROUPS: BaseLabelGroup[] = [
   },
   {
     position: 'end',
-    lines: [{ text: '台灣的創造力，' }, { text: '走向世界', align: 'end' }],
+    lines: [{ text: '臺灣的創造力，' }, { text: '走向世界', align: 'end' }],
   },
 ];
 
@@ -282,16 +282,29 @@ export function DecorativeTextCloud({
   const [hovered, setHovered] = useState<number | null>(null);
   const [photoIdx, setPhotoIdx] = useState(0);
 
-  // hero 三色塊各自對應一個計畫（色塊 i ↔ shapeContents[i]）。hover 某色塊時，
-  // 整片雲的裝飾文字切換為「該色塊計畫」的詞、該色塊翻出「該色塊計畫」的照片；
-  // 未 hover 時裝飾文字回到 defaultIndex（目前作用中計畫）。
+  // hover 某色塊時，該色塊翻出「該色塊計畫」的照片（照片仍隨 hover 顯示）。
   const displayedIndex = hovered ?? defaultIndex;
+
+  // 整片雲的裝飾文字：每次進入頁面隨機呈現一組（色塊計畫的詞），不隨 hover 切換。
+  // Math.random 僅於掛載後（client）執行，避免 SSR / hydration 取值不一致；定前先
+  // 以 defaultIndex 佔位，定後就地更新固定數量的字 span（不重跑入場動畫）。
+  const [randomGroup, setRandomGroup] = useState<number | null>(null);
+  const textIndex = randomGroup ?? defaultIndex;
 
   // 各色塊對應計畫的照片陣列（index 對應色塊 = 計畫）。
   const photosByShape = useMemo(
     () => [0, 1, 2].map((i) => shapeContents[i]?.photos ?? []),
     [shapeContents],
   );
+
+  // 進場隨機挑一組「有詞」的裝飾文字。
+  useEffect(() => {
+    const candidates = [0, 1, 2].filter(
+      (i) => (shapeContents[i]?.words?.length ?? 0) > 0,
+    );
+    if (!candidates.length) return;
+    setRandomGroup(candidates[Math.floor(Math.random() * candidates.length)]);
+  }, [shapeContents]);
 
   // 直向佈局判斷 — SSR 與首次 client render 皆為橫向，掛載後再依視窗校正，
   // 避免 hydration 不一致。
@@ -320,11 +333,11 @@ export function DecorativeTextCloud({
     [shapeContents],
   );
 
-  // 整片雲顯示「目前作用中計畫」的裝飾文字位置（hover 切換 → displayedIndex 改變
-  // → 重算）。每個字只出現一組、不重複、不隨機換詞。詞數少於 maxWords 時，
-  // 以隱藏佔位補齊到固定長度（沿用最後一個位置、visibility 控制顯隱）。
+  // 整片雲顯示「進場隨機選定那組」的裝飾文字位置（textIndex 改變 → 重算）。每個字
+  // 只出現一組、不重複、不隨機換詞。詞數少於 maxWords 時，以隱藏佔位補齊到固定
+  // 長度（沿用最後一個位置、visibility 控制顯隱）。
   const positions = useMemo(() => {
-    const texts = (shapeContents[displayedIndex]?.words ?? [])
+    const texts = (shapeContents[textIndex]?.words ?? [])
       .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
       .filter((t): t is string => Boolean(t));
     const placed = placeWords(texts, vertical);
@@ -342,7 +355,7 @@ export function DecorativeTextCloud({
       hidden: true,
     }));
     return [...placed, ...padded];
-  }, [shapeContents, displayedIndex, language, vertical, maxWords]);
+  }, [shapeContents, textIndex, language, vertical, maxWords]);
 
   // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
   // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
@@ -638,7 +651,8 @@ export function DecorativeTextCloud({
                   fill="transparent"
                   onMouseEnter={() => handleEnter(i)}
                   onMouseLeave={() => handleLeave(i)}
-                  style={{ cursor: photo ? 'pointer' : 'default' }}
+                  // 沿用頁面自訂 portal 游標，hover 色塊不改成 pointer 或系統預設。
+                  style={{ cursor: 'inherit' }}
                 />
               </g>
             </g>
@@ -747,7 +761,7 @@ export function DecorativeTextCloud({
       {/* 底部固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40：
           - 左塊（regular）：ART x DESIGN / Gateway（兩行）
           - 中塊（bold）：Taiwan（一行，粗體強調）
-          - 右塊（regular）：台灣的創造力，（左）/ 走向世界（右靠縮進）
+          - 右塊（regular）：臺灣的創造力，（左）/ 走向世界（右靠縮進）
           三塊以絕對定位精準錨點，而非 space-between，避免被視口寬度均勻拉開；
           top-aligned 讓第二行自然下沉，產生高低錯落。
           Vertical 直向佈局仍是兩欄堆疊（左頂 + 右底），手機版邏輯不變。 */}
@@ -876,7 +890,7 @@ export function DecorativeTextCloud({
             Taiwan
           </Box>
 
-          {/* 右塊：台灣的創造力，/ 走向世界 — 對齊 Figma 1:38
+          {/* 右塊：臺灣的創造力，/ 走向世界 — 對齊 Figma 1:38
               x=805/1440 = 55.9% 至 x=1028/1440 = 71.4%（right edge）
               即 left=55.9%, right=28.6% from container right */}
           <Box
@@ -901,7 +915,7 @@ export function DecorativeTextCloud({
                 mixBlendMode: 'difference',
               }}
             >
-              台灣的創造力，
+              臺灣的創造力，
             </Box>
             <Box
               component="span"

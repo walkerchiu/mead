@@ -10,7 +10,7 @@ import { portalTokens } from '../../tokens';
 export interface PortalIntroSectionProps {
   /** 上方小標，預設「教育部藝術設計三大計畫」 */
   eyebrow?: string;
-  /** 主標題（可含橘色關鍵字節點），預設「為台灣藝術設計開啟更多可能」 */
+  /** 主標題（可含橘色關鍵字節點），預設「為臺灣藝術設計開啟更多可能」 */
   heading?: ReactNode;
   /** 主標識別鍵 — 變動時觸發淡入淡出交疊過場（依設計師 spec） */
   headingKey?: string;
@@ -55,7 +55,7 @@ export const SLOGAN_EXIT_MS = 3700;
  */
 export function PortalIntroSection({
   eyebrow = '教育部藝術設計三大計畫',
-  heading = '為台灣藝術設計開啟更多可能',
+  heading = '為臺灣藝術設計開啟更多可能',
   headingKey,
   exiting = false,
 }: PortalIntroSectionProps) {

@@ -31,16 +31,19 @@ export interface PortalFooterProps {
 }
 
 /** 品牌副標 — 三大計畫名（依 Figma node 1:53） */
-const BRAND_SUBLINE = '菁培計畫｜設計戰國策｜台灣國際學生創意設計大賽';
+const BRAND_SUBLINE = '菁培計畫｜設計戰國策｜臺灣國際學生創意設計大賽';
 
 /** 連結欄位（依 Figma node 1:47）：計畫連結三個計畫官網 + 關於我們教育部官網。 */
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
     title: '計畫連結',
     links: [
-      { label: '菁培計畫', href: 'https://www.animlab.yuntech.edu.tw/sposad/' },
+      {
+        label: '藝術與設計菁英海外培訓計畫',
+        href: 'https://www.animlab.yuntech.edu.tw/sposad/',
+      },
       { label: '設計戰國策', href: 'https://www.moe-idc.org/' },
-      { label: '台灣國際學生創意設計大賽', href: 'https://www.tisdc.org/' },
+      { label: '臺灣國際學生創意設計大賽', href: 'https://www.tisdc.org/' },
     ],
   },
   {
@@ -72,7 +75,7 @@ const copyrightSx = { fontSize: 11, color: C.copyright } as const;
  */
 export function PortalFooter({
   siteName = '教育部藝術設計計畫資訊網',
-  tagline = '教育部藝術與設計人才培育計畫入口網，致力於推動台灣藝術設計教育發展。',
+  tagline = '教育部藝術與設計人才培育計畫入口網，致力於推動臺灣藝術設計教育發展。',
   columns = DEFAULT_COLUMNS,
   copyright = `Copyright ${new Date().getFullYear()} . All Rights Reserved.`,
 }: PortalFooterProps) {
@@ -245,8 +248,8 @@ export function PortalFooter({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
-                  // ≥834px：欄寬依設計稿，使「台灣國際學生創意設計大賽」折成
-                  // 兩行（台灣國際學生創 / 意設計大賽）。minWidth:0 允許視窗極窄
+                  // ≥834px：欄寬依設計稿，使「臺灣國際學生創意設計大賽」折成
+                  // 兩行（臺灣國際學生創 / 意設計大賽）。minWidth:0 允許視窗極窄
                   // 時縮排換行，避免擠爆版面。
                   [portalTokens.mq.tabletUp]: { width: 100, minWidth: 0 },
                 }}

@@ -668,7 +668,7 @@
           "deviceInfo": "設備資訊",
           "deviceInfoPlaceholder": "例如：Chrome、iPhone",
           "location": "地理位置",
-          "locationPlaceholder": "例如：台灣",
+          "locationPlaceholder": "例如：臺灣",
           "revokedMethod": "撤銷方式",
           "revokedMethodHint": "已撤銷的細節",
           "revokedMethods": {
@@ -1230,7 +1230,7 @@
   },
   "portal": {
     "eyebrow": "教育部藝術設計三大計畫",
-    "heading": "為台灣藝術設計開啟更多可能",
+    "heading": "為臺灣藝術設計開啟更多可能",
     "viewingPlan": "目前查看：{name}",
     "learnMore": "了解更多",
     "loading": "計畫資料載入中…",
@@ -1238,7 +1238,7 @@
     "retry": "重新載入",
     "footer": {
       "siteName": "教育部藝術設計計畫資訊網",
-      "tagline": "教育部藝術與設計人才培育計畫入口網\n致力於推動台灣藝術設計教育發展",
+      "tagline": "教育部藝術與設計人才培育計畫入口網\n致力於推動臺灣藝術設計教育發展",
       "copyright": "Copyright {year} . All Rights Reserved."
     },
     "detail": {
