@@ -466,6 +466,12 @@ export function PaperFlipStar({
         overflow: 'visible',
         // z-index 由 rAF 依翻折進度設定（見 loop）；靜止在卡後、翻折抬到卡前
         zIndex: 0,
+        // 依 Figma 裝飾星形（node 1:3/1:4/1:5）opacity 60%：靜止時融入灰底、
+        // 照片色調與設計稿一致；hover 翻出特寫時還原全不透明。
+        opacity: 0.6,
+        transition: 'opacity 0.4s ease',
+        '&:hover': { opacity: 1 },
+        '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
       }}
     >
       <canvas
