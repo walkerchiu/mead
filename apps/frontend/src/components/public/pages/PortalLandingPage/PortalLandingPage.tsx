@@ -43,10 +43,15 @@ const PIN_TOP_PAD = 120;
  * 即每張卡的捲動量 = 卡片可捲距離 + 此距離；捲超過後才切下一張並回到頂端。
  */
 const DWELL_PX = 100;
-/** 自適應第二屏：卡片底部留白（px）；可用高 = 視窗高 − PIN_TOP_PAD − 此值。 */
-const PIN_BOTTOM_PAD = 24;
-/** 自適應縮放下限：避免極矮視窗把卡片縮到難以閱讀。 */
+/**
+ * 自適應第二屏的對稱留白基準（px，未縮放）。縮放倍率以
+ * scale = 視窗高 /（卡片自然高 + 2×此值）計算 → 卡片依高度比例放大／縮小填滿，
+ * 上下留白 = 此值×scale（對稱），且足以容納卡片上緣溢出的裝飾星形（最高約 112px）。
+ */
+const FIT_MARGIN_BASE = 130;
+/** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
+const MAX_CARD_SCALE = 2;
 /**
  * 往上倒退的觸發距離（px）：捲到卡頂後，還要再往上捲過此距離（卡片往下滑、上方露出
  * 空隙）才倒退上一張。上一張從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距）。
@@ -211,15 +216,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const vh = window.innerHeight;
       // 還原自然高度：zoom 會讓 scrollHeight 變成縮放後高度，除以目前已套用倍率還原。
       const natural = wrap.scrollHeight / (appliedScaleRef.current || 1);
-      // 自適應第二屏：可用高 = 視窗 − 上方星形內距 − 底部留白；超出才等比縮小。
-      const avail = vh - PIN_TOP_PAD - PIN_BOTTOM_PAD;
-      const scale =
-        natural > avail ? Math.max(MIN_CARD_SCALE, avail / natural) : 1;
+      // 依高度比例放大／縮小填滿第二屏：scale = 視窗高 /（卡片自然高 + 2×留白基準），
+      // 卡片視覺高 = natural×scale，上下各留 FIT_MARGIN_BASE×scale 的對稱留白
+      // （含裝飾星形上緣淨空）；夾在縮放上下限內。
+      const raw = vh / (natural + 2 * FIT_MARGIN_BASE);
+      const scale = Math.min(MAX_CARD_SCALE, Math.max(MIN_CARD_SCALE, raw));
       appliedScaleRef.current = scale;
       setCardScale(scale);
-      // 縮放後的視覺高；填入一屏後 cardMax≈0，段內 reveal 自然停用、捲動僅切換卡片。
-      const scaledH = natural * scale;
-      const cardMax = Math.max(0, scaledH - (vh - PIN_TOP_PAD));
+      // 卡片填入一屏後段內無需 reveal，捲動僅作離散切換。
+      const cardMax = Math.max(0, natural * scale - vh);
       segLenRef.current = cardMax + DWELL_PX;
     };
     measure();
@@ -654,8 +659,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             sx={{
               height: '100vh',
               overflow: 'hidden',
-              pt: `${PIN_TOP_PAD}px`,
               boxSizing: 'border-box',
+              // 卡片在第二屏內垂直置中：各視窗高度都不靠頂留大片空白。卡片依高度比例
+              // 由 cardScale（zoom）放大／縮小填滿，置中後上下自然形成對稱留白
+              // （= FIT_MARGIN_BASE×scale，含裝飾星形上緣淨空）。
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
             }}
           >
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>

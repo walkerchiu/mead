@@ -110,11 +110,9 @@ function peekSx(direction: 'prev' | 'next') {
     display: 'none',
     position: 'absolute',
     top: 0,
-    // peek 是固定不隨 reveal 平移的邊緣預覽條；卡片區本身高於視窗（靠捲動 reveal
-    // 逐段露出），若用 bottom:0 撐滿整個卡片區，peek 底部圓角會落在釘住視窗
-    // （100vh）之外被裁掉。改以視窗高度收斂高度，讓上下圓角框線都在可見範圍內。
-    // 160 = 頂部 PIN_TOP_PAD(120) + 底部留白(40)。
-    height: 'calc(100vh - 160px)',
+    bottom: 0,
+    // peek 與卡片同高：top/bottom:0 撐滿 carousel 根（其高度 = 卡片 zoom 後的高度），
+    // 故 peek 隨卡片縮放與置中一起對齊，上下圓角框線自然落在可見視窗內。
     width: 760,
     p: 0,
     border: 'none',
@@ -182,8 +180,11 @@ function peekSx(direction: 'prev' | 'next') {
 export function PlanCardWithStars({
   plan,
   showStars = true,
+  cardScale = 1,
 }: {
   plan: Plan;
+  /** 卡片自適應放大倍率（≥1）；轉傳給星形以同步提高其 WebGL 解析度。 */
+  cardScale?: number;
   /**
    * 是否渲染周圍裝飾星形照片。點擊展開的左下滑入過場 overlay 設為 false：
    * 星形（PaperFlipStar）是 WebGL，掛載要建 context + 載貼圖才會顯示，過場
@@ -211,6 +212,7 @@ export function PlanCardWithStars({
             topPx={s.y}
             // 星形中心在 760 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
             flipDir={s.x + STAR_SIZE / 2 < 380 ? -1 : 1}
+            scale={cardScale}
           />
         ) : null,
       )}
@@ -1117,7 +1119,8 @@ export function PlanCarousel({
           // 自適應第二屏：卡片內容高於一屏時等比縮小填入（只縮卡片，不含兩側 peek）。
           // 用 zoom 而非 transform:scale —— zoom 會以最終尺寸重新排版／重繪，SVG logo
           // 與文字維持銳利；transform:scale 會把已點陣化的 SVG 再縮放而變糊。
-          zoom: cardScale < 1 ? cardScale : undefined,
+          // 放大與縮小都套用（依高度比例填滿第二屏）；星形 canvas 另以 pixelRatio 補償。
+          zoom: cardScale !== 1 ? cardScale : undefined,
         }}
       >
         <Box
@@ -1162,7 +1165,7 @@ export function PlanCarousel({
                   },
                 }}
               >
-                <PlanCardWithStars plan={exitingPlan} />
+                <PlanCardWithStars plan={exitingPlan} cardScale={cardScale} />
               </Box>
             </Box>
           )}
@@ -1206,7 +1209,7 @@ export function PlanCarousel({
                 },
               }}
             >
-              <PlanCardWithStars plan={activePlan} />
+              <PlanCardWithStars plan={activePlan} cardScale={cardScale} />
             </Box>
           </Box>
         </Box>

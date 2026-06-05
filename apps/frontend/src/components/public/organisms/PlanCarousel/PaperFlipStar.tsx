@@ -29,6 +29,8 @@ export interface PaperFlipStarProps {
   topPx: number;
   /** 弧線甩出方向：+1 往右、-1 往左（背向卡片中心） */
   flipDir: number;
+  /** 卡片自適應放大倍率（≥1）；放大時同步拉高 WebGL pixelRatio 讓星形維持銳利。 */
+  scale?: number;
 }
 
 /** 平面分段數 — 越高捲曲越平滑 */
@@ -38,7 +40,8 @@ const CANVAS = 1000;
 /** hover 放大倍率（prototype START 297 → END 394 ≈ 1.33） */
 const GROW = 1.33;
 /** 貼圖解析度（含星形 alpha） */
-const TEX_SIZE = 512;
+// 貼圖解析度：來源照片為 2000px，取 1024 讓卡片放大填滿大螢幕時星形仍有足夠細節。
+const TEX_SIZE = 1024;
 
 /** 在 2D context 上畫出 24 角鋸齒星形路徑（與舊版 STAR_CLIP 一致） */
 function traceStar(ctx: CanvasRenderingContext2D, w: number, h: number) {
@@ -225,6 +228,7 @@ export function PaperFlipStar({
   leftPx,
   topPx,
   flipDir,
+  scale = 1,
 }: PaperFlipStarProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -258,7 +262,14 @@ export function PaperFlipStar({
     } catch {
       return;
     }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+    // 基礎 pixelRatio 取 min(dpr,1.5)，並乘上卡片放大倍率，讓放大填滿時星形 canvas
+    // 的點陣解析度同步提高而不糊；上限 3 以免大螢幕記憶體/GPU 負擔過重。
+    renderer.setPixelRatio(
+      Math.min(
+        Math.min(window.devicePixelRatio || 1, 1.5) * Math.max(1, scale),
+        3,
+      ),
+    );
     renderer.setSize(CANVAS, CANVAS, false);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -402,6 +413,21 @@ export function PaperFlipStar({
       renderer.dispose();
     };
   }, [size, flipDir]);
+
+  // 卡片放大倍率變動時，更新既有 renderer 的 pixelRatio（不重建 context、不丟失貼圖），
+  // 讓星形 canvas 的點陣解析度隨放大同步提高，維持銳利。
+  useEffect(() => {
+    const gfx = gfxRef.current;
+    if (!gfx) return;
+    gfx.renderer.setPixelRatio(
+      Math.min(
+        Math.min(window.devicePixelRatio || 1, 1.5) * Math.max(1, scale),
+        3,
+      ),
+    );
+    gfx.renderer.setSize(CANVAS, CANVAS, false);
+    gfx.draw();
+  }, [scale]);
 
   // 載入 / 更換貼圖（切換計畫時只換貼圖，重用既有 context）
   useEffect(() => {
