@@ -176,14 +176,12 @@ export function PlanCard({ plan }: PlanCardProps) {
             <Typography
               component="p"
               sx={{
-                // <834px 依 Figma node 43:406 為 12px；≥834px 依 node 1:115 為 14px
-                // （皆 Inter Regular / line-height 1.8）
-                fontSize: 12,
+                // 描述 Inter Regular 16px / line-height 1.8
+                fontSize: 16,
                 lineHeight: 1.8,
                 color: '#000000',
                 // 全形標點不擠壓（與 Figma 同），斷行點才會與設計稿一致
                 textSpacingTrim: 'space-all',
-                [portalTokens.mq.tabletUp]: { fontSize: 14 },
               }}
             >
               {plan.intro}
@@ -196,10 +194,10 @@ export function PlanCard({ plan }: PlanCardProps) {
                   [portalTokens.mq.tabletUp]: { mt: '34px' },
                 }}
               >
-                {/* 依設計師最新稿（heroSubtitle）— Inter Regular 12px / line-height 1.8 */}
+                {/* 執行單位 Inter Regular 14px / line-height 1.8 */}
                 <Typography
                   component="p"
-                  sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                  sx={{ fontSize: 14, lineHeight: 1.8, color: '#000000' }}
                 >
                   執行單位：
                 </Typography>
@@ -207,7 +205,7 @@ export function PlanCard({ plan }: PlanCardProps) {
                   <Typography
                     key={org}
                     component="p"
-                    sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                    sx={{ fontSize: 14, lineHeight: 1.8, color: '#000000' }}
                   >
                     {org}
                   </Typography>
