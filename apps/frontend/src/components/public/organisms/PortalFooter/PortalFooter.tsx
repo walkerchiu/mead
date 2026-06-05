@@ -55,7 +55,8 @@ const C = {
   link: '#888888', // node 1:54 簡述 / 1:63-65 連結
   subline: '#BBBBBB', // node 1:53 菁培｜設計戰國策｜…
   badgeBorder: '#444444', // node 1:56 徽章邊框
-  badgeText: '#AAAAAA', // node 1:60 徽章字 + 圖示
+  badgeText: '#AAAAAA', // node 1:60 徽章文字
+  badgeIcon: '#B8860B', // node 1:57 shield-check 圖示（金色）
   copyright: '#666666', // node 1:80
 };
 
@@ -196,7 +197,7 @@ export function PortalFooter({
                 py: 0.5,
               }}
             >
-              <GppGoodOutlinedIcon sx={{ fontSize: 14, color: C.badgeText }} />
+              <GppGoodOutlinedIcon sx={{ fontSize: 14, color: C.badgeIcon }} />
               <Typography
                 component="span"
                 sx={{ fontSize: 11, fontWeight: 500, color: C.badgeText }}
