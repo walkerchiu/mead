@@ -10,6 +10,7 @@ import type { Plan } from '@/types/plan';
 import { AnimatedSlogan } from '../../atoms/AnimatedSlogan';
 import { LearnMoreButton } from '../../atoms/LearnMoreButton';
 import { PlanLogo } from '../../molecules/PlanLogo';
+import { PlanStatsBar } from '../../molecules/PlanStatsBar';
 import { PlanTimeline } from '../../molecules/PlanTimeline';
 import { SocialLinkBar } from '../../molecules/SocialLinkBar';
 import { StatsMarquee } from '../../molecules/StatsMarquee';
@@ -32,7 +33,16 @@ const FROSTED = {
   borderRadius: '17.35px',
 } as const;
 
-/** 計畫標語：優先 slogan，其次以裝飾性文字首句替代 */
+/**
+ * 各計畫主標的文字框寬度（手機版用，依 Figma 各卡標題節點）：控制主標斷行。
+ */
+const HEADLINE_WIDTH: Record<string, number> = {
+  sposad: 195,
+  idc: 195,
+  tisdc: 249,
+};
+
+/** 計畫主標／標語：優先 slogan，其次以裝飾性文字首句替代 */
 function getHeadline(plan: Plan): string {
   return (
     plan.slogan.zh ??
@@ -53,19 +63,174 @@ function getCardImage(plan: Plan): string | null {
 }
 
 /**
- * PlanCard — 三大計畫介紹卡片（依設計師新版稿 Figma node 1:2 — 卡片左右拉伸）。
+ * 手機版（<834px）卡片 — 維持改版前的原始版面：單欄堆疊、主標 h2、橫列數據成果
+ * （PlanStatsBar）、內縮 banner、社群連結列。設計師新版僅更新桌機版面，手機版沿用原樣。
+ */
+function PlanCardMobile({ plan }: PlanCardProps) {
+  const headline = getHeadline(plan);
+  const cardImage = getCardImage(plan);
+  const [sloganNonce, setSloganNonce] = useState(0);
+
+  return (
+    <Box
+      onMouseEnter={() => setSloganNonce((n) => n + 1)}
+      sx={{ position: 'relative', width: '100%' }}
+    >
+      {/* 卡片一 — 識別 / 簡介 / 執行單位 / 時程 */}
+      <Box
+        sx={{
+          ...FROSTED,
+          position: 'relative',
+          pt: '28px',
+          pb: '42px',
+          px: '24px',
+        }}
+      >
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '47px' }}>
+          {/* 識別 + 主標 */}
+          <Box sx={{ minWidth: 0 }}>
+            <PlanLogo
+              name={plan.name}
+              planId={plan.id}
+              logoSrc={plan.logoUrl}
+            />
+            <Typography
+              component="h2"
+              sx={{
+                mt: '47px',
+                // 依 Figma node 1:117 — Inter Medium 20px / line-height 1.8
+                fontSize: 20,
+                fontWeight: 500,
+                lineHeight: 1.8,
+                color: '#000000',
+                ...(HEADLINE_WIDTH[plan.id]
+                  ? { width: `${HEADLINE_WIDTH[plan.id]}px` }
+                  : {}),
+              }}
+            >
+              <AnimatedSlogan key={sloganNonce} text={headline} />
+            </Typography>
+          </Box>
+
+          {/* 簡介 + 執行單位 */}
+          <Box sx={{ minWidth: 0 }}>
+            <Typography
+              component="p"
+              sx={{
+                fontSize: 14,
+                lineHeight: 1.8,
+                color: '#000000',
+                textSpacingTrim: 'space-all',
+              }}
+            >
+              {plan.intro}
+            </Typography>
+            {plan.organizers.length > 0 && (
+              <Box sx={{ mt: '47px' }}>
+                <Typography
+                  component="p"
+                  sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                >
+                  執行單位：
+                </Typography>
+                {plan.organizers.map((org) => (
+                  <Typography
+                    key={org}
+                    component="p"
+                    sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                  >
+                    {org}
+                  </Typography>
+                ))}
+              </Box>
+            )}
+          </Box>
+        </Box>
+
+        {/* 時程 */}
+        <Box sx={{ mt: 3 }}>
+          <PlanTimeline />
+        </Box>
+
+        {/* 了解更多 — 時程下方靠右 */}
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
+          <LearnMoreButton tilt={-4.86} href={plan.officialUrl} />
+        </Box>
+      </Box>
+
+      {/* 卡片二 — 數據成果（橫列）/ 代表圖 / 社群連結 */}
+      <Box
+        sx={{
+          ...FROSTED,
+          position: 'relative',
+          mt: '10px',
+          pt: '36px',
+          pb: '12px',
+        }}
+      >
+        <Box sx={{ px: '16px' }}>
+          <PlanStatsBar stats={plan.stats} />
+        </Box>
+
+        {cardImage ? (
+          <Box
+            component="img"
+            src={cardImage}
+            alt={`${plan.name.zh} 代表圖`}
+            loading="lazy"
+            sx={{
+              display: 'block',
+              mt: '26px',
+              mx: '12px',
+              width: 'calc(100% - 24px)',
+              aspectRatio: '752 / 287',
+              objectFit: 'cover',
+              borderRadius: '10px',
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              mt: '26px',
+              mx: '12px',
+              width: 'calc(100% - 24px)',
+              aspectRatio: '752 / 287',
+              borderRadius: '10px',
+              background: `linear-gradient(120deg, ${portalTokens.color.blobOrangeFrom}, ${portalTokens.color.blobOrangeTo})`,
+            }}
+          />
+        )}
+
+        <Box
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            bottom: '-22px',
+            transform: 'translateX(-50%)',
+            zIndex: 2,
+          }}
+        >
+          <SocialLinkBar
+            socialLinks={plan.socialLinks}
+            learnMoreHref={plan.officialUrl}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+/**
+ * 桌機版（≥834px）卡片 — 設計師新版稿（Figma node 1:2）：卡片左右拉伸。
  *
- * - 卡片一（960×441）：三欄 — 左 logo＋標語｜中 描述｜右 執行單位；右上角「了解更多」；
+ * - 卡片一（960×441）：三欄 — 左 logo＋標語｜中 描述｜右 執行單位；右欄下方「了解更多」；
  *   下方時程軸。
  * - 卡片二（960×314）：左窄欄數據成果（垂直跑馬燈）＋右側大代表圖 banner；社群連結列
  *   疊於底緣。
- * <834px 退為單欄堆疊。三個計畫共用此版面（依設計師：其他計畫同菁培）。
  */
-export function PlanCard({ plan }: PlanCardProps) {
+function PlanCardDesktop({ plan }: PlanCardProps) {
   const headline = getHeadline(plan);
   const cardImage = getCardImage(plan);
-
-  // slogan 動畫重播計數 — 初次掛載播放一次，hover 卡片時再次重播
   const [sloganNonce, setSloganNonce] = useState(0);
 
   return (
@@ -78,38 +243,23 @@ export function PlanCard({ plan }: PlanCardProps) {
         sx={{
           ...FROSTED,
           position: 'relative',
-          pt: '28px',
+          pt: '40px',
+          pr: '40px',
           pb: '36px',
-          px: '24px',
-          [portalTokens.mq.tabletUp]: {
-            pt: '40px',
-            pr: '40px',
-            pb: '36px',
-            pl: '36px',
-          },
+          pl: '36px',
         }}
       >
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
-            gap: '40px',
-            // ≥834px：三欄並列（logo＋標語｜描述｜執行單位），欄距自動分配
-            [portalTokens.mq.tabletUp]: {
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              gap: '48px',
-            },
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '48px',
           }}
         >
           {/* 欄一：識別 + 標語 */}
-          <Box
-            sx={{
-              minWidth: 0,
-              [portalTokens.mq.tabletUp]: { flex: '0 0 218px' },
-            }}
-          >
+          <Box sx={{ minWidth: 0, flex: '0 0 218px' }}>
             <PlanLogo
               name={plan.name}
               planId={plan.id}
@@ -124,7 +274,7 @@ export function PlanCard({ plan }: PlanCardProps) {
                 fontWeight: 500,
                 lineHeight: 1.8,
                 color: '#000000',
-                [portalTokens.mq.tabletUp]: { width: '195px' },
+                width: '195px',
               }}
             >
               <AnimatedSlogan key={sloganNonce} text={headline} />
@@ -132,12 +282,7 @@ export function PlanCard({ plan }: PlanCardProps) {
           </Box>
 
           {/* 欄二：簡介描述 */}
-          <Box
-            sx={{
-              minWidth: 0,
-              [portalTokens.mq.tabletUp]: { flex: '0 1 329px' },
-            }}
-          >
+          <Box sx={{ minWidth: 0, flex: '0 1 329px' }}>
             <Typography
               component="p"
               sx={{
@@ -154,12 +299,7 @@ export function PlanCard({ plan }: PlanCardProps) {
 
           {/* 欄三：執行單位 */}
           {plan.organizers.length > 0 && (
-            <Box
-              sx={{
-                minWidth: 0,
-                [portalTokens.mq.tabletUp]: { flex: '0 0 auto' },
-              }}
-            >
+            <Box sx={{ minWidth: 0, flex: '0 0 auto' }}>
               {/* 執行單位 Inter Regular 12px / line-height 1.8（依設計稿 node 1:116）*/}
               <Typography
                 component="p"
@@ -175,7 +315,7 @@ export function PlanCard({ plan }: PlanCardProps) {
                     fontSize: 12,
                     lineHeight: 1.8,
                     color: '#000000',
-                    whiteSpace: { md: 'nowrap' },
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   {org}
@@ -190,20 +330,12 @@ export function PlanCard({ plan }: PlanCardProps) {
           <PlanTimeline />
         </Box>
 
-        {/* 了解更多 — ≥834px 依 Figma node 1:141：卡片一右欄、執行單位下方（距卡頂約
-            198px、距右緣約 57px）；<834px 置於內容下方靠右 */}
+        {/* 了解更多 — 依 Figma node 1:141：卡片一右欄、執行單位下方 */}
         <Box
           sx={{
-            mt: 2,
-            display: 'flex',
-            justifyContent: 'flex-end',
-            [portalTokens.mq.tabletUp]: {
-              mt: 0,
-              position: 'absolute',
-              top: '198px',
-              right: '57px',
-              display: 'block',
-            },
+            position: 'absolute',
+            top: '198px',
+            right: '57px',
           }}
         >
           <LearnMoreButton tilt={-4.86} href={plan.officialUrl} />
@@ -211,38 +343,17 @@ export function PlanCard({ plan }: PlanCardProps) {
       </Box>
 
       {/* 卡片二 — 數據跑馬燈 + 大代表圖 + 社群連結 */}
-      <Box
-        sx={{
-          ...FROSTED,
-          position: 'relative',
-          mt: '10px',
-          p: '12px',
-        }}
-      >
+      <Box sx={{ ...FROSTED, position: 'relative', mt: '10px', p: '12px' }}>
         <Box
           sx={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
+            alignItems: 'stretch',
             gap: '16px',
-            [portalTokens.mq.tabletUp]: {
-              flexDirection: 'row',
-              alignItems: 'stretch',
-              gap: '16px',
-            },
           }}
         >
           {/* 數據跑馬燈（窄欄） */}
-          <Box
-            sx={{
-              flexShrink: 0,
-              height: '200px',
-              [portalTokens.mq.tabletUp]: {
-                flex: '0 0 185px',
-                alignSelf: 'stretch',
-                height: 'auto',
-              },
-            }}
-          >
+          <Box sx={{ flex: '0 0 185px', alignSelf: 'stretch' }}>
             <StatsMarquee stats={plan.stats} />
           </Box>
 
@@ -255,21 +366,23 @@ export function PlanCard({ plan }: PlanCardProps) {
               loading="lazy"
               sx={{
                 display: 'block',
+                flex: '1 1 auto',
+                minWidth: 0,
                 width: '100%',
                 aspectRatio: '752 / 287',
                 objectFit: 'cover',
                 borderRadius: '10px',
-                [portalTokens.mq.tabletUp]: { flex: '1 1 auto', minWidth: 0 },
               }}
             />
           ) : (
             <Box
               sx={{
+                flex: '1 1 auto',
+                minWidth: 0,
                 width: '100%',
                 aspectRatio: '752 / 287',
                 borderRadius: '10px',
                 background: `linear-gradient(120deg, ${portalTokens.color.blobOrangeFrom}, ${portalTokens.color.blobOrangeTo})`,
-                [portalTokens.mq.tabletUp]: { flex: '1 1 auto', minWidth: 0 },
               }}
             />
           )}
@@ -292,5 +405,33 @@ export function PlanCard({ plan }: PlanCardProps) {
         </Box>
       </Box>
     </Box>
+  );
+}
+
+/**
+ * PlanCard — 依視窗寬度切換版面：<834px 手機版（原始版面）、≥834px 桌機版（新版）。
+ * 以 CSS display 斷點切換（非 useMediaQuery）以避免 SSR / hydration 不一致。
+ */
+export function PlanCard({ plan }: PlanCardProps) {
+  return (
+    <>
+      <Box
+        sx={{
+          width: '100%',
+          [portalTokens.mq.tabletUp]: { display: 'none' },
+        }}
+      >
+        <PlanCardMobile plan={plan} />
+      </Box>
+      <Box
+        sx={{
+          width: '100%',
+          display: 'none',
+          [portalTokens.mq.tabletUp]: { display: 'block' },
+        }}
+      >
+        <PlanCardDesktop plan={plan} />
+      </Box>
+    </>
   );
 }

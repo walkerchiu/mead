@@ -39,6 +39,14 @@ const DECOR_STARS: Record<string, { x: number; y: number }[]> = {
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
 
+// 手機版（<834px）星形排列：依設計稿（node 43:1142）於窄卡片邊緣露出。卡片在手機為
+// 滿版寬度，故以邊緣錨定的 CSS 值定位（right 用 calc），縮小至約 0.55；順序對應 3 顆星。
+const MOBILE_STAR_LAYOUT: { left: string; top: string }[] = [
+  { left: 'calc(100% - 150px)', top: '-44px' }, // 右上露出
+  { left: '-72px', top: '42%' }, // 左側露出
+  { left: 'calc(100% - 120px)', top: '74%' }, // 右下露出
+];
+
 export interface PlanCarouselProps {
   /** 三大計畫（已依設計稿順序排好） */
   plans: Plan[];
@@ -217,6 +225,8 @@ export function PlanCardWithStars({
             // 星形中心在 960 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
             flipDir={s.x + STAR_SIZE / 2 < 480 ? -1 : 1}
             scale={cardScale}
+            mobileLeft={MOBILE_STAR_LAYOUT[i]?.left}
+            mobileTop={MOBILE_STAR_LAYOUT[i]?.top}
           />
         ) : null,
       )}

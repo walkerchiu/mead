@@ -31,6 +31,13 @@ export interface PaperFlipStarProps {
   flipDir: number;
   /** 卡片自適應放大倍率（≥1）；放大時同步拉高 WebGL pixelRatio 讓星形維持銳利。 */
   scale?: number;
+  /**
+   * 手機版（<834px）專用位置與縮放。提供時星形於手機也顯示（桌機卡片較寬，手機改以
+   * 邊緣錨定的 CSS 值定位，故用字串如 'calc(100% - 120px)'）。未提供則手機不顯示。
+   */
+  mobileLeft?: string;
+  mobileTop?: string;
+  mobileScale?: number;
 }
 
 /** 平面分段數 — 越高捲曲越平滑 */
@@ -229,7 +236,11 @@ export function PaperFlipStar({
   topPx,
   flipDir,
   scale = 1,
+  mobileLeft,
+  mobileTop,
+  mobileScale = 0.55,
 }: PaperFlipStarProps) {
+  const showMobile = mobileLeft != null && mobileTop != null;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const gfxRef = useRef<Gfx | null>(null);
@@ -468,21 +479,29 @@ export function PaperFlipStar({
         ctrl.current.kick();
       }}
       sx={{
-        display: 'none',
-        [portalTokens.mq.tabletUp]: { display: 'block' },
         position: 'absolute',
-        left: `${leftPx}px`,
-        top: `${topPx}px`,
+        // 手機（<834px）：依設計稿於卡片邊緣露出（邊緣錨定 CSS 值 + 縮小）；未提供手機
+        // 位置則手機不顯示。桌機（≥834px）：用各計畫精確座標、原尺寸。
+        display: showMobile ? 'block' : 'none',
+        left: showMobile ? mobileLeft : `${leftPx}px`,
+        top: showMobile ? mobileTop : `${topPx}px`,
+        transform: showMobile ? `scale(${mobileScale})` : 'none',
+        transformOrigin: 'center',
         width: size,
         height: size,
         overflow: 'visible',
         // z-index 由 rAF 依翻折進度設定（見 loop）；靜止在卡後、翻折抬到卡前
         zIndex: 0,
-        // 依 Figma 裝飾星形（node 1:3/1:4/1:5）opacity 60%：靜止時融入灰底、
-        // 照片色調與設計稿一致；hover 翻出特寫時還原全不透明。
+        // 依 Figma 裝飾星形 opacity 60%：靜止時融入灰底；hover 翻出特寫時還原全不透明。
         opacity: 0.6,
         transition: 'opacity 0.4s ease',
         '&:hover': { opacity: 1 },
+        [portalTokens.mq.tabletUp]: {
+          display: 'block',
+          left: `${leftPx}px`,
+          top: `${topPx}px`,
+          transform: 'none',
+        },
         '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
       }}
     >
