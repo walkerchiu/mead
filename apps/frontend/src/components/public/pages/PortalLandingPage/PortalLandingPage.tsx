@@ -52,6 +52,10 @@ const FIT_MARGIN_BASE = 130;
 /** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
 const MAX_CARD_SCALE = 2;
+/** 展開卡設計寬度（px，與 PlanCarousel 的 maxWidth 一致）；供寬度上限計算。 */
+const CARD_BASE_W = 960;
+/** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
+const FIT_SIDE_MARGIN = 72;
 /**
  * 往上倒退的觸發距離（px）：捲到卡頂後，還要再往上捲過此距離（卡片往下滑、上方露出
  * 空隙）才倒退上一張。上一張從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距）。
@@ -220,7 +224,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       // 卡片視覺高 = natural×scale，上下各留 FIT_MARGIN_BASE×scale 的對稱留白
       // （含裝飾星形上緣淨空）；夾在縮放上下限內。
       const raw = vh / (natural + 2 * FIT_MARGIN_BASE);
-      const scale = Math.min(MAX_CARD_SCALE, Math.max(MIN_CARD_SCALE, raw));
+      // 寬度上限：卡片放大後不得超出視窗（並讓兩側保留淨空、不壓到 peek）。
+      // CARD_BASE_W 為展開卡設計寬（960）；視窗較窄時以寬度為準收斂縮放。
+      const widthCap = (window.innerWidth - 2 * FIT_SIDE_MARGIN) / CARD_BASE_W;
+      const scale = Math.min(
+        MAX_CARD_SCALE,
+        Math.max(MIN_CARD_SCALE, Math.min(raw, widthCap)),
+      );
       appliedScaleRef.current = scale;
       setCardScale(scale);
       // 卡片填入一屏後段內無需 reveal，捲動僅作離散切換。
@@ -681,10 +691,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           </Box>
         )}
 
-        {/* 敘事段落（第三屏 / 資訊區）*/}
+        {/* 敘事段落（第三屏 / 資訊區）— 上下留適當留白，使捲動／PageDown 切到此屏時
+            敘事內容不貼齊視窗上緣、下方亦留呼吸空間（隨視窗高度等比、夾在上下限）。*/}
         <Box
           ref={infoSectionRef}
-          sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 12 } }}
+          sx={{
+            pt: 'clamp(56px, 12vh, 180px)',
+            pb: 'clamp(48px, 9vh, 140px)',
+          }}
         >
           <PortalNarrativeSection
             leadParagraph={t('narrative.lead')}
