@@ -53,6 +53,23 @@ function getHeadline(plan: Plan): string {
   );
 }
 
+/**
+ * 各計畫 slogan 的指定斷行（依業主要求，'\n' 為明確換行點）：
+ *  - 菁培：值得你期待的／設計公費留學品牌
+ *  - 設計戰國策：來自亞洲設計的力量（單行）
+ *  - 創意設計大賽：全球最大規模／學生創意設計競賽
+ */
+const SLOGAN_LINES: Record<string, string> = {
+  sposad: '值得你期待的\n設計公費留學品牌',
+  idc: '來自亞洲設計的力量',
+  tisdc: '全球最大規模\n學生創意設計競賽',
+};
+
+/** slogan 文字（含指定斷行）；未指定者回退 getHeadline */
+function getSloganText(plan: Plan): string {
+  return SLOGAN_LINES[plan.id] ?? getHeadline(plan);
+}
+
 /** 卡片用代表圖：優先本機 banner，其次首張本機照片 */
 function getCardImage(plan: Plan): string | null {
   return (
@@ -67,7 +84,7 @@ function getCardImage(plan: Plan): string | null {
  * （PlanStatsBar）、內縮 banner、社群連結列。設計師新版僅更新桌機版面，手機版沿用原樣。
  */
 function PlanCardMobile({ plan }: PlanCardProps) {
-  const headline = getHeadline(plan);
+  const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
   const [sloganNonce, setSloganNonce] = useState(0);
 
@@ -229,7 +246,7 @@ function PlanCardMobile({ plan }: PlanCardProps) {
  *   疊於底緣。
  */
 function PlanCardDesktop({ plan }: PlanCardProps) {
-  const headline = getHeadline(plan);
+  const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
   const [sloganNonce, setSloganNonce] = useState(0);
 

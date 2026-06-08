@@ -57,11 +57,6 @@ const CARD_BASE_W = 960;
 /** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
 const FIT_SIDE_MARGIN = 72;
 /**
- * 往上倒退的觸發距離（px）：捲到卡頂後，還要再往上捲過此距離（卡片往下滑、上方露出
- * 空隙）才倒退上一張。上一張從「卡頂」進場（上半不被截、留 PIN_TOP_PAD 上方間距）。
- */
-const UP_THRESHOLD = 200;
-/**
  * 切換後鎖住滾輪的時間（ms）：吸收觸控板 / 滑鼠的慣性殘餘 wheel 事件，確保「一次
  * 手勢只切一張」。沒有這道鎖，一次快速滑動的動量會連續累加、一口氣衝過好幾張卡，
  * 看起來就是「意外的快速左右切換」。
@@ -278,12 +273,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
     const onWheel = (e: WheelEvent) => {
       if (!engagedRef.current) {
-        // 在 hero（計畫區之上）往下滾一下 → 一次性平滑跳到計畫區並釘住第一張，
-        // 不讓使用者慢慢手動往下捲（依業主需求）。抵達由 onScroll 跨越偵測釘住，
-        // 700ms timeout 為後備（涵蓋 segLen 尚未量到、跨越事件未觸發的情況）。
         const bt = blockTop();
+        const dySnap = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
         if (window.scrollY < bt - 4) {
-          const dySnap = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
+          // 在 hero（計畫區之上）往下滾一下 → 一次性平滑跳到計畫區並釘住第一張。
+          // 抵達由 onScroll 跨越偵測釘住，700ms timeout 為後備。
           if (dySnap > 0) {
             e.preventDefault();
             if (heroSnappingRef.current) return;
@@ -293,6 +287,17 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               if (!engagedRef.current) engageAt(0);
               heroSnappingRef.current = false;
             }, 700);
+          }
+        } else {
+          // 在資訊區（第三屏，計畫區正下方）往上滾一下 → 一滾回計畫區最後一張（與往下對稱）。
+          const infoTop = infoSectionRef.current?.offsetTop ?? Infinity;
+          if (
+            dySnap < 0 &&
+            window.scrollY > bt + 4 &&
+            window.scrollY <= infoTop + 8
+          ) {
+            e.preventDefault();
+            engageAt(planCount - 1, true);
           }
         }
         return;
@@ -356,24 +361,23 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         }
         return;
       }
-      // dy < 0：往上
+      // dy < 0：往上（與往下對稱：一個手勢即換頁）
       const next = offsetRef.current + dy;
       if (i === 0) {
-        // 第一張：往上把卡片收回卡頂後即釋放回 hero（offset 不往負、上方無凹槽、不需門檻）。
+        // 第一張：卡片若仍有露出（短視窗）先往上收回卡頂；到頂後一滾即整頁回 hero。
         if (next > 0) {
           e.preventDefault();
           offsetRef.current = next;
           applyReveal();
           return;
         }
-        offsetRef.current = 0;
-        applyReveal();
-        release();
+        e.preventDefault();
+        goToHero();
+        lockGesture(-1);
         return;
       }
-      // 非第一張：捲到卡頂後再往上累積（offset 記為負、但卡片停在頂端不露凹槽），
-      // 過 UP_THRESHOLD 才倒退上一張（從卡頂進場），並上鎖。
-      if (next > -UP_THRESHOLD) {
+      // 非第一張：與往下相同門檻（seg）—— 累積到 -seg 即倒退上一張（一個手勢即換）。
+      if (next > -seg) {
         e.preventDefault();
         offsetRef.current = next;
         applyReveal();

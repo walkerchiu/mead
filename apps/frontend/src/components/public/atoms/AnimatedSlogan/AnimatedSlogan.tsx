@@ -29,54 +29,62 @@ export function AnimatedSlogan({
   durationMs = 480,
   sx,
 }: AnimatedSloganProps) {
-  const chars = useMemo(() => Array.from(text), [text]);
+  // 以 '\n' 明確斷行：每行一個 block，逐字進場延遲索引跨行連續累加。
+  const lines = useMemo(() => text.split('\n'), [text]);
+  const charSx = {
+    display: 'inline-block',
+    whiteSpace: 'pre',
+    opacity: 0,
+    animationName: 'sloganCharIn',
+    animationDuration: `${durationMs}ms`,
+    animationTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    animationFillMode: 'both',
+    '@keyframes sloganCharIn': {
+      from: {
+        opacity: 0,
+        transform: 'translateY(0.5em)',
+        filter: 'blur(4px)',
+      },
+      to: { opacity: 1, transform: 'translateY(0)', filter: 'blur(0)' },
+    },
+    '@media (prefers-reduced-motion: reduce)': {
+      opacity: 1,
+      animation: 'none',
+    },
+  } as const;
+
+  let charIndex = 0;
 
   return (
-    <Box component="span" aria-label={text} sx={sx}>
-      {chars.map((char, i) => {
-        if (char === ' ') {
-          return (
-            <Box
-              key={i}
-              component="span"
-              aria-hidden
-              sx={{ display: 'inline-block', width: '0.32em' }}
-            />
-          );
-        }
-        return (
-          <Box
-            key={i}
-            component="span"
-            aria-hidden
-            sx={{
-              display: 'inline-block',
-              whiteSpace: 'pre',
-              opacity: 0,
-              animation: `sloganCharIn ${durationMs}ms cubic-bezier(0.22, 1, 0.36, 1) both`,
-              animationDelay: `${i * staggerMs}ms`,
-              '@keyframes sloganCharIn': {
-                from: {
-                  opacity: 0,
-                  transform: 'translateY(0.5em)',
-                  filter: 'blur(4px)',
-                },
-                to: {
-                  opacity: 1,
-                  transform: 'translateY(0)',
-                  filter: 'blur(0)',
-                },
-              },
-              '@media (prefers-reduced-motion: reduce)': {
-                opacity: 1,
-                animation: 'none',
-              },
-            }}
-          >
-            {char}
-          </Box>
-        );
-      })}
+    <Box component="span" aria-label={text.replace(/\n/g, ' ')} sx={sx}>
+      {lines.map((line, li) => (
+        <Box key={li} component="span" sx={{ display: 'block' }}>
+          {Array.from(line).map((char, ci) => {
+            const delay = charIndex * staggerMs;
+            charIndex += 1;
+            if (char === ' ') {
+              return (
+                <Box
+                  key={ci}
+                  component="span"
+                  aria-hidden
+                  sx={{ display: 'inline-block', width: '0.32em' }}
+                />
+              );
+            }
+            return (
+              <Box
+                key={ci}
+                component="span"
+                aria-hidden
+                sx={{ ...charSx, animationDelay: `${delay}ms` }}
+              >
+                {char}
+              </Box>
+            );
+          })}
+        </Box>
+      ))}
     </Box>
   );
 }

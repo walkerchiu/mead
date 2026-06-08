@@ -285,11 +285,11 @@ export function DecorativeTextCloud({
   // hover 某色塊時，該色塊翻出「該色塊計畫」的照片（照片仍隨 hover 顯示）。
   const displayedIndex = hovered ?? defaultIndex;
 
-  // 整片雲的裝飾文字：每次進入頁面隨機呈現一組（色塊計畫的詞），不隨 hover 切換。
-  // Math.random 僅於掛載後（client）執行，避免 SSR / hydration 取值不一致；定前先
-  // 以 defaultIndex 佔位，定後就地更新固定數量的字 span（不重跑入場動畫）。
+  // 整片雲的裝飾文字：進場隨機呈現一組；hover 某色塊時切換為「該色塊計畫」的詞，
+  // 離開後回到進場隨機那組。Math.random 僅於掛載後（client）執行，避免 SSR / hydration
+  // 取值不一致；定前先以 defaultIndex 佔位，定後就地更新固定數量的字 span（不重跑入場動畫）。
   const [randomGroup, setRandomGroup] = useState<number | null>(null);
-  const textIndex = randomGroup ?? defaultIndex;
+  const textIndex = hovered ?? randomGroup ?? defaultIndex;
 
   // 各色塊對應計畫的照片陣列（index 對應色塊 = 計畫）。
   const photosByShape = useMemo(

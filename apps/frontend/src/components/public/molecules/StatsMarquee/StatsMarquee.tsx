@@ -41,19 +41,24 @@ export function StatsMarquee({ stats }: StatsMarqueeProps) {
     >
       <Typography
         component="p"
-        sx={{ fontSize: 24, fontWeight: 800, lineHeight: 1, color: '#000000' }}
+        sx={{
+          fontSize: 26,
+          fontWeight: 800,
+          lineHeight: 1.1,
+          color: '#000000',
+        }}
       >
         {stat.value}
       </Typography>
       <Typography
         component="p"
-        sx={{ fontSize: '8.345px', lineHeight: 1, color: '#000000' }}
+        sx={{ fontSize: 14, lineHeight: 1.3, color: '#000000' }}
       >
         {stat.unit}
       </Typography>
       <Typography
         component="p"
-        sx={{ fontSize: '7.153px', lineHeight: 1.3, color: '#666666' }}
+        sx={{ fontSize: 11, lineHeight: 1.4, color: '#666666' }}
       >
         {stat.description}
       </Typography>
