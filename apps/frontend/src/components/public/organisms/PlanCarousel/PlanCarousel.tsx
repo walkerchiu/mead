@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 
@@ -103,87 +103,6 @@ function localPhotos(plan: Plan): string[] {
 }
 
 /**
- * 兩側豎立的相鄰計畫預覽矩形 — 半透明毛玻璃。
- * 760 寬、left/right: -720px 讓多數寬度溢出畫面，露出約 40px 在視窗左右側緣。
- * 點擊以橫向滑動切換上/下計畫。
- *
- * peekSx() 回傳完整 sx — direction 控制：
- *  - 自訂方向游標（左 / 右箭頭，與 portal-cursor.svg 同風格）
- *  - hover 時整塊向視窗中央輕推、背景加深、邊框變實，露出更多寬度
- *  - 內部箭頭 icon 預設淡出、hover 時淡入並向中央微滑（強化方向感）
- *  - 用 `&&` 雙重 class 提高特異性，覆蓋 PortalLandingPage 對 `button` 的 cursor 規則
- */
-function peekSx(direction: 'prev' | 'next') {
-  const isPrev = direction === 'prev';
-  const cursorUrl = isPrev
-    ? 'url("/cursors/portal-cursor-left.svg") 4 17, pointer'
-    : 'url("/cursors/portal-cursor-right.svg") 30 17, pointer';
-  return {
-    display: 'none',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    // peek 與卡片同高：top/bottom:0 撐滿 carousel 根（其高度 = 卡片 zoom 後的高度），
-    // 故 peek 隨卡片縮放與置中一起對齊，上下圓角框線自然落在可見視窗內。
-    width: 760,
-    p: 0,
-    border: 'none',
-    borderRadius: '17.35px',
-    bgcolor: 'rgba(255, 255, 255, 0.54)',
-    // 原本 rgba(138,138,138,0.49) 實效 ≈ #B4B4B4 on #E4E4E4 ≈ 1.6:1，
-    // UI 元件須 ≥3:1（WCAG 1.4.11）。加深至 rgba(92,92,92,0.85) 約 4.4:1。
-    outline: '1px solid rgba(92, 92, 92, 0.85)',
-    outlineOffset: '-1px',
-    backdropFilter: 'blur(28.34px)',
-    WebkitBackdropFilter: 'blur(28.34px)',
-    zIndex: 5,
-    // 對齊 portal cursor 風格的方向箭頭 cursor（雙重 class 覆蓋父層 button 規則）
-    '&&': { cursor: cursorUrl },
-    // 平滑過渡：背景、邊框、位移、陰影
-    transition:
-      'background-color 0.28s ease, outline-color 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
-    // 露出約 40px 在視窗左右側緣（細長預覽條）。
-    [isPrev ? 'left' : 'right']: -720,
-    '&:hover': {
-      bgcolor: 'rgba(255, 255, 255, 0.85)',
-      outlineColor: 'rgba(138, 138, 138, 0.85)',
-      // 往視窗中央輕推 12px，露出更多寬度暗示「可拉出」
-      transform: isPrev ? 'translateX(12px)' : 'translateX(-12px)',
-      boxShadow: '0 18px 40px -22px rgba(0, 0, 0, 0.28)',
-    },
-    '&:active': {
-      transform: isPrev ? 'translateX(6px)' : 'translateX(-6px)',
-      bgcolor: 'rgba(255, 255, 255, 0.92)',
-    },
-    '&:focus-visible': portalTokens.focusRing,
-    [portalTokens.mq.tabletUp]: { display: 'flex' },
-    // 內部箭頭 icon — 預設淡出、hover 時淡入並朝中央滑入
-    alignItems: 'center',
-    justifyContent: isPrev ? 'flex-end' : 'flex-start',
-    // 箭頭預留邊距：靠近視窗中央那一側
-    px: '10px',
-    '& .peek-arrow': {
-      width: 22,
-      height: 22,
-      color: '#1A1A1A',
-      opacity: 0,
-      transform: isPrev ? 'translateX(8px)' : 'translateX(-8px)',
-      transition:
-        'opacity 0.28s ease, transform 0.32s cubic-bezier(0.22, 1, 0.36, 1)',
-    },
-    '&:hover .peek-arrow': {
-      opacity: 0.7,
-      transform: 'translateX(0)',
-    },
-    '@media (prefers-reduced-motion: reduce)': {
-      transition: 'none',
-      '&:hover': { transform: 'none' },
-      '& .peek-arrow': { transition: 'none' },
-    },
-  } as const;
-}
-
-/**
  * PlanCardWithStars — 展開大卡 + 周圍裝飾星形照片的組合單元。
  *
  * 抽出此 helper 是為了讓「退場舊卡」和「入場新卡」共用同一份星形渲染邏輯，
@@ -192,20 +111,23 @@ function peekSx(direction: 'prev' | 'next') {
 export function PlanCardWithStars({
   plan,
   showStars = true,
+  starsVisible = true,
   cardScale = 1,
 }: {
   plan: Plan;
   /** 卡片自適應放大倍率（≥1）；轉傳給星形以同步提高其 WebGL 解析度。 */
   cardScale?: number;
   /**
-   * 是否渲染周圍裝飾星形照片。點擊展開的左下滑入過場 overlay 設為 false：
-   * 星形（PaperFlipStar）是 WebGL，掛載要建 context + 載貼圖才會顯示，過場
-   * overlay 與 commit 後的正式卡片是兩棵不同子樹，若兩邊都渲染星形，handoff
-   * 時 overlay 星形卸載、正式卡星形重新掛載重載，中間一段空白會造成「照片
-   * 消失再冒出」的閃跳。過場不畫星形，讓星形只在正式卡片掛載一次（與捲動
-   * 展開路徑一致），即可消除閃跳。
+   * 是否渲染（掛載）周圍裝飾星形照片。環狀軌道只在「中份」卡片掛載星形，兩側
+   * 複本不掛載（peek 細條不需星形、也省 WebGL context）。
    */
   showStars?: boolean;
+  /**
+   * 星形是否可見。中份的非作用卡片仍掛載星形但以 opacity 0 隱藏；切換時改用
+   * opacity 淡入淡出，星形（PaperFlipStar，WebGL）全程掛載、毋需卸載重載貼圖，
+   * 即可消除「照片消失再冒出」的閃跳。
+   */
+  starsVisible?: boolean;
 }) {
   const photos = localPhotos(plan);
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
@@ -213,23 +135,33 @@ export function PlanCardWithStars({
     <>
       {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示（PaperFlipStar 內部以
           mq.tabletUp 控制）。平常以星形小尺寸藏在卡片後方；hover 時以紙張翻折
-          物理向觀者翻出、放大、上抬到卡片前方（依設計師 WebGL prototype）。 */}
-      {stars.map((s, i) =>
-        photos[i] ? (
-          <PaperFlipStar
-            key={i}
-            src={photos[i]}
-            size={STAR_SIZE}
-            leftPx={s.x}
-            topPx={s.y}
-            // 星形中心在 960 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
-            flipDir={s.x + STAR_SIZE / 2 < 480 ? -1 : 1}
-            scale={cardScale}
-            mobileLeft={MOBILE_STAR_LAYOUT[i]?.left}
-            mobileTop={MOBILE_STAR_LAYOUT[i]?.top}
-          />
-        ) : null,
-      )}
+          物理向觀者翻出、放大、上抬到卡片前方。以 opacity 控制可見性，
+          切換計畫時星形保持掛載、僅淡入淡出。 */}
+      <Box
+        aria-hidden
+        sx={{
+          opacity: starsVisible ? 1 : 0,
+          transition: 'opacity 0.5s ease',
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+        }}
+      >
+        {stars.map((s, i) =>
+          photos[i] ? (
+            <PaperFlipStar
+              key={i}
+              src={photos[i]}
+              size={STAR_SIZE}
+              leftPx={s.x}
+              topPx={s.y}
+              // 星形中心在 960 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
+              flipDir={s.x + STAR_SIZE / 2 < 480 ? -1 : 1}
+              scale={cardScale}
+              mobileLeft={MOBILE_STAR_LAYOUT[i]?.left}
+              mobileTop={MOBILE_STAR_LAYOUT[i]?.top}
+            />
+          ) : null,
+        )}
+      </Box>
       {/* 作用中的計畫卡片 */}
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <PlanCard plan={plan} />
@@ -494,8 +426,6 @@ function PlanMiniCard({
  * 的升起 → 停 → 飛出三段節奏完全對齊。
  */
 const EXIT_MS = SLOGAN_EXIT_MS;
-/** 計畫之間左右滑動切換的轉場長度（ms）— 放慢、從容，退出端點 opacity 0 不留殘影。 */
-const SLIDE_MS = 1000;
 
 /**
  * 「橘字接力」飛行動畫時序（依使用者要求：游標在卡片間移動時，橘字會跟著
@@ -624,23 +554,30 @@ export function PlanCarousel({
   const [exitingTo, setExitingTo] = useState<number | null>(null);
   const exitTimerRef = useRef<number | null>(null);
 
-  // 展開後左右切換計畫的方向（peek 點擊 / dots 變更皆會觸發）
-  const [slideDir, setSlideDir] = useState<'prev' | 'next' | null>(null);
-  // 滑動中暫存的「退場舊計畫」— 與新計畫同時渲染，反方向滑出
-  const [exitingPlan, setExitingPlan] = useState<Plan | null>(null);
-  const slideTimerRef = useRef<number | null>(null);
-  const prevExpandedIdxRef = useRef<number | null>(expandedIndex);
-
-  /**
-   * 「點擊→展開」對應的 plan id — 用以決定展開分支的入場動畫類型：
-   *  - 該 id 就是當前展開的 activePlan → 點擊來源 → 大卡走 planSlideUpFromBL（左下滑入）
-   *  - 否則 → sentinel auto-expand → 走 planExpand 膨脹
-   * 用 state（非 ref）才能進入 useMemo 依賴；setState 與 onExpandedIndexChange
-   * 同個 React 18 batch 提交，第一次 render 即拿到正確值。
-   * 切到下一張計畫（peek / dots）時 activePlan.id 改變、走 slideDir 分支，
-   * 此 state 即便保留舊值也無妨。
-   */
-  const [clickedExpandId, setClickedExpandId] = useState<string | null>(null);
+  // 視窗寬與是否桌機（≥834px）：展開環狀軌道用視窗寬自適應卡距（peek 露出量恆定），
+  // 並在桌機才啟用環狀軌道；手機維持單張滿版卡片。
+  const [viewportW, setViewportW] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth : 0,
+  );
+  const [isTablet, setIsTablet] = useState(() =>
+    typeof window !== 'undefined'
+      ? window.matchMedia('(min-width:834px)').matches
+      : false,
+  );
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width:834px)');
+    const onResize = () => setViewportW(window.innerWidth);
+    const onMq = () => setIsTablet(mq.matches);
+    onResize();
+    onMq();
+    window.addEventListener('resize', onResize);
+    mq.addEventListener('change', onMq);
+    return () => {
+      window.removeEventListener('resize', onResize);
+      mq.removeEventListener('change', onMq);
+    };
+  }, []);
 
   // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
   const miniContainerRef = useRef<HTMLDivElement | null>(null);
@@ -667,7 +604,6 @@ export function PlanCarousel({
   useEffect(() => {
     return () => {
       if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
-      if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
       if (flightTravelTimerRef.current)
         window.clearTimeout(flightTravelTimerRef.current);
       if (flightCleanupTimerRef.current)
@@ -741,79 +677,6 @@ export function PlanCarousel({
     onHoverPlanChange?.(null);
   };
 
-  // ── 展開分支入場動畫選擇（鎖在 activePlan + slideDir + clickedExpandId 上，
-  //     避免 hover/其他 state 變動觸發 className 改變而重播動畫） ──
-  // 三種來源：
-  //  - slideDir 存在 → peek / dots 左右切換 → planSlideIn{Left,Right}
-  //  - clickedExpandId 等於目前展開的 plan id → 點擊→展開 → planSlideUpFromBL
-  //  - 其餘（IntersectionObserver auto-expand）→ planExpand 膨脹進場
-  const activePlanForExpand =
-    expandedIndex !== null ? (plans[expandedIndex] ?? null) : null;
-  const enterAnimation = useMemo<string | null>(() => {
-    if (!activePlanForExpand) return null;
-    // slideDir 由下方 useEffect 設定，會晚一個 render。外部（捲動 / peek）改變
-    // expandedIndex 時，第一影格一律「以索引差直接推算方向」——不可沿用殘留的
-    // slideDir（那是上一次切換的方向；若上次往下這次往上，會先朝錯邊滑一下再更正，
-    // 看起來「先往右再往左」）。索引已同步（prev===curr）時才用 slideDir。
-    const prevIdx = prevExpandedIdxRef.current;
-    let dir: 'prev' | 'next' | null;
-    if (
-      prevIdx !== null &&
-      expandedIndex !== null &&
-      prevIdx !== expandedIndex
-    ) {
-      const total = plans.length;
-      dir = expandedIndex > prevIdx ? 'next' : 'prev';
-      if (prevIdx === total - 1 && expandedIndex === 0) dir = 'next';
-      if (prevIdx === 0 && expandedIndex === total - 1) dir = 'prev';
-    } else {
-      dir = slideDir;
-    }
-    if (dir) {
-      // 方向（依使用者偏好）：next（往下 / 右 peek）新卡從左滑入；prev（往上 /
-      // 左 peek）新卡從右滑入。
-      return dir === 'next'
-        ? `planSlideInLeft ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`
-        : `planSlideInRight ${SLIDE_MS}ms cubic-bezier(0.22, 1, 0.36, 1) both`;
-    }
-    // click 來源：滑入動畫已在 PortalLandingPage 的 overlay 於 EXIT 期間
-    // 完整跑完，這裡接手時大卡已到定位，用 'none' 避免再播一次造成閃動。
-    return clickedExpandId === activePlanForExpand.id
-      ? 'none'
-      : 'planExpand 0.55s cubic-bezier(0.22, 1, 0.36, 1) both';
-  }, [
-    activePlanForExpand,
-    slideDir,
-    clickedExpandId,
-    expandedIndex,
-    plans.length,
-  ]);
-
-  // 監聽 expandedIndex 變化 → 偵測切換方向、啟動左右滑動轉場。
-  // prev=null（從 mini cards 首次展開）跳過 slide，沿用既有 planExpand 膨脹動畫。
-  useEffect(() => {
-    const prev = prevExpandedIdxRef.current;
-    const curr = expandedIndex;
-    prevExpandedIdxRef.current = curr;
-    if (prev === null || curr === null || prev === curr) return;
-    const total = plans.length;
-    let dir: 'prev' | 'next' = curr > prev ? 'next' : 'prev';
-    // wrap-around：(last → 0) 視為 next；(0 → last) 視為 prev
-    if (prev === total - 1 && curr === 0) dir = 'next';
-    if (prev === 0 && curr === total - 1) dir = 'prev';
-    setSlideDir(dir);
-    setExitingPlan(plans[prev] ?? null);
-    if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
-    // 只清退場舊卡；slideDir 刻意保留：清掉會讓新卡的 animation 從
-    // `planSlideIn*` 切回 `planExpand`，瀏覽器會把它視為新動畫重新從
-    // scale(0.55) 播放、造成切換完成後「跳一下」。下次 expandedIndex
-    // 變動時 useEffect 會把 slideDir 改成新方向，key 變動再觸發動畫。
-    slideTimerRef.current = window.setTimeout(() => {
-      setExitingPlan(null);
-      slideTimerRef.current = null;
-    }, SLIDE_MS);
-  }, [expandedIndex, plans]);
-
   const count = plans.length;
   if (count === 0) return null;
 
@@ -823,55 +686,12 @@ export function PlanCarousel({
     setExitingTo(i);
     if (exitTimerRef.current) window.clearTimeout(exitTimerRef.current);
     exitTimerRef.current = window.setTimeout(() => {
-      // React 會把三個 setState 一起 batch，下次 render 同時擁有
-      // exitingTo=null、expandedIndex=i、clickedExpandId=被點的 plan.id
-      // → 直接走展開分支、enterAnimation 走 planSlideUpFromBL 而非 planExpand。
-      const targetPlan = plans[i];
-      if (targetPlan) setClickedExpandId(targetPlan.id);
+      // exitingTo=null 與 expandedIndex=i 由 React 18 一起 batch，下次 render
+      // 即進入展開分支顯示該計畫大卡。
       setExitingTo(null);
       onExpandedIndexChange(i);
       exitTimerRef.current = null;
     }, EXIT_MS);
-  };
-
-  /**
-   * peek 點擊 — 切到上 / 下一個計畫（環狀 wrap-around）。
-   *
-   * 同步先 setSlideDir + setExitingPlan 再呼叫 onExpandedIndexChange，三個
-   * setState 由 React 18 自動 batch 為單次 render，讓新卡一掛上就走滑動動畫，
-   * 避免使用 useEffect 偵測時介於兩次 render 之間先以 planExpand 短暫渲染、
-   * useEffect commit 後再切到 planSlideIn 的「先膨脹再滑入」閃動。
-   * 也提前更新 prevExpandedIdxRef 讓 useEffect fallback 偵測為 no-op。
-   */
-  const startSlide = (newIdx: number, dir: 'prev' | 'next') => {
-    if (expandedIndex === null) return;
-    setSlideDir(dir);
-    setExitingPlan(plans[expandedIndex] ?? null);
-    if (slideTimerRef.current) window.clearTimeout(slideTimerRef.current);
-    slideTimerRef.current = window.setTimeout(() => {
-      setExitingPlan(null);
-      slideTimerRef.current = null;
-    }, SLIDE_MS);
-    prevExpandedIdxRef.current = newIdx;
-    onExpandedIndexChange(newIdx);
-  };
-  const goPrev = () => {
-    if (expandedIndex === null) return;
-    const target = (expandedIndex - 1 + count) % count;
-    if (onPeekNavigate) {
-      onPeekNavigate(target, 'prev');
-      return;
-    }
-    startSlide(target, 'prev');
-  };
-  const goNext = () => {
-    if (expandedIndex === null) return;
-    const target = (expandedIndex + 1) % count;
-    if (onPeekNavigate) {
-      onPeekNavigate(target, 'next');
-      return;
-    }
-    startSlide(target, 'next');
   };
 
   const outerSx = {
@@ -1041,191 +861,116 @@ export function PlanCarousel({
     );
   }
 
-  // ── 展開：詳細大卡 + 周圍裝飾星形照片 + 兩側豎立 peek 預覽矩形 ──
-  const activePlan = plans[expandedIndex];
+  // ── 手機（<834px）：單張滿版卡片（維持原行為，自動輪播 / 圓點切換） ──
+  if (!isTablet) {
+    const mobilePlan = plans[expandedIndex] ?? plans[0];
+    return (
+      <Box sx={{ ...outerSx, overflow: 'visible' }}>
+        <Box sx={{ position: 'relative', mx: 'auto', maxWidth: 960 }}>
+          <PlanCardWithStars plan={mobilePlan} />
+        </Box>
+      </Box>
+    );
+  }
 
-  // 滑動轉場用的共用 keyframes — 同時掛在退場舊卡與入場新卡的 sx，
-  // emotion 會以名稱 dedupe，不會重複注入 CSS。
-  const slideKeyframes = {
-    '@keyframes planSlideInRight': {
-      from: { transform: 'translateX(120%)', opacity: 0 },
-      to: { transform: 'translateX(0)', opacity: 1 },
-    },
-    '@keyframes planSlideInLeft': {
-      from: { transform: 'translateX(-120%)', opacity: 0 },
-      to: { transform: 'translateX(0)', opacity: 1 },
-    },
-    // 退出端點 opacity 直接收到 0（原本是 0.25 → 半透明殘影看起來拖很久）。
-    '@keyframes planSlideOutLeft': {
-      from: { transform: 'translateX(0)', opacity: 1 },
-      to: { transform: 'translateX(-120%)', opacity: 0 },
-    },
-    '@keyframes planSlideOutRight': {
-      from: { transform: 'translateX(0)', opacity: 1 },
-      to: { transform: 'translateX(120%)', opacity: 0 },
-    },
-    // 退場舊卡「停在原位」只淡出（不位移）：新卡滑入疊在上層覆蓋它，舊卡同時淡出
-    // 避免半透明毛玻璃疊影。
-    '@keyframes planFadeOut': {
-      from: { opacity: 1 },
-      to: { opacity: 0 },
-    },
-  } as const;
+  // ── 桌機展開：持久環狀軌道 ──
+  // 三份卡片並列（左／中／右複本），讓左右兩側永遠是真實卡片內容；active 永遠落在
+  // 中份範圍內、被置中，兩側恆有完整鄰卡。切換時整條軌道以 translateX 平滑滑動 ——
+  // 卡片全程掛載、不 remount，故無 pop-in、無閃跳。星形只掛在 active 卡（與設計稿
+  // 一致，peek 無星形），且照片皆已預載，切換時 PaperFlipStar 只換貼圖、不重建 context。
+  const RING_CARD_W = 960;
+  // peek 露出量（螢幕 px）：兩側鄰卡露出的寬度。卡距以視窗寬反推，讓各螢幕寬下
+  // peek 露出量大致一致（zoom 內 px = 螢幕 px / cardScale）。
+  const PEEK_PX = 72;
+  const cwScreen = RING_CARD_W * cardScale;
+  const gapScreen = viewportW
+    ? Math.max(16, (viewportW - cwScreen) / 2 - PEEK_PX)
+    : 64 * cardScale;
+  const RING_GAP = gapScreen / (cardScale || 1);
+  const RING_STEP = RING_CARD_W + RING_GAP;
+  const mid = Math.floor(count / 2);
+  // 置中 active：以「中份的中央計畫」為 translateX=0 基準，平移 (active - mid) 步。
+  const trackX = -(expandedIndex - mid) * RING_STEP;
+
+  // 點某張鄰卡 → 切換到該計畫（捲動驅動交由上層 onPeekNavigate，否則直接改索引）。
+  const navigateTo = (target: number) => {
+    if (target === expandedIndex) return;
+    let dir: 'prev' | 'next' = target > expandedIndex ? 'next' : 'prev';
+    if (expandedIndex === count - 1 && target === 0) dir = 'next';
+    if (expandedIndex === 0 && target === count - 1) dir = 'prev';
+    if (onPeekNavigate) onPeekNavigate(target, dir);
+    else onExpandedIndexChange(target);
+  };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%' }}>
-      {/* 左右兩側豎立的相鄰計畫預覽矩形 — 點擊以橫向滑動切換上 / 下計畫。
-          760 寬 + left/right: -720px 讓多數寬度溢出畫面、露約 40px 在視窗邊緣。
-          頁面外層已 overflow-x: clip，溢出部分自然裁切。
-          hover：自訂方向 cursor、整塊向中央輕推、背景加深、露出方向箭頭。*/}
-      {count > 1 && (
-        <>
-          <Box
-            component="button"
-            type="button"
-            aria-label="上一個計畫"
-            onClick={goPrev}
-            sx={peekSx('prev')}
-          >
-            {/* 箭頭 icon — 靠 peek 右側（即視窗左側可見區），hover 才淡入 */}
-            <Box
-              aria-hidden
-              className="peek-arrow"
-              component="svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M15 6 L9 12 L15 18" />
-            </Box>
-          </Box>
-          <Box
-            component="button"
-            type="button"
-            aria-label="下一個計畫"
-            onClick={goNext}
-            sx={peekSx('next')}
-          >
-            {/* 箭頭 icon — 靠 peek 左側（即視窗右側可見區），hover 才淡入 */}
-            <Box
-              aria-hidden
-              className="peek-arrow"
-              component="svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 6 L15 12 L9 18" />
-            </Box>
-          </Box>
-        </>
-      )}
-
+    <Box sx={{ position: 'relative', width: '100%', overflow: 'visible' }}>
       <Box
         sx={{
-          ...outerSx,
-          // 自適應第二屏：卡片內容高於一屏時等比縮小填入（只縮卡片，不含兩側 peek）。
-          // 用 zoom 而非 transform:scale —— zoom 會以最終尺寸重新排版／重繪，SVG logo
-          // 與文字維持銳利；transform:scale 會把已點陣化的 SVG 再縮放而變糊。
-          // 放大與縮小都套用（依高度比例填滿第二屏）；星形 canvas 另以 pixelRatio 補償。
+          // 自適應第二屏縮放：用 zoom（非 transform:scale）讓 SVG／文字重排後維持銳利。
           zoom: cardScale !== 1 ? cardScale : undefined,
+          position: 'relative',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          overflow: 'visible',
         }}
       >
         <Box
           sx={{
-            position: 'relative',
             display: 'flex',
             justifyContent: 'center',
-            // 滑動時舊卡會 translateX 到 ±120%，須允許其視覺溢出（不裁切）
-            overflow: 'visible',
+            alignItems: 'flex-start',
+            gap: `${RING_GAP}px`,
+            transform: `translateX(${trackX}px)`,
+            transition: 'transform 0.62s cubic-bezier(0.22, 1, 0.36, 1)',
+            willChange: 'transform',
+            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
           }}
         >
-          {/* 退場舊卡 — 絕對定位疊在新卡同一位置、反方向滑出。
-              key 用 plan.id 確保 React 重新掛載播放動畫；slideDir 控制方向。*/}
-          {exitingPlan && slideDir && (
-            <Box
-              aria-hidden
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                mx: 'auto',
-                width: '100%',
-                maxWidth: 960,
-                pointerEvents: 'none',
-                zIndex: 0,
-                // 凍結在切換當下的 reveal 位移，與入場新卡各自垂直定位，避免兩卡
-                // 共用單一位移導致退場卡瞬間跳回頂端（先前的「頓一下」）。
-                transform: 'translateY(calc(var(--exit-reveal-y, 0px) * -1))',
-              }}
-            >
-              <Box
-                key={`exit-${exitingPlan.id}`}
-                sx={{
-                  // 退場舊卡停在原位、只淡出（不位移）；新卡滑入疊在上層覆蓋。
-                  // 淡出比滑入快，舊卡早早消失、不殘留。
-                  animation: `planFadeOut ${Math.round(SLIDE_MS * 0.55)}ms ease forwards`,
-                  ...slideKeyframes,
-                  '@media (prefers-reduced-motion: reduce)': {
-                    animation: 'none',
-                    opacity: 0,
-                  },
-                }}
-              >
-                <PlanCardWithStars plan={exitingPlan} cardScale={cardScale} />
-              </Box>
-            </Box>
+          {[-1, 0, 1].map((copy) =>
+            plans.map((plan, i) => {
+              const isCenter = copy === 0 && i === expandedIndex;
+              return (
+                <Box
+                  key={`${copy}-${plan.id}`}
+                  onClick={isCenter ? undefined : () => navigateTo(i)}
+                  onMouseEnter={
+                    isCenter
+                      ? () => onHoverPlanChange?.(expandedIndex)
+                      : undefined
+                  }
+                  onMouseLeave={
+                    isCenter ? () => onHoverPlanChange?.(null) : undefined
+                  }
+                  aria-hidden={!isCenter}
+                  sx={{
+                    flex: '0 0 auto',
+                    width: RING_CARD_W,
+                    transformOrigin: 'top center',
+                    // active：保留段內捲動 reveal 位移；鄰卡：淡化、略縮、降彩度。
+                    transform: isCenter
+                      ? 'translateY(calc(var(--reveal-y, 0px) * -1))'
+                      : 'scale(0.965)',
+                    opacity: isCenter ? 1 : 0.42,
+                    filter: isCenter ? 'none' : 'saturate(0.55)',
+                    cursor: isCenter ? 'default' : 'pointer',
+                    transition:
+                      'opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease',
+                    '@media (prefers-reduced-motion: reduce)': {
+                      transition: 'none',
+                    },
+                  }}
+                >
+                  <PlanCardWithStars
+                    plan={plan}
+                    cardScale={cardScale}
+                    showStars={isCenter}
+                    starsVisible={isCenter}
+                  />
+                </Box>
+              );
+            }),
           )}
-
-          {/* 入場新卡 — key 變動觸發 React remount、播放 enterAnimation（由上方
-              useMemo 依 source 決定）。三種來源：
-                - slideDir → planSlideInLeft / planSlideInRight（peek / dots 切換）
-                - click → planSlideUpFromBL（主標退場後，大卡從左下方滑入）
-                - 其餘 → planExpand 膨脹（IntersectionObserver auto-expand） */}
-          <Box
-            sx={{
-              position: 'relative',
-              width: '100%',
-              maxWidth: 960,
-              zIndex: 1,
-              // 段內捲動露出整張卡的 reveal 位移 — 只套在卡片上，兩側 peek 不受影響。
-              transform: 'translateY(calc(var(--reveal-y, 0px) * -1))',
-            }}
-          >
-            <Box
-              key={activePlan.id}
-              onMouseEnter={() => onHoverPlanChange?.(expandedIndex)}
-              onMouseLeave={() => onHoverPlanChange?.(null)}
-              sx={{
-                transformOrigin: 'top center',
-                animation: enterAnimation ?? undefined,
-                ...slideKeyframes,
-                '@keyframes planExpand': {
-                  '0%': { opacity: 0, transform: 'scale(0.55)' },
-                  '40%': { opacity: 0.7 },
-                  '100%': { opacity: 1, transform: 'scale(1)' },
-                },
-                // 大卡從左下方滑入 — 從視窗左下方往中央上推、不旋轉，
-                // 與主標 Phase D 結束銜接（主標已淡出、舞台清空後大卡才上場）。
-                '@keyframes planSlideUpFromBL': {
-                  '0%': { transform: 'translate(-220px, 280px)', opacity: 0 },
-                  '100%': { transform: 'translate(0, 0)', opacity: 1 },
-                },
-                '@media (prefers-reduced-motion: reduce)': {
-                  animation: 'none',
-                },
-              }}
-            >
-              <PlanCardWithStars plan={activePlan} cardScale={cardScale} />
-            </Box>
-          </Box>
         </Box>
       </Box>
     </Box>

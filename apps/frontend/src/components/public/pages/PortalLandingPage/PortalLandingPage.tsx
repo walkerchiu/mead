@@ -1,6 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import Box from '@mui/material/Box';
 import { useLocale, useTranslations } from 'next-intl';
@@ -14,6 +20,10 @@ import { PlanCarousel } from '../../organisms/PlanCarousel';
 import { PortalFooter } from '../../organisms/PortalFooter';
 import { PortalNarrativeSection } from '../../organisms/PortalNarrativeSection';
 import { portalTokens } from '../../tokens';
+
+/** SSR 安全的 layout effect：伺服器端退回 useEffect，避免 React 警告。 */
+const useIsoLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 export interface PortalLandingPageProps {
   /** 三大計畫資料 */
@@ -207,7 +217,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   }, []);
 
   // 量測 cardMax / segLen（計畫區掛載後、視窗縮放、與圖片載入後各量一次；三張卡高度相近）。
-  useEffect(() => {
+  // 用 layout effect 在 paint 前算好縮放並套用，避免卡片先以原尺寸畫一幀、再縮小的「先大後小」。
+  useIsoLayoutEffect(() => {
     if (!scrollDriven || !mountPlans) return;
     const measure = () => {
       const wrap = cardWrapRef.current;
@@ -235,7 +246,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     measure();
     const tid = window.setTimeout(measure, 400);
     window.addEventListener('resize', measure);
+    // 字體載入會改變卡片高度 → 載入完成後再量一次，讓最終縮放在使用者捲到第二屏前就定案。
+    let cancelled = false;
+    if (typeof document !== 'undefined' && document.fonts?.ready) {
+      document.fonts.ready.then(() => {
+        if (!cancelled) measure();
+      });
+    }
     return () => {
+      cancelled = true;
       window.clearTimeout(tid);
       window.removeEventListener('resize', measure);
     };
@@ -685,6 +704,23 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>
               {mountPlans && planCarousel}
             </Box>
+            {/* 輪播指示點 — 卡片正下方（第二屏）。與卡片的間距依設計稿 72px（社群列底→
+                指示點），並隨 cardScale 等比縮放，維持與卡片相同的視覺比例。 */}
+            <Box
+              sx={{
+                mt: `${72 * cardScale}px`,
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <CarouselDots
+                count={planCount}
+                activeIndex={activeIndex}
+                onSelect={handleDotSelect}
+                labels={orderedPlans.map((p) => p.name.zh)}
+                ariaLabel="計畫切換"
+              />
+            </Box>
           </Box>
         ) : (
           // 手機 / 減少動態：不劫持捲動，原生流；自動輪播 + 指示點切換。
@@ -692,6 +728,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             sx={{ width: '100%', pt: `${PIN_TOP_PAD}px`, overflowX: 'clip' }}
           >
             {mountPlans && planCarousel}
+            <Box sx={{ mt: '14px', display: 'flex', justifyContent: 'center' }}>
+              <CarouselDots
+                count={planCount}
+                activeIndex={activeIndex}
+                onSelect={handleDotSelect}
+                labels={orderedPlans.map((p) => p.name.zh)}
+                ariaLabel="計畫切換"
+              />
+            </Box>
           </Box>
         )}
 
@@ -705,44 +750,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           }}
         >
           <PortalNarrativeSection
-            leadParagraph={t('narrative.lead')}
-            statement={t('narrative.statement')}
-            trailParagraph={t('narrative.trail')}
-            trailParagraph2={t('narrative.trail2')}
+            heading={t('narrative.heading')}
+            intro={t('narrative.intro')}
+            paragraphs={[
+              t('narrative.body1'),
+              t('narrative.body2'),
+              t('narrative.body3'),
+              t('narrative.body4'),
+            ]}
           />
-        </Box>
-
-        {/* 輪播指示點 — 依 Figma node 1:2：置於敘事段落之後、頁尾之前；
-          ≥834px 靠右並帶間距，<834px 置中 */}
-        <Box sx={{ mt: 8, [portalTokens.mq.tabletUp]: { mt: 19 } }}>
-          <Box
-            sx={{
-              maxWidth: portalTokens.layout.maxWidth,
-              mx: 'auto',
-              px: `${portalTokens.layout.gutter}px`,
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: 760,
-                mx: 'auto',
-                display: 'flex',
-                justifyContent: 'center',
-                [portalTokens.mq.tabletUp]: {
-                  justifyContent: 'flex-end',
-                  pr: '84px',
-                },
-              }}
-            >
-              <CarouselDots
-                count={orderedPlans.length}
-                activeIndex={activeIndex}
-                onSelect={handleDotSelect}
-                labels={orderedPlans.map((p) => p.name.zh)}
-                ariaLabel="計畫切換"
-              />
-            </Box>
-          </Box>
         </Box>
       </Box>
       {/* 頁尾（PortalFooter 內部已使用 component="footer" landmark） */}

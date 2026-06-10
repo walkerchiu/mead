@@ -6,108 +6,129 @@ import Typography from '@mui/material/Typography';
 import { portalTokens } from '../../tokens';
 
 export interface PortalNarrativeSectionProps {
-  /** 前導段落 — 小字、靠左 */
-  leadParagraph?: string;
-  /** 重點標語 — 大字、靠右偏移 */
-  statement?: string;
-  /** 收尾段落（第一段）— 小字、靠左 */
-  trailParagraph?: string;
-  /** 收尾段落（第二段）— 小字、靠左，接續第一段 */
-  trailParagraph2?: string;
+  /** 區塊標題 — ≥834px 以直書置於右側 */
+  heading: string;
+  /** 前導段落 */
+  intro?: string;
+  /** 主文段落（依序排列，每段一個元素） */
+  paragraphs?: readonly string[];
 }
 
-/** 前導 / 收尾段落共用樣式 — 依 Figma node 1:41 / 1:42（Inter Regular 14px / 1.8） */
+/** 內文段落共用樣式（Inter / Noto Sans TC Regular 14px、行高 1.8、兩端對齊） */
 const bodySx = {
   fontSize: 14,
   lineHeight: 1.8,
   color: '#000000',
+  textAlign: 'justify',
 } as const;
 
 /**
- * PortalNarrativeSection — 計畫敘事區塊（依 Figma node 1:2 敘事段）。
+ * PortalNarrativeSection — 三大計畫敘事區塊。
  *
- * 「前導段落 → 重點標語 → 收尾段落」的編輯式錯落排版：前導與收尾為靠左
- * 窄欄小字，重點標語為靠右偏移的中字。各段間距依設計稿留白。
+ * ≥834px：右側以直書呈現區塊標題（CJK 字元正立），左側為單欄內文（前導段落
+ * 接續主文各段）；右下角一枚品牌橘圓點作為收束標記。
+ * <834px：標題改為橫書置頂，內文於其下單欄排列。
  */
 export function PortalNarrativeSection({
-  leadParagraph,
-  statement,
-  trailParagraph,
-  trailParagraph2,
+  heading,
+  intro,
+  paragraphs = [],
 }: PortalNarrativeSectionProps) {
   return (
     <Box
       component="section"
-      aria-labelledby={statement ? 'portal-narrative-heading' : undefined}
+      aria-labelledby="portal-narrative-heading"
       sx={{
         maxWidth: portalTokens.layout.maxWidth,
         mx: 'auto',
         px: `${portalTokens.layout.gutter}px`,
       }}
     >
-      {/* 內容帶寬對齊計畫卡片（Figma 卡片寬 772） */}
-      <Box sx={{ maxWidth: 772, mx: 'auto' }}>
-        {/* 前導段落 — 靠左窄欄（Figma node 1:41） */}
-        {leadParagraph && (
-          <Typography
-            component="p"
-            sx={{
-              ...bodySx,
-              maxWidth: 411,
-              [portalTokens.mq.tabletUp]: { ml: '10.1%' },
-            }}
-          >
-            {leadParagraph}
-          </Typography>
-        )}
+      {/* 內容帶寬對齊計畫卡片（展開卡寬 960） */}
+      <Box
+        sx={{
+          maxWidth: 960,
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 4,
+          [portalTokens.mq.tabletUp]: {
+            flexDirection: 'row',
+            alignItems: 'stretch',
+            gap: '72px',
+          },
+        }}
+      >
+        {/* 內文欄 — 前導段落 + 主文各段 */}
+        <Box
+          sx={{
+            flex: 1,
+            maxWidth: 560,
+            [portalTokens.mq.tabletUp]: { ml: '6.5%' },
+          }}
+        >
+          {intro && (
+            <Typography component="p" sx={bodySx}>
+              {intro}
+            </Typography>
+          )}
+          {paragraphs.map((para, i) => (
+            <Typography
+              key={i}
+              component="p"
+              sx={{ ...bodySx, mt: intro || i > 0 ? '1.8em' : 0 }}
+            >
+              {para}
+            </Typography>
+          ))}
+        </Box>
 
-        {/* 重點標語 — 靠右偏移、中字（Figma node 1:43）。語意 h2 作為敘事
-            段落的標題，提供 section landmark 的 aria-labelledby 來源
-            （WCAG 1.3.1 / 2.4.6）。 */}
-        {statement && (
+        {/* 標題欄 — ≥834px 直書置右、橘圓點收於底；<834px 橫書置頂 */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            order: -1,
+            [portalTokens.mq.tabletUp]: {
+              order: 0,
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              flexShrink: 0,
+            },
+          }}
+        >
           <Typography
             id="portal-narrative-heading"
             component="h2"
             sx={{
-              mt: 6,
-              maxWidth: 362,
               fontSize: 18,
               fontWeight: 500,
-              lineHeight: 1.8,
+              letterSpacing: '0.18em',
               color: '#000000',
               [portalTokens.mq.tabletUp]: {
-                mt: '177px',
-                ml: 'auto',
-                mr: '7.8%',
+                writingMode: 'vertical-rl',
+                textOrientation: 'upright',
                 fontSize: 21,
+                lineHeight: 1,
               },
             }}
           >
-            {statement}
+            {heading}
           </Typography>
-        )}
-
-        {/* 收尾段落 — 靠左窄欄，兩段接續（Figma node 1:42） */}
-        {(trailParagraph || trailParagraph2) && (
+          {/* 收束標記 — 品牌橘圓點（裝飾性） */}
           <Box
+            aria-hidden
             sx={{
-              mt: 6,
-              maxWidth: 411,
-              [portalTokens.mq.tabletUp]: { mt: '151px', ml: '10.1%' },
+              flexShrink: 0,
+              width: 16,
+              height: 16,
+              borderRadius: '50%',
+              bgcolor: portalTokens.color.brandOrange,
+              [portalTokens.mq.tabletUp]: { width: 28, height: 28, mt: 'auto' },
             }}
-          >
-            {trailParagraph && (
-              <Typography component="p" sx={bodySx}>
-                {trailParagraph}
-              </Typography>
-            )}
-            {trailParagraph2 && (
-              <Typography component="p" sx={bodySx}>
-                {trailParagraph2}
-              </Typography>
-            )}
-          </Box>
-        )}
+          />
+        </Box>
       </Box>
     </Box>
   );

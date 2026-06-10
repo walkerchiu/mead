@@ -5,7 +5,8 @@ import { useState } from 'react';
 import { CarouselDots } from './CarouselDots';
 
 /**
- * 入口網輪播指示點：作用中為品牌橘，其餘深色；支援圓形與六角形。
+ * 入口網輪播指示點：三種形狀（微鋸齒星形／近圓多邊形／六邊形），
+ * 作用中為品牌橘、其餘淺灰。
  */
 const meta = {
   title: 'Public Scope/Atoms/CarouselDots',

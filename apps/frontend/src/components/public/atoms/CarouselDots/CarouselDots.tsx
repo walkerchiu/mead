@@ -5,11 +5,12 @@ import Box from '@mui/material/Box';
 import { portalTokens } from '../../tokens';
 
 /**
- * 三個指示點的形狀 — 依 Figma node 1:2 的 Star 90/91/92，與 hero 文字雲三圖形
- * 一致：① 微鋸齒星形 ② 近圓多邊形 ③ 六邊形。
+ * 三個指示點的形狀 — 與 hero 文字雲三圖形（DecorativeTextCloud 的 SHAPE_META）
+ * 完全一致，即設計稿三計畫的標記：① 微鋸齒星形（菁培）② 近圓多邊形（設計戰國策）
+ * ③ 六邊形（創意設計大賽）。數值需與 hero 同步以維持視覺一致。
  */
 const DOT_SHAPES = [
-  { rotation: 8, sides: 16, innerRatio: 0.93 },
+  { rotation: 8, sides: 11, innerRatio: 0.89 },
   { rotation: 14, sides: 13, innerRatio: 1 },
   { rotation: 0, sides: 6, innerRatio: 1 },
 ] as const;
@@ -43,9 +44,9 @@ export interface CarouselDotsProps {
   activeIndex: number;
   /** 點擊指示點的回呼 */
   onSelect?: (index: number) => void;
-  /** 指示點尺寸（px），預設 28（依 Figma node 1:44 Star 90/91/92） */
+  /** 指示點尺寸（px），預設 16（依 Figma node 1:44 Star 90/91/92） */
   size?: number;
-  /** 每個指示點對應的可讀名稱（如「教育部藝術與設計菁英海外培訓計畫」），
+  /** 每個指示點對應的可讀名稱（如「臺灣國際學生創意設計大賽」），
    *  作為 aria-label 提供給讀屏使用者；未提供時退回「第 N 個計畫」。 */
   labels?: readonly string[];
   /** 整組指示點的可讀區塊標籤，作為 nav landmark 的 aria-label。 */
@@ -53,22 +54,19 @@ export interface CarouselDotsProps {
 }
 
 /**
- * CarouselDots — 入口網輪播指示點。
+ * CarouselDots — 入口網輪播指示點，置於計畫卡片下方顯示目前位置。
  *
- * 依設計稿（node 1:2 的 Star 90/91/92），三個指示點為三種不同形狀
- * （與 hero 文字雲一致）：微鋸齒星形、近圓多邊形、六邊形。
- * 作用中為品牌橘實心、其餘為深色實心。
+ * 依設計稿（node 1:2 的 Star 90/91/92），三個指示點為三種不同形狀（與各計畫標記
+ * 呼應）：微鋸齒星形、近圓多邊形、六邊形。作用中為品牌橘實心、其餘為淺灰實心。
  *
- * 語意：原本套 `role="tablist"` 但沒有對應的 tabpanel 與鍵盤模式，反而不合
- * ARIA Authoring Practices。改用 `<nav>` + `<button aria-current>`（WAI 推薦
- * 用於非 tablist 切換器）— 讀屏會唸出「目前頁面/項目」狀態，鍵盤也走原生
- * button 行為，毋需自訂 ←→ 處理。
+ * 語意：用 `<nav>` + `<button aria-current>`（WAI 推薦的非 tablist 切換器寫法）—
+ * 讀屏會唸出「目前項目」狀態，鍵盤走原生 button 行為。
  */
 export function CarouselDots({
   count,
   activeIndex,
   onSelect,
-  size = 28,
+  size = 16,
   labels,
   ariaLabel = '計畫輪播',
 }: CarouselDotsProps) {
@@ -76,7 +74,7 @@ export function CarouselDots({
     <Box
       component="nav"
       aria-label={ariaLabel}
-      sx={{ display: 'inline-flex', alignItems: 'center', gap: 2 }}
+      sx={{ display: 'inline-flex', alignItems: 'center', gap: '12px' }}
     >
       {Array.from({ length: count }, (_, i) => {
         const active = i === activeIndex;
@@ -97,10 +95,9 @@ export function CarouselDots({
               height: size,
               // 每個指示點對應一種形狀（依序循環）
               clipPath: DOT_CLIPS[i % DOT_CLIPS.length],
-              bgcolor: active
-                ? portalTokens.color.brandOrange
-                : portalTokens.color.ink,
-              transition: 'opacity 0.2s ease, transform 0.2s ease',
+              // 作用中：品牌橘；其餘：淺灰（依設計稿 #B2B2B2）
+              bgcolor: active ? portalTokens.color.brandOrange : '#B2B2B2',
+              transition: 'background-color 0.3s ease, opacity 0.2s ease',
               '&:hover': { opacity: active ? 1 : 0.7 },
               '&:focus-visible': portalTokens.focusRing,
             }}
