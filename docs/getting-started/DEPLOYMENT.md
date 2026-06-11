@@ -392,3 +392,31 @@ kubectl rollout undo deployment/mead-backend
 - [備份還原](../database/BACKUP_RESTORE.md)
 - [疑難排解](./TROUBLESHOOTING.md)
 - [貢獻指南](./CONTRIBUTING.md)
+
+## 容器化部署與 per-env override
+
+backend / frontend 可容器化部署（compose profile `app`）；各環境的資源限額走 per-host override，與本機 dev 流程互不影響。
+
+### Per-env compose override
+
+範本 `docker-compose.<env>.override.yml.example`（已入庫）含各服務 cpus / mem 限額（dev 另含容器內連線改用 compose service name 的覆寫）。套用：
+
+```bash
+cp docker-compose.<env>.override.yml.example docker-compose.<env>.override.yml
+```
+
+實際檔 `docker-compose.<env>.override.yml` 為 gitignored（每機器值不同）。`cli.sh` 的 up 路徑會依 `.current-env` 自動 `-f` 疊上對應 override（見 `scripts/utils/common.sh` 的 `get_compose_override`）；未 cp 出實際檔時不加 `-f`、行為與未導入 override 時完全相同。
+
+### 容器化 app 部署
+
+```bash
+docker compose --env-file .env.docker -f docker-compose.yml \
+  -f docker-compose.<env>.override.yml --profile app up -d --build
+```
+
+`--profile app` 起 backend / frontend（不帶 `--profile tools`，mailpit / adminer 不啟）。前端 `NEXT_PUBLIC_*` 於 build 時由 compose `build.args`（值取自 `.env.docker`）烘進 client bundle。另有自架 HTTPS 部署見 `docs/infrastructure/SELF_HOSTED_TLS_DEPLOYMENT.md`（`docker-compose.selfhost.yml`）。
+
+### 環境設定檔
+
+- `./scripts/cli.sh env switch <env>` 把選定範本複製到固定執行期檔（`.env.docker` / `apps/backend/.env` / `apps/frontend/.env`）。
+- 對特定環境跑資料庫 migration 時，後端連線取自 `apps/backend/.env.prod`（production）、`.env.uat`（uat）等。
