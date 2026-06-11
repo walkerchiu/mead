@@ -187,7 +187,7 @@ JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 ```
 
-**Production (.env.production.example):**
+**Production (.env.prod.example):**
 
 ```env
 # Access Token 過期時間（生產環境建議 15 分鐘）

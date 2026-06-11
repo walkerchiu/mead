@@ -1203,7 +1203,9 @@ node cleanup-unused-i18n-keys.js --confirm  # 確認刪除
 
 - local - 本地開發環境
 - dev - 開發環境
+- sit - 系統整合測試環境
 - uat - 測試環境
+- staging - 生產鏡像環境
 - prod - 生產環境
 
 **3. switch - 切換到指定環境**
@@ -1216,7 +1218,9 @@ node cleanup-unused-i18n-keys.js --confirm  # 確認刪除
 
 - `local` - 本地開發
 - `dev` - 開發環境
+- `sit` - 系統整合測試環境
 - `uat` - 測試環境
+- `staging` - 生產鏡像環境
 - `prod` - 生產環境
 
 **切換流程：**

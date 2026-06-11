@@ -221,7 +221,7 @@ NEXT_PUBLIC_SENTRY_DSN=your-uat-dsn     # 使用獨立的 UAT Sentry 專案
 #### 生產環境 (Production)
 
 ```bash
-# .env.production.example (生產環境)
+# .env.prod.example (生產環境)
 NEXT_PUBLIC_APOLLO_TIMEOUT=60000        # 60s - 提升用戶體驗
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=5        # 5 次重試
 NEXT_PUBLIC_APOLLO_RETRY_MAX_DELAY=15000 # 15s - 更長的最大延遲

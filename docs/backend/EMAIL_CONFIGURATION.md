@@ -77,7 +77,7 @@ pnpm add -D @types/nodemailer
 cp apps/backend/.env.example apps/backend/.env
 
 # 生產環境
-cp apps/backend/.env.production.example apps/backend/.env.production
+cp apps/backend/.env.prod.example apps/backend/.env.production
 ```
 
 ### 3. 啟動服務

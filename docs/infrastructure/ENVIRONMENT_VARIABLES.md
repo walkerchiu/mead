@@ -90,11 +90,11 @@ mead/
 │   ├── backend/
 │   │   ├── .env             # Backend 開發環境變數 ❌ 不提交
 │   │   ├── .env.example     # Backend 範本 ✅
-│   │   └── .env.production.example  # Backend 生產範本 ✅
+│   │   └── .env.prod.example  # Backend 生產範本 ✅
 │   └── frontend/
 │       ├── .env             # Frontend 開發環境變數 ❌ 不提交
 │       ├── .env.example     # Frontend 範本 ✅
-│       └── .env.production.example  # Frontend 生產範本 ✅
+│       └── .env.prod.example  # Frontend 生產範本 ✅
 ```
 
 **圖例**：
@@ -458,18 +458,18 @@ pnpm dev
 
 ### 生產環境 (Production)
 
-**Docker**: 使用 `.env.docker.production`（需自行創建）
+**Docker**: 使用 `.env.docker.prod`（需自行創建）
 
 ```bash
-cp .env.docker.example .env.docker.production
-vim .env.docker.production  # 填入強密碼
-docker-compose --env-file .env.docker.production up -d
+cp .env.docker.example .env.docker.prod
+vim .env.docker.prod  # 填入強密碼
+docker-compose --env-file .env.docker.prod up -d
 ```
 
 **Backend**: 使用 `.env.production`
 
 ```bash
-cp .env.production.example .env.production
+cp .env.prod.example .env.production
 vim .env.production  # 填入強密碼和生產配置
 NODE_ENV=production pnpm start
 ```
@@ -477,7 +477,7 @@ NODE_ENV=production pnpm start
 **Frontend**: 使用 `.env.production`
 
 ```bash
-cp .env.production.example .env.production
+cp .env.prod.example .env.production
 vim .env.production  # 填入生產配置
 
 # .env.production (生產環境完整配置)

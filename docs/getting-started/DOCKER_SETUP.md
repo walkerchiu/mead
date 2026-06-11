@@ -259,7 +259,7 @@ postgresql://postgres:YOUR_PASSWORD@localhost:5432/mead_db
 ```text
 .env.docker           # 開發環境
 .env.docker.uat   # 測試環境
-.env.docker.production# 生產環境
+.env.docker.prod# 生產環境
 ```
 
 ### 4. 容器安全

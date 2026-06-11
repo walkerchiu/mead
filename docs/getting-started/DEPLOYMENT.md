@@ -36,7 +36,8 @@ MEAD 規劃四層環境：
 - `.env.example` — Dev 參考
 - `.env.dev.example` — Dev
 - `.env.uat.example` — UAT
-- `.env.production.example` — Production
+- `.env.staging.example` — Staging
+- `.env.prod.example` — Production
 
 ---
 
@@ -159,7 +160,8 @@ MEAD 規劃四層環境：
 .env.example              # Dev 範本（commit）
 .env.dev.example          # Dev 範本（commit）
 .env.uat.example          # UAT 範本（commit）
-.env.production.example   # Production 範本（commit）
+.env.staging.example      # Staging 範本（commit）
+.env.prod.example   # Production 範本（commit）
 
 .env                      # Dev 本機（.gitignore）
 .env.docker               # Dev Docker（.gitignore）
