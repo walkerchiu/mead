@@ -364,12 +364,17 @@ env_switch() {
 
   # 步驟 7: 啟動 Docker 服務
   log_step "啟動 Docker 服務"
-  # prod 不啟 dev 工具（mailpit / adminer 屬 profile tools）；其餘環境帶 --profile tools。
-  local up_profiles=()
-  if [[ "$target" != "prod" && "$target" != "production" ]]; then
-    up_profiles=(--profile tools)
+  local up_args=(--env-file "$PROJECT_ROOT/.env.docker")
+  # per-host override（存在才疊；未 cp 出實際檔時回空字串 → 行為與未導入 override 完全相同）。
+  local _ov; _ov="$(get_compose_override)"
+  if [[ -n "$_ov" ]]; then
+    up_args+=(-f docker-compose.yml -f "$_ov")
   fi
-  if docker compose --env-file "$PROJECT_ROOT/.env.docker" "${up_profiles[@]}" up -d 2>/dev/null; then
+  # prod 不啟 dev 工具（mailpit / adminer 屬 profile tools）；其餘環境帶 --profile tools。
+  if [[ "$target" != "prod" && "$target" != "production" ]]; then
+    up_args+=(--profile tools)
+  fi
+  if docker compose "${up_args[@]}" up -d 2>/dev/null; then
     log_success "Docker 服務已啟動"
   else
     log_error "Docker 服務啟動失敗"

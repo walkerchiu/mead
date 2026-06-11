@@ -24,6 +24,14 @@ storybook-static/
 .env.docker
 !.env.docker.example
 
+# Per-host docker compose override（每環境 override，對齊 .env.docker.<env>.example）
+# 從 docker-compose.<env>.override.yml.example 衍生；每台機器值不同，不入庫。
+docker-compose.dev.override.yml
+docker-compose.sit.override.yml
+docker-compose.uat.override.yml
+docker-compose.staging.override.yml
+docker-compose.prod.override.yml
+
 # SeaweedFS generated config (generated from infra/seaweedfs/s3.json.template)
 infra/seaweedfs/s3.json
 

@@ -1,0 +1,37 @@
+# docker-compose.prod.override.yml.example — Per-host prod override（疊在 docker-compose.yml 上，gitignored）
+#
+# 每環境 override 模型，對齊 .env.docker.prod.example：範本（此 .example）tracked → `cp` 成
+# docker-compose.prod.override.yml（gitignored）。`.current-env` = prod 時 cli.sh 自動 -f 疊上。
+#
+# 角色：base（docker-compose.yml）不含任何資源限額；本檔是 prod 的限額唯一來源；不含 dev 工具。
+#   容器化部署：docker compose --env-file .env.docker -f docker-compose.yml \
+#     -f docker-compose.prod.override.yml --profile app up -d
+#   （--profile app 起 backend / frontend；不帶 --profile tools，mailpit / adminer 不啟）。
+#   prod 的 apps/backend/.env 已用 compose service name 連線，故無 dev 那種連線覆寫。
+# 下列為 8 vCPU / 16 GB target 規格；換規格時等比例調整。
+
+services:
+  timescaledb:
+    cpus: 3.0
+    mem_limit: 5g
+    mem_reservation: 2g
+
+  rabbitmq:
+    cpus: 0.5
+    mem_limit: 1g
+    mem_reservation: 384m
+
+  dragonfly:
+    cpus: 1.0
+    mem_limit: 2g
+    mem_reservation: 512m
+
+  backend:
+    cpus: 2.0
+    mem_limit: 2g
+    mem_reservation: 768m
+
+  frontend:
+    cpus: 1.0
+    mem_limit: 2g
+    mem_reservation: 384m

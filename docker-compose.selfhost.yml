@@ -1,8 +1,10 @@
-# 正式環境：app（前端 + 後端）+ Caddy 反向代理（自動 HTTPS）。
-# 與基礎設施 docker-compose.yml 疊加使用：
+# docker-compose.selfhost.yml — 自架部署 overlay：Caddy 反向代理（自動 HTTPS）+ 容器化 app。
+# 與基礎設施 docker-compose.yml 疊加、並帶 --profile app（backend / frontend 定義在 base，profile app）：
 #
-#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#   docker compose -f docker-compose.yml -f docker-compose.selfhost.yml --profile app up -d --build
 #
+# 注意：本檔是「自架 HTTPS 部署」用途，與資源限額 override（docker-compose.<env>.override.yml）**不同**，
+#       兩者命名刻意區分以免混淆；需要時可再疊資源限額：再加 -f docker-compose.prod.override.yml。
 # 前置：建立 .env（含 SITE_DOMAIN、ACME_EMAIL）、
 #       apps/frontend/.env.production、apps/backend/.env.production
 
@@ -26,23 +28,17 @@ services:
       - frontend
       - backend
 
-  # 前端入口網（Next.js standalone）
+  # 前端入口網（Next.js standalone）— 服務本體定義在 base（profile app），此處疊加自架部署設定。
   frontend:
-    build:
-      context: .
-      dockerfile: apps/frontend/Dockerfile
-    restart: unless-stopped
+    profiles: ['app']
     env_file:
       - apps/frontend/.env.production
     expose:
       - '3000' # 僅供內網（Caddy）存取，不對外開埠
 
-  # 後端（NestJS GraphQL）
+  # 後端（NestJS GraphQL）— 服務本體定義在 base（profile app），此處疊加自架部署設定。
   backend:
-    build:
-      context: .
-      dockerfile: apps/backend/Dockerfile
-    restart: unless-stopped
+    profiles: ['app']
     env_file:
       - apps/backend/.env.production
     expose:

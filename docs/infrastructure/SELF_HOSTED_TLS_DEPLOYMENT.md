@@ -23,14 +23,14 @@
 
 ## 相關檔案
 
-| 檔案                       | 作用                                                  |
-| -------------------------- | ----------------------------------------------------- |
-| `deploy/Caddyfile`         | 反向代理 + 自動 HTTPS 設定（網域、email 由 env 注入） |
-| `apps/frontend/Dockerfile` | 前端映像（Next.js standalone，多階段、非 root）       |
-| `apps/backend/Dockerfile`  | 後端映像（NestJS + Prisma generate）                  |
-| `docker-compose.prod.yml`  | caddy + frontend + backend（與基礎設施 compose 疊加） |
-| `.dockerignore`            | 縮小 build context                                    |
-| `next.config.ts`           | 已加 `output: 'standalone'` + `outputFileTracingRoot` |
+| 檔案                          | 作用                                                                                                                  |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `deploy/Caddyfile`            | 反向代理 + 自動 HTTPS 設定（網域、email 由 env 注入）                                                                 |
+| `apps/frontend/Dockerfile`    | 前端映像（Next.js standalone，多階段、非 root）                                                                       |
+| `apps/backend/Dockerfile`     | 後端映像（NestJS + Prisma generate）                                                                                  |
+| `docker-compose.selfhost.yml` | caddy 反向代理 overlay；frontend / backend 本體在 base（profile app），疊加 `-f docker-compose.yml ... --profile app` |
+| `.dockerignore`               | 縮小 build context                                                                                                    |
+| `next.config.ts`              | 已加 `output: 'standalone'` + `outputFileTracingRoot`                                                                 |
 
 ## 前置條件（缺一不可）
 
@@ -43,7 +43,7 @@
 
 ### 1. 建立環境檔
 
-根目錄 `.env`（供 docker-compose.prod.yml 注入 Caddy）：
+根目錄 `.env`（供 docker-compose.selfhost.yml 注入 Caddy）：
 
 ```dotenv
 SITE_DOMAIN=portal.業主網域.gov.tw
@@ -74,16 +74,16 @@ Let's Encrypt 正式環境有 rate limit；先用 staging 驗證整套流程：
 # 先起基礎設施（DB 等）
 docker compose up -d
 # 套用資料庫 migration（後端首次部署）
-docker compose -f docker-compose.yml -f docker-compose.prod.yml run --rm backend \
+docker compose -f docker-compose.yml -f docker-compose.selfhost.yml --profile app run --rm backend \
   pnpm --filter @mead/backend exec prisma migrate deploy
 # 起 app + Caddy（會自動申請憑證）
-docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.yml -f docker-compose.selfhost.yml --profile app up -d --build
 ```
 
 ### 4. 驗證
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml logs -f caddy   # 看憑證申請是否成功
+docker compose -f docker-compose.yml -f docker-compose.selfhost.yml logs -f caddy   # 看憑證申請是否成功
 curl -I https://portal.業主網域.gov.tw                                          # 應為 200 + HTTPS
 ```
 

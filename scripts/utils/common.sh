@@ -16,6 +16,34 @@ export BOLD='\033[1m'
 export DIM='\033[2m'
 export NC='\033[0m' # No Color
 
+# 依 .current-env 推導「應該用的」per-host compose override 檔名（不檢查是否存在）。
+# 對齊 .env.docker.<env>.example 的每環境模型：override 範本 *.override.yml.example tracked、
+# 實際檔 docker-compose.<env>.override.yml gitignored，由 cli 在 runtime 依當前環境自動挑
+# （env switch 切 .env.docker / .env，up 時才 -f 疊上 override）。
+#   local | dev → docker-compose.dev.override.yml
+#   sit/uat/staging/prod → docker-compose.<env>.override.yml
+get_compose_override_name() {
+  local root="${PROJECT_ROOT:-$(pwd)}"
+  local env="local"
+  [[ -f "$root/.current-env" ]] && env="$(tr -d '[:space:]' < "$root/.current-env")"
+  [[ -z "$env" ]] && env="local"
+  case "$env" in
+    sit) echo "docker-compose.sit.override.yml" ;;
+    uat) echo "docker-compose.uat.override.yml" ;;
+    staging) echo "docker-compose.staging.override.yml" ;;
+    prod) echo "docker-compose.prod.override.yml" ;;
+    *) echo "docker-compose.dev.override.yml" ;;
+  esac
+}
+
+# 回傳「存在的」override 檔名（相對 PROJECT_ROOT）；不存在則回空字串，呼叫端自行決定是否 -f。
+# 預設情況（未 cp 出實際 override 檔）回空字串 → 所有指令行為與未導入 override 時完全相同。
+get_compose_override() {
+  local root="${PROJECT_ROOT:-$(pwd)}"
+  local file; file="$(get_compose_override_name)"
+  [[ -f "$root/$file" ]] && echo "$file" || echo ""
+}
+
 # 日誌函數
 log_info() {
   echo -e "${BLUE}ℹ${NC}  $1"

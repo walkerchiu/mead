@@ -1,0 +1,43 @@
+# docker-compose.uat.override.yml.example — Per-host UAT override（疊在 docker-compose.yml 上，gitignored）
+#
+# 每環境 override 模型，對齊 .env.docker.uat.example：範本 tracked → `cp` 成
+# docker-compose.uat.override.yml（gitignored）。`.current-env` = uat 時 cli.sh 自動 -f 疊上。
+#
+# base 不含資源限額；本檔是 UAT 的限額唯一來源。UAT 部署的 .env 連線已用 service name。
+# 下列為 ~4 vCPU / 8 GB 機器規格（較 SIT 大、接近 prod 行為以利使用者測試）。
+
+services:
+  timescaledb:
+    cpus: 2.0
+    mem_limit: 2g
+    mem_reservation: 768m
+
+  rabbitmq:
+    cpus: 0.5
+    mem_limit: 512m
+    mem_reservation: 192m
+
+  dragonfly:
+    cpus: 0.75
+    mem_limit: 768m
+    mem_reservation: 256m
+
+  backend:
+    cpus: 1.5
+    mem_limit: 1g
+    mem_reservation: 384m
+
+  frontend:
+    cpus: 0.75
+    mem_limit: 768m
+    mem_reservation: 256m
+
+  mailpit:
+    cpus: 0.2
+    mem_limit: 128m
+    mem_reservation: 32m
+
+  adminer:
+    cpus: 0.2
+    mem_limit: 128m
+    mem_reservation: 32m

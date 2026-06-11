@@ -1,0 +1,64 @@
+# docker-compose.dev.override.yml.example — Per-host dev override（疊在 docker-compose.yml 上）
+#
+# base（docker-compose.yml）不含任何資源限額；本檔是 dev 的限額**唯一來源**，兩個用途：
+#   1. dev limits — dev 主機規格通常遠小於 prod target，此處給 dev 規格的 cpus / mem。
+#   2. 容器化 app 連線覆寫 — apps/backend/.env 的連線用 localhost（給 host 上 pnpm dev）。
+#      backend 跑在容器內時 localhost 指向容器自己，連不到 timescaledb / dragonfly / rabbitmq
+#      容器；必須改用同網路的 compose service name。下方 backend 的 environment 即此覆寫，
+#      host 的 .env 維持不動；敏感值不寫死，沿用 --env-file .env.docker 的變數插值。
+#
+# 把此檔 cp 成 docker-compose.dev.override.yml（.gitignore 內已忽略），cli.sh 依 .current-env 自動 -f 套用。
+#
+# 預設此 sample 針對 **2 vCPU / 4 GB host**；升 / 換機後可整列等比例放大 cpus / mem。
+#
+# 用法：
+#   1. cp docker-compose.dev.override.yml.example docker-compose.dev.override.yml
+#   2. （可選）視自家 host 規格調整下列數字
+#   3. ./scripts/cli.sh env switch dev   # 或 docker compose ... --profile app up -d 套用
+
+# 容器內連線覆寫（service name；敏感值走 .env.docker 變數插值）。NEXT_PUBLIC_* 在 build 時
+# 烘焙進前端 bundle，不受 runtime environment 影響，故 frontend 無連線覆寫。
+x-app-env: &app-env
+  DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD}@timescaledb:5432/${POSTGRES_DB:-mead_db}?schema=public&connection_limit=10&pool_timeout=10
+  REDIS_HOST: dragonfly
+  REDIS_PORT: '6379'
+  RABBITMQ_URL: amqp://${RABBITMQ_DEFAULT_USER:-hq}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+
+services:
+  timescaledb:
+    cpus: 1.5
+    mem_limit: 1g
+    mem_reservation: 384m
+
+  rabbitmq:
+    cpus: 0.3
+    mem_limit: 384m
+    mem_reservation: 128m
+
+  dragonfly:
+    cpus: 0.5
+    mem_limit: 384m
+    mem_reservation: 128m
+
+  # 容器化 backend：連線改指向 compose service name（見檔首用途 2）。
+  backend:
+    cpus: 1.0
+    mem_limit: 768m
+    mem_reservation: 256m
+    environment: *app-env
+
+  frontend:
+    cpus: 0.5
+    mem_limit: 512m
+    mem_reservation: 192m
+
+  # dev 工具（profile tools）— 設小 limits 保險，避免吃光 dev 記憶體。
+  mailpit:
+    cpus: 0.2
+    mem_limit: 128m
+    mem_reservation: 32m
+
+  adminer:
+    cpus: 0.2
+    mem_limit: 128m
+    mem_reservation: 32m

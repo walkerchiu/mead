@@ -3,7 +3,9 @@
 #   - 無 profile（always-on）：核心 infra timescaledb / rabbitmq / dragonfly。
 #   - profile `tools`：mailpit / adminer（dev 工具，prod 不啟）。
 #   - profile `storage`：SeaweedFS 四件套。
-# 後端 / 前端目前跑在 host（cli.sh dev / pnpm dev），未納入 compose；無 app profile。
+#   - profile `app`：backend / frontend（dev 平常跑 host，容器版供 sit/uat/staging/prod 部署與驗證）。
+# 各環境差異（資源限額、dev 容器內連線覆寫）走 per-host override `docker-compose.<env>.override.yml`
+#   （每機器值不同而 gitignored，範本 *.override.yml.example tracked，由 cli.sh 依 .current-env 自動 -f 疊上）。
 # 本檔不含任何資源限額（cpus / mem_limit）。
 
 name: mead
@@ -201,6 +203,56 @@ services:
       - WEED_S3_DEFAULT_PWD=${SEAWEEDFS_S3_PASSWORD:-admin123}
     # 注意：S3 API 所有端點都需要認證，無法使用簡單的 HTTP 健康檢查
     # 服務能綁定端口即代表正常運行
+
+  # ==========================================
+  # 應用服務（profile `app`）—— dev 平常跑 host（cli.sh dev / pnpm dev），容器版供
+  # sit/uat/staging/prod 部署與容器化驗證。資源限額在 docker-compose.<env>.override.yml（本檔不含限額）。
+  # 容器化部署：docker compose --env-file .env.docker -f docker-compose.yml \
+  #   -f docker-compose.<env>.override.yml --profile app up -d --build
+  # dev 在容器內跑時，apps/backend/.env 的連線是 localhost（給 host），須靠 dev override 把連線
+  # 改指向 compose service name（timescaledb / dragonfly / rabbitmq），否則容器連不到 infra。
+  # ==========================================
+  backend:
+    image: mead-backend:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: mead-backend
+    restart: unless-stopped
+    profiles: ['app']
+    ports:
+      - '127.0.0.1:${BACKEND_PORT:-4000}:4000'
+    env_file:
+      - ./apps/backend/.env
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      dragonfly:
+        condition: service_healthy
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'wget -q --spider http://localhost:4000/health || exit 1']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    image: mead-frontend:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: mead-frontend
+    restart: unless-stopped
+    profiles: ['app']
+    ports:
+      - '127.0.0.1:${FRONTEND_PORT:-3000}:3000'
+    env_file:
+      - ./apps/frontend/.env
+    depends_on:
+      backend:
+        condition: service_healthy
 
 volumes:
   timescaledb-data:
