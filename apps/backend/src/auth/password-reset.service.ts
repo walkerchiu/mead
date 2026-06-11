@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { assertPasswordStrengthAsync } from '../common/utils/password-validator';
 import { logger } from '../common/services/logger.service';
 import { NotificationService } from '../notification/notification.service';
+import { AccessScope } from '../common/enums/access-scope.enum';
 import { RevokedMethod } from './hq-session.types';
 
 @Injectable()
@@ -86,13 +87,18 @@ export class PasswordResetService {
       },
     });
 
+    // HQ 帳號的重設連結走 /hq/reset-password 分軌（對齊前端 auth 路由分軌）
+    const resetUrl = user.accessScopes?.includes(AccessScope.HQ_SCOPE)
+      ? this.RESET_URL.replace(/\/reset-password$/, '/hq/reset-password')
+      : this.RESET_URL;
+
     // 發送重置 email
     try {
       await this.mailService.sendPasswordResetEmail(
         user.email,
         user.name,
         rawToken,
-        this.RESET_URL,
+        resetUrl,
         ipAddress,
         lang,
       );

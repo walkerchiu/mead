@@ -24,20 +24,19 @@ import { useParams } from 'next/navigation';
 import { useApolloClient } from '@apollo/client/react';
 
 /**
- * customer 登入頁落點：以登入入口 scope 優先 —— 含 CUSTOMER_SCOPE → /dashboard，
- * 僅 HQ_SCOPE → fallback /hq/users，純 public（無商業 scope）→ /settings/security。
+ * HQ 登入頁落點：以登入入口 scope 優先 —— 含 HQ_SCOPE → /hq/users，
+ * 僅 CUSTOMER_SCOPE → fallback /dashboard，無 scope → /dashboard。
  */
 function resolveLandingPath(): string {
   const token = getAccessToken();
   if (!token) return '/dashboard';
   const scopes = (parseJwt(token)?.accessScopes as string[]) || [];
-  if (scopes.includes(AccessScope.CUSTOMER_SCOPE)) return '/dashboard';
   if (scopes.includes(AccessScope.HQ_SCOPE)) return '/hq/users';
-  // 純 public（無商業 scope）：/dashboard 受 CUSTOMER_SCOPE 守門進不去，導向無守門的個人安全頁。
-  return '/settings/security';
+  if (scopes.includes(AccessScope.CUSTOMER_SCOPE)) return '/dashboard';
+  return '/dashboard';
 }
 
-export default function LoginPage() {
+export default function HqLoginPage() {
   const router = useRouter();
   const params = useParams();
   const apolloClient = useApolloClient();
@@ -57,24 +56,19 @@ export default function LoginPage() {
     VERIFY_TWO_FACTOR_LOGIN_MUTATION,
   );
 
-  // 背景檢查是否已登入，如果已登入則重定向到首頁
   useEffect(() => {
     const checkAuth = async () => {
-      // 立即檢查一次
       if (isAuthenticated()) {
         setRedirecting(true);
         router.replace(resolveLandingPath());
         return;
       }
 
-      // 使用輪詢機制再檢查幾次（最多 300ms）
       const maxAttempts = 3;
       let attempts = 0;
-
       while (attempts < maxAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         attempts++;
-
         if (isAuthenticated()) {
           setRedirecting(true);
           router.replace(resolveLandingPath());
@@ -86,9 +80,6 @@ export default function LoginPage() {
     checkAuth();
   }, [router]);
 
-  /**
-   * 登入成功後根據 profile.language 導向正確 locale 的落點
-   */
   const redirectToDashboard = async () => {
     const landing = resolveLandingPath();
     try {
@@ -98,7 +89,6 @@ export default function LoginPage() {
       });
       const profileLanguage = (meData as any)?.me?.profile?.language;
       if (profileLanguage && profileLanguage !== currentLocale) {
-        // locale 不同，用完整 URL 跳轉到正確 locale
         window.location.href = `/${profileLanguage}${landing}`;
         return;
       }
@@ -215,6 +205,7 @@ export default function LoginPage() {
           onSubmit={handleLogin}
           loading={loginLoading || redirecting}
           error={loginError}
+          forgotPasswordHref="/hq/forgot-password"
         />
       ) : (
         <TwoFactorForm

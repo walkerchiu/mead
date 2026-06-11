@@ -12,6 +12,7 @@ import {
   isAuthInitComplete,
 } from '@/lib/auth';
 import { useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 // Context to notify children when auth is ready
@@ -69,6 +70,13 @@ function hasAnyPermission(requiredPermissions: string[]): boolean {
   );
 }
 
+/**
+ * 依當前路徑是否含 /hq/ 決定未登入導向 HQ 或 customer 登入頁（不含 locale 前綴，router 會自動補）。
+ */
+function resolveLoginRoute(pathname: string | null): string {
+  return pathname && pathname.includes('/hq/') ? '/hq/login' : '/login';
+}
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredPermission?: string; // Legacy support (single permission)
@@ -83,6 +91,7 @@ export default function ProtectedRoute({
   requiredScopes,
 }: ProtectedRouteProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const t = useTranslations('common.error');
   const [checking, setChecking] = useState(true);
   const [authed, setAuthed] = useState(false);
@@ -184,7 +193,7 @@ export default function ProtectedRoute({
             '[ProtectedRoute] Auth init completed but not authenticated, redirecting to login',
           );
           setChecking(false);
-          router.push('/login');
+          router.push(resolveLoginRoute(pathname));
           return;
         }
 
@@ -208,7 +217,7 @@ export default function ProtectedRoute({
           setAuthReady(true);
         } else {
           setChecking(false);
-          router.push('/login');
+          router.push(resolveLoginRoute(pathname));
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Authentication failed');
@@ -217,7 +226,14 @@ export default function ProtectedRoute({
     };
 
     check();
-  }, [requiredPermission, requiredPermissions, requiredScopes, router, t]);
+  }, [
+    requiredPermission,
+    requiredPermissions,
+    requiredScopes,
+    router,
+    t,
+    pathname,
+  ]);
 
   // Authentication checking — show a thin fixed top progress bar (NextTopLoader-style)
   // so the user gets immediate feedback instead of staring at a blank page.
@@ -236,7 +252,11 @@ export default function ProtectedRoute({
         severity={isPermissionError ? 'warning' : 'error'}
         showRetry
         retryText={isPermissionError ? t('backToHome') : 'Back to Login'}
-        onRetry={() => router.push(isPermissionError ? '/dashboard' : '/login')}
+        onRetry={() =>
+          router.push(
+            isPermissionError ? '/dashboard' : resolveLoginRoute(pathname),
+          )
+        }
       />
     );
   }

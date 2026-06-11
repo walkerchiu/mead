@@ -20,6 +20,8 @@ export interface LoginFormProps {
   error?: string;
   defaultEmail?: string;
   showForgotPassword?: boolean;
+  /** 「忘記密碼」連結目標（HQ 軌傳 /hq/forgot-password）。 */
+  forgotPasswordHref?: string;
 }
 
 export type LoginFormData = {
@@ -33,6 +35,7 @@ export function LoginForm({
   error,
   defaultEmail = '',
   showForgotPassword = true,
+  forgotPasswordHref = '/forgot-password',
 }: LoginFormProps) {
   const t = useTranslations('auth.login');
   const tv = useTranslations('validation');
@@ -106,7 +109,7 @@ export function LoginForm({
         <Box sx={{ mt: 1, mb: 2, textAlign: 'right' }}>
           <Link
             component={NextLink}
-            href="/forgot-password"
+            href={forgotPasswordHref}
             variant="body2"
             underline="hover"
           >

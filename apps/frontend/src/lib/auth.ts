@@ -181,9 +181,18 @@ const getLocalePrefix = (): string => {
 };
 
 /**
- * 取得登入頁路徑（含 locale 前綴）
+ * 取得登入頁路徑（含 locale 前綴）。依當前 URL 是否含 `/hq/` 前綴分流 HQ / customer 登入頁。
  */
-export const getLoginPath = (): string => `${getLocalePrefix()}/login`;
+export const getLoginPath = (): string => {
+  const prefix = getLocalePrefix();
+  if (
+    typeof window !== 'undefined' &&
+    window.location.pathname.includes('/hq/')
+  ) {
+    return `${prefix}/hq/login`;
+  }
+  return `${prefix}/login`;
+};
 
 /**
  * 登出（調用後端 API 清除 refresh token cookie，並清除前端 tokens）

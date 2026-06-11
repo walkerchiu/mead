@@ -365,7 +365,8 @@ function ActivityFeedList({
 
 export default function DashboardPage() {
   return (
-    <ProtectedRoute>
+    // customer 商業頁：限 CUSTOMER_SCOPE。純 HQ / 純 public 無此 scope → 顯示權限不足頁（不放行）。
+    <ProtectedRoute requiredScopes={['CUSTOMER_SCOPE']}>
       <DashboardContent />
     </ProtectedRoute>
   );

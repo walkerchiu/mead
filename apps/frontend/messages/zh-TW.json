@@ -47,7 +47,7 @@
       "loadFailed": "載入失敗",
       "permissionDenied": "權限不足",
       "permissionDeniedMessage": "抱歉，您沒有權限訪問此頁面。",
-      "permissionDeniedDescription": "此頁面僅限管理員訪問。如需協助，請聯繫系統管理員。",
+      "permissionDeniedDescription": "您沒有權限訪問此頁面。如需協助，請聯繫系統管理員。",
       "backToHome": "返回首頁",
       "failed": "操作失敗",
       "createFailed": "建立失敗",

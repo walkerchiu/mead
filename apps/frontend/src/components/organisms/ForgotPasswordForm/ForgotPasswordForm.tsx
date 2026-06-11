@@ -21,6 +21,8 @@ export interface ForgotPasswordFormProps {
   error?: string;
   success?: boolean;
   defaultEmail?: string;
+  /** 「返回登入」連結目標（HQ 軌傳 /hq/login）。 */
+  backToLoginHref?: string;
 }
 
 export function ForgotPasswordForm({
@@ -29,6 +31,7 @@ export function ForgotPasswordForm({
   error,
   success = false,
   defaultEmail = '',
+  backToLoginHref = '/login',
 }: ForgotPasswordFormProps) {
   const t = useTranslations('auth.forgotPassword');
   const tv = useTranslations('validation');
@@ -65,7 +68,7 @@ export function ForgotPasswordForm({
 
         <Link
           component={NextLink}
-          href="/login"
+          href={backToLoginHref}
           variant="body2"
           underline="hover"
         >
@@ -118,7 +121,7 @@ export function ForgotPasswordForm({
       <Box sx={{ mt: 2, textAlign: 'center' }}>
         <Link
           component={NextLink}
-          href="/login"
+          href={backToLoginHref}
           variant="body2"
           underline="hover"
         >

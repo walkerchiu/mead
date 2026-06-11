@@ -47,7 +47,7 @@
       "loadFailed": "Load failed",
       "permissionDenied": "Permission Denied",
       "permissionDeniedMessage": "Sorry, you don't have permission to access this page.",
-      "permissionDeniedDescription": "This page is restricted to hqs only. Please contact your system hq if you need assistance.",
+      "permissionDeniedDescription": "You don't have permission to access this page. Please contact your system administrator if you need assistance.",
       "backToHome": "Back to Home",
       "failed": "Operation failed",
       "createFailed": "Create failed",
