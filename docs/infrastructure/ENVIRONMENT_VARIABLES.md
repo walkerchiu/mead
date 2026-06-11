@@ -466,11 +466,11 @@ vim .env.docker.prod  # 填入強密碼
 docker-compose --env-file .env.docker.prod up -d
 ```
 
-**Backend**: 使用 `.env.production`
+**Backend**: 使用 `.env.prod`
 
 ```bash
-cp .env.prod.example .env.production
-vim .env.production  # 填入強密碼和生產配置
+cp .env.prod.example .env.prod
+vim .env.prod  # 填入強密碼和生產配置
 NODE_ENV=production pnpm start
 ```
 
@@ -744,7 +744,7 @@ curl http://localhost:4000/graphql
 
 使用 `@nestjs/config` 載入：
 
-1. `.env.production` (NODE_ENV=production)
+1. `.env.prod` (NODE_ENV=production)
 2. `.env.development` (NODE_ENV=development)
 3. `.env` (預設)
 

@@ -6,7 +6,7 @@
 # 注意：本檔是「自架 HTTPS 部署」用途，與資源限額 override（docker-compose.<env>.override.yml）**不同**，
 #       兩者命名刻意區分以免混淆；需要時可再疊資源限額：再加 -f docker-compose.prod.override.yml。
 # 前置：建立 .env（含 SITE_DOMAIN、ACME_EMAIL）、
-#       apps/frontend/.env.production、apps/backend/.env.production
+#       apps/frontend/.env.production、apps/backend/.env.prod
 
 services:
   # 反向代理 + 自動申請/續簽 Let's Encrypt 憑證
@@ -40,7 +40,7 @@ services:
   backend:
     profiles: ['app']
     env_file:
-      - apps/backend/.env.production
+      - apps/backend/.env.prod
     expose:
       - '4000'
     depends_on:

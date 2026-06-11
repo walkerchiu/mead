@@ -54,7 +54,7 @@ ACME_EMAIL=ops@業主網域.gov.tw
 
 ```bash
 cp apps/frontend/.env.prod.example apps/frontend/.env.production
-cp apps/backend/.env.prod.example  apps/backend/.env.production
+cp apps/backend/.env.prod.example  apps/backend/.env.prod
 ```
 
 - 前端：Apollo / API endpoint 等若指向後端，請設為**同網域相對路徑**（如 `/graphql`），

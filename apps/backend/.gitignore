@@ -39,7 +39,7 @@ lerna-debug.log*
 .env
 .env.development
 .env.uat
-.env.production
+.env.prod
 
 # TLS dev secret store（FileSecretStore 寫入的 cert / key；僅 dev）
 .dev-secrets/

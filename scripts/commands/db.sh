@@ -140,7 +140,7 @@ get_database_url() {
       env_file="$PROJECT_ROOT/apps/backend/.env.uat"
       ;;
     production)
-      env_file="$PROJECT_ROOT/apps/backend/.env.production"
+      env_file="$PROJECT_ROOT/apps/backend/.env.prod"
       ;;
   esac
 
