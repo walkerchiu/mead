@@ -6,11 +6,13 @@
 # 後端 / 前端目前跑在 host（cli.sh dev / pnpm dev），未納入 compose；無 app profile。
 # 本檔不含任何資源限額（cpus / mem_limit）。
 
+name: mead
+
 services:
   # 核心 infra（必須，無 profile，always-on）
 
   timescaledb:
-    image: timescale/timescaledb:latest-pg16
+    image: timescale/timescaledb:2.27.0-pg16 # 釘版（原 latest-pg16）
     container_name: mead-timescaledb
     restart: unless-stopped
     ports:
@@ -69,7 +71,7 @@ services:
   # ==========================================
 
   mailpit:
-    image: axllent/mailpit:latest
+    image: axllent/mailpit:v1.29.0 # 釘版（原 latest）
     container_name: mead-mailpit
     restart: unless-stopped
     profiles: ['tools'] # dev 工具：不帶 --profile tools / 不顯式命名則不啟（prod 不要）

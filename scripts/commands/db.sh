@@ -136,6 +136,12 @@ get_database_url() {
     development)
       env_file="$PROJECT_ROOT/apps/backend/.env"
       ;;
+    sit)
+      env_file="$PROJECT_ROOT/apps/backend/.env.sit"
+      ;;
+    staging)
+      env_file="$PROJECT_ROOT/apps/backend/.env.staging"
+      ;;
     uat)
       env_file="$PROJECT_ROOT/apps/backend/.env.uat"
       ;;

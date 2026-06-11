@@ -14,17 +14,17 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$SCRIPT_DIR/../utils/common.sh"
 
 # 支援的環境
-ENVS=("local" "dev" "uat" "prod")
-ENV_LABELS=("Local (本地環境)" "Dev (開發環境)" "UAT (測試環境)" "Production (生產環境)")
-ENV_NODE_ENVS=("development" "development" "uat" "production")
+ENVS=("local" "dev" "sit" "uat" "staging" "prod")
+ENV_LABELS=("Local (本地環境)" "Dev (開發環境)" "SIT (系統整合測試)" "UAT (測試環境)" "Staging (生產鏡像)" "Production (生產環境)")
+ENV_NODE_ENVS=("development" "development" "uat" "uat" "production" "production")
 
 # 環境範本對應
 # Docker env files
-ENV_DOCKER_TEMPLATES=(".env.docker.example" ".env.docker.dev.example" ".env.docker.uat.example" ".env.docker.production.example")
+ENV_DOCKER_TEMPLATES=(".env.docker.example" ".env.docker.dev.example" ".env.docker.sit.example" ".env.docker.uat.example" ".env.docker.staging.example" ".env.docker.prod.example")
 # Backend env files
-ENV_BACKEND_TEMPLATES=(".env.example" ".env.dev.example" ".env.uat.example" ".env.production.example")
+ENV_BACKEND_TEMPLATES=(".env.example" ".env.dev.example" ".env.sit.example" ".env.uat.example" ".env.staging.example" ".env.prod.example")
 # Frontend env files
-ENV_FRONTEND_TEMPLATES=(".env.example" ".env.dev.example" ".env.uat.example" ".env.production.example")
+ENV_FRONTEND_TEMPLATES=(".env.example" ".env.dev.example" ".env.sit.example" ".env.uat.example" ".env.staging.example" ".env.prod.example")
 
 CURRENT_ENV_FILE="$PROJECT_ROOT/.current-env"
 
@@ -72,7 +72,7 @@ show_command_help() {
   echo "  ./scripts/cli.sh env <subcommand> [options]"
   echo ""
   echo -e "${YELLOW}子命令:${NC}"
-  echo -e "  ${CYAN}switch <env>${NC}      切換到指定環境（local/dev/uat/prod）"
+  echo -e "  ${CYAN}switch <env>${NC}      切換到指定環境（local/dev/sit/uat/staging/prod）"
   echo -e "  ${CYAN}current${NC}           顯示當前環境"
   echo -e "  ${CYAN}list${NC}              列出所有可用環境及狀態"
   echo -e "  ${CYAN}diff <env>${NC}        比較當前環境與目標環境的差異"
@@ -418,27 +418,27 @@ show_env_menu() {
     fi
   done
 
-  echo -e "  ${CYAN}5${NC}) 比較環境差異"
-  echo -e "  ${CYAN}6${NC}) 列出所有環境"
-  echo -ne "${GREEN}請選擇 [1-6]:${NC} "
+  local env_count="${#ENVS[@]}"
+  local diff_choice=$((env_count + 1))
+  local list_choice=$((env_count + 2))
+
+  echo -e "  ${CYAN}${diff_choice}${NC}) 比較環境差異"
+  echo -e "  ${CYAN}${list_choice}${NC}) 列出所有環境"
+  echo -ne "${GREEN}請選擇 [1-${list_choice}]:${NC} "
   read -r env_choice
 
-  case "$env_choice" in
-    1) env_switch "local" ;;
-    2) env_switch "dev" ;;
-    3) env_switch "uat" ;;
-    4) env_switch "prod" ;;
-    5)
-      echo -ne "比較目標環境 (local/dev/uat/prod): "
-      read -r diff_target
-      env_diff "$diff_target"
-      ;;
-    6) env_list ;;
-    *)
-      echo -e "${RED}無效選擇${NC}"
-      exit 1
-      ;;
-  esac
+  if [[ "$env_choice" =~ ^[0-9]+$ ]] && (( env_choice >= 1 && env_choice <= env_count )); then
+    env_switch "${ENVS[$((env_choice - 1))]}"
+  elif [[ "$env_choice" == "$diff_choice" ]]; then
+    echo -ne "比較目標環境 (${ENVS[*]}): "
+    read -r diff_target
+    env_diff "$diff_target"
+  elif [[ "$env_choice" == "$list_choice" ]]; then
+    env_list
+  else
+    echo -e "${RED}無效選擇${NC}"
+    exit 1
+  fi
 }
 
 # 主入口
