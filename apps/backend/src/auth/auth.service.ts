@@ -623,6 +623,9 @@ export class AuthService {
       accessScopes,
       roles: rolesByScope,
       permissions,
+      // 僅在為 true 時加入 claim；login / refresh / 2FA verify 都從即時 user 重簽，
+      // 故旗標清除後刷新出的 token 即不再帶此 claim。
+      ...(user.mustChangePassword ? { mustChangePassword: true } : {}),
     };
 
     logger.info('[AuthService] Signing access token', { userId: user.id });

@@ -46,6 +46,9 @@ export interface JwtPayload {
 
   /** 用戶的權限名稱陣列（扁平化所有 scope 的權限） */
   permissions?: string[];
+
+  /** 首次登入須強制變更密碼（僅在為 true 時加入，避免污染既有 token 形狀） */
+  mustChangePassword?: boolean;
 }
 
 /**

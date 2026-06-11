@@ -593,6 +593,7 @@ export class UserService {
       {
         email: user.email,
         name: user.name || undefined,
+        username: user.accountName || undefined,
       },
       {
         passwordHashes: passwordHistories.map((h) => h.passwordHash),
@@ -612,10 +613,10 @@ export class UserService {
         },
       });
 
-      // 2. 更新密碼
+      // 2. 更新密碼（一併解除「首次登入須改密」關卡）
       await tx.user.update({
         where: { id: userId },
-        data: { password: hashedPassword },
+        data: { password: hashedPassword, mustChangePassword: false },
       });
 
       // 3. 只保留最近 3 組密碼歷史記錄（刪除更舊的記錄）
@@ -858,6 +859,8 @@ export class UserService {
         name: input.name,
         password: hashedPassword,
         accessScopes,
+        // 管理員建立的是臨時密碼，首次登入須強制變更
+        mustChangePassword: true,
       },
       include: {
         profile: true,
@@ -978,6 +981,7 @@ export class UserService {
     assertPasswordStrength(input.newPassword, lang, this.i18n, {
       email: targetUser.email,
       name: targetUser.name || undefined,
+      username: targetUser.accountName || undefined,
     });
 
     // 加密新密碼
@@ -986,10 +990,10 @@ export class UserService {
       this.SALT_ROUNDS,
     );
 
-    // 更新密碼
+    // 更新密碼（管理員重設的是臨時密碼，使用者下次登入須強制改密）
     await this.prisma.user.update({
       where: { id },
-      data: { password: hashedPassword },
+      data: { password: hashedPassword, mustChangePassword: true },
     });
 
     // 撤銷該用戶的所有 sessions

@@ -1,6 +1,6 @@
 // This file is auto-generated. DO NOT EDIT manually.
 // Edit files in prisma/schemas/ instead and run: pnpm db:merge-schemas
-// Generated at: 2026-06-11T06:28:40.599Z
+// Generated at: 2026-06-11T06:47:43.980Z
 
 // ============================================
 // Source: base.prisma
@@ -786,6 +786,10 @@ model User {
 
   /// 密碼雜湊值（bcrypt，不會暴露到 API）
   password     String
+
+  /// 首次登入須強制變更密碼旗標。管理員建立帳號 / 重設密碼及種子帳號設為 true；
+  /// 使用者成功變更密碼後清為 false。由 JWT claim（mustChangePassword）帶到前端作為關卡。
+  mustChangePassword Boolean @default(false) @map("must_change_password")
 
   /// 用戶可訪問的範圍陣列（PUBLIC_SCOPE, CUSTOMER_SCOPE, HQ_SCOPE）
   accessScopes AccessScope[]

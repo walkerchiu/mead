@@ -23,6 +23,7 @@ export async function seedDevelopment(prisma: PrismaClient) {
     where: { accountName: 'hq_admin' },
     update: {
       accessScopes: ['HQ_SCOPE', 'CUSTOMER_SCOPE'],
+      mustChangePassword: true,
     },
     create: {
       accountName: 'hq_admin',
@@ -30,6 +31,7 @@ export async function seedDevelopment(prisma: PrismaClient) {
       password: hashedPassword,
       name: 'Super HQ',
       accessScopes: ['HQ_SCOPE', 'CUSTOMER_SCOPE'],
+      mustChangePassword: true,
     },
   });
 
@@ -68,6 +70,7 @@ export async function seedDevelopment(prisma: PrismaClient) {
     where: { accountName: 'customer_admin' },
     update: {
       accessScopes: ['CUSTOMER_SCOPE'],
+      mustChangePassword: true,
     },
     create: {
       accountName: 'customer_admin',
@@ -75,6 +78,7 @@ export async function seedDevelopment(prisma: PrismaClient) {
       password: hashedPassword,
       name: 'Customer Admin',
       accessScopes: ['CUSTOMER_SCOPE'],
+      mustChangePassword: true,
     },
   });
 
@@ -95,13 +99,16 @@ export async function seedDevelopment(prisma: PrismaClient) {
   // Public 用戶
   const publicUser = await prisma.user.upsert({
     where: { accountName: 'public_user' },
-    update: {},
+    update: {
+      mustChangePassword: true,
+    },
     create: {
       accountName: 'public_user',
       email: 'public@example.com',
       password: hashedPassword,
       name: 'Public User',
       accessScopes: ['PUBLIC_SCOPE'],
+      mustChangePassword: true,
     },
   });
 
