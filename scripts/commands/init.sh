@@ -202,7 +202,7 @@ if [ "$SKIP_DOCKER" = false ]; then
 
   # per-host override（存在才疊；未 cp 出實際檔時為空 → 行為與未導入 override 完全相同）。
   _ov="$(get_compose_override)"; _ov_args=(); [[ -n "$_ov" ]] && _ov_args=(-f docker-compose.yml -f "$_ov")
-  if docker-compose --env-file .env.docker "${_ov_args[@]}" --profile tools up -d; then
+  if docker-compose --env-file .env.docker "${_ov_args[@]+"${_ov_args[@]}"}" --profile tools up -d; then
     log_success "核心服務已啟動"
 
     # 等待核心服務就緒
