@@ -649,13 +649,21 @@ export class UserService {
     }
 
     // 發送密碼變更通知（email + 系統通知）
+    // 通知信寄送失敗不應使整個改密操作失敗（密碼已於上方交易提交）；僅記錄錯誤。
     const userLang = user.profile?.language || lang;
-    await this.mailService.sendPasswordChangedEmail(
-      user.email,
-      user.name,
-      ipAddress,
-      userLang,
-    );
+    try {
+      await this.mailService.sendPasswordChangedEmail(
+        user.email,
+        user.name,
+        ipAddress,
+        userLang,
+      );
+    } catch (error) {
+      logger.error(
+        '[UserService] Failed to send password change email:',
+        error,
+      );
+    }
 
     if (
       this.config.get<string>('PUSH_NOTIFY_PASSWORD_CHANGED', 'true') !==
@@ -1002,13 +1010,21 @@ export class UserService {
     }
 
     // 發送密碼變更通知（email + 系統通知）
+    // 通知信寄送失敗不應使整個操作失敗（密碼已更新）；僅記錄錯誤。
     const userLang = targetUser.profile?.language || lang;
-    await this.mailService.sendPasswordChangedEmail(
-      targetUser.email,
-      targetUser.name,
-      ipAddress,
-      userLang,
-    );
+    try {
+      await this.mailService.sendPasswordChangedEmail(
+        targetUser.email,
+        targetUser.name,
+        ipAddress,
+        userLang,
+      );
+    } catch (error) {
+      logger.error(
+        '[UserService] Failed to send password change email:',
+        error,
+      );
+    }
 
     if (
       this.config.get<string>('PUSH_NOTIFY_PASSWORD_CHANGED', 'true') !==
