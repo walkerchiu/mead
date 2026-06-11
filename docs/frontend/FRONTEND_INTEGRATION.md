@@ -383,18 +383,21 @@ export const REFRESH_TOKEN_MUTATION = gql`
 
 ### 登入流程
 
+> 登入身分為「帳號（accountName）」，非 email。`login` mutation 的 arg 名沿用 `email`
+> 為向後相容，但傳入值為帳號。HQ 與 customer 各自走 `/login` 與 `/hq/login` 分軌。
+
 1. **無 2FA**：
-   - 輸入 email 和密碼
+   - 輸入帳號和密碼
    - 獲得 accessToken（記憶體儲存），refresh token 自動設為 HttpOnly Cookie
-   - 跳轉到 Dashboard
+   - 跳轉到對應 scope 落點（customer → `/dashboard`、HQ → `/hq/users`）；若帶 `mustChangePassword` 則先導向變更密碼頁
 
 2. **有 2FA**：
-   - 輸入 email 和密碼
+   - 輸入帳號和密碼
    - 收到 `TwoFactorLoginResponse`，包含 `temporaryToken`
    - 系統自動發送驗證碼到 email
    - 輸入 6 位數驗證碼
    - 獲得 accessToken，refresh token 設為 HttpOnly Cookie
-   - 跳轉到 Dashboard
+   - 跳轉到對應 scope 落點（首次登入須先變更密碼）
 
 ### 頁面重新整理後的 Session 恢復
 

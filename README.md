@@ -180,11 +180,14 @@ MEAD CLI 會自動完成：
 
 ### 預設帳號（development / uat seed 共用）
 
-| Email                | 密碼           | 角色                                                    |
-| -------------------- | -------------- | ------------------------------------------------------- |
-| `hq@example.com`     | `Password123!` | `SUPER_HQ`（HQ）+ `MANAGER`（CUSTOMER）— 最高權限       |
-| `admin@example.com`  | `Password123!` | `OWNER`（CUSTOMER）— 純 Customer Scope dashboard 體驗用 |
-| `public@example.com` | `Password123!` | 無角色（PUBLIC_SCOPE）— 用於測試「未授權」情境          |
+> 登入身分為「帳號（accountName）」，**非 email**；email 僅作通知用。
+> 這些 seed 帳號首次登入會被**強制變更密碼**（詳見 [Scope Routing](docs/authentication/SCOPE_ROUTING.md)）。
+
+| 帳號（登入用）   | 密碼           | Email（通知）        | 角色                                                    |
+| ---------------- | -------------- | -------------------- | ------------------------------------------------------- |
+| `hq_admin`       | `Password123!` | `hq@example.com`     | `SUPER_HQ`（HQ）+ `MANAGER`（CUSTOMER）— 最高權限       |
+| `customer_admin` | `Password123!` | `admin@example.com`  | `OWNER`（CUSTOMER）— 純 Customer Scope dashboard 體驗用 |
+| `public_user`    | `Password123!` | `public@example.com` | 無角色（PUBLIC_SCOPE）— 用於測試「未授權」情境          |
 
 > Production 環境刻意**不**建立任何測試帳號。部署前請改密碼並建立正式帳號。
 > 詳見 `apps/backend/database/prisma/seeds/development.ts`。
