@@ -304,7 +304,8 @@ if [ "$CLEAN_ENV" = true ]; then
         # 停止 Docker 服務（趁 .env.docker 還存在時執行）
         if [ -f ".env.docker" ]; then
           log_info "停止 Docker 容器..."
-          docker-compose --env-file .env.docker --profile storage down 2>/dev/null || \
+          # 帶 --profile tools --profile storage，否則 tools（mailpit / adminer）容器會殘留、導致 network 移不掉。
+          docker-compose --env-file .env.docker --profile tools --profile storage down 2>/dev/null || \
           docker-compose --env-file .env.docker down 2>/dev/null || true
           log_success "Docker 服務已停止"
         fi

@@ -27,6 +27,7 @@ show_command_help() {
   echo -e "  ${CYAN}backend${NC}         停止後端 (NestJS)"
   echo -e "  ${CYAN}storybook${NC}       停止 Storybook"
   echo -e "  ${CYAN}prisma-studio${NC}   停止 Prisma Studio"
+  echo -e "  ${CYAN}adminer${NC}         停止 Adminer (DB GUI)"
   echo -e "  ${CYAN}docker${NC}          停止 Docker 服務"
   echo -e "  ${CYAN}all${NC}             停止所有服務"
   echo ""
@@ -151,11 +152,11 @@ stop_docker() {
   log_info "停止 Docker 容器..."
   if [ "$stop_storage" = true ]; then
     # 停止所有容器
-    docker-compose --env-file .env.docker --profile storage down
+    docker-compose --env-file .env.docker --profile tools --profile storage down
     log_success "所有 Docker 服務已停止"
   else
-    # 只停止核心服務
-    docker-compose --env-file .env.docker down
+    # 只停止核心服務 + dev 工具（mailpit / adminer 屬 profile tools）
+    docker-compose --env-file .env.docker --profile tools down
     if [ "$seaweedfs_running" = true ]; then
       log_success "核心服務已停止（SeaweedFS 保持運行）"
     else
@@ -188,6 +189,18 @@ stop_prisma_studio() {
   kill_process 5555 "Prisma Studio"
 }
 
+# 停止 Adminer (Docker container)
+stop_adminer() {
+  print_header "停止 Adminer (DB GUI)"
+  if docker ps --format '{{.Names}}' | grep -q '^mead-adminer$'; then
+    docker compose --env-file "$PROJECT_ROOT/.env.docker" stop adminer 2>/dev/null \
+      || docker-compose --env-file "$PROJECT_ROOT/.env.docker" stop adminer 2>/dev/null
+    log_success "Adminer 已停止"
+  else
+    log_info "Adminer 容器未運行"
+  fi
+}
+
 # 停止所有服務
 stop_all() {
   print_header "停止所有服務"
@@ -206,7 +219,7 @@ stop_all() {
 
   # 停止所有 Docker 服務
   log_info "停止所有 Docker 容器..."
-  docker-compose --env-file .env.docker --profile storage down
+  docker-compose --env-file .env.docker --profile tools --profile storage down
 
   echo ""
   log_success "所有服務已停止"
@@ -225,6 +238,9 @@ case "$SERVICE" in
     ;;
   prisma-studio|studio|prisma)
     stop_prisma_studio
+    ;;
+  adminer|db-ui)
+    stop_adminer
     ;;
   docker|db|services)
     stop_docker

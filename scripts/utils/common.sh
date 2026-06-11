@@ -364,6 +364,11 @@ get_container_name() {
       compose_service_name="mailpit"
       default_name="mead-mailpit"
       ;;
+    adminer|db-ui)
+      env_var_name="ADMINER_CONTAINER_NAME"
+      compose_service_name="adminer"
+      default_name="mead-adminer"
+      ;;
     seaweedfs-master|seaweedfs_master)
       env_var_name="SEAWEEDFS_MASTER_CONTAINER_NAME"
       compose_service_name="seaweedfs-master"

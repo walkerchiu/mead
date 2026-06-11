@@ -169,9 +169,10 @@ show_interactive_menu() {
         echo -e "  ${CYAN}6${NC}) 僅 Backend"
         echo -e "  ${CYAN}7${NC}) 僅 Storybook"
         echo -e "  ${CYAN}8${NC}) 僅 Prisma Studio"
-        echo -e "  ${CYAN}9${NC}) Docker 服務"
-        echo -e "  ${CYAN}10${NC}) SeaweedFS"
-        echo -ne "${GREEN}請選擇 [1-10]:${NC} "
+        echo -e "  ${CYAN}9${NC}) 僅 Adminer (DB GUI)"
+        echo -e "  ${CYAN}10${NC}) Docker 服務"
+        echo -e "  ${CYAN}11${NC}) SeaweedFS"
+        echo -ne "${GREEN}請選擇 [1-11]:${NC} "
         read -r svc
         case "$svc" in
           1) bash "$SCRIPT_DIR/commands/stop.sh" all || true ;;
@@ -192,8 +193,9 @@ show_interactive_menu() {
           6) bash "$SCRIPT_DIR/commands/stop.sh" backend || true ;;
           7) bash "$SCRIPT_DIR/commands/stop.sh" storybook || true ;;
           8) bash "$SCRIPT_DIR/commands/stop.sh" prisma-studio || true ;;
-          9) bash "$SCRIPT_DIR/commands/stop.sh" docker || true ;;
-          10) bash "$SCRIPT_DIR/commands/storage.sh" stop || true ;;
+          9) bash "$SCRIPT_DIR/commands/stop.sh" adminer || true ;;
+          10) bash "$SCRIPT_DIR/commands/stop.sh" docker || true ;;
+          11) bash "$SCRIPT_DIR/commands/storage.sh" stop || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -209,9 +211,10 @@ show_interactive_menu() {
         echo -e "  ${CYAN}6${NC}) 僅 Backend"
         echo -e "  ${CYAN}7${NC}) 僅 Storybook"
         echo -e "  ${CYAN}8${NC}) 僅 Prisma Studio"
-        echo -e "  ${CYAN}9${NC}) Docker 服務"
-        echo -e "  ${CYAN}10${NC}) SeaweedFS"
-        echo -ne "${GREEN}請選擇 [1-10]:${NC} "
+        echo -e "  ${CYAN}9${NC}) 僅 Adminer (DB GUI)"
+        echo -e "  ${CYAN}10${NC}) Docker 服務"
+        echo -e "  ${CYAN}11${NC}) SeaweedFS"
+        echo -ne "${GREEN}請選擇 [1-11]:${NC} "
         read -r svc
         case "$svc" in
           1) bash "$SCRIPT_DIR/commands/restart.sh" all || true ;;
@@ -235,8 +238,9 @@ show_interactive_menu() {
           6) bash "$SCRIPT_DIR/commands/restart.sh" backend || true ;;
           7) bash "$SCRIPT_DIR/commands/restart.sh" storybook || true ;;
           8) bash "$SCRIPT_DIR/commands/restart.sh" prisma-studio || true ;;
-          9) bash "$SCRIPT_DIR/commands/restart.sh" docker || true ;;
-          10) bash "$SCRIPT_DIR/commands/storage.sh" restart || true ;;
+          9) bash "$SCRIPT_DIR/commands/restart.sh" adminer || true ;;
+          10) bash "$SCRIPT_DIR/commands/restart.sh" docker || true ;;
+          11) bash "$SCRIPT_DIR/commands/storage.sh" restart || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return
@@ -252,12 +256,13 @@ show_interactive_menu() {
         echo -e "  ${CYAN}6${NC}) RabbitMQ"
         echo -e "  ${CYAN}7${NC}) Redis/Dragonfly"
         echo -e "  ${CYAN}8${NC}) Mailpit"
-        echo -e "  ${CYAN}9${NC}) SeaweedFS (所有)"
-        echo -e "  ${CYAN}10${NC}) SeaweedFS Master"
-        echo -e "  ${CYAN}11${NC}) SeaweedFS Volume"
-        echo -e "  ${CYAN}12${NC}) SeaweedFS Filer"
-        echo -e "  ${CYAN}13${NC}) SeaweedFS S3"
-        echo -ne "${GREEN}請選擇 [1-13]:${NC} "
+        echo -e "  ${CYAN}9${NC}) Adminer (DB GUI)"
+        echo -e "  ${CYAN}10${NC}) SeaweedFS (所有)"
+        echo -e "  ${CYAN}11${NC}) SeaweedFS Master"
+        echo -e "  ${CYAN}12${NC}) SeaweedFS Volume"
+        echo -e "  ${CYAN}13${NC}) SeaweedFS Filer"
+        echo -e "  ${CYAN}14${NC}) SeaweedFS S3"
+        echo -ne "${GREEN}請選擇 [1-14]:${NC} "
         read -r log_choice
         case "$log_choice" in
           1) bash "$SCRIPT_DIR/commands/logs.sh" docker -f || true ;;
@@ -268,11 +273,12 @@ show_interactive_menu() {
           6) bash "$SCRIPT_DIR/commands/logs.sh" rabbitmq -f || true ;;
           7) bash "$SCRIPT_DIR/commands/logs.sh" redis -f || true ;;
           8) bash "$SCRIPT_DIR/commands/logs.sh" mailpit -f || true ;;
-          9) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs -f || true ;;
-          10) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-master -f || true ;;
-          11) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-volume -f || true ;;
-          12) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-filer -f || true ;;
-          13) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-s3 -f || true ;;
+          9) bash "$SCRIPT_DIR/commands/logs.sh" adminer -f || true ;;
+          10) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs -f || true ;;
+          11) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-master -f || true ;;
+          12) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-volume -f || true ;;
+          13) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-filer -f || true ;;
+          14) bash "$SCRIPT_DIR/commands/logs.sh" seaweedfs-s3 -f || true ;;
           *) echo -e "${RED}無效選擇${NC}"; sleep 1; continue ;;
         esac
         wait_and_return

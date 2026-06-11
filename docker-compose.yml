@@ -1,7 +1,13 @@
+# docker-compose.yml — MEAD 唯一 compose 基底（tracked IaC，無機密：密碼走 ${VAR} 從 .env.docker 插值）。
+# 用 profile 閘控分層：
+#   - 無 profile（always-on）：核心 infra timescaledb / rabbitmq / dragonfly。
+#   - profile `tools`：mailpit / adminer（dev 工具，prod 不啟）。
+#   - profile `storage`：SeaweedFS 四件套。
+# 後端 / 前端目前跑在 host（cli.sh dev / pnpm dev），未納入 compose；無 app profile。
+# 本檔不含任何資源限額（cpus / mem_limit）。
+
 services:
-  # ==========================================
-  # 核心服務（必須）
-  # ==========================================
+  # 核心 infra（必須，無 profile，always-on）
 
   timescaledb:
     image: timescale/timescaledb:latest-pg16
@@ -58,10 +64,15 @@ services:
       timeout: 5s
       retries: 5
 
+  # ==========================================
+  # dev 工具（profile `tools`）—— 不帶 --profile tools / 不顯式命名則不啟（prod 不要）。
+  # ==========================================
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: mead-mailpit
     restart: unless-stopped
+    profiles: ['tools'] # dev 工具：不帶 --profile tools / 不顯式命名則不啟（prod 不要）
     ports:
       - '127.0.0.1:${MAIL_SMTP_PORT:-1025}:1025' # SMTP 端口
       - '127.0.0.1:${MAIL_WEB_PORT:-8025}:8025' # Web UI
@@ -72,6 +83,30 @@ services:
     healthcheck:
       test:
         ['CMD', 'wget', '-q', '--spider', 'http://localhost:8025/api/v1/info']
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================
+  # Adminer - 輕量資料庫 Web GUI
+  # ==========================================
+  adminer:
+    image: adminer:5
+    container_name: mead-adminer
+    restart: unless-stopped
+    profiles: ['tools'] # dev 工具：不帶 --profile tools / 不顯式命名則不啟（prod 不要）
+    ports:
+      - '127.0.0.1:${ADMINER_PORT:-5556}:8080'
+    environment:
+      ADMINER_DEFAULT_SERVER: timescaledb
+      ADMINER_DEFAULT_DRIVER: pgsql
+      ADMINER_DEFAULT_DB: ${POSTGRES_DB:-mead_db}
+      ADMINER_DESIGN: pepa-linha-dark
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q --spider http://localhost:8080/ || exit 1']
       interval: 10s
       timeout: 5s
       retries: 3

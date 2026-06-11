@@ -197,10 +197,10 @@ if [ "$SKIP_DOCKER" = false ]; then
     log_warning "找不到 SeaweedFS S3 設定範本，跳過"
   fi
 
-  # 啟動核心服務
-  log_info "啟動核心服務 (TimescaleDB, RabbitMQ, Dragonfly, Mailpit)..."
+  # 啟動核心服務 + dev 工具（mailpit / adminer 屬 profile `tools`）
+  log_info "啟動核心服務 (TimescaleDB, RabbitMQ, Dragonfly, Mailpit, Adminer)..."
 
-  if docker-compose --env-file .env.docker up -d; then
+  if docker-compose --env-file .env.docker --profile tools up -d; then
     log_success "核心服務已啟動"
 
     # 等待核心服務就緒

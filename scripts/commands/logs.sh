@@ -31,6 +31,7 @@ show_command_help() {
   echo -e "  ${CYAN}rabbitmq${NC}        RabbitMQ 日誌"
   echo -e "  ${CYAN}redis${NC}           Dragonfly/Redis 日誌"
   echo -e "  ${CYAN}mailpit${NC}         Mailpit 日誌"
+  echo -e "  ${CYAN}adminer${NC}         Adminer (DB GUI) 日誌"
   echo -e "  ${CYAN}seaweedfs${NC}       SeaweedFS 所有服務日誌"
   echo -e "  ${CYAN}seaweedfs-master${NC}  SeaweedFS Master 日誌"
   echo -e "  ${CYAN}seaweedfs-volume${NC}  SeaweedFS Volume 日誌"
@@ -166,7 +167,7 @@ view_docker_logs() {
 
   "${cmd_args[@]}" || {
     log_error "容器 $container_name 未運行"
-    echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker up -d${NC}"
+    echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker --profile tools up -d${NC}"
     exit 1
   }
 }
@@ -186,7 +187,7 @@ view_all_docker_logs() {
 
   "${cmd_args[@]}" || {
     log_error "Docker 服務未運行"
-    echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker up -d${NC}"
+    echo -e "啟動服務: ${CYAN}docker-compose --env-file .env.docker --profile tools up -d${NC}"
     exit 1
   }
 }
@@ -227,6 +228,9 @@ case "$SERVICE" in
     ;;
   mailpit|mail|smtp)
     view_docker_logs "$(get_container_name mailpit)" "Mailpit"
+    ;;
+  adminer|db-ui)
+    view_docker_logs "$(get_container_name adminer)" "Adminer (DB GUI)"
     ;;
   seaweedfs-master)
     view_docker_logs "$(get_container_name seaweedfs-master)" "SeaweedFS Master"

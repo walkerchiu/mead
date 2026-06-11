@@ -27,6 +27,7 @@ show_command_help() {
   echo -e "  ${CYAN}backend${NC}         重啟後端 (NestJS)"
   echo -e "  ${CYAN}storybook${NC}       重啟 Storybook"
   echo -e "  ${CYAN}prisma-studio${NC}   重啟 Prisma Studio"
+  echo -e "  ${CYAN}adminer${NC}         重啟 Adminer (DB GUI)"
   echo -e "  ${CYAN}docker${NC}          重啟 Docker 服務"
   echo -e "  ${CYAN}all${NC}             重啟所有服務"
   echo ""
@@ -120,10 +121,10 @@ restart_docker() {
 
   # 停止所有 Docker 容器
   log_info "停止所有 Docker 容器..."
-  docker-compose --env-file .env.docker --profile storage down
+  docker-compose --env-file .env.docker --profile tools --profile storage down
 
-  log_info "啟動 Docker 容器..."
-  if docker-compose --env-file .env.docker up -d; then
+  log_info "啟動 Docker 容器（含 dev 工具 profile tools）..."
+  if docker-compose --env-file .env.docker --profile tools up -d; then
     log_success "Docker 服務已重啟"
 
     # 等待服務就緒
@@ -210,6 +211,23 @@ restart_prisma_studio() {
   exec "$SCRIPT_DIR/db.sh" studio
 }
 
+# 重啟 Adminer (Docker container)
+restart_adminer() {
+  print_header "重啟 Adminer (DB GUI)"
+
+  log_info "重啟 Adminer container..."
+  if docker compose --env-file "$PROJECT_ROOT/.env.docker" restart adminer 2>/dev/null \
+       || docker-compose --env-file "$PROJECT_ROOT/.env.docker" restart adminer 2>/dev/null; then
+    log_success "Adminer 已重啟"
+  else
+    log_warning "Adminer container 不存在，嘗試啟動..."
+    docker compose --env-file "$PROJECT_ROOT/.env.docker" up -d adminer 2>/dev/null \
+      || docker-compose --env-file "$PROJECT_ROOT/.env.docker" up -d adminer 2>/dev/null
+    log_success "Adminer 已啟動"
+  fi
+  log_info "請開啟 http://localhost:${ADMINER_PORT:-5556}"
+}
+
 # 重啟所有服務
 restart_all() {
   print_header "重啟所有服務"
@@ -252,6 +270,9 @@ case "$SERVICE" in
     ;;
   prisma-studio|studio|prisma)
     restart_prisma_studio
+    ;;
+  adminer|db-ui)
+    restart_adminer
     ;;
   docker|db|services)
     restart_docker

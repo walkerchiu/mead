@@ -175,7 +175,7 @@ check_docker_service() {
     if [[ "$is_storage" == "true" ]]; then
       echo -e "      ${DIM}啟動: ${CYAN}./scripts/cli.sh storage start${NC}"
     else
-      echo -e "      ${DIM}啟動: ${CYAN}docker-compose up -d${NC}"
+      echo -e "      ${DIM}啟動: ${CYAN}docker-compose --env-file .env.docker --profile tools up -d${NC}"
     fi
     return 1
   fi
@@ -270,6 +270,9 @@ if [[ "$WATCH_MODE" == "true" ]]; then
     ((TOTAL++))
     check_docker_service "Mailpit" "$(get_container_name mailpit)" && ((RUNNING++)) || true
     ((TOTAL++))
+    # Adminer 是 docker container（mead-adminer），用 docker check 避免 5556 被別的 process 誤觸
+    check_docker_service "Adminer" "$(get_container_name adminer)" && ((RUNNING++)) || true
+    ((TOTAL++))
     check_docker_service "SeaweedFS Master" "$(get_container_name seaweedfs-master)" true && ((RUNNING++)) || true
     ((TOTAL++))
     check_docker_service "SeaweedFS Volume" "$(get_container_name seaweedfs-volume)" true && ((RUNNING++)) || true
@@ -323,7 +326,9 @@ done
 echo ""
 
 # Docker 服務
-DOCKER_SERVICES=("PostgreSQL:timescaledb:false" "RabbitMQ:rabbitmq:false" "Dragonfly:dragonfly:false" "Mailpit:mailpit:false" "SeaweedFS Master:seaweedfs-master:true" "SeaweedFS Volume:seaweedfs-volume:true" "SeaweedFS Filer:seaweedfs-filer:true" "SeaweedFS S3:seaweedfs-s3:true")
+# Adminer 是 docker container（mead-adminer），放 DOCKER_SERVICES 用容器名判斷，
+# 避免別的 process（例如其他 repo 的 mgc-adminer / nptc-adminer）佔住 5556 時誤觸 ✓
+DOCKER_SERVICES=("PostgreSQL:timescaledb:false" "RabbitMQ:rabbitmq:false" "Dragonfly:dragonfly:false" "Mailpit:mailpit:false" "Adminer:adminer:false" "SeaweedFS Master:seaweedfs-master:true" "SeaweedFS Volume:seaweedfs-volume:true" "SeaweedFS Filer:seaweedfs-filer:true" "SeaweedFS S3:seaweedfs-s3:true")
 DOCKER_RUNNING=()
 
 echo -e "${YELLOW}🐳 Docker 服務${NC}"

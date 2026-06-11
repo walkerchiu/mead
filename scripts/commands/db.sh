@@ -39,7 +39,8 @@ show_command_help() {
   echo -e "  ${CYAN}backup${NC}        備份資料（資料庫 + 檔案儲存）"
   echo -e "  ${CYAN}restore${NC}       還原資料（資料庫 + 檔案儲存）"
   echo -e "  ${CYAN}cleanup${NC}       清理舊備份"
-  echo -e "  ${CYAN}studio${NC}        開啟 Prisma Studio"
+  echo -e "  ${CYAN}studio${NC}        開啟 Prisma Studio（http://localhost:5555）"
+  echo -e "  ${CYAN}adminer${NC}       啟動 Adminer DB GUI（http://localhost:\${ADMINER_PORT:-5556}）"
   echo -e "  ${CYAN}generate${NC}      產生 Prisma Client"
   echo ""
   echo -e "${YELLOW}環境選項:${NC}"
@@ -1011,6 +1012,43 @@ db_studio() {
 }
 
 # ==========================================
+# 子命令: adminer（啟動 Adminer DB GUI）
+# ==========================================
+db_adminer() {
+  print_header "資料庫瀏覽工具（Adminer）"
+
+  ADMINER_PORT="${ADMINER_PORT:-5556}"
+  ADMINER_URL="http://localhost:${ADMINER_PORT}"
+
+  if docker ps --format '{{.Names}}' | grep -q '^mead-adminer$'; then
+    log_success "Adminer 已運行：${ADMINER_URL}"
+  else
+    log_info "Adminer 容器未運行，嘗試啟動..."
+    if docker compose --env-file "${PROJECT_ROOT}/.env.docker" up -d adminer 2>/dev/null \
+        || docker-compose --env-file "${PROJECT_ROOT}/.env.docker" up -d adminer 2>/dev/null; then
+      sleep 2
+      log_success "Adminer 已啟動：${ADMINER_URL}"
+    else
+      log_warning "啟動 Adminer 失敗（可能 .env.docker 不存在）。"
+      log_info "請先 cp .env.docker.example .env.docker，再 docker compose up -d adminer"
+      return 1
+    fi
+  fi
+
+  echo ""
+  log_info "登入資訊（從 .env.docker）："
+  echo "  System:   PostgreSQL"
+  echo "  Server:   timescaledb"
+  echo "  Username: \${POSTGRES_USER:-postgres}"
+  echo "  Password: 見 .env.docker"
+  echo "  Database: \${POSTGRES_DB:-mead_db}"
+
+  if command -v open >/dev/null 2>&1; then
+    open "$ADMINER_URL" 2>/dev/null || true
+  fi
+}
+
+# ==========================================
 # 子命令: generate
 # ==========================================
 db_generate() {
@@ -1073,6 +1111,9 @@ case "$SUBCOMMAND" in
     ;;
   studio)
     db_studio "$@"
+    ;;
+  adminer|db-ui)
+    db_adminer "$@"
     ;;
   generate)
     db_generate "$@"

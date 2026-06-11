@@ -336,7 +336,7 @@ env_switch() {
 
   # 步驟 5: 停止 Docker 服務
   log_step "停止 Docker 服務"
-  if docker compose --env-file "$PROJECT_ROOT/.env.docker" down 2>/dev/null; then
+  if docker compose --env-file "$PROJECT_ROOT/.env.docker" --profile tools --profile storage down 2>/dev/null; then
     log_success "Docker 服務已停止"
   else
     log_warning "Docker 服務停止失敗（可能未在運行）"
@@ -364,11 +364,16 @@ env_switch() {
 
   # 步驟 7: 啟動 Docker 服務
   log_step "啟動 Docker 服務"
-  if docker compose --env-file "$PROJECT_ROOT/.env.docker" up -d 2>/dev/null; then
+  # prod 不啟 dev 工具（mailpit / adminer 屬 profile tools）；其餘環境帶 --profile tools。
+  local up_profiles=()
+  if [[ "$target" != "prod" && "$target" != "production" ]]; then
+    up_profiles=(--profile tools)
+  fi
+  if docker compose --env-file "$PROJECT_ROOT/.env.docker" "${up_profiles[@]}" up -d 2>/dev/null; then
     log_success "Docker 服務已啟動"
   else
     log_error "Docker 服務啟動失敗"
-    echo -e "  請手動執行: ${CYAN}docker compose --env-file .env.docker up -d${NC}"
+    echo -e "  請手動執行: ${CYAN}docker compose --env-file .env.docker --profile tools up -d${NC}"
     return 1
   fi
 

@@ -189,11 +189,11 @@ if docker ps --format '{{.Names}}' | grep -q "mead-"; then
 else
   ISSUES_FOUND=$((ISSUES_FOUND + 1))
   log_error "沒有運行中的 MEAD 容器"
-  echo "      建議: docker-compose --env-file .env.docker up -d"
+  echo "      建議: docker-compose --env-file .env.docker --profile tools up -d"
 
   if [ "$AUTO_FIX" = true ]; then
     if confirm "是否要啟動 Docker 服務?"; then
-      docker-compose --env-file .env.docker up -d
+      docker-compose --env-file .env.docker --profile tools up -d
       log_success "Docker 服務已啟動"
       sleep 5
     fi
@@ -293,6 +293,7 @@ log_step "5/7 Port 可用性"
 check_port 3000 "Frontend (Next.js)"
 check_port 4000 "Backend (NestJS)"
 check_port 5555 "Prisma Studio"
+check_port "${ADMINER_PORT:-5556}" "Adminer (DB GUI)"
 check_port 6006 "Storybook"
 
 # SeaweedFS Port（如果有運行，檢查端口是否正在監聽）
