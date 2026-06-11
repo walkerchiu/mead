@@ -18,6 +18,7 @@ import { SessionManagementService } from '../../auth/session-management.service'
 import {
   assertValidEmail,
   assertValidName,
+  assertValidAccountName,
 } from '../../common/utils/input-validator';
 import { logger } from '../../common/services/logger.service';
 import {
@@ -810,31 +811,35 @@ export class UserService {
       throw new BadRequestException(message);
     }
 
-    // 驗證 email 格式
+    // 帳號（登入識別子）一律小寫化；驗證格式
+    const accountLower = input.accountName.trim().toLowerCase();
+    assertValidAccountName(accountLower, lang, this.i18n);
+
+    // 驗證 email 格式（email 已非唯一、僅通知用）
     assertValidEmail(input.email, lang, this.i18n);
 
     // 驗證名稱
     assertValidName(input.name, lang, this.i18n);
 
-    // 檢查 email 是否已存在
+    // 唯一性以「帳號」為準（email 已非唯一）
     const existingUser = await this.prisma.user.findFirst({
       where: {
-        email: input.email,
-        deletedAt: null,
+        accountName: accountLower,
       },
     });
 
     if (existingUser) {
-      const message = this.i18n.translate('validation.email.alreadyUsed', {
+      const message = this.i18n.translate('validation.account.alreadyUsed', {
         lang,
       });
       throw new BadRequestException(message);
     }
 
-    // 驗證密碼強度
+    // 驗證密碼強度（username 帶帳號避免密碼含帳號片段）
     assertPasswordStrength(input.password, lang, this.i18n, {
       email: input.email,
       name: input.name,
+      username: accountLower,
     });
 
     // 加密密碼
@@ -848,6 +853,7 @@ export class UserService {
     // 創建用戶
     const user = await this.prisma.user.create({
       data: {
+        accountName: accountLower,
         email: input.email,
         name: input.name,
         password: hashedPassword,

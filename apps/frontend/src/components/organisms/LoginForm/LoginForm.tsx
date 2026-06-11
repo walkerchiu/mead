@@ -37,8 +37,12 @@ export function LoginForm({
   const t = useTranslations('auth.login');
   const tv = useTranslations('validation');
 
+  // 登入識別子為「帳號」（非 email）。form data 欄位名沿用 `email` 為向後相容保留（語意為帳號）。
   const loginSchema = z.object({
-    email: z.string().email(tv('email.invalid')),
+    email: z
+      .string()
+      .min(1, tv('account.required'))
+      .regex(/^[a-zA-Z0-9_]{3,20}$/, tv('account.invalid')),
     password: z.string().min(1, tv('password.required')),
   });
 
@@ -79,12 +83,12 @@ export function LoginForm({
 
       <FormField
         {...register('email')}
-        label={t('emailLabel')}
-        type="email"
+        label={t('accountLabel')}
+        type="text"
         error={errors.email}
-        autoComplete="email"
+        autoComplete="username"
         autoFocus
-        placeholder="your@email.com"
+        placeholder={t('accountPlaceholder')}
         disabled={loading}
       />
 

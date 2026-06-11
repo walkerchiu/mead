@@ -71,7 +71,9 @@ export class AuthResolver {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequiresAnyScope([AccessScope.CUSTOMER_SCOPE, AccessScope.HQ_SCOPE])
   async registerCustomer(
-    @Args('email', { description: '電子郵件地址（必須唯一）' })
+    @Args('accountName', { description: '登入帳號（3-20 英數底線，唯一）' })
+    accountName: string,
+    @Args('email', { description: '電子郵件地址（通知用）' })
     email: string,
     @Args('password', {
       description: '密碼（至少 8 字符，包含大小寫字母和數字）',
@@ -84,6 +86,7 @@ export class AuthResolver {
   ): Promise<AuthResponse> {
     const { refreshToken, ...authResponse } =
       await this.authService.registerCustomer(
+        accountName,
         email,
         password,
         name,
@@ -122,7 +125,9 @@ export class AuthResolver {
   @UseGuards(JwtAuthGuard, PermissionGuard)
   @RequiresAnyScope([AccessScope.HQ_SCOPE])
   async registerHQ(
-    @Args('email', { description: '電子郵件地址（必須唯一）' })
+    @Args('accountName', { description: '登入帳號（3-20 英數底線，唯一）' })
+    accountName: string,
+    @Args('email', { description: '電子郵件地址（通知用）' })
     email: string,
     @Args('password', {
       description: '密碼（至少 8 字符，包含大小寫字母和數字）',
@@ -134,6 +139,7 @@ export class AuthResolver {
     @Context() context: GraphQLContextWithExpress,
   ): Promise<AuthResponse> {
     const { refreshToken, ...authResponse } = await this.authService.registerHQ(
+      accountName,
       email,
       password,
       name,

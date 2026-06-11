@@ -23,6 +23,7 @@ import { assertPasswordStrength } from '../common/utils/password-validator';
 import {
   assertValidEmail,
   assertValidName,
+  assertValidAccountName,
 } from '../common/utils/input-validator';
 import { logger } from '../common/services/logger.service';
 
@@ -60,6 +61,7 @@ export class AuthService {
    * 只有 CUSTOMER_SCOPE 或 HQ_SCOPE 的用戶可以調用
    */
   async registerCustomer(
+    accountName: string,
     email: string,
     password: string,
     name?: string,
@@ -67,29 +69,34 @@ export class AuthService {
     ipAddress?: string,
     lang?: string,
   ): Promise<AuthTokenResult> {
+    const accountLower = accountName.trim().toLowerCase();
+    assertValidAccountName(accountLower, lang, this.i18n);
     assertValidEmail(email, lang, this.i18n);
     assertValidName(name, lang, this.i18n);
 
+    // 唯一性檢查改以帳號為準（email 已非唯一）
     const existingUser = await this.prisma.user.findUnique({
-      where: { email },
+      where: { accountName: accountLower },
     });
 
     if (existingUser) {
       throw new ConflictException(
-        this.i18n.translate('auth.emailAlreadyRegistered', { lang }),
+        this.i18n.translate('auth.accountAlreadyRegistered', { lang }),
       );
     }
 
-    // 驗證密碼強度（包含相似度檢查）
+    // 驗證密碼強度（包含相似度檢查；username 帶帳號避免密碼含帳號片段）
     assertPasswordStrength(password, lang, this.i18n, {
       email,
       name,
+      username: accountLower,
     });
 
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
 
     const user = await this.prisma.user.create({
       data: {
+        accountName: accountLower,
         email,
         password: hashedPassword,
         name,
@@ -121,6 +128,7 @@ export class AuthService {
    * 只有 HQ_SCOPE 的用戶可以調用
    */
   async registerHQ(
+    accountName: string,
     email: string,
     password: string,
     name?: string,
@@ -128,29 +136,34 @@ export class AuthService {
     ipAddress?: string,
     lang?: string,
   ): Promise<AuthTokenResult> {
+    const accountLower = accountName.trim().toLowerCase();
+    assertValidAccountName(accountLower, lang, this.i18n);
     assertValidEmail(email, lang, this.i18n);
     assertValidName(name, lang, this.i18n);
 
+    // 唯一性檢查改以帳號為準（email 已非唯一）
     const existingUser = await this.prisma.user.findUnique({
-      where: { email },
+      where: { accountName: accountLower },
     });
 
     if (existingUser) {
       throw new ConflictException(
-        this.i18n.translate('auth.emailAlreadyRegistered', { lang }),
+        this.i18n.translate('auth.accountAlreadyRegistered', { lang }),
       );
     }
 
-    // 驗證密碼強度（包含相似度檢查）
+    // 驗證密碼強度（包含相似度檢查；username 帶帳號避免密碼含帳號片段）
     assertPasswordStrength(password, lang, this.i18n, {
       email,
       name,
+      username: accountLower,
     });
 
     const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
 
     const user = await this.prisma.user.create({
       data: {
+        accountName: accountLower,
         email,
         password: hashedPassword,
         name,
@@ -197,13 +210,20 @@ export class AuthService {
       );
     }
 
-    logger.info('[AuthService] Asserting valid email', { email });
-    assertValidEmail(email, lang, this.i18n);
+    // 登入識別子為帳號（accountName），非 email。一律小寫化以命中 case-insensitive 唯一索引。
+    // arg 名沿用 `email` 為向後相容保留，語意為 accountName。
+    const accountLower = email.trim().toLowerCase();
+    logger.info('[AuthService] Asserting valid account', {
+      account: accountLower,
+    });
+    assertValidAccountName(accountLower, lang, this.i18n);
 
-    logger.info('[AuthService] Fetching user from database', { email });
+    logger.info('[AuthService] Fetching user from database', {
+      account: accountLower,
+    });
 
     const user = await this.prisma.user.findUnique({
-      where: { email },
+      where: { accountName: accountLower },
       include: {
         userRoles: {
           include: {
@@ -684,6 +704,7 @@ export class AuthService {
       refreshToken,
       user: {
         id: user.id,
+        accountName: user.accountName,
         email: user.email,
         name: user.name,
         accessScopes,

@@ -144,6 +144,8 @@ type CreatePersonalAccessTokenResult {
 }
 
 input CreateUserInput {
+  """登入帳號（3-20 英數底線，唯一）"""
+  accountName: String!
   email: String!
   name: String!
   password: String!
@@ -530,7 +532,10 @@ type Mutation {
 
   """註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 HQ_SCOPE 權限，用於邀請制註冊）"""
   registerCustomer(
-    """電子郵件地址（必須唯一）"""
+    """登入帳號（3-20 英數底線，唯一）"""
+    accountName: String!
+
+    """電子郵件地址（通知用）"""
     email: String!
 
     """用戶顯示名稱（選填）"""
@@ -542,7 +547,10 @@ type Mutation {
 
   """註冊新的管理員用戶（僅限 HQ_SCOPE 權限，用於建立管理團隊）"""
   registerHQ(
-    """電子郵件地址（必須唯一）"""
+    """登入帳號（3-20 英數底線，唯一）"""
+    accountName: String!
+
+    """電子郵件地址（通知用）"""
     email: String!
 
     """用戶顯示名稱（選填）"""
@@ -1549,6 +1557,9 @@ input UpdateUserInput {
 type User {
   """訪問範圍陣列（PUBLIC_SCOPE, CUSTOMER_SCOPE, HQ_SCOPE）"""
   accessScopes: [AccessScope!]!
+
+  """登入帳號（accountName）"""
+  accountName: String
 
   """記錄建立時間"""
   createdAt: DateTime!

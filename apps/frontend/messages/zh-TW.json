@@ -125,6 +125,8 @@
       "title": "登入",
       "subtitle": "輸入您的帳號資訊以登入系統",
       "emailLabel": "電子郵件",
+      "accountLabel": "帳號",
+      "accountPlaceholder": "請輸入帳號",
       "passwordLabel": "密碼",
       "forgotPassword": "忘記密碼？",
       "submit": "登入",
@@ -209,6 +211,10 @@
     }
   },
   "validation": {
+    "account": {
+      "required": "請輸入帳號",
+      "invalid": "帳號必須為 3-20 個英數字或底線"
+    },
     "email": {
       "required": "請輸入電子郵件",
       "invalid": "請輸入有效的電子郵件地址",

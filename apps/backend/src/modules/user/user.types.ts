@@ -87,6 +87,12 @@ export class UserType {
   @Field(() => ID, { description: '用戶唯一識別碼' })
   id: string;
 
+  @Field(() => String, {
+    nullable: true,
+    description: '登入帳號（accountName）',
+  })
+  accountName?: string;
+
   @Field({
     description: '電子郵件地址',
   })

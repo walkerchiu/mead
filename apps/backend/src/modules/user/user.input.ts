@@ -11,6 +11,7 @@ import {
   Min,
   Max,
   IsEnum,
+  Matches,
 } from 'class-validator';
 import { AccessScope } from '../../common/enums/access-scope.enum';
 
@@ -85,6 +86,13 @@ export class ChangePasswordInput {
  */
 @InputType()
 export class CreateUserInput {
+  @Field({ description: '登入帳號（3-20 英數底線，唯一）' })
+  @IsNotEmpty({ message: '帳號不可為空' })
+  @Matches(/^[a-zA-Z0-9_]{3,20}$/, {
+    message: '帳號必須為 3-20 個英數字或底線',
+  })
+  accountName: string;
+
   @Field()
   @IsNotEmpty({ message: 'Email 不可為空' })
   @IsEmail({}, { message: 'Email 格式不正確' })

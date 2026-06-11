@@ -1,6 +1,6 @@
 // This file is auto-generated. DO NOT EDIT manually.
 // Edit files in prisma/schemas/ instead and run: pnpm db:merge-schemas
-// Generated at: 2026-05-28T02:23:08.260Z
+// Generated at: 2026-06-11T06:28:40.599Z
 
 // ============================================
 // Source: base.prisma
@@ -773,8 +773,13 @@ model User {
   /// 用戶唯一識別碼（UUID v7）
   id           String        @id @default(dbgenerated("uuid_generate_v7()")) @db.Uuid
 
-  /// 用戶電子郵件地址（唯一，用於登入）
-  email        String        @unique
+  /// 登入帳號（3-20 英數底線，case-insensitive 唯一）。登入識別子即此欄位。
+  /// 一律以小寫儲存（write-path normalize）以達成 case-insensitive 唯一性與 exact-match 命中索引。
+  /// DB 層 nullable 以相容既有資料；建立 / 註冊時由 application 層強制必填。
+  accountName  String?       @unique @map("account_name") @db.VarChar(20)
+
+  /// 用戶電子郵件地址（已改為非唯一，僅供通知 / 聯繫用）
+  email        String
 
   /// 用戶顯示名稱（選填）
   name         String?

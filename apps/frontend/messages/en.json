@@ -125,6 +125,8 @@
       "title": "Login",
       "subtitle": "Enter your credentials to sign in",
       "emailLabel": "Email",
+      "accountLabel": "Account",
+      "accountPlaceholder": "Enter your account",
       "passwordLabel": "Password",
       "forgotPassword": "Forgot password?",
       "submit": "Login",
@@ -209,6 +211,10 @@
     }
   },
   "validation": {
+    "account": {
+      "required": "Account is required",
+      "invalid": "Account must be 3-20 alphanumeric characters or underscores"
+    },
     "email": {
       "required": "Email is required",
       "invalid": "Please enter a valid email address",

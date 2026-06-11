@@ -57,7 +57,7 @@ export class MailService {
    */
   private async isUserEmailEnabled(email: string): Promise<boolean> {
     try {
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findFirst({
         where: { email },
         select: { id: true },
       });

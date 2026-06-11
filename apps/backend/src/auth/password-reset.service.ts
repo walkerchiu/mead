@@ -47,9 +47,10 @@ export class PasswordResetService {
     ipAddress?: string,
     lang?: string,
   ): Promise<boolean> {
-    // 查找用戶
-    const user = await this.prisma.user.findUnique({
+    // 查找用戶（email 已非唯一；多帳號共用同一 email 時取最早建立者）
+    const user = await this.prisma.user.findFirst({
       where: { email },
+      orderBy: { createdAt: 'asc' },
     });
 
     // 即使用戶不存在也等待相同時間（防止時序攻擊）

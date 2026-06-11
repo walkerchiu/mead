@@ -20,11 +20,12 @@ export async function seedDevelopment(prisma: PrismaClient) {
 
   // Super HQ 用戶（同時擁有 HQ_SCOPE 和 CUSTOMER_SCOPE）
   const hqUser = await prisma.user.upsert({
-    where: { email: 'hq@example.com' },
+    where: { accountName: 'hq_admin' },
     update: {
       accessScopes: ['HQ_SCOPE', 'CUSTOMER_SCOPE'],
     },
     create: {
+      accountName: 'hq_admin',
       email: 'hq@example.com',
       password: hashedPassword,
       name: 'Super HQ',
@@ -64,11 +65,12 @@ export async function seedDevelopment(prisma: PrismaClient) {
 
   // Customer Admin 用戶（純 CUSTOMER_SCOPE，OWNER 角色）
   const adminUser = await prisma.user.upsert({
-    where: { email: 'admin@example.com' },
+    where: { accountName: 'customer_admin' },
     update: {
       accessScopes: ['CUSTOMER_SCOPE'],
     },
     create: {
+      accountName: 'customer_admin',
       email: 'admin@example.com',
       password: hashedPassword,
       name: 'Customer Admin',
@@ -92,9 +94,10 @@ export async function seedDevelopment(prisma: PrismaClient) {
 
   // Public 用戶
   const publicUser = await prisma.user.upsert({
-    where: { email: 'public@example.com' },
+    where: { accountName: 'public_user' },
     update: {},
     create: {
+      accountName: 'public_user',
       email: 'public@example.com',
       password: hashedPassword,
       name: 'Public User',
@@ -142,11 +145,15 @@ export async function seedDevelopment(prisma: PrismaClient) {
 
   console.log('✅ 測試 Profile 創建完成');
 
-  console.log('\n測試帳號：');
+  console.log('\n測試帳號（登入身分為「帳號」，非 email）：');
   console.log(
-    '  - hq@example.com (SUPER_HQ in HQ_SCOPE + MANAGER in CUSTOMER_SCOPE)',
+    '  - hq_admin       (hq@example.com，SUPER_HQ in HQ_SCOPE + MANAGER in CUSTOMER_SCOPE)',
   );
-  console.log('  - admin@example.com (OWNER in CUSTOMER_SCOPE)');
-  console.log('  - public@example.com (PUBLIC_SCOPE only, no roles)');
+  console.log(
+    '  - customer_admin (admin@example.com，OWNER in CUSTOMER_SCOPE)',
+  );
+  console.log(
+    '  - public_user    (public@example.com，PUBLIC_SCOPE only, no roles)',
+  );
   console.log('  密碼: Password123!');
 }
