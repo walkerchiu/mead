@@ -15,10 +15,13 @@ import { Button } from '@/components/atoms';
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
+  /** 是否顯示「登出其他設備」勾選框；首次登入強制改密頁不需要（預設顯示）。 */
+  showRevokeOtherSessions?: boolean;
 }
 
 export default function ChangePasswordForm({
   onSuccess,
+  showRevokeOtherSessions = true,
 }: ChangePasswordFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const t = useTranslations('pages.settings.security');
@@ -146,20 +149,22 @@ export default function ChangePasswordForm({
         disabled={loading}
       />
 
-      <FormControlLabel
-        control={
-          <Checkbox {...register('revokeOtherSessions')} disabled={loading} />
-        }
-        label={
-          <Box>
-            <Typography variant="body2">{t('revokeOtherDevices')}</Typography>
-            <Typography variant="caption" color="text.secondary">
-              {t('revokeOtherDevicesHelper')}
-            </Typography>
-          </Box>
-        }
-        sx={{ mt: 2, mb: 2 }}
-      />
+      {showRevokeOtherSessions && (
+        <FormControlLabel
+          control={
+            <Checkbox {...register('revokeOtherSessions')} disabled={loading} />
+          }
+          label={
+            <Box>
+              <Typography variant="body2">{t('revokeOtherDevices')}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {t('revokeOtherDevicesHelper')}
+              </Typography>
+            </Box>
+          }
+          sx={{ mt: 2, mb: 2 }}
+        />
+      )}
 
       <Button
         type="submit"
