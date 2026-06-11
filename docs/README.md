@@ -99,6 +99,17 @@ NestJS + GraphQL + Prisma 後端開發指南。
 | [Token 配置](authentication/TOKEN-CONFIGURATION.md)     | JWT Token 配置與更新機制                                        | 10 分鐘  |
 | [個人存取權杖](authentication/PERSONAL_ACCESS_TOKEN.md) | PAT 管理、CLI/腳本認證、通知機制                                | 12 分鐘  |
 | [密碼政策](authentication/PASSWORD_POLICY.md)           | 密碼強度要求與驗證規則                                          | 8 分鐘   |
+| [Scope 路由分軌](authentication/SCOPE_ROUTING.md)       | Customer vs HQ 路由分流、帳號登入、首登強制改密、Form 共用 prop | 15 分鐘  |
+
+---
+
+### [架構](architecture/)
+
+跨前後端的契約與設計規範。
+
+| 文檔                                                           | 說明                                                               | 閱讀時間 |
+| -------------------------------------------------------------- | ------------------------------------------------------------------ | -------- |
+| [GraphQL Schema 合約](architecture/GRAPHQL_SCHEMA_CONTRACT.md) | 命名規則、ID 型別、login union、PaginatedXxx shape、JWT claim 形狀 | 15 分鐘  |
 
 ---
 
@@ -225,9 +236,11 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 ### 認證與會話
 
 - 用戶登入 → [前端認證整合](frontend/FRONTEND_INTEGRATION.md)
+- 帳號登入 / HQ vs Customer 路由分軌 → [Scope 路由分軌](authentication/SCOPE_ROUTING.md)
+- 首登強制改密 → [Scope 路由分軌](authentication/SCOPE_ROUTING.md#首次登入強制變更密碼mustchangepassword)
 - 密碼重設 → [用戶註冊](authentication/REGISTRATION.md)
 - 雙因素認證 → [雙因素認證](authentication/TWO_FACTOR_AUTH.md)
-- JWT Token → [前端認證整合](frontend/FRONTEND_INTEGRATION.md)
+- JWT Token / claim 形狀 → [前端認證整合](frontend/FRONTEND_INTEGRATION.md)、[GraphQL Schema 合約](architecture/GRAPHQL_SCHEMA_CONTRACT.md#jwt-claim-形狀)
 - 會話管理 → [會話用詞規範](backend/SESSION_TERMINOLOGY.md)
 
 ### 權限相關
@@ -243,6 +256,7 @@ Docker、RabbitMQ、Dragonfly、SeaweedFS、GeoIP 等基礎設施配置。
 
 - API 格式 → [API 回應格式規範](backend/API_RESPONSE_FORMAT.md)
 - 分頁 → [分頁實現指南](backend/PAGINATION_GUIDE.md)
+- Schema 契約（命名、ID 型別、union、JWT claim）→ [GraphQL Schema 合約](architecture/GRAPHQL_SCHEMA_CONTRACT.md)
 - GraphQL → [GraphQL 最佳實踐](backend/GRAPHQL_BEST_PRACTICES.md)
 - 即時訂閱 → [GraphQL Subscriptions 指南](backend/SUBSCRIPTION_GUIDE.md)
 - 訂閱實作 → [GraphQL Subscriptions 實作](backend/SUBSCRIPTION_IMPLEMENTATION_PLAN.md)

@@ -29,8 +29,9 @@
     - [常見錯誤](#常見錯誤)
       - [1. `UNAUTHENTICATED` - 未登入](#1-unauthenticated---未登入)
       - [2. `FORBIDDEN` - 權限不足](#2-forbidden---權限不足)
-      - [3. `CONFLICT` - Email 已存在](#3-conflict---email-已存在)
+      - [3. `CONFLICT` - 帳號已存在](#3-conflict---帳號已存在)
       - [4. `BAD_USER_INPUT` - 密碼強度不足](#4-bad_user_input---密碼強度不足)
+  - [首次登入強制變更密碼](#首次登入強制變更密碼)
   - [安全考量](#安全考量)
     - [1. **不提供公開註冊**](#1-不提供公開註冊)
     - [2. **層級權限分離**](#2-層級權限分離)
@@ -50,6 +51,11 @@
 
 本系統採用**受邀請制註冊**，不提供公開註冊端點。新用戶需要由現有的 Customer 或 HQ 用戶創建。
 
+> **登入身分為「帳號（`accountName`）」而非 email。** 註冊 / 建立帳號時須同時提供唯一的
+> `accountName`（3-20 英數底線，case-insensitive 唯一）；`email` 已改為**非唯一**、僅供通知用。
+> 登入、忘記密碼、scope 分軌與首登強制改密的完整說明見
+> [Scope-Based Auth Routing](./SCOPE_ROUTING.md)。
+
 ---
 
 ## 註冊端點
@@ -66,12 +72,22 @@
 **GraphQL Mutation**：
 
 ```graphql
-mutation RegisterCustomer($email: String!, $password: String!, $name: String) {
-  registerCustomer(email: $email, password: $password, name: $name) {
+mutation RegisterCustomer(
+  $accountName: String!
+  $email: String!
+  $password: String!
+  $name: String
+) {
+  registerCustomer(
+    accountName: $accountName
+    email: $email
+    password: $password
+    name: $name
+  ) {
     accessToken
-    refreshToken
     user {
       id
+      accountName
       email
       name
       accessScopes
@@ -80,12 +96,15 @@ mutation RegisterCustomer($email: String!, $password: String!, $name: String) {
 }
 ```
 
+> `AuthResponse` 不回傳 `refreshToken`（透過 HttpOnly Cookie 傳遞，不在 GraphQL 回應中暴露）。
+
 **變數範例**：
 
 ```json
 {
+  "accountName": "new_customer",
   "email": "newcustomer@example.com",
-  "password": "SecurePass123",
+  "password": "SecurePass123!",
   "name": "New Customer"
 }
 ```
@@ -108,12 +127,22 @@ mutation RegisterCustomer($email: String!, $password: String!, $name: String) {
 **GraphQL Mutation**：
 
 ```graphql
-mutation RegisterHQ($email: String!, $password: String!, $name: String) {
-  registerHQ(email: $email, password: $password, name: $name) {
+mutation RegisterHQ(
+  $accountName: String!
+  $email: String!
+  $password: String!
+  $name: String
+) {
+  registerHQ(
+    accountName: $accountName
+    email: $email
+    password: $password
+    name: $name
+  ) {
     accessToken
-    refreshToken
     user {
       id
+      accountName
       email
       name
       accessScopes
@@ -126,9 +155,10 @@ mutation RegisterHQ($email: String!, $password: String!, $name: String) {
 
 ```json
 {
+  "accountName": "new_hq",
   "email": "newhq@example.com",
-  "password": "HQPass123",
-  "name": "New HQistrator"
+  "password": "HQPass123!",
+  "name": "New HQ Admin"
 }
 ```
 
@@ -214,11 +244,14 @@ cd packages/database
 pnpm db:seed
 ```
 
-這將創建：
+這將創建（登入身分為**帳號**，括號內為通知用 email）：
 
-- ✅ `hq@example.com` (HQ_SCOPE + CUSTOMER_SCOPE, 密碼: `Password123!`)
-- ✅ `admin@example.com` (CUSTOMER_SCOPE / OWNER, 密碼: `Password123!`)
-- ✅ `public@example.com` (PUBLIC_SCOPE, 密碼: `Password123!`)
+- ✅ `hq_admin` (`hq@example.com`，HQ_SCOPE + CUSTOMER_SCOPE，SUPER_HQ + MANAGER，密碼: `Password123!`)
+- ✅ `customer_admin` (`admin@example.com`，CUSTOMER_SCOPE / OWNER，密碼: `Password123!`)
+- ✅ `public_user` (`public@example.com`，PUBLIC_SCOPE，密碼: `Password123!`)
+
+> 三個 seed 帳號皆帶 `mustChangePassword: true`，首次登入會被導向變更密碼頁（見
+> [首次登入強制變更密碼](#首次登入強制變更密碼)）。
 
 ### 方法 2：直接在數據庫創建
 
@@ -243,11 +276,25 @@ pnpm db:seed
 
 ### 步驟 2：管理員登入
 
+> `login` 的 `email` 參數名為**向後相容保留**，語意為**帳號（accountName）**。
+
 ```graphql
 mutation Login {
-  login(email: "hq@example.com", password: "Password123!") {
-    accessToken
-    refreshToken
+  # 傳入的是帳號（accountName），非 email
+  login(email: "hq_admin", password: "Password123!") {
+    ... on AuthResponse {
+      accessToken
+      user {
+        id
+        accountName
+        accessScopes
+      }
+    }
+    ... on TwoFactorLoginResponse {
+      requiresTwoFactor
+      temporaryToken
+      message
+    }
   }
 }
 ```
@@ -259,12 +306,14 @@ mutation Login {
 ```graphql
 mutation CreateNewCustomer {
   registerCustomer(
+    accountName: "client_co"
     email: "client@company.com"
-    password: "ClientPass123"
+    password: "ClientPass123!"
     name: "Client Name"
   ) {
     user {
       id
+      accountName
       email
       accessScopes
     }
@@ -279,12 +328,14 @@ mutation CreateNewCustomer {
 ```graphql
 mutation InviteTeamMember {
   registerCustomer(
+    accountName: "teammate"
     email: "teammate@company.com"
-    password: "TeamPass123"
+    password: "TeamPass123!"
     name: "Team Member"
   ) {
     user {
       id
+      accountName
       email
       accessScopes
     }
@@ -355,13 +406,15 @@ curl -X POST http://localhost:4000/graphql \
 
 - 客戶用戶嘗試調用 `registerHQ` ❌ - PUBLIC_SCOPE 用戶嘗試註冊新用戶 ❌
 
-#### 3. `CONFLICT` - Email 已存在
+#### 3. `CONFLICT` - 帳號已存在
+
+唯一性以**帳號（accountName）**為準（email 已非唯一）。註冊重複帳號時：
 
 ```json
 {
   "errors": [
     {
-      "message": "此 Email 已被註冊",
+      "message": "此帳號已被註冊",
       "extensions": {
         "code": "CONFLICT"
       }
@@ -370,7 +423,7 @@ curl -X POST http://localhost:4000/graphql \
 }
 ```
 
-**解決方案**：使用不同的 email 地址
+**解決方案**：使用不同的 `accountName`（注意 case-insensitive：`Admin` 與 `admin` 視為同一帳號）
 
 #### 4. `BAD_USER_INPUT` - 密碼強度不足
 
@@ -388,6 +441,29 @@ curl -X POST http://localhost:4000/graphql \
 ```
 
 **解決方案**：確保密碼符合強度要求
+
+---
+
+## 首次登入強制變更密碼
+
+由**管理員配置**（非自助設定）而來的帳號，首次登入必須先變更密碼才能進入系統。這透過
+`User.mustChangePassword` 旗標與 JWT claim 實現：
+
+| 來源                                                   | `mustChangePassword` |
+| ------------------------------------------------------ | -------------------- |
+| 管理員建立帳號（`createUser`）                         | `true`（臨時密碼）   |
+| 管理員重設密碼（`hqResetPassword`）                    | `true`               |
+| Seed 帳號（`hq_admin`/`customer_admin`/`public_user`） | `true`               |
+| 自助註冊（`registerCustomer`/`registerHQ`，密碼自選）  | `false`              |
+| 使用者自助成功改密（`changePassword`）後               | `false`（清除）      |
+
+- 後端 `AuthService.generateTokens()` 僅在旗標為 `true` 時於 JWT 加入 `mustChangePassword: true`
+  claim；`login` / `refresh` / 2FA verify 皆從即時 user 重簽，旗標清除後 token 即不再帶此 claim。
+- 前端依此 claim 把使用者導向對應 scope 的變更密碼頁（customer `/change-password`、HQ
+  `/hq/change-password`），改完才放行 scope 落點。
+
+> 完整機制（含 `ProtectedRoute` 關卡、`ForcedChangePassword` 元件、scope 分軌）見
+> [Scope-Based Auth Routing — 首次登入強制變更密碼](./SCOPE_ROUTING.md#首次登入強制變更密碼mustchangepassword)。
 
 ---
 
@@ -439,12 +515,20 @@ curl -X POST http://localhost:4000/graphql \
 
 ### Q: 密碼可以在註冊後修改嗎？
 
-**A**: 可以，用戶可以通過密碼重設流程或個人設置頁面修改密碼
+**A**: 可以，用戶可以通過密碼重設流程或個人設置頁面修改密碼。此外，由管理員建立 / 重設密碼的帳號
+（含 seed 帳號）首次登入會被**強制**先變更密碼，見[首次登入強制變更密碼](#首次登入強制變更密碼)。
+
+### Q: 為什麼登入用的是帳號而不是 email？
+
+**A**: 登入識別子已改為 `accountName`（3-20 英數底線，case-insensitive 唯一）；`email` 改為非唯一、
+僅供通知用。GraphQL `login` 與前端表單欄位名仍沿用 `email` 為向後相容保留，但語意是帳號。
+詳見 [Scope-Based Auth Routing — 帳號登入](./SCOPE_ROUTING.md#帳號登入accountname)。
 
 ---
 
 ## 相關文檔
 
+- [Scope-Based Auth Routing](./SCOPE_ROUTING.md) - 帳號登入、HQ/customer 路由分軌、首登強制改密
 - [RBAC Architecture](./RBAC_ARCHITECTURE.md) - 角色權限系統架構
 - [Token Configuration](./TOKEN-CONFIGURATION.md) - JWT Token 配置
 - [Two Factor Auth](./TWO_FACTOR_AUTH.md) - 雙因素認證
