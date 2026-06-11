@@ -53,7 +53,7 @@ ACME_EMAIL=ops@業主網域.gov.tw
 各 app 的正式環境變數（由範例複製後填值）：
 
 ```bash
-cp apps/frontend/.env.prod.example apps/frontend/.env.production
+cp apps/frontend/.env.prod.example apps/frontend/.env.prod
 cp apps/backend/.env.prod.example  apps/backend/.env.prod
 ```
 

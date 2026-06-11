@@ -474,13 +474,13 @@ vim .env.prod  # 填入強密碼和生產配置
 NODE_ENV=production pnpm start
 ```
 
-**Frontend**: 使用 `.env.production`
+**Frontend**: 使用 `.env.prod`
 
 ```bash
-cp .env.prod.example .env.production
-vim .env.production  # 填入生產配置
+cp .env.prod.example .env.prod
+vim .env.prod  # 填入生產配置
 
-# .env.production (生產環境完整配置)
+# .env.prod (生產環境完整配置)
 NEXT_PUBLIC_GRAPHQL_ENDPOINT=https://api.yourapp.com/graphql
 NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT=wss://api.yourapp.com/graphql
 NEXT_PUBLIC_APOLLO_TIMEOUT=60000           # 生產環境使用較長超時
@@ -736,7 +736,7 @@ curl http://localhost:4000/graphql
 
 優先級從高到低：
 
-1. `.env.production` (生產)
+1. `.env.prod` (生產)
 2. `.env.development` (環境專用)
 3. `.env` (基礎配置，Git 忽略)
 

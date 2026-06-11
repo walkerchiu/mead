@@ -243,6 +243,15 @@ services:
     build:
       context: .
       dockerfile: apps/frontend/Dockerfile
+      args:
+        # NEXT_PUBLIC_* 在 build 時烘進 client bundle；值由 .env.docker 插值（未設則為空）。
+        NEXT_PUBLIC_GRAPHQL_ENDPOINT: ${NEXT_PUBLIC_GRAPHQL_ENDPOINT:-}
+        NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT: ${NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT:-}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-}
+        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-}
+        NEXT_PUBLIC_ENABLE_2FA: ${NEXT_PUBLIC_ENABLE_2FA:-}
+        NEXT_PUBLIC_ENABLE_ANALYTICS: ${NEXT_PUBLIC_ENABLE_ANALYTICS:-}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
     container_name: mead-frontend
     restart: unless-stopped
     profiles: ['app']

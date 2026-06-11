@@ -1190,7 +1190,7 @@ function MonitoredQuery() {
 **1. 使用環境變數管理全局配置**
 
 ```bash
-# .env.production
+# .env.prod
 NEXT_PUBLIC_APOLLO_TIMEOUT=60000
 NEXT_PUBLIC_APOLLO_MAX_RETRIES=5
 NEXT_PUBLIC_SENTRY_DSN=your-prod-dsn
