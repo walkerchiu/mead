@@ -1,6 +1,5 @@
 // This file is auto-generated. DO NOT EDIT manually.
 // Edit files in prisma/schemas/ instead and run: pnpm db:merge-schemas
-// Generated at: 2026-06-11T06:47:43.980Z
 
 // ============================================
 // Source: base.prisma

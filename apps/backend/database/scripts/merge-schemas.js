@@ -35,7 +35,8 @@ function mergeSchemas() {
   let mergedContent = '// This file is auto-generated. DO NOT EDIT manually.\n';
   mergedContent +=
     '// Edit files in prisma/schemas/ instead and run: pnpm db:merge-schemas\n';
-  mergedContent += `// Generated at: ${new Date().toISOString()}\n\n`;
+  // 不輸出時間戳，避免每次重新產生時造成 schema.prisma 無意義 churn（檔頭已標示 auto-generated）。
+  mergedContent += '\n';
 
   schemaFiles.forEach((file) => {
     const filePath = path.join(SCHEMAS_DIR, file);
