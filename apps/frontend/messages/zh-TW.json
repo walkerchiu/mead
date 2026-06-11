@@ -121,6 +121,12 @@
     "cronJobs": "排程任務"
   },
   "auth": {
+    "changePassword": {
+      "title": "變更您的密碼",
+      "subtitle": "為了帳號安全，請先設定新密碼才能繼續",
+      "notice": "這是您的首次登入，請變更密碼以繼續使用。",
+      "success": "密碼已更新，正在為您導向…"
+    },
     "login": {
       "title": "登入",
       "subtitle": "輸入您的帳號資訊以登入系統",
@@ -361,7 +367,8 @@
         "confirmPasswordHelper": "再次輸入您的新密碼",
         "revokeOtherDevices": "登出其他設備",
         "revokeOtherDevicesHelper": "修改密碼後將其他所有設備登出",
-        "passwordChanged": "密碼修改成功"
+        "passwordChanged": "密碼修改成功",
+        "updateError": "變更密碼失敗，請再試一次。"
       },
       "tokens": {
         "title": "存取權杖",

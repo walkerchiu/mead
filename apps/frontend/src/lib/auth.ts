@@ -251,6 +251,17 @@ export const parseJwt = (token: string): Record<string, unknown> | null => {
 };
 
 /**
+ * 是否須強制變更密碼（首次登入）。來源為 access token 內的 `mustChangePassword` claim
+ * （後端僅在為 true 時加入；使用者成功改密後刷新出的 token 即不再帶此 claim）。前端僅用於 UI 導向。
+ */
+export const mustChangePassword = (): boolean => {
+  const token = getAccessToken();
+  if (!token) return false;
+  const value = parseJwt(token)?.mustChangePassword;
+  return value === true || value === 'true';
+};
+
+/**
  * 檢查 token 是否過期
  */
 export const isTokenExpired = (token: string): boolean => {

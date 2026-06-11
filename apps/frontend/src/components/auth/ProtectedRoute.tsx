@@ -8,6 +8,7 @@ import {
   isAuthenticated,
   parseJwt,
   refreshAccessToken,
+  mustChangePassword,
   AUTH_INIT_COMPLETE_EVENT,
   isAuthInitComplete,
 } from '@/lib/auth';
@@ -77,6 +78,28 @@ function resolveLoginRoute(pathname: string | null): string {
   return pathname && pathname.includes('/hq/') ? '/hq/login' : '/login';
 }
 
+/**
+ * 首次登入強制改密關卡：帶 mustChangePassword 旗標且不在變更密碼頁時，導向對應 scope 的
+ * 變更密碼頁（依 /hq/ 前綴分軌）。需先於權限/scope 檢查執行。回傳是否已觸發導向。
+ */
+function enforcePasswordChange(
+  router: { replace: (path: string) => void },
+  pathname: string | null,
+): boolean {
+  if (
+    mustChangePassword() &&
+    !(pathname && pathname.includes('/change-password'))
+  ) {
+    router.replace(
+      pathname && pathname.includes('/hq/')
+        ? '/hq/change-password'
+        : '/change-password',
+    );
+    return true;
+  }
+  return false;
+}
+
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requiredPermission?: string; // Legacy support (single permission)
@@ -129,6 +152,12 @@ export default function ProtectedRoute({
             '[ProtectedRoute] Already authenticated, setting authReady to true',
           );
 
+          // 首次登入強制改密優先於權限/scope 檢查
+          if (enforcePasswordChange(router, pathname)) {
+            setChecking(false);
+            return;
+          }
+
           // check permissions and scopes
           if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));
@@ -173,6 +202,12 @@ export default function ProtectedRoute({
         });
 
         if (authenticated) {
+          // 首次登入強制改密優先於權限/scope 檢查
+          if (enforcePasswordChange(router, pathname)) {
+            setChecking(false);
+            return;
+          }
+
           // check permissions and scopes
           if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));
@@ -204,6 +239,12 @@ export default function ProtectedRoute({
         const refreshed = await refreshAccessToken('protected-route-fallback');
 
         if (refreshed) {
+          // 首次登入強制改密優先於權限/scope 檢查
+          if (enforcePasswordChange(router, pathname)) {
+            setChecking(false);
+            return;
+          }
+
           // check permissions and scopes
           if (!checkPermissions()) {
             setError(t('permissionDeniedMessage'));

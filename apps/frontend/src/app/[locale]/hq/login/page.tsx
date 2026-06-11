@@ -16,6 +16,7 @@ import {
   isAuthenticated,
   getAccessToken,
   parseJwt,
+  mustChangePassword,
 } from '@/lib/auth';
 import { AccessScope } from '@/types/auth';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -60,7 +61,14 @@ export default function HqLoginPage() {
     const checkAuth = async () => {
       if (isAuthenticated()) {
         setRedirecting(true);
-        router.replace(resolveLandingPath());
+        {
+          const landing = resolveLandingPath();
+          router.replace(
+            mustChangePassword()
+              ? { pathname: '/hq/change-password', query: { next: landing } }
+              : landing,
+          );
+        }
         return;
       }
 
@@ -82,6 +90,14 @@ export default function HqLoginPage() {
 
   const redirectToDashboard = async () => {
     const landing = resolveLandingPath();
+    // 首次登入須強制改密：先導向 HQ 變更密碼頁，並把落點以 next 帶過去，改完直接回落點。
+    if (mustChangePassword()) {
+      router.replace({
+        pathname: '/hq/change-password',
+        query: { next: landing },
+      });
+      return;
+    }
     try {
       const { data: meData } = await apolloClient.query({
         query: ME_QUERY,
