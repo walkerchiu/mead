@@ -44,6 +44,7 @@
 | molecules | `PlanStatsBar`           | 數據成果格線（響應式欄數、末項橫跨整列）                   |
 | molecules | `PlanTimeline`           | 計畫時程軸（年份 / 月份 / 軌道 / 說明氣泡）                |
 | molecules | `SocialLinkBar`          | 社群圖示半透明膠囊 + 了解更多按鈕                          |
+| molecules | `StatsMarquee`           | 數據成果跑馬燈（內容多於可視範圍時無縫循環滾動）           |
 | organisms | `DecorativeTextCloud`    | hero 文字雲（三圖形 metaball、hover 照片、橫向／直向佈局） |
 | organisms | `PlanCard`               | 計畫卡片（兩張毛玻璃卡片：識別/時程 + 數據/banner/社群）   |
 | organisms | `PlanCarousel`           | 三計畫輪播（中央卡片 + 兩側相鄰卡片預覽 + 裝飾星形照片）   |
