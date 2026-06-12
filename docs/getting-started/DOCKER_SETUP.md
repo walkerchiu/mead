@@ -305,14 +305,14 @@ services:
 ### 啟動與停止
 
 ```bash
-# 啟動所有服務
-docker-compose --env-file .env.docker up -d
+# 啟動所有服務（核心 infra + dev 工具 profile tools）
+docker-compose --env-file .env.docker --profile tools up -d
 
-# 停止所有服務
-docker-compose down
+# 停止所有服務（含 tools / storage profile，否則 profile-only 容器不會被 down）
+docker-compose --profile tools --profile storage down
 
 # 停止並刪除 volumes（⚠️ 會刪除資料）
-docker-compose down -v
+docker-compose --profile tools --profile storage down -v
 ```
 
 ### 查看狀態

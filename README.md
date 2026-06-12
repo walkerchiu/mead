@@ -341,8 +341,8 @@ pnpm db:seed                # 載入初始資料
 **Docker**
 
 ```bash
-docker-compose --env-file .env.docker up -d    # 啟動服務
-docker-compose down                            # 停止服務
+docker-compose --env-file .env.docker --profile tools up -d  # 啟動服務（含 dev 工具）
+docker-compose --profile tools --profile storage down        # 停止服務（含 tools / storage profile）
 docker-compose logs -f                         # 查看日誌
 docker-compose ps                              # 查看服務狀態
 ```

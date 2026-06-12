@@ -135,6 +135,18 @@ docker system df                  # 查看用量
 docker system prune -a --volumes  # ⚠️ 會刪除所有未使用的 image/volume
 ```
 
+### 停止服務後出現 `Network ... Resource is still in use`
+
+`docker compose down` 未帶 profile 時，`tools`（mailpit / adminer）與 `storage` 容器不會被停，仍連在 network 上，導致網路無法移除。
+
+```bash
+# 建議：用 CLI 一次停乾淨（已帶齊 profile）
+./scripts/cli.sh stop
+
+# 或手動停止時補上 profile
+docker-compose --env-file .env.docker --profile tools --profile storage down
+```
+
 ---
 
 ## 資料庫問題
