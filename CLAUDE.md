@@ -21,3 +21,15 @@
 - infra：`docker compose --env-file .env.docker up -d`
 - 後端 `apps/backend`：`pnpm db:push && pnpm db:seed && pnpm dev`
 - 前端 `apps/frontend`：`pnpm dev`
+
+## 驗證指令（包含但不限於，愈多愈好；對應 `family-verify` 工具箱）
+
+- 型別：`pnpm type-check`
+- Lint / 格式：`pnpm lint`、`pnpm format:check`
+- 建置：`pnpm build`、`pnpm build-storybook`
+- 測試：`pnpm test`、`pnpm test:i18n`、`pnpm test:e2e`（Playwright）
+- 相依稽核：`pnpm audit`（授權見 `dependency-policy`）
+- DB：`pnpm db:push`、`pnpm db:seed`（migration 用 `pnpm db:migrate`）
+- e2e 起服務：`docker compose --env-file .env.docker up -d` → 後端 `apps/backend` `pnpm dev` → 前端 `apps/frontend` `pnpm dev` → curl / Playwright
+
+> 以上為常用清單，**不限於此**——根 `package.json` 還有更多 scripts，能跑的都跑。
