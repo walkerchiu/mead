@@ -94,7 +94,7 @@ docker-compose ps
 
 **用途**: 主資料庫
 **Port**: 5432
-**Image**: `timescale/timescaledb:latest-pg16`
+**Image**: `timescale/timescaledb:2.27.0-pg16`
 
 **特色**:
 

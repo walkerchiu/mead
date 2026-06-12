@@ -311,40 +311,27 @@ BATCH_INTERVAL_MS = 5000; // 或每 5 秒寫入一次
 
 ### RabbitMQ 配置
 
-**Exchange 和 Queue 設定**:
+**NestJS RMQ Transport 設定**（`apps/backend/src/queue/queue.module.ts`）：
 
 ```typescript
-// Exchange 配置
 {
-  name: 'audit_log.exchange',
-  type: 'topic',
-  durable: true,  // 持久化 Exchange
-}
-
-// Queue 配置
-{
-  name: 'audit_log.create',
-  durable: true,  // 持久化 Queue（伺服器重啟後保留訊息）
-  arguments: {
-    'x-message-ttl': 86400000,  // 訊息 TTL：24 小時
-    'x-max-length': 100000,      // 最大訊息數：10 萬筆
-  }
-}
-
-// Binding
-{
-  exchange: 'audit_log.exchange',
-  routingKey: 'audit_log.create',
-  queue: 'audit_log.create',
+  transport: Transport.RMQ,
+  options: {
+    urls: [url],
+    queue: 'audit_logs',
+    queueOptions: {
+      durable: true, // 持久化佇列（伺服器重啟後保留訊息）
+    },
+  },
 }
 ```
 
+採 NestJS 內建 RMQ microservice：訊息發到預設 exchange 的具名佇列 `audit_logs`，未另建 topic exchange / routing key。
+
 **訊息持久化策略**:
 
-- ✅ **Exchange 持久化**: 伺服器重啟後 Exchange 不會消失
-- ✅ **Queue 持久化**: 訊息保存到磁碟，重啟後恢復
-- ✅ **Message TTL**: 訊息 24 小時後自動過期（防止積壓）
-- ✅ **Max Length**: 最多保留 10 萬筆訊息（防止記憶體溢出）
+- ✅ **Queue 持久化**: `durable: true`，訊息保存到磁碟，重啟後恢復
+- ℹ️ **TTL / Max Length**: 目前未在 `queueOptions` 設定（如需防積壓，可後續加上 `x-message-ttl` / `x-max-length`）
 
 ### 批次處理機制
 

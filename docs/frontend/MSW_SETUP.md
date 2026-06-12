@@ -118,7 +118,7 @@ pnpm storybook
 
 1. 導航到：`Example > Apollo + MSW Test`
 2. 輸入：
-   - Email: `public@example.com`
+   - Email 欄位（值為帳號 accountName）: `public_user`
    - Password: `Password123!`
 3. 點擊「登入」
 4. 應該看到：「✅ 登入成功！用戶: public@example.com」
