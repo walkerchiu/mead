@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { Switch } from './Switch';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Fields/Switch',
+  title: 'Shared/Atoms/Fields/Switch',
   component: Switch,
   parameters: {
     layout: 'centered',

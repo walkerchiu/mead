@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Radio } from './Radio';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Fields/Radio',
+  title: 'Shared/Atoms/Fields/Radio',
   component: Radio,
   parameters: {
     layout: 'centered',

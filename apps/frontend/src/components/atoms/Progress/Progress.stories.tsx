@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Progress',
+  title: 'Shared/Atoms/Progress',
   component: Progress,
   parameters: {
     layout: 'centered',

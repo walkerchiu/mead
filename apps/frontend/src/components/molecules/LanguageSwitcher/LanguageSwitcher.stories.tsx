@@ -13,7 +13,7 @@ import { AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
  * - Accessible with ARIA labels
  */
 const meta = {
-  title: 'HQ Scope/Molecules/LanguageSwitcher',
+  title: 'Shared/Molecules/LanguageSwitcher',
   component: LanguageSwitcher,
   parameters: {
     layout: 'centered',

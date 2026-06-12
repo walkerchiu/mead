@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Molecules/Stepper',
+  title: 'Shared/Molecules/Stepper',
   component: Stepper,
   parameters: {
     layout: 'centered',

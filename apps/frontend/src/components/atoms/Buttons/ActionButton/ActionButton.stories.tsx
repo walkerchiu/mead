@@ -10,7 +10,7 @@ import type {} from '../../../../theme/palette'; // Use relative path for augmen
 import { ActionButton } from './ActionButton';
 
 const meta = {
-  title: 'HQ Scope/Atoms/ActionButton',
+  title: 'Shared/Atoms/ActionButton',
   component: ActionButton,
   parameters: {
     layout: 'centered',

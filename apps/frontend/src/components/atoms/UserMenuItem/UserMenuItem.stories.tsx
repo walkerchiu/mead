@@ -16,7 +16,7 @@ import { Box } from '@mui/material';
  * Single user menu item that supports icon, label, click events, and danger styling.
  */
 const meta = {
-  title: 'HQ Scope/Atoms/UserMenuItem',
+  title: 'Shared/Atoms/UserMenuItem',
   component: UserMenuItem,
   parameters: {
     layout: 'padded',

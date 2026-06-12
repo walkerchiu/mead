@@ -7,7 +7,7 @@ import type {
 } from './NotificationFilters';
 
 const meta = {
-  title: 'HQ Scope/Molecules/NotificationFilters',
+  title: 'Shared/Molecules/NotificationFilters',
   component: NotificationFilters,
   parameters: {
     layout: 'padded',

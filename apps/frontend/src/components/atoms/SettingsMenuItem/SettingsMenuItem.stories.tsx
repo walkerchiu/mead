@@ -15,7 +15,7 @@ import { Box } from '@mui/material';
  * Single settings menu item that supports icon, label, click events, and link navigation.
  */
 const meta = {
-  title: 'HQ Scope/Atoms/SettingsMenuItem',
+  title: 'Shared/Atoms/SettingsMenuItem',
   component: SettingsMenuItem,
   parameters: {
     layout: 'padded',

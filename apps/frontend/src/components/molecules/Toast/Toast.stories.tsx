@@ -5,7 +5,7 @@ import type { ToastState } from '@/hooks/useToast';
 import { Button, Stack, Typography } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Molecules/Toast',
+  title: 'Shared/Molecules/Toast',
   component: Toast,
   parameters: {
     layout: 'centered',

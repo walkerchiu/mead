@@ -30,7 +30,7 @@ import { KPICard } from './KPICard';
  * - 兩者底層都使用 MUI `<Card>` 作為容器，視覺基調（elevation / border / radius）一致。
  */
 const meta = {
-  title: 'HQ Scope/Molecules/KPICard',
+  title: 'Shared/Molecules/KPICard',
   component: KPICard,
   parameters: {
     layout: 'centered',

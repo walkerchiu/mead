@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import { Search } from './Search';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Fields/Search',
+  title: 'Shared/Atoms/Fields/Search',
   component: Search,
   parameters: {
     layout: 'centered',

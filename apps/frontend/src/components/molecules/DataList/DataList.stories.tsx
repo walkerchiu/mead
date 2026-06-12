@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 const meta = {
-  title: 'HQ Scope/Molecules/DataList',
+  title: 'Shared/Molecules/DataList',
   component: DataList,
   parameters: {
     layout: 'padded',

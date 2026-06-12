@@ -10,7 +10,7 @@ import {
 } from '@mui/icons-material';
 
 const meta = {
-  title: 'HQ Scope/Molecules/PageHeader',
+  title: 'Shared/Molecules/PageHeader',
   component: PageHeader,
   parameters: {
     layout: 'fullscreen',

@@ -21,7 +21,7 @@ import {
  * Fully follows the Atomic Design architecture like the Notification system.
  */
 const meta = {
-  title: 'HQ Scope/Organisms/UserMenu',
+  title: 'Shared/Organisms/UserMenu',
   component: UserMenu,
   parameters: {
     layout: 'centered',

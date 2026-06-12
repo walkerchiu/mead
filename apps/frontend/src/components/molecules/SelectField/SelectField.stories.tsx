@@ -28,7 +28,7 @@ import Typography from '@mui/material/Typography';
  * - Option menus with icons
  */
 const meta = {
-  title: 'HQ Scope/Molecules/SelectField',
+  title: 'Shared/Molecules/SelectField',
   component: SelectField,
   parameters: {
     layout: 'centered',

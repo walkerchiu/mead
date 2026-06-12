@@ -79,21 +79,20 @@ Examples:
 
 ### Browse Components
 
-The sidebar is organized into four top-level **scopes**, each with its own
+The sidebar is organized into three top-level **scopes**, each with its own
 `Overview` page:
 
-1. **Public Scope** - Public, login-free content site (near-term focus, currently empty)
-2. **HQ Scope** - Back-office admin; holds the template's full component set today
-3. **Customer Scope** - Logged-in customer-facing screens (currently empty)
-4. **Shared** - Reserved for genuinely cross-scope components (currently empty)
+1. **Public Scope** - Public, login-free content site (the primary near-term focus)
+2. **HQ Scope** - Back-office admin; ops tooling (audit logs, cron jobs, sessions) and HQ-only shell
+3. **Shared** - Cross-scope generic UI components and the auth flow
 
 Inside every scope, components follow the same Atomic Design layering:
 **Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages**.
 
-Public Scope and Customer Scope are expected to differ substantially in style,
-so the existing template components are treated as HQ-specific rather than
-shared. Promote a component to **Shared** only once two or more scopes truly
-use it with the same styling.
+Scope is encoded by source folder: scope-specific components live under
+`components/public/<level>/` (Public) or `components/<level>/hq/` (HQ); generic
+shared components stay directly under `components/<level>/`. When unsure where a
+component belongs, default it to **Shared**.
 
 ### Test Components
 

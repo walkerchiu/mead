@@ -17,7 +17,7 @@ import { Box } from '@mui/material';
  * Supports dividers and danger style items.
  */
 const meta = {
-  title: 'HQ Scope/Molecules/UserMenuList',
+  title: 'Shared/Molecules/UserMenuList',
   component: UserMenuList,
   parameters: {
     layout: 'padded',

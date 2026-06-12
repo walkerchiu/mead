@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Molecules/Tabs',
+  title: 'Shared/Molecules/Tabs',
   component: Tabs,
   parameters: {
     layout: 'centered',

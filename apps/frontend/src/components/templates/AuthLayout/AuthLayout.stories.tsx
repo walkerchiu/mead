@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'HQ Scope/Templates/AuthLayout',
+  title: 'Shared/Templates/AuthLayout',
   component: AuthLayout,
   parameters: {
     layout: 'fullscreen',

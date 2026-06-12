@@ -8,7 +8,7 @@ import ScheduleIcon from '@mui/icons-material/Schedule';
 import { Chip } from './Chip';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Chip',
+  title: 'Shared/Atoms/Chip',
   component: Chip,
   parameters: {
     layout: 'centered',

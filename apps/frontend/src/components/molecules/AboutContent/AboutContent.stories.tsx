@@ -3,7 +3,7 @@ import { AboutContent } from './AboutContent';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'HQ Scope/Molecules/AboutContent',
+  title: 'Shared/Molecules/AboutContent',
   component: AboutContent,
   parameters: {
     docs: {

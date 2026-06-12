@@ -60,7 +60,7 @@ import {
  * - Multi-level navigation menus
  */
 const meta = {
-  title: 'HQ Scope/Organisms/Drawer',
+  title: 'Shared/Organisms/Drawer',
   component: Drawer,
   parameters: {
     layout: 'padded',

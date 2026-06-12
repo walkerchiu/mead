@@ -9,7 +9,7 @@ import { Box, Typography } from '@mui/material';
  * Single theme toggle button for selecting Light, Dark, or System theme.
  */
 const meta = {
-  title: 'HQ Scope/Atoms/ThemeToggleButton',
+  title: 'Shared/Atoms/ThemeToggleButton',
   component: ThemeToggleButton,
   parameters: {
     layout: 'padded',

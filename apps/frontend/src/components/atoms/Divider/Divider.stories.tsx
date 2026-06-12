@@ -3,7 +3,7 @@ import { Divider } from './Divider';
 import { Box, Typography } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Divider',
+  title: 'Shared/Atoms/Divider',
   component: Divider,
   parameters: {
     layout: 'centered',

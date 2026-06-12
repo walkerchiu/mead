@@ -11,7 +11,7 @@ import {
 import { ActivityLogItem } from './ActivityLogItem';
 
 const meta: Meta<typeof ActivityLogItem> = {
-  title: 'HQ Scope/Molecules/ActivityLogItem',
+  title: 'Shared/Molecules/ActivityLogItem',
   component: ActivityLogItem,
   parameters: {
     layout: 'padded',

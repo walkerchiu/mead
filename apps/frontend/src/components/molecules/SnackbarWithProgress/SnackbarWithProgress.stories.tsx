@@ -14,7 +14,7 @@ import { Button, Box, Stack, Typography, Paper } from '@mui/material';
  * - Smooth animations
  */
 const meta = {
-  title: 'HQ Scope/Molecules/SnackbarWithProgress',
+  title: 'Shared/Molecules/SnackbarWithProgress',
   component: SnackbarWithProgress,
   parameters: {
     layout: 'centered',

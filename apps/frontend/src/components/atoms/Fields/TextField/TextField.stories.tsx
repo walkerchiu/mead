@@ -20,7 +20,7 @@ import { TextField } from './TextField';
  * - Use appropriate type attribute (email, password, number, etc.)
  */
 const meta = {
-  title: 'HQ Scope/Atoms/Fields/TextField',
+  title: 'Shared/Atoms/Fields/TextField',
   component: TextField,
   parameters: {
     layout: 'centered',

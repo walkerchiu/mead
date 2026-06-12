@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 
 const meta = {
-  title: 'HQ Scope/Organisms/TwoFactorForm',
+  title: 'Shared/Organisms/TwoFactorForm',
   component: TwoFactorForm,
   parameters: {
     layout: 'centered',

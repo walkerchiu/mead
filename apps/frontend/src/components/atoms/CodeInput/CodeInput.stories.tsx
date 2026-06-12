@@ -21,7 +21,7 @@ import Alert from '@mui/material/Alert';
  * - Password reset verification
  */
 const meta = {
-  title: 'HQ Scope/Atoms/CodeInput',
+  title: 'Shared/Atoms/CodeInput',
   component: CodeInput,
   parameters: {
     layout: 'centered',

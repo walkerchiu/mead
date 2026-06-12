@@ -5,7 +5,7 @@ import { ForgotPasswordForm } from '@/components/organisms';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'HQ Scope/Pages/ForgotPasswordPage',
+  title: 'Shared/Pages/ForgotPasswordPage',
   parameters: {
     layout: 'fullscreen',
     docs: {

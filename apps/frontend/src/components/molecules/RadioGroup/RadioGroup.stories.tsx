@@ -23,7 +23,7 @@ import Alert from '@mui/material/Alert';
  * - Plan selection
  */
 const meta = {
-  title: 'HQ Scope/Molecules/RadioGroup',
+  title: 'Shared/Molecules/RadioGroup',
   component: RadioGroup,
   parameters: {
     layout: 'centered',

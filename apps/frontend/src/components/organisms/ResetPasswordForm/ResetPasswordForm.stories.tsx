@@ -5,7 +5,7 @@ import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 
 const meta = {
-  title: 'HQ Scope/Organisms/ResetPasswordForm',
+  title: 'Shared/Organisms/ResetPasswordForm',
   component: ResetPasswordForm,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import { NotificationListSkeleton } from './NotificationListSkeleton';
 import { Box } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Skeleton/NotificationListSkeleton',
+  title: 'Shared/Atoms/Skeleton/NotificationListSkeleton',
   component: NotificationListSkeleton,
   parameters: {
     layout: 'centered',

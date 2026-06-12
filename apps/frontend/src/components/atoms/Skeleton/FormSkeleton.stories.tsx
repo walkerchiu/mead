@@ -25,7 +25,7 @@ import Box from '@mui/material/Box';
  * - Display during initial load and data fetching
  */
 const meta = {
-  title: 'HQ Scope/Atoms/Skeleton/FormSkeleton',
+  title: 'Shared/Atoms/Skeleton/FormSkeleton',
   component: FormSkeleton,
   parameters: {
     layout: 'centered',

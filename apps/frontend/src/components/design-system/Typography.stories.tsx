@@ -269,7 +269,7 @@ const TypographySystem = () => {
 };
 
 const meta = {
-  title: 'HQ Scope/Design System/Typography',
+  title: 'Shared/Design System/Typography',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

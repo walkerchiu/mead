@@ -32,7 +32,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
  * - **AlertMessage**: Inline, lightweight, small icon, suitable for forms and page notifications
  */
 const meta = {
-  title: 'HQ Scope/Molecules/ErrorDisplay',
+  title: 'Shared/Molecules/ErrorDisplay',
   component: ErrorDisplay,
   parameters: {
     layout: 'fullscreen',

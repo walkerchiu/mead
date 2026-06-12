@@ -13,7 +13,7 @@ import { UserLink } from './UserLink';
  * - 可選擇隱藏 Avatar（超緊湊場景）
  */
 const meta = {
-  title: 'HQ Scope/Atoms/UserLink',
+  title: 'Shared/Atoms/UserLink',
   component: UserLink,
   parameters: {
     layout: 'centered',

@@ -53,7 +53,7 @@ const mockNotifications = [
 ];
 
 const meta = {
-  title: 'HQ Scope/Molecules/NotificationList',
+  title: 'Shared/Molecules/NotificationList',
   component: NotificationList,
   parameters: {
     layout: 'centered',

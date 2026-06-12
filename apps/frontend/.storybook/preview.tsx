@@ -53,8 +53,8 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        // Four top-level scopes: Public Scope (near-term focus) / HQ Scope /
-        // Customer Scope / Shared (cross-scope components + auth flow).
+        // Three top-level scopes: Public Scope (primary) / HQ Scope /
+        // Shared (cross-scope components + auth flow).
         // method: 'alphabetical' auto-sorts anything not listed in `order`;
         // the nested arrays in `order` fix the manual sequence per level.
         // Each scope shares the same Atomic Design layering:
@@ -66,7 +66,7 @@ const preview: Preview = {
           'Introduction',
           ['Welcome', 'Best Practices', 'Getting Started'],
 
-          // 1. Public Scope (near-term focus — content site, no login/admin)
+          // 1. Public Scope (primary — content site, no login/admin)
           'Public Scope',
           [
             'Overview',
@@ -80,21 +80,7 @@ const preview: Preview = {
             'Pages',
           ],
 
-          // 2. Customer Scope (customer-facing dashboard)
-          'Customer Scope',
-          [
-            'Overview',
-            'Design System',
-            ['Colors', 'Typography'],
-            'Atoms',
-            'Molecules',
-            'Organisms',
-            'Layout',
-            'Templates',
-            'Pages',
-          ],
-
-          // 3. HQ Scope (back-office admin)
+          // 2. HQ Scope (back-office admin)
           'HQ Scope',
           [
             'Overview',
@@ -109,7 +95,7 @@ const preview: Preview = {
             'Pages',
           ],
 
-          // 4. Shared (cross-scope components + auth flow)
+          // 3. Shared (cross-scope components + auth flow)
           'Shared',
           [
             'Overview',

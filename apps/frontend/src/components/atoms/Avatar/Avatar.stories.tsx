@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Avatar, AvatarGroup } from './Avatar';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Avatar',
+  title: 'Shared/Atoms/Avatar',
   component: Avatar,
   parameters: {
     layout: 'centered',

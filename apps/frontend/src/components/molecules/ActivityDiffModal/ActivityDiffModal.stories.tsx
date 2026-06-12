@@ -30,7 +30,7 @@ function Demo(
 }
 
 const meta: Meta<typeof Demo> = {
-  title: 'HQ Scope/Molecules/ActivityDiffModal',
+  title: 'Shared/Molecules/ActivityDiffModal',
   component: Demo,
   parameters: {
     layout: 'centered',

@@ -3,7 +3,7 @@ import { Badge } from './Badge';
 import { Box, Avatar, IconButton } from '@mui/material';
 
 const meta = {
-  title: 'HQ Scope/Atoms/Badge',
+  title: 'Shared/Atoms/Badge',
   component: Badge,
   parameters: {
     layout: 'centered',

@@ -5,7 +5,7 @@ import { Paper } from '@mui/material';
 import { graphql, HttpResponse, delay } from 'msw';
 
 const meta = {
-  title: 'HQ Scope/Organisms/ChangePasswordForm',
+  title: 'Shared/Organisms/ChangePasswordForm',
   component: ChangePasswordForm,
   parameters: {
     layout: 'centered',

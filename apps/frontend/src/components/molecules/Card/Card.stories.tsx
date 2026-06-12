@@ -13,7 +13,7 @@ import { Box, Avatar, IconButton, Typography, Chip } from '@mui/material';
  * - 若要展示**單一關鍵數值**（KPI、統計指標），請改用 [`<KPICard>`](/docs/molecules-kpicard--docs) — 它有專為數字設計的排版（icon 方框 + 大字號 + hint 提示），視覺重心不同。
  */
 const meta = {
-  title: 'HQ Scope/Molecules/Card',
+  title: 'Shared/Molecules/Card',
   component: Card,
   parameters: {
     layout: 'centered',

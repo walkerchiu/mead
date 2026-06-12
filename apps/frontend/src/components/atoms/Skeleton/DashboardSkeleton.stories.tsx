@@ -23,7 +23,7 @@ import Box from '@mui/material/Box';
  * - Improve page loading experience
  */
 const meta = {
-  title: 'HQ Scope/Atoms/Skeleton/DashboardSkeleton',
+  title: 'Shared/Atoms/Skeleton/DashboardSkeleton',
   component: DashboardSkeleton,
   parameters: {
     layout: 'fullscreen',

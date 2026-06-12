@@ -36,7 +36,7 @@ import {
  * - Content preview
  */
 const meta = {
-  title: 'HQ Scope/Organisms/Modal',
+  title: 'Shared/Organisms/Modal',
   component: Modal,
   parameters: {
     layout: 'centered',

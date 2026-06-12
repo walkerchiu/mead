@@ -16,7 +16,7 @@ import { Box } from '@mui/material';
  * Settings menu item list that combines multiple SettingsMenuItem (Atom) components.
  */
 const meta = {
-  title: 'HQ Scope/Molecules/SettingsMenuList',
+  title: 'Shared/Molecules/SettingsMenuList',
   component: SettingsMenuList,
   parameters: {
     layout: 'padded',
