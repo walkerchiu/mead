@@ -207,6 +207,7 @@ pnpm --filter @mead/backend exec prisma migrate reset   # 會清空 + 自動跑 
 1. Refresh token cookie 未正確設定（`SameSite`、`Secure`）
 2. 前後端 port 不一致導致 cookie 無法共享
 3. 瀏覽器第三方 cookie 被封鎖
+4. 登入時未勾「記住我」→ `refresh_token` 為 session cookie，關閉瀏覽器即清除（屬預期行為；勾選後才帶 `maxAge` 持久化，並以 HttpOnly 的 `remember_me` cookie 記錄偏好，見 [Token 配置 — 記住我](../authentication/TOKEN-CONFIGURATION.md#記住我remember-me)）
 
 **排查**：
 

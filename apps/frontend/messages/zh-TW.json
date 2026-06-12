@@ -135,6 +135,7 @@
       "accountPlaceholder": "請輸入帳號",
       "passwordLabel": "密碼",
       "forgotPassword": "忘記密碼？",
+      "rememberMe": "記住我（在此裝置保持登入）",
       "submit": "登入",
       "success": "登入成功",
       "error": "登入失敗，請檢查您的電子郵件和密碼",

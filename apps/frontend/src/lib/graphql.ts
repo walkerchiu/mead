@@ -54,8 +54,12 @@ export const USER_WITH_PROFILE_FRAGMENT = gql`
  */
 export const LOGIN_MUTATION = gql`
   ${USER_FRAGMENT}
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+  mutation Login(
+    $email: String!
+    $password: String!
+    $rememberMe: Boolean! = false
+  ) {
+    login(email: $email, password: $password, rememberMe: $rememberMe) {
       ... on AuthResponse {
         __typename
         accessToken

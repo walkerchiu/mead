@@ -514,6 +514,7 @@ type Mutation {
 
     """用戶密碼"""
     password: String!
+    rememberMe: Boolean = false
   ): LoginResult!
 
   """登出（清除伺服器端的 Refresh Token 和 Cookie）"""

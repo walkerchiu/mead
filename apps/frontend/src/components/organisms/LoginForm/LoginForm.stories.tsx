@@ -124,6 +124,23 @@ export const ErrorStates: Story = {
 };
 
 /**
+ * 含「記住我」
+ *
+ * 展示送出按鈕上方的「記住我」勾選框。勾選後 login mutation 會帶 rememberMe=true，
+ * 後端據此讓 refresh token cookie 持久化（依 REFRESH_TOKEN_MAX_AGE）；未勾選則為
+ * session cookie（關閉瀏覽器即失效）。此偏好另寫入 remember_me cookie，供
+ * refreshToken / 2FA 驗證後還原同樣的持久化策略。
+ */
+export const WithRememberMe: Story = {
+  args: {
+    onSubmit: async (data) => {
+      console.log('Login with rememberMe:', data);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    },
+  },
+};
+
+/**
  * 互動範例
  * 模擬完整的登入流程
  */

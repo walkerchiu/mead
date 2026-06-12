@@ -23,6 +23,7 @@ JWT Token 配置策略、安全實踐和 Session 管理機制，平衡安全性�
     - [環境變量配置](#環境變量配置)
   - [使用流程](#使用流程)
     - [正常使用流程](#正常使用流程)
+    - [記住我（Remember Me）](#記住我remember-me)
     - [Session 撤銷流程](#session-撤銷流程)
   - [安全性考量](#安全性考量)
     - [多層防護](#多層防護)
@@ -215,6 +216,50 @@ JWT_REFRESH_EXPIRES_IN=7d
 09:16 - 繼續正常使用
         ✅ 每 15 分鐘自動重新整理 Access Token
         ✅ 持續 7 天無需重新登入
+```
+
+### 記住我（Remember Me）
+
+登入頁（customer `/login` 與 HQ `/hq/login` **兩種 scope 皆適用**）提供「記住我」勾選框，
+用來控制 **`refresh_token` cookie 的存活策略**。`login` mutation 新增 `rememberMe: Boolean = false`
+參數承載此選擇（未傳時預設 `false`，前端 `LoginForm` 依勾選狀態帶入）。
+
+| 勾選狀態   | `refresh_token` cookie 型態 | 行為                                                                  |
+| ---------- | --------------------------- | --------------------------------------------------------------------- |
+| **勾選**   | 持久 cookie（persistent）   | cookie 帶 `maxAge`（`REFRESH_TOKEN_MAX_AGE`）；關閉瀏覽器後仍保持登入 |
+| **未勾選** | session cookie              | 省略 `maxAge`／`expires`，瀏覽器關閉即清除，需重新登入                |
+
+> NestJS 端**無 DB migration**：偏好不存 DB，而是以一個 cookie 記錄。
+
+此選擇會寫入一個 **HttpOnly 的 `remember_me` 偏好 cookie**，使後續 token refresh
+（`refreshToken`）與 2FA 驗證（`verifyTwoFactorLogin`）重新簽發 `refresh_token` cookie 時，
+沿用相同的持久 / session 策略，避免換 token 後持久性被重置。登出（`logout`）時一併清除此偏好 cookie。
+
+**程式碼實現**（`apps/backend/src/auth/cookie.utils.ts`）：
+
+```typescript
+// 依 rememberMe 決定 refresh_token cookie 為持久或 session cookie
+setRefreshTokenCookie(res, refreshToken, rememberMe);
+
+// 寫入 / 清除 remember_me 偏好 cookie（HttpOnly）
+setRememberMeCookie(res, rememberMe);
+
+// refreshToken / verifyTwoFactorLogin 還原偏好
+const rememberMe = readRememberMe(req); // remember_me === '1'
+```
+
+```text
+勾選「記住我」：
+login(rememberMe: true) → refresh_token cookie = persistent（maxAge = REFRESH_TOKEN_MAX_AGE）
+                       → remember_me cookie = '1'（HttpOnly）
+refreshToken / verifyTwoFactorLogin → readRememberMe → 維持 persistent
+
+未勾選：
+login(rememberMe: false) → refresh_token cookie = session cookie（無 maxAge）
+                        → remember_me cookie 清除
+refreshToken / verifyTwoFactorLogin → readRememberMe → 維持 session cookie
+
+logout → 清除 access_token / refresh_token / remember_me cookie
 ```
 
 ### Session 撤銷流程

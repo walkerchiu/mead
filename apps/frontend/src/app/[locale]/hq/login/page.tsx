@@ -114,7 +114,11 @@ export default function HqLoginPage() {
     router.push(landing);
   };
 
-  const handleLogin = async (data: { email: string; password: string }) => {
+  const handleLogin = async (data: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }) => {
     setLoginError(undefined);
 
     try {
@@ -122,6 +126,7 @@ export default function HqLoginPage() {
         variables: {
           email: data.email,
           password: data.password,
+          rememberMe: data.rememberMe ?? false,
         },
       });
 

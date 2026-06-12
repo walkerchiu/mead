@@ -1048,6 +1048,7 @@ type Mutation {
     用戶密碼
     """
     password: String!
+    rememberMe: Boolean = false
   ): LoginResult!
 
   """

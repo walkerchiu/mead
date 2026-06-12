@@ -93,8 +93,8 @@ type User {
 ```graphql
 union LoginResult = AuthResponse | TwoFactorLoginResponse
 
-mutation Login($email: String!, $password: String!) {
-  login(email: $email, password: $password) {
+mutation Login($email: String!, $password: String!, $rememberMe: Boolean) {
+  login(email: $email, password: $password, rememberMe: $rememberMe) {
     ... on AuthResponse {
       accessToken
       user {
@@ -121,6 +121,10 @@ mutation Login($email: String!, $password: String!) {
 - `LoginResult = createUnionType({ name: 'LoginResult', types: () => [AuthResponse, TwoFactorLoginResponse] })`，
   `resolveType` 以 `'requiresTwoFactor' in value` 判別。
 - `verifyTwoFactorLogin(input)` 直接回 `AuthResponse`（非 union）。
+- `login` 的 `rememberMe: Boolean = false` 為選用參數，控制 `refresh_token` cookie 是否持久化
+  （true → 帶 `maxAge` 的持久 cookie；false / 未傳 → session cookie）。此偏好另以 HttpOnly 的
+  `remember_me` cookie 記錄，供 `refreshToken` / `verifyTwoFactorLogin` 重簽 cookie 時沿用
+  （見 [Token 配置 — 記住我](../authentication/TOKEN-CONFIGURATION.md#記住我remember-me)）。
 
 > 後端 service 內部用 `AuthTokenResult`（含 `refreshToken`）這個 **non-GraphQL** interface 傳遞，
 > resolver destructure 出 `refreshToken` 設 cookie 後只回 `AuthResponse`。
@@ -221,24 +225,24 @@ map 成扁平 `roles` 陣列。
 
 ## Mutation 回傳型別與 Input 命名
 
-| Mutation                                                | Input / Args                          | Return                                                       |
-| ------------------------------------------------------- | ------------------------------------- | ------------------------------------------------------------ |
-| `login(email, password)`                                | flat args                             | `LoginResult`（union）                                       |
-| `verifyTwoFactorLogin(input)`                           | `VerifyTwoFactorInput`                | `AuthResponse`                                               |
-| `refreshToken`                                          | （cookie，無 args）                   | `AuthResponse`                                               |
-| `registerCustomer(accountName, email, password, name?)` | flat args                             | `AuthResponse`                                               |
-| `registerHQ(accountName, email, password, name?)`       | flat args                             | `AuthResponse`                                               |
-| `requestPasswordReset(email)`                           | flat                                  | `PasswordResetResponse { success, message }`                 |
-| `resetPassword(token, newPassword)`                     | flat                                  | `Boolean!`                                                   |
-| `verifyPasswordResetToken(token)` (query)               | flat                                  | `VerifyTokenResponse { valid: Boolean! }`                    |
-| `me` (query)                                            | —                                     | `User`                                                       |
-| `createUser(input)`                                     | `CreateUserInput`                     | `User`（含 `accountName`，建立後 `mustChangePassword=true`） |
-| `hqUpdateUser(id, input)`                               | `HQUpdateUserInput`                   | `User`                                                       |
-| `hqResetPassword(id, input)`                            | `HQResetPasswordInput`                | `Boolean!`（重設後 `mustChangePassword=true`）               |
-| `changePassword(input)`                                 | `ChangePasswordInput`                 | `Boolean!`（成功後 `mustChangePassword=false`）              |
-| `lockUser(id, input)` / `unlockUser(id)`                | `LockUserInput` / flat                | `User`                                                       |
-| `softDeleteUser(id)` / `restoreUser(id)`                | flat                                  | `User`                                                       |
-| `assignRole(input)` / `revokeRole(input)`               | `AssignRoleInput` / `RevokeRoleInput` | `Boolean!`                                                   |
+| Mutation                                                | Input / Args                               | Return                                                       |
+| ------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
+| `login(email, password, rememberMe?)`                   | flat args（`rememberMe: Boolean = false`） | `LoginResult`（union）                                       |
+| `verifyTwoFactorLogin(input)`                           | `VerifyTwoFactorInput`                     | `AuthResponse`                                               |
+| `refreshToken`                                          | （cookie，無 args）                        | `AuthResponse`                                               |
+| `registerCustomer(accountName, email, password, name?)` | flat args                                  | `AuthResponse`                                               |
+| `registerHQ(accountName, email, password, name?)`       | flat args                                  | `AuthResponse`                                               |
+| `requestPasswordReset(email)`                           | flat                                       | `PasswordResetResponse { success, message }`                 |
+| `resetPassword(token, newPassword)`                     | flat                                       | `Boolean!`                                                   |
+| `verifyPasswordResetToken(token)` (query)               | flat                                       | `VerifyTokenResponse { valid: Boolean! }`                    |
+| `me` (query)                                            | —                                          | `User`                                                       |
+| `createUser(input)`                                     | `CreateUserInput`                          | `User`（含 `accountName`，建立後 `mustChangePassword=true`） |
+| `hqUpdateUser(id, input)`                               | `HQUpdateUserInput`                        | `User`                                                       |
+| `hqResetPassword(id, input)`                            | `HQResetPasswordInput`                     | `Boolean!`（重設後 `mustChangePassword=true`）               |
+| `changePassword(input)`                                 | `ChangePasswordInput`                      | `Boolean!`（成功後 `mustChangePassword=false`）              |
+| `lockUser(id, input)` / `unlockUser(id)`                | `LockUserInput` / flat                     | `User`                                                       |
+| `softDeleteUser(id)` / `restoreUser(id)`                | flat                                       | `User`                                                       |
+| `assignRole(input)` / `revokeRole(input)`               | `AssignRoleInput` / `RevokeRoleInput`      | `Boolean!`                                                   |
 
 > MEAD 的 mutation 回 `User` 時，service 內已 `include: { profile: true }` 重新查回完整實體，
 > 不需 nptc 那種 `ReloadAsUserAsync` 的 mediator reload pattern（MEAD 無 MediatR / CQRS handler）。

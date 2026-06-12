@@ -26,6 +26,9 @@ import {
   setRefreshTokenCookie,
   clearAccessTokenCookie,
   clearRefreshTokenCookie,
+  setRememberMeCookie,
+  clearRememberMeCookie,
+  readRememberMe,
 } from './cookie.utils';
 import {
   PasswordResetResponse,
@@ -109,9 +112,10 @@ export class AuthResolver {
       );
     }
 
-    // 設置 access token 和 refresh token cookies
+    // 設置 access token 和 refresh token cookies（註冊一律持久化）
     setAccessTokenCookie(context.res, authResponse.accessToken);
-    setRefreshTokenCookie(context.res, refreshToken);
+    setRememberMeCookie(context.res, true);
+    setRefreshTokenCookie(context.res, refreshToken, true);
     return authResponse;
   }
 
@@ -162,9 +166,10 @@ export class AuthResolver {
       );
     }
 
-    // 設置 access token 和 refresh token cookies
+    // 設置 access token 和 refresh token cookies（註冊一律持久化）
     setAccessTokenCookie(context.res, authResponse.accessToken);
-    setRefreshTokenCookie(context.res, refreshToken);
+    setRememberMeCookie(context.res, true);
+    setRefreshTokenCookie(context.res, refreshToken, true);
     return authResponse;
   }
 
@@ -181,6 +186,14 @@ export class AuthResolver {
     email: string,
     @Args('password', { description: '用戶密碼' })
     password: string,
+    @Args('rememberMe', {
+      type: () => Boolean,
+      nullable: true,
+      defaultValue: false,
+      description:
+        '記住我：true 時 refresh token cookie 持久化，false 為 session cookie',
+    })
+    rememberMe: boolean,
     @Context() context: GraphQLContextWithExpress,
     @I18nLang() lang: string,
   ): Promise<typeof LoginResult> {
@@ -207,13 +220,15 @@ export class AuthResolver {
         );
       }
 
-      // 設置 access token 和 refresh token cookies
+      // 設置 access token 和 refresh token cookies（依 rememberMe 決定持久化）
       setAccessTokenCookie(context.res, authResponse.accessToken);
-      setRefreshTokenCookie(context.res, refreshToken);
+      setRememberMeCookie(context.res, rememberMe);
+      setRefreshTokenCookie(context.res, refreshToken, rememberMe);
       return authResponse;
     }
 
-    // 否則是 TwoFactorLoginResponse
+    // 否則是 TwoFactorLoginResponse：先記下偏好，2FA 驗證完成時還原 refresh cookie 持久化策略
+    setRememberMeCookie(context.res, rememberMe);
     return result;
   }
 
@@ -249,9 +264,10 @@ export class AuthResolver {
       );
     }
 
-    // 設置 access token 和 refresh token cookies
+    // 設置 access token 和 refresh token cookies（依登入時記下的 rememberMe 偏好還原）
+    const rm = readRememberMe(context.req);
     setAccessTokenCookie(context.res, authResponse.accessToken);
-    setRefreshTokenCookie(context.res, refreshToken);
+    setRefreshTokenCookie(context.res, refreshToken, rm);
     return authResponse;
   }
 
@@ -320,7 +336,11 @@ export class AuthResolver {
         },
       );
       setAccessTokenCookie(context.res, authResponse.accessToken);
-      setRefreshTokenCookie(context.res, refreshToken);
+      setRefreshTokenCookie(
+        context.res,
+        refreshToken,
+        readRememberMe(context.req),
+      );
 
       logger.debug('[AuthResolver] Returning authResponse', {
         authResponseKeys: Object.keys(authResponse),
@@ -372,6 +392,7 @@ export class AuthResolver {
     if (success) {
       clearAccessTokenCookie(context.res);
       clearRefreshTokenCookie(context.res);
+      clearRememberMeCookie(context.res);
     }
 
     return success;

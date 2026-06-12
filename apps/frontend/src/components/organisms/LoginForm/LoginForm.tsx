@@ -7,6 +7,8 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import NextLink from 'next/link';
 import { useTranslations } from 'next-intl';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import { FormField, PasswordField, AlertMessage } from '@/components/molecules';
 import { Button } from '@/components/atoms';
 
@@ -27,6 +29,7 @@ export interface LoginFormProps {
 export type LoginFormData = {
   email: string;
   password: string;
+  rememberMe?: boolean;
 };
 
 export function LoginForm({
@@ -47,6 +50,7 @@ export function LoginForm({
       .min(1, tv('account.required'))
       .regex(/^[a-zA-Z0-9_]{3,20}$/, tv('account.invalid')),
     password: z.string().min(1, tv('password.required')),
+    rememberMe: z.boolean().optional(),
   });
 
   const {
@@ -59,11 +63,12 @@ export function LoginForm({
     defaultValues: {
       email: defaultEmail,
       password: '',
+      rememberMe: false,
     },
   });
 
   const handleRetry = () => {
-    reset({ email: defaultEmail, password: '' });
+    reset({ email: defaultEmail, password: '', rememberMe: false });
   };
 
   return (
@@ -117,6 +122,12 @@ export function LoginForm({
           </Link>
         </Box>
       )}
+
+      <FormControlLabel
+        control={<Checkbox {...register('rememberMe')} disabled={loading} />}
+        label={t('rememberMe')}
+        sx={{ mt: 1 }}
+      />
 
       <Button
         type="submit"

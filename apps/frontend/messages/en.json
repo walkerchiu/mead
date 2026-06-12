@@ -135,6 +135,7 @@
       "accountPlaceholder": "Enter your account",
       "passwordLabel": "Password",
       "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me (stay signed in on this device)",
       "submit": "Login",
       "success": "Login successful",
       "error": "Login failed, please check your email and password",

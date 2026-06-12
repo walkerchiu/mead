@@ -129,7 +129,11 @@ export default function LoginPage() {
     router.push(landing);
   };
 
-  const handleLogin = async (data: { email: string; password: string }) => {
+  const handleLogin = async (data: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }) => {
     setLoginError(undefined);
 
     try {
@@ -137,6 +141,7 @@ export default function LoginPage() {
         variables: {
           email: data.email,
           password: data.password,
+          rememberMe: data.rememberMe ?? false,
         },
       });
 

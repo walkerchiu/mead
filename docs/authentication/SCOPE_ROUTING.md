@@ -77,6 +77,11 @@ fallback、以及未來若要分軌視覺時都會交纏在同一路徑上。把
 - **前端**：`LoginForm`（`apps/frontend/src/components/organisms/LoginForm/LoginForm.tsx`）欄位
   label 改「帳號」（`t('accountLabel')`）、`type="text"`、`autoComplete="username"`，zod 改用
   `regex(/^[a-zA-Z0-9_]{3,20}$/)` 而非 `.email()`。
+- **記住我**：`/login` 與 `/hq/login` 共用的 `LoginForm` 含「記住我」checkbox，透過 `login`
+  mutation 的 `rememberMe` 參數送至後端決定 `refresh_token` cookie 是否持久化；勾選後 token
+  refresh（`refreshToken`）與 2FA（`verifyTwoFactorLogin`）皆沿用該偏好（以 HttpOnly 的
+  `remember_me` cookie 記錄，無 DB migration；見 [Token 配置](TOKEN-CONFIGURATION.md#記住我remember-me)）。
+  兩個 scope 的登入頁皆已接上，行為一致。
 - **Seed 測試帳號**：`hq_admin`（`hq@example.com`）/ `customer_admin`（`admin@example.com`）/
   `public_user`（`public@example.com`），密碼皆 `Password123!`（`apps/backend/database/prisma/seeds/development.ts`，
   以 `accountName` 為 `upsert` 鍵）。
