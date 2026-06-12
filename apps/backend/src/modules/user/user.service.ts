@@ -49,7 +49,7 @@ export interface UserQueryContext {
 
 @Injectable()
 export class UserService {
-  private readonly SALT_ROUNDS = 10;
+  private readonly SALT_ROUNDS = 12; // OWASP 建議 12-14 rounds
 
   constructor(
     private prisma: PrismaService,

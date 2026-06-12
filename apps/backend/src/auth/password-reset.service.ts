@@ -17,7 +17,7 @@ import { RevokedMethod } from './hq-session.types';
 
 @Injectable()
 export class PasswordResetService {
-  private readonly SALT_ROUNDS = 10;
+  private readonly SALT_ROUNDS = 12; // OWASP 建議 12-14 rounds
   private readonly TOKEN_BYTES = 32;
   private readonly EXPIRE_MINUTES: number;
   private readonly RESET_URL: string;

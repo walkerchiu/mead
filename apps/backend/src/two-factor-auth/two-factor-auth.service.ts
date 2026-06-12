@@ -26,7 +26,7 @@ export class TwoFactorAuthService {
   private readonly CODE_LENGTH = 6;
   private readonly CODE_EXPIRY_MINUTES = 10;
   private readonly MAX_ATTEMPTS = 5;
-  private readonly SALT_ROUNDS = 10;
+  private readonly SALT_ROUNDS = 12; // OWASP 建議 12-14 rounds
 
   constructor(
     private prisma: PrismaService,
