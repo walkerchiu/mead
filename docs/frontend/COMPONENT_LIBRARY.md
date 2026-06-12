@@ -99,23 +99,9 @@ Templates (模板)
 Pages (頁面)
 ```
 
-### 組件分類說明（重要）
+### 組件分類說明
 
-本專案採用**務實的 Atomic Design** 實踐方式。某些組件的實際位置基於開發效率和團隊協作考量，而非嚴格的理論分類。
-
-#### 為何某些組件不在「理論上正確」的位置？
-
-**設計原則**：我們優先考慮**可維護性**和**避免循環依賴**，而非教科書式的分類。
-
-#### 實際分類決策
-
-| 組件                     | 實際位置     | 理論位置 | 保持現狀的原因                                        |
-| ------------------------ | ------------ | -------- | ----------------------------------------------------- |
-| **Drawer**               | `atoms/`     | Organism | 作為基礎佈局組件，被多個 Organisms 引用；避免循環依賴 |
-| **Modal**                | `molecules/` | Organism | 作為對話框容器，不包含業務邏輯；降低依賴複雜度        |
-| **Sidebar**              | `molecules/` | Organism | 基於 Drawer 構建；與 Layout 組件搭配使用              |
-| **LanguageSwitcher**     | `atoms/`     | Molecule | 視為單一功能按鈕；在多個 Layout 中被引用              |
-| **SnackbarWithProgress** | `atoms/`     | Molecule | 通知提示的基礎組件；單一職責原則                      |
+本專案的組件依標準 Atomic Design 分層放置：`atoms/`（基礎原子）、`molecules/`（分子）、`organisms/`（有機體）、`templates/`（頁面模板），另有 `layout/` 放置 App 級佈局組件（如 MainAppBar）。Drawer、Modal、Sidebar 為 `organisms/`，LanguageSwitcher、SnackbarWithProgress 為 `molecules/`，皆位於各自對應的層級。
 
 #### 對開發者的建議
 
@@ -161,9 +147,6 @@ apps/frontend/src/components/
 │   ├── Progress/
 │   ├── Divider/
 │   ├── Skeleton/
-│   ├── Drawer/         # 佈局抽屜組件（基於務實考量放置於此）
-│   ├── LanguageSwitcher/  # 語言切換器（功能按鈕）
-│   ├── SnackbarWithProgress/  # 帶進度的通知提示
 │   ├── NotificationBadge/
 │   ├── NotificationItem/
 │   ├── UserButton/
@@ -193,8 +176,8 @@ apps/frontend/src/components/
 │   ├── UserMenuList/
 │   ├── SettingsMenuList/
 │   ├── ThemeSelector/
-│   ├── Sidebar/       # 側邊欄導航組件（基於 Drawer 構建）
-│   └── Modal/         # 對話框容器組件
+│   ├── LanguageSwitcher/
+│   └── SnackbarWithProgress/
 │
 ├── organisms/          # 有機體組件（完整功能單元）
 │   ├── LoginForm/
@@ -205,11 +188,12 @@ apps/frontend/src/components/
 │   ├── NotificationCenter/
 │   ├── UserMenu/
 │   ├── SettingsMenu/
-│   ├── SessionsTable/
-│   └── SystemStatusMonitor/
+│   ├── Drawer/
+│   ├── Modal/
+│   └── Sidebar/
 │
 ├── layout/             # 佈局組件
-│   └── MainAppBar/
+│   └── MainAppBar.tsx
 │
 ├── templates/          # 頁面模板（佈局）
 │   ├── AuthLayout/
@@ -462,8 +446,8 @@ pnpm storybook
 5. Organisms（有機體組件）        — 字母排序
    ChangePasswordForm, Drawer, ForgotPasswordForm, HQ(子群組),
    LoginForm, Modal, NotificationCenter, NotificationMenu,
-   ResetPasswordForm, SessionsTable, SettingsMenu, Sidebar,
-   SystemStatusMonitor, TwoFactorForm, TwoFactorSettings, UserMenu
+   ResetPasswordForm, SettingsMenu, Sidebar, TwoFactorForm,
+   TwoFactorSettings, UserMenu
 
    HQ 子群組（管理後台組件）:
    AuditLogDetailsModal, AuditLogTable, BatchRevokeModal,
