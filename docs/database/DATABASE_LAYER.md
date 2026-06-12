@@ -197,7 +197,7 @@ datasource db {
 
 ### 環境別載入
 
-Seed 系統根據 `NPT_ENV` 環境變數載入對應資料：
+Seed 系統根據 `MEAD_ENV` 環境變數載入對應資料：
 
 - **base**: 所有環境的基礎資料（roles、permissions、cron-job configs）
 - **development / uat**: 共用同一組測試帳號（`hq@example.com`、`admin@example.com`、`public@example.com`）
@@ -210,7 +210,7 @@ Seed 系統根據 `NPT_ENV` 環境變數載入對應資料：
 pnpm db:seed
 
 # 指定環境
-NPT_ENV=uat pnpm db:seed
+MEAD_ENV=uat pnpm db:seed
 ```
 
 ### 預設帳號（development / uat）

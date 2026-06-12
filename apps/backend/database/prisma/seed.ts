@@ -5,7 +5,7 @@ import { seedDevelopment } from './seeds/development';
 const prisma = new PrismaClient();
 
 async function main() {
-  const env = process.env.NPT_ENV || process.env.NODE_ENV || 'development';
+  const env = process.env.MEAD_ENV || process.env.NODE_ENV || 'development';
 
   console.log(`🌱 開始 Seed 資料...（環境: ${env}）`);
 

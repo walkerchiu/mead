@@ -17,7 +17,7 @@ source "$SCRIPT_DIR/../utils/common.sh"
 source "$SCRIPT_DIR/../utils/file-storage.sh"
 
 # 預設環境
-ENVIRONMENT="${NPT_ENV:-development}"
+ENVIRONMENT="${MEAD_ENV:-development}"
 
 # 顯示幫助
 show_command_help() {
@@ -45,7 +45,7 @@ show_command_help() {
   echo ""
   echo -e "${YELLOW}環境選項:${NC}"
   echo "  --env <env>    指定環境 (development, uat, production)"
-  echo "                 預設: development (或從 NPT_ENV 環境變數讀取)"
+  echo "                 預設: development (或從 MEAD_ENV 環境變數讀取)"
   echo ""
   echo -e "${YELLOW}範例:${NC}"
   echo "  # 開發環境（預設）"
@@ -355,8 +355,8 @@ db_reset() {
   fi
 
   log_step "3/3 載入種子資料"
-  export NPT_ENV="$ENVIRONMENT"
-  log_info "Seed 環境: $NPT_ENV"
+  export MEAD_ENV="$ENVIRONMENT"
+  log_info "Seed 環境: $MEAD_ENV"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else
@@ -401,8 +401,8 @@ db_seed() {
   # 設置資料庫 URL
   export DATABASE_URL=$(get_database_url)
 
-  export NPT_ENV="$ENVIRONMENT"
-  log_info "載入種子資料...（環境: ${NPT_ENV}）"
+  export MEAD_ENV="$ENVIRONMENT"
+  log_info "載入種子資料...（環境: ${MEAD_ENV}）"
   if pnpm db:seed; then
     log_success "種子資料已載入"
   else

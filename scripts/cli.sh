@@ -318,10 +318,10 @@ show_interactive_menu() {
         read -r backup_choice
         case "$backup_choice" in
           1)
-            CURRENT_ENV="${NPT_ENV:-development}"
+            CURRENT_ENV="${MEAD_ENV:-development}"
             echo -e ""
             echo -e "${YELLOW}將備份環境:${NC} ${CYAN}$CURRENT_ENV${NC}"
-            echo -e "${DIM}提示: 使用 NPT_ENV 環境變數可指定其他環境${NC}"
+            echo -e "${DIM}提示: 使用 MEAD_ENV 環境變數可指定其他環境${NC}"
             echo -e ""
             if confirm "確定要繼續嗎?" "y"; then
               bash "$SCRIPT_DIR/commands/db.sh" backup || true
@@ -332,7 +332,7 @@ show_interactive_menu() {
             ;;
           2)
             # 列出可用備份供選擇
-            CURRENT_ENV="${NPT_ENV:-development}"
+            CURRENT_ENV="${MEAD_ENV:-development}"
             BACKUP_DIR="$SCRIPT_DIR/../backups/$CURRENT_ENV"
 
             # 檢查是否有任何備份檔案

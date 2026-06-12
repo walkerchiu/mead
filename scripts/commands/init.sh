@@ -287,21 +287,21 @@ if [ "$SKIP_DB" = false ]; then
     exit 1
   fi
 
-  # 讀取當前環境並設定 NPT_ENV
+  # 讀取當前環境並設定 MEAD_ENV
   CURRENT_ENV="local"
   if [[ -f "$PROJECT_ROOT/.current-env" ]]; then
     CURRENT_ENV=$(cat "$PROJECT_ROOT/.current-env")
   fi
 
   case "$CURRENT_ENV" in
-    local|dev) NPT_ENV="development" ;;
-    uat)       NPT_ENV="uat" ;;
-    prod)      NPT_ENV="production" ;;
-    *)         NPT_ENV="development" ;;
+    local|dev) MEAD_ENV="development" ;;
+    uat)       MEAD_ENV="uat" ;;
+    prod)      MEAD_ENV="production" ;;
+    *)         MEAD_ENV="development" ;;
   esac
 
-  export NPT_ENV
-  log_info "Seed 環境: $NPT_ENV"
+  export MEAD_ENV
+  log_info "Seed 環境: $MEAD_ENV"
 
   # 執行 seed
   log_info "載入初始資料..."
