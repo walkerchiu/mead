@@ -242,7 +242,7 @@ storage_diagnose() {
   echo ""
 
   # 先確認自己 repo 的 SeaweedFS containers 全部在跑，否則跳過 port / HTTP 檢查。
-  # 否則別 repo（例如 meadc）的 SeaweedFS 在 forward 同樣 port 會被當成自己的服務 ✓。
+  # 否則別 repo（例如 mead-x）的 SeaweedFS 在 forward 同樣 port 會被當成自己的服務 ✓。
   local self_running=true
   for svc in seaweedfs-master seaweedfs-volume seaweedfs-filer seaweedfs-s3; do
     local cn

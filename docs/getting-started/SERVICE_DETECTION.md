@@ -28,7 +28,7 @@
 
 1. **Client connection 誤報**：瀏覽器（Chrome、Safari）對某 port 留下 `CLOSE_WAIT` / `ESTABLISHED` 連線，`lsof -ti:port` 列出的是 client process 不是 server。
 2. **Docker port forward 誤報**：別的 repo 啟動 docker container 把 `127.0.0.1:5555` forward 給容器內部，這時佔住 5555 的是 `com.docker.backend`（macOS）或 `docker-proxy`（Linux），不是真正的服務。
-3. **跨 repo 同 port 誤報**：`/icp/meadc` 的 next dev 在 3000 LISTEN，當前 repo（`/icp/mead`）的 status 仍會把它認成「自己的 Frontend 在跑」。
+3. **跨 repo 同 port 誤報**：`/icp/mead-x` 的 next dev 在 3000 LISTEN，當前 repo（`/icp/mead`）的 status 仍會把它認成「自己的 Frontend 在跑」。
 
 這三類誤報會讓 `status` 失去診斷價值，於是 `cli.sh` 用三層過濾來排除。
 
@@ -74,26 +74,26 @@ fi
 
 `lsof -p PID` 可以拿到 process 的 working directory。Next.js / NestJS / Storybook 等 dev server 都是從 `apps/<workspace>` 目錄啟動，cwd 會落在 `$PROJECT_ROOT/apps/...`。比對 cwd 是否在當前 `$PROJECT_ROOT` 之下就能精準判斷服務歸屬。
 
-**為什麼要 `"$PROJECT_ROOT"/*` 而不是 `"$PROJECT_ROOT"*`**：bash glob 中 `"$PROJECT_ROOT"*` 是純字串前綴匹配，`/icp/meadc/...` 字面上以 `/icp/mead` 開頭會被誤認為「在 `mead` PROJECT_ROOT 下」。加上 `/` 邊界確保只認真正的子目錄。額外的 `"$PROC_CWD" != "$PROJECT_ROOT"` 比對處理 cwd 剛好就是 PROJECT_ROOT 本身（極少見）的邊界情況。
+**為什麼要 `"$PROJECT_ROOT"/*` 而不是 `"$PROJECT_ROOT"*`**：bash glob 中 `"$PROJECT_ROOT"*` 是純字串前綴匹配，`/icp/mead-x/...` 字面上以 `/icp/mead` 開頭會被誤認為「在 `mead` PROJECT_ROOT 下」。加上 `/` 邊界確保只認真正的子目錄。額外的 `"$PROC_CWD" != "$PROJECT_ROOT"` 比對處理 cwd 剛好就是 PROJECT_ROOT 本身（極少見）的邊界情況。
 
-**典型擋下的誤報**：`/icp/meadc/apps/frontend` 的 next dev 在 3000 LISTEN，當前 repo `/icp/mead` 的 status 之前會誤報 Frontend 。加上 cwd 比對後顯示「被其他專案佔用」+ 佔用者路徑。
+**典型擋下的誤報**：`/icp/mead-x/apps/frontend` 的 next dev 在 3000 LISTEN，當前 repo `/icp/mead` 的 status 之前會誤報 Frontend 。加上 cwd 比對後顯示「被其他專案佔用」+ 佔用者路徑。
 
 ---
 
 ## 顯示效果（真實範例）
 
-當 `/icp/meadc` 的服務都在跑、且 `/icp/mead` 的服務都沒跑時：
+當 `/icp/mead-x` 的服務都在跑、且 `/icp/mead` 的服務都沒跑時：
 
 ```text
 📦 應用服務
   ✗ Frontend  (Port 3000，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/meadc/apps/frontend
+      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/frontend
       啟動: ./scripts/cli.sh dev
   ✗ Backend   (Port 4000，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/meadc/apps/backend/src/Nptc.Api
+      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/backend
       啟動: ./scripts/cli.sh dev
   ✗ Storybook (Port 6006，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/meadc/apps/frontend
+      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/frontend
       啟動: ./scripts/cli.sh dev
   ✗ Prisma Studio (Port 5555，被其他 docker container forward 佔用) 未運行
       啟動: ./scripts/cli.sh dev
@@ -141,7 +141,7 @@ scripts/commands/port.sh      # port_free / port_free_all
 scripts/commands/restart.sh   # kill_process
 scripts/commands/stop.sh      # kill_process
 scripts/commands/clean.sh     # port cleanup × 2
-scripts/commands/storage.sh   # SeaweedFS port health + diagnose 加 self container check（避免 meadc forward 誤判 ✓）
+scripts/commands/storage.sh   # SeaweedFS port health + diagnose 加 self container check（避免 mead-x forward 誤判 ✓）
 scripts/commands/doctor.sh    # S3 endpoint check
 ```
 
