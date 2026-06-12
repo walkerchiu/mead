@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -9,6 +10,7 @@ import {
 } from 'react';
 
 import Box from '@mui/material/Box';
+import { styled } from '@mui/material/styles';
 import { useLocale, useTranslations } from 'next-intl';
 
 import { getLocalPhotos } from '@/lib/portal/plans';
@@ -19,6 +21,7 @@ import { DecorativeTextCloud } from '../../organisms/DecorativeTextCloud';
 import { PlanCarousel } from '../../organisms/PlanCarousel';
 import { PortalFooter } from '../../organisms/PortalFooter';
 import { PortalNarrativeSection } from '../../organisms/PortalNarrativeSection';
+import { PLAN_SHAPE_CLIPS } from '../../planShapes';
 import { portalTokens } from '../../tokens';
 
 /** SSR 安全的 layout effect：伺服器端退回 useEffect，避免 React 警告。 */
@@ -74,6 +77,48 @@ const FIT_SIDE_MARGIN = 72;
 const GESTURE_LOCK_MS = 700;
 /** 自動輪播間隔（手機 / 非捲動驅動時） */
 const AUTO_ADVANCE_MS = 6000;
+
+/**
+ * 敘事內文計畫名稱連結的行內樣式 — 以 styled('span') 實作為真正的行內元素。
+ *
+ * 不可用 <button>：button 為 inline-block 原子盒，會讓前面的開引號「被孤立
+ * 斷在行尾；行內 span 讓文字連續流動，中文禁則（line-break: strict）才能把
+ * 「留在下一行開頭。品牌橘、hover / focus 加粗並加底線。
+ */
+const NarrativePlanLinkSpan = styled('span')({
+  color: portalTokens.color.brandOrange,
+  cursor: 'pointer',
+  textUnderlineOffset: '0.2em',
+  '&:hover, &:focus-visible': {
+    fontWeight: 700,
+    textDecoration: 'underline',
+  },
+  '&:focus-visible': portalTokens.focusRing,
+});
+
+function NarrativePlanLink({
+  onClick,
+  children,
+}: {
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <NarrativePlanLinkSpan
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick();
+        }
+      }}
+    >
+      {children}
+    </NarrativePlanLinkSpan>
+  );
+}
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -581,6 +626,21 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     [scrollDriven, engageAt],
   );
 
+  // 切到指定計畫卡並捲回計畫介紹區（敘事連結 / 收束圓點共用）。
+  // （onClick 閉包本就每次 render 重建，故不需 useCallback。）
+  const goToPlanIndex = (i: number) => {
+    if (i < 0 || i >= planCount) return;
+    if (scrollDriven) engageAt(i);
+    else setActiveIndex(i);
+    if (typeof document !== 'undefined') {
+      document
+        .getElementById('portal-plans')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  const handlePlanLink = (planId: string) =>
+    goToPlanIndex(orderedPlans.findIndex((p) => p.id === planId));
+
   // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端、記入已看過），
   // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
   const handlePeekNavigate = useCallback(
@@ -689,6 +749,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           // PlanCarousel 內部只套在卡片上（不影響兩側固定的 peek）。
           <Box
             ref={planSectionRef}
+            id="portal-plans"
             sx={{
               height: '100vh',
               overflow: 'hidden',
@@ -723,20 +784,18 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             </Box>
           </Box>
         ) : (
-          // 手機 / 減少動態：不劫持捲動，原生流；自動輪播 + 指示點切換。
+          // 手機 / 減少動態：不劫持捲動，原生流；自動輪播切換計畫（依設計稿不顯示指示點）。
+          // pb 預留卡片二導覽列向下懸出的空間，避免覆蓋下一段。
           <Box
-            sx={{ width: '100%', pt: `${PIN_TOP_PAD}px`, overflowX: 'clip' }}
+            id="portal-plans"
+            sx={{
+              width: '100%',
+              pt: `${PIN_TOP_PAD}px`,
+              pb: '48px',
+              overflowX: 'clip',
+            }}
           >
             {mountPlans && planCarousel}
-            <Box sx={{ mt: '14px', display: 'flex', justifyContent: 'center' }}>
-              <CarouselDots
-                count={planCount}
-                activeIndex={activeIndex}
-                onSelect={handleDotSelect}
-                labels={orderedPlans.map((p) => p.name.zh)}
-                ariaLabel="計畫切換"
-              />
-            </Box>
           </Box>
         )}
 
@@ -753,11 +812,40 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             heading={t('narrative.heading')}
             intro={t('narrative.intro')}
             paragraphs={[
-              t('narrative.body1'),
-              t('narrative.body2'),
-              t('narrative.body3'),
+              t.rich('narrative.body1', {
+                link: (chunks) => (
+                  <NarrativePlanLink onClick={() => handlePlanLink('sposad')}>
+                    {chunks}
+                  </NarrativePlanLink>
+                ),
+              }),
+              t.rich('narrative.body2', {
+                link: (chunks) => (
+                  <NarrativePlanLink onClick={() => handlePlanLink('idc')}>
+                    {chunks}
+                  </NarrativePlanLink>
+                ),
+              }),
+              t.rich('narrative.body3', {
+                link: (chunks) => (
+                  <NarrativePlanLink onClick={() => handlePlanLink('tisdc')}>
+                    {chunks}
+                  </NarrativePlanLink>
+                ),
+              }),
               t('narrative.body4'),
             ]}
+            planMarker={{
+              currentShapeClip:
+                PLAN_SHAPE_CLIPS[activeIndex % PLAN_SHAPE_CLIPS.length],
+              nextShapeClip:
+                PLAN_SHAPE_CLIPS[
+                  ((activeIndex + 1) % planCount) % PLAN_SHAPE_CLIPS.length
+                ],
+              nextLabel:
+                orderedPlans[(activeIndex + 1) % planCount]?.name.zh ?? '',
+              onSelectNext: () => goToPlanIndex((activeIndex + 1) % planCount),
+            }}
           />
         </Box>
       </Box>

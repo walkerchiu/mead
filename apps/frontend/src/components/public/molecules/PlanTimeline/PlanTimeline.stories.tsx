@@ -35,3 +35,15 @@ export const ActiveMonth: Story = {
     calloutText: '115年度 甄選報名期間',
   },
 };
+
+/** 窄版（手機卡片）：月份固定寬、整排超出容器寬，可橫向滑動閱讀。 */
+export const Scroll: Story = {
+  args: { variant: 'scroll' },
+  decorators: [
+    (Story) => (
+      <Box sx={{ maxWidth: 320, mx: 'auto' }}>
+        <Story />
+      </Box>
+    ),
+  ],
+};

@@ -10,7 +10,6 @@ import type { Plan } from '@/types/plan';
 import { AnimatedSlogan } from '../../atoms/AnimatedSlogan';
 import { LearnMoreButton } from '../../atoms/LearnMoreButton';
 import { PlanLogo } from '../../molecules/PlanLogo';
-import { PlanStatsBar } from '../../molecules/PlanStatsBar';
 import { PlanTimeline } from '../../molecules/PlanTimeline';
 import { SocialLinkBar } from '../../molecules/SocialLinkBar';
 import { StatsMarquee } from '../../molecules/StatsMarquee';
@@ -80,8 +79,9 @@ function getCardImage(plan: Plan): string | null {
 }
 
 /**
- * 手機版（<834px）卡片 — 維持改版前的原始版面：單欄堆疊、主標 h2、橫列數據成果
- * （PlanStatsBar）、內縮 banner、社群連結列。設計師新版僅更新桌機版面，手機版沿用原樣。
+ * 手機版（<834px）卡片 — 單欄堆疊：主標 h2、簡介、執行單位、橫向可滑動時程；
+ * 卡片二為橫向滾動數據跑馬燈、內縮 banner、社群連結列。時程與數據改為橫向呈現，
+ * 讓窄版閱讀更從容、版面更輕（與桌機卡片的跑馬燈處理一致）。
  */
 function PlanCardMobile({ plan }: PlanCardProps) {
   const headline = getSloganText(plan);
@@ -99,7 +99,7 @@ function PlanCardMobile({ plan }: PlanCardProps) {
           ...FROSTED,
           position: 'relative',
           pt: '28px',
-          pb: '42px',
+          pb: '20px',
           px: '24px',
         }}
       >
@@ -129,7 +129,7 @@ function PlanCardMobile({ plan }: PlanCardProps) {
             </Typography>
           </Box>
 
-          {/* 簡介 + 執行單位 */}
+          {/* 簡介 + 執行單位 + 了解更多（與執行單位同列、靠右、底部對齊） */}
           <Box sx={{ minWidth: 0 }}>
             <Typography
               component="p"
@@ -142,51 +142,62 @@ function PlanCardMobile({ plan }: PlanCardProps) {
             >
               {plan.intro}
             </Typography>
-            {plan.organizers.length > 0 && (
-              <Box sx={{ mt: '47px' }}>
-                <Typography
-                  component="p"
-                  sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
-                >
-                  執行單位：
-                </Typography>
-                {plan.organizers.map((org) => (
-                  <Typography
-                    key={org}
-                    component="p"
-                    sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
-                  >
-                    {org}
-                  </Typography>
-                ))}
+            <Box
+              sx={{
+                mt: '47px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-end',
+                gap: 2,
+              }}
+            >
+              <Box sx={{ minWidth: 0 }}>
+                {plan.organizers.length > 0 && (
+                  <>
+                    <Typography
+                      component="p"
+                      sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                    >
+                      執行單位：
+                    </Typography>
+                    {plan.organizers.map((org) => (
+                      <Typography
+                        key={org}
+                        component="p"
+                        sx={{ fontSize: 12, lineHeight: 1.8, color: '#000000' }}
+                      >
+                        {org}
+                      </Typography>
+                    ))}
+                  </>
+                )}
               </Box>
-            )}
+              <Box sx={{ flexShrink: 0 }}>
+                <LearnMoreButton tilt={-4.86} href={plan.officialUrl} />
+              </Box>
+            </Box>
           </Box>
         </Box>
 
-        {/* 時程 */}
+        {/* 時程 — 窄版橫向可滑動 */}
         <Box sx={{ mt: 3 }}>
-          <PlanTimeline />
-        </Box>
-
-        {/* 了解更多 — 時程下方靠右 */}
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-          <LearnMoreButton tilt={-4.86} href={plan.officialUrl} />
+          <PlanTimeline variant="scroll" />
         </Box>
       </Box>
 
-      {/* 卡片二 — 數據成果（橫列）/ 代表圖 / 社群連結 */}
+      {/* 卡片二 — 數據成果（橫向跑馬燈）/ 代表圖 / 社群連結 */}
+      {/* banner 下方預留空間（依 Figma 約 28px），讓導覽列落在 banner 下方、不覆蓋圖片。 */}
       <Box
         sx={{
           ...FROSTED,
           position: 'relative',
           mt: '10px',
           pt: '36px',
-          pb: '12px',
+          pb: '28px',
         }}
       >
-        <Box sx={{ px: '16px' }}>
-          <PlanStatsBar stats={plan.stats} />
+        <Box sx={{ px: '12px' }}>
+          <StatsMarquee stats={plan.stats} direction="horizontal" />
         </Box>
 
         {cardImage ? (
@@ -222,7 +233,8 @@ function PlanCardMobile({ plan }: PlanCardProps) {
           sx={{
             position: 'absolute',
             left: '50%',
-            bottom: '-22px',
+            // 導覽列頂部落在 banner 下方、整列向下懸出卡片（依 Figma 約 41px）。
+            bottom: '-40px',
             transform: 'translateX(-50%)',
             zIndex: 2,
           }}
