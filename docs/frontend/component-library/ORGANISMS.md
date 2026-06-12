@@ -505,29 +505,6 @@ interface ModalAction {
 
 ---
 
-#### SessionsTable
-
-**路徑**: `components/organisms/SessionsTable/`
-
-**功能**:
-
-- 會話管理表格組件
-- 顯示用戶會話列表
-- 支援撤銷會話操作
-- 顯示設備資訊、IP 地址、地理位置
-- 顯示會話狀態和撤銷方式
-
-**使用場景**: 管理員查看和管理用戶會話
-
-**特性**:
-
-- 整合 GraphQL mutations
-- 撤銷確認對話框
-- 顯示當前會話
-- 格式化時間顯示
-
----
-
 #### SettingsMenu
 
 **路徑**: `components/organisms/SettingsMenu/`
@@ -679,33 +656,6 @@ interface MenuItem {
 - 支援響應式設計 (mobile: temporary, desktop: persistent/permanent)
 
 **Storybook**: ✅ `Sidebar.stories.tsx`
-
----
-
-#### SystemStatusMonitor
-
-**路徑**: `components/organisms/SystemStatusMonitor/`
-
-**功能**:
-
-- 系統狀態監控面板組件
-- 即時顯示各服務健康狀態
-- 支援自動訂閱狀態變更
-- 顯示回應時間和詳細資訊
-
-**監控服務**:
-
-- PostgreSQL 資料庫
-- Redis 快取
-- RabbitMQ 訊息佇列
-- GraphQL 服務
-
-**特性**:
-
-- 整合 useSystemStatus hook
-- 狀態圖示和顏色編碼
-- 運行時間顯示
-- 自動重新整理功能
 
 ---
 

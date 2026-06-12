@@ -383,7 +383,7 @@ interface ProgressProps {
 
 #### Switch
 
-**路徑**: `components/atoms/Switch/`
+**路徑**: `components/atoms/Fields/Switch/`
 
 **功能**:
 
