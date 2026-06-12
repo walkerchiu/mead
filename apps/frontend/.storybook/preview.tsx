@@ -59,6 +59,7 @@ const preview: Preview = {
           ['Welcome', 'Getting Started'],
           'Public Scope',
           [
+            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
@@ -70,6 +71,7 @@ const preview: Preview = {
           ],
           'HQ Scope',
           [
+            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
@@ -81,6 +83,7 @@ const preview: Preview = {
           ],
           'Shared',
           [
+            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
