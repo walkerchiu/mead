@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Displays application information including version details, technology stack, license, and contact information. Designed to be used inside a Modal or as standalone scrollable content. Responds to the active locale.',
+          '顯示應用程式資訊，包含版本詳情、技術堆疊、授權與聯絡資訊。設計用於 Modal 內或作為獨立的可捲動內容，並會依目前語系調整。',
       },
     },
   },

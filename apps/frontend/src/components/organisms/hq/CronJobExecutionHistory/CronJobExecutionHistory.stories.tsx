@@ -77,7 +77,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Paginated table displaying cron job execution history with status indicators and detail modal access.',
+          '分頁顯示 cron job 執行歷史的表格，含狀態指示器並可開啟詳情 modal。',
       },
     },
   },
@@ -95,7 +95,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — execution history with pagination.
+ * 預設 — 含分頁的執行歷史。
  */
 export const Default: Story = {
   args: {
@@ -109,7 +109,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state — skeleton rows while data is being fetched.
+ * 載入中狀態 — 在取得資料期間顯示骨架列。
  */
 export const Loading: Story = {
   args: {
@@ -122,7 +122,7 @@ export const Loading: Story = {
 };
 
 /**
- * Empty — no executions found.
+ * 空 — 找不到任何執行紀錄。
  */
 export const Empty: Story = {
   args: {
@@ -142,7 +142,7 @@ export const Empty: Story = {
 };
 
 /**
- * With failed executions — highlights problematic jobs.
+ * 含失敗的執行 — 突顯有問題的任務。
  */
 export const WithFailedExecutions: Story = {
   args: {

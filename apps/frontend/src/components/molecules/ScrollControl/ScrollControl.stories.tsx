@@ -21,36 +21,36 @@ const meta = {
         'left-bottom',
         'custom',
       ],
-      description: 'Component position',
+      description: '元件位置',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Button size',
+      description: '按鈕尺寸',
     },
     offset: {
       control: 'number',
-      description: 'Scroll offset per click (px)',
+      description: '每次點擊的捲動距離（px）',
     },
     visibilityThreshold: {
       control: 'number',
-      description: 'Visibility threshold (px)',
+      description: '顯示門檻（px）',
     },
     showScrollUp: {
       control: 'boolean',
-      description: 'Show scroll up button',
+      description: '顯示向上捲動按鈕',
     },
     showScrollDown: {
       control: 'boolean',
-      description: 'Show scroll down button',
+      description: '顯示向下捲動按鈕',
     },
     showScrollToTop: {
       control: 'boolean',
-      description: 'Show scroll to top button',
+      description: '顯示捲動至頂端按鈕',
     },
     showScrollToBottom: {
       control: 'boolean',
-      description: 'Show scroll to bottom button',
+      description: '顯示捲動至底端按鈕',
     },
   },
   decorators: [
@@ -82,7 +82,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default configuration: bottom-right position with scroll up, scroll down, and back to top buttons
+ * 預設設定：右下位置，含向上捲動、向下捲動與回到頂端按鈕
  */
 export const Default: Story = {
   args: {
@@ -91,7 +91,7 @@ export const Default: Story = {
 };
 
 /**
- * Top-right position
+ * 右上位置
  */
 export const RightTop: Story = {
   args: {
@@ -100,7 +100,7 @@ export const RightTop: Story = {
 };
 
 /**
- * Right-center position
+ * 右側置中位置
  */
 export const RightCenter: Story = {
   args: {
@@ -109,7 +109,7 @@ export const RightCenter: Story = {
 };
 
 /**
- * Bottom-left position
+ * 左下位置
  */
 export const LeftBottom: Story = {
   args: {
@@ -118,7 +118,7 @@ export const LeftBottom: Story = {
 };
 
 /**
- * Top-left position
+ * 左上位置
  */
 export const LeftTop: Story = {
   args: {
@@ -127,7 +127,7 @@ export const LeftTop: Story = {
 };
 
 /**
- * Left-center position
+ * 左側置中位置
  */
 export const LeftCenter: Story = {
   args: {
@@ -136,7 +136,7 @@ export const LeftCenter: Story = {
 };
 
 /**
- * Show all buttons (including scroll to bottom)
+ * 顯示所有按鈕（含捲動至底端）
  */
 export const WithAllButtons: Story = {
   args: {
@@ -149,7 +149,7 @@ export const WithAllButtons: Story = {
 };
 
 /**
- * Show only scroll to top button
+ * 僅顯示捲動至頂端按鈕
  */
 export const OnlyScrollToTop: Story = {
   args: {
@@ -161,7 +161,7 @@ export const OnlyScrollToTop: Story = {
 };
 
 /**
- * Custom position (x: 100px, y: 100px)
+ * 自訂位置（x: 100px、y: 100px）
  */
 export const CustomPosition: Story = {
   args: {
@@ -171,7 +171,7 @@ export const CustomPosition: Story = {
 };
 
 /**
- * Small button size
+ * 小尺寸按鈕
  */
 export const SmallSize: Story = {
   args: {
@@ -180,7 +180,7 @@ export const SmallSize: Story = {
 };
 
 /**
- * Large button size
+ * 大尺寸按鈕
  */
 export const LargeSize: Story = {
   args: {
@@ -189,7 +189,7 @@ export const LargeSize: Story = {
 };
 
 /**
- * Fast scrolling (offset: 1000px)
+ * 快速捲動（offset: 1000px）
  */
 export const FastScroll: Story = {
   args: {
@@ -198,7 +198,7 @@ export const FastScroll: Story = {
 };
 
 /**
- * Slow scrolling (offset: 200px)
+ * 慢速捲動（offset: 200px）
  */
 export const SlowScroll: Story = {
   args: {
@@ -207,7 +207,7 @@ export const SlowScroll: Story = {
 };
 
 /**
- * Low visibility threshold (shows after scrolling 100px)
+ * 低顯示門檻（捲動 100px 後顯示）
  */
 export const LowThreshold: Story = {
   args: {
@@ -216,7 +216,7 @@ export const LowThreshold: Story = {
 };
 
 /**
- * High visibility threshold (shows after scrolling 500px)
+ * 高顯示門檻（捲動 500px 後顯示）
  */
 export const HighThreshold: Story = {
   args: {

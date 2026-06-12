@@ -14,20 +14,20 @@ const meta = {
     type: {
       control: 'select',
       options: ['linear', 'circular'],
-      description: 'Progress type',
+      description: '進度類型',
     },
     value: {
       control: { type: 'range', min: 0, max: 100, step: 1 },
-      description: 'Progress value',
+      description: '進度值',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
-      description: 'Color',
+      description: '顏色',
     },
     showLabel: {
       control: 'boolean',
-      description: 'Whether to show label',
+      description: '是否顯示標籤',
     },
   },
 } satisfies Meta<typeof Progress>;

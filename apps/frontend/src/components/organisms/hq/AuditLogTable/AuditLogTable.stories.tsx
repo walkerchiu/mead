@@ -128,8 +128,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'HQ audit log table displaying system activity with details modal and pagination.',
+        component: 'HQ 稽核日誌表格，顯示系統活動，含詳情 modal 與分頁。',
       },
     },
   },
@@ -147,7 +146,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state - Table with audit logs.
+ * 預設狀態 - 含稽核日誌的表格。
  */
 export const Default: Story = {
   args: {
@@ -160,7 +159,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state.
+ * 載入中狀態。
  */
 export const Loading: Story = {
   args: {
@@ -172,7 +171,7 @@ export const Loading: Story = {
 };
 
 /**
- * Empty state - No audit logs found.
+ * 空狀態 - 找不到稽核日誌。
  */
 export const Empty: Story = {
   args: {
@@ -192,7 +191,7 @@ export const Empty: Story = {
 };
 
 /**
- * Success logs only - All successful operations.
+ * 僅成功日誌 - 所有成功的操作。
  */
 export const SuccessOnly: Story = {
   args: {
@@ -212,7 +211,7 @@ export const SuccessOnly: Story = {
 };
 
 /**
- * With failures - Mix of success and failure statuses.
+ * 含失敗 - 成功與失敗狀態混合。
  */
 export const WithFailures: Story = {
   args: {
@@ -239,7 +238,7 @@ export const WithFailures: Story = {
 };
 
 /**
- * Login attempts - Filter showing only login actions.
+ * 登入嘗試 - 僅顯示登入操作的篩選。
  */
 export const LoginAttempts: Story = {
   args: {
@@ -274,7 +273,7 @@ export const LoginAttempts: Story = {
 };
 
 /**
- * Many logs - Full table with pagination.
+ * 大量日誌 - 含分頁的完整表格。
  */
 export const ManyLogs: Story = {
   args: {
@@ -298,7 +297,7 @@ export const ManyLogs: Story = {
 };
 
 /**
- * HQ actions - HQistrative operations only.
+ * HQ 操作 - 僅限管理操作。
  */
 export const HQActions: Story = {
   args: {
@@ -336,7 +335,7 @@ export const HQActions: Story = {
 };
 
 /**
- * Last page - Final page of pagination.
+ * 最後一頁 - 分頁的最末頁。
  */
 export const LastPage: Story = {
   args: {
@@ -356,14 +355,14 @@ export const LastPage: Story = {
 };
 
 /**
- * Column Alignment Demo - Demonstrates the column alignment configuration.
+ * 欄位對齊示範 - 展示欄位對齊設定。
  *
- * This story showcases how columns are aligned in the audit log table:
- * - **Left-aligned**: Timestamp, User (text content that should be left-aligned for readability)
- * - **Center-aligned**: Action, Entity, Status, IP Address (badges and status indicators)
- * - **Right-aligned**: Duration, Actions (numbers and action buttons typically align right)
+ * 此 story 展示稽核日誌表格中欄位的對齊方式：
+ * - **靠左對齊**：Timestamp、User（為了可讀性應靠左對齊的文字內容）
+ * - **置中對齊**：Action、Entity、Status、IP Address（徽章與狀態指示器）
+ * - **靠右對齊**：Duration、Actions（數字與操作按鈕通常靠右對齊）
  *
- * The alignment is configured in the component's column definitions via the `align` property.
+ * 對齊方式透過元件欄位定義中的 `align` 屬性設定。
  */
 export const ColumnAlignmentDemo: Story = {
   args: {
@@ -377,7 +376,7 @@ export const ColumnAlignmentDemo: Story = {
     docs: {
       description: {
         story:
-          'Demonstrates column alignment: Left (Timestamp, User), Center (Action, Entity, Status, IP), Right (Duration, Actions)',
+          '示範欄位對齊：靠左（Timestamp、User）、置中（Action、Entity、Status、IP）、靠右（Duration、Actions）',
       },
     },
   },

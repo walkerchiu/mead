@@ -8,7 +8,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'session-cleanup',
     displayName: 'Session Cleanup',
-    description: 'Removes expired sessions from the database',
+    description: '從資料庫移除過期的 session',
     jobType: 'cleanup',
     category: 'maintenance',
     cronExpression: '0 2 * * *',
@@ -31,7 +31,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'audit-log-archive',
     displayName: 'Audit Log Archive',
-    description: 'Archives old audit logs to cold storage',
+    description: '將舊的稽核日誌封存至冷儲存',
     jobType: 'archive',
     category: 'maintenance',
     cronExpression: '0 3 * * 0',
@@ -56,7 +56,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'notification-sender',
     displayName: 'Notification Sender',
-    description: 'Sends pending email notifications',
+    description: '寄送待發送的 email 通知',
     jobType: 'notification',
     category: 'communication',
     cronExpression: '*/5 * * * *',
@@ -86,7 +86,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Table displaying cron job configurations with enable/disable toggles, manual trigger, and detail view capabilities.',
+          '顯示 cron job 設定的表格，具備啟用／停用切換、手動觸發與檢視詳情的功能。',
       },
     },
   },
@@ -104,7 +104,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — table with all mock cron job configs.
+ * 預設 — 含所有模擬 cron job 設定的表格。
  */
 export const Default: Story = {
   args: {
@@ -118,7 +118,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state — skeleton rows while configs are being fetched.
+ * 載入中狀態 — 在取得設定期間顯示骨架列。
  */
 export const Loading: Story = {
   args: {
@@ -131,7 +131,7 @@ export const Loading: Story = {
 };
 
 /**
- * Empty configs — no cron jobs configured.
+ * 空設定 — 未設定任何 cron job。
  */
 export const EmptyConfigs: Story = {
   args: {
@@ -144,7 +144,7 @@ export const EmptyConfigs: Story = {
 };
 
 /**
- * With disabled jobs — some jobs are disabled with failure history.
+ * 含已停用任務 — 部分任務已停用且有失敗紀錄。
  */
 export const WithDisabledJobs: Story = {
   args: {

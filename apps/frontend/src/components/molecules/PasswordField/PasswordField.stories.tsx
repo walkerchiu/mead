@@ -8,22 +8,22 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 
 /**
- * PasswordField is a component specifically designed for password input.
+ * PasswordField 是專為密碼輸入設計的元件。
  *
- * ## Features
- * - Show/hide password toggle
- * - Password strength indicator (optional)
- * - Automatic password strength calculation
- * - Supports all TextField properties
+ * ## 功能特性
+ * - 顯示／隱藏密碼切換
+ * - 密碼強度指示器（選用）
+ * - 自動計算密碼強度
+ * - 支援所有 TextField 屬性
  *
- * ## Password Strength Scoring Rules
- * - Length ≥ 8: +25 points
- * - Length ≥ 12: +10 points
- * - Length ≥ 16: +10 points
- * - Contains lowercase letters: +15 points
- * - Contains uppercase letters: +15 points
- * - Contains numbers: +15 points
- * - Contains special characters: +10 points
+ * ## 密碼強度計分規則
+ * - 長度 ≥ 8：+25 分
+ * - 長度 ≥ 12：+10 分
+ * - 長度 ≥ 16：+10 分
+ * - 包含小寫字母：+15 分
+ * - 包含大寫字母：+15 分
+ * - 包含數字：+15 分
+ * - 包含特殊字元：+10 分
  */
 const meta = {
   title: 'Shared/Molecules/PasswordField',
@@ -32,8 +32,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Component designed for password input, providing show/hide toggle and password strength indication.',
+        component: '專為密碼輸入設計的元件，提供顯示／隱藏切換與密碼強度提示。',
       },
     },
   },
@@ -41,7 +40,7 @@ const meta = {
   argTypes: {
     showStrength: {
       control: 'boolean',
-      description: 'Whether to show password strength indicator',
+      description: '是否顯示密碼強度指示器',
     },
   },
   decorators: [
@@ -57,8 +56,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Basic Usage
- * Simplest password input field
+ * 基本用法
+ * 最簡單的密碼輸入欄位
  */
 export const Default: Story = {
   args: {
@@ -68,8 +67,8 @@ export const Default: Story = {
 };
 
 /**
- * With Strength Indicator
- * Shows password strength visual feedback
+ * 含強度指示器
+ * 顯示密碼強度的視覺回饋
  */
 export const WithStrength: Story = {
   args: {
@@ -82,7 +81,7 @@ export const WithStrength: Story = {
 };
 
 /**
- * Required Field
+ * 必填欄位
  */
 export const Required: Story = {
   args: {
@@ -93,7 +92,7 @@ export const Required: Story = {
 };
 
 /**
- * Error State
+ * 錯誤狀態
  */
 export const Error: Story = {
   args: {
@@ -106,7 +105,7 @@ export const Error: Story = {
 };
 
 /**
- * Disabled State
+ * 停用狀態
  */
 export const Disabled: Story = {
   args: {
@@ -117,8 +116,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Interactive Example
- * Shows real-time password strength changes
+ * 互動範例
+ * 顯示即時的密碼強度變化
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -148,8 +147,8 @@ export const Interactive: Story = {
 };
 
 /**
- * Password Strength Examples
- * Demonstrates different strength passwords
+ * 密碼強度範例
+ * 示範不同強度的密碼
  */
 export const StrengthExamples: Story = {
   render: () => (
@@ -194,8 +193,8 @@ export const StrengthExamples: Story = {
 };
 
 /**
- * Registration Form Example
- * Includes password and confirm password
+ * 註冊表單範例
+ * 包含密碼與確認密碼
  */
 export const RegisterForm: Story = {
   render: function RegisterFormExample() {
@@ -241,8 +240,8 @@ export const RegisterForm: Story = {
 };
 
 /**
- * Password Requirements Tooltip
- * Shows password rules checklist
+ * 密碼需求工具提示
+ * 顯示密碼規則檢查清單
  */
 export const WithRequirements: Story = {
   render: function WithRequirementsExample() {

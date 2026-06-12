@@ -13,8 +13,8 @@ import { Box } from '@mui/material';
 /**
  * UserMenuList - Atomic Design: Molecule
  *
- * User menu item list that combines multiple UserMenuItem (Atom) components.
- * Supports dividers and danger style items.
+ * 結合多個 UserMenuItem（Atom）元件的使用者選單項目列表。
+ * 支援分隔線與 danger 樣式項目。
  */
 const meta = {
   title: 'Shared/Molecules/UserMenuList',
@@ -43,7 +43,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style - Basic menu items
+ * 預設樣式 - 基本選單項目
  */
 export const Default: Story = {
   args: {
@@ -71,7 +71,7 @@ export const Default: Story = {
 };
 
 /**
- * Menu with dividers
+ * 含分隔線的選單
  */
 export const WithDividers: Story = {
   args: {
@@ -114,7 +114,7 @@ export const WithDividers: Story = {
 };
 
 /**
- * Menu with danger action
+ * 含 danger 操作的選單
  */
 export const WithDangerItem: Story = {
   args: {
@@ -150,7 +150,7 @@ export const WithDangerItem: Story = {
 };
 
 /**
- * Menu using href for navigation
+ * 使用 href 導覽的選單
  */
 export const WithHrefNavigation: Story = {
   args: {
@@ -178,7 +178,7 @@ export const WithHrefNavigation: Story = {
 };
 
 /**
- * Menu mixing onClick and href
+ * 混用 onClick 與 href 的選單
  */
 export const MixedNavigation: Story = {
   args: {
@@ -214,7 +214,7 @@ export const MixedNavigation: Story = {
 };
 
 /**
- * Menu items without icons
+ * 不含圖示的選單項目
  */
 export const WithoutIcons: Story = {
   args: {
@@ -239,7 +239,7 @@ export const WithoutIcons: Story = {
 };
 
 /**
- * Single item only
+ * 僅單一項目
  */
 export const SingleItem: Story = {
   args: {
@@ -256,7 +256,7 @@ export const SingleItem: Story = {
 };
 
 /**
- * Empty list
+ * 空列表
  */
 export const Empty: Story = {
   args: {
@@ -265,7 +265,7 @@ export const Empty: Story = {
 };
 
 /**
- * Complete user menu example
+ * 完整的使用者選單範例
  */
 export const CompleteUserMenu: Story = {
   args: {

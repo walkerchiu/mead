@@ -9,18 +9,18 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 
 /**
- * RadioGroup combines radio buttons with error handling.
+ * RadioGroup 將單選按鈕與錯誤處理結合在一起。
  *
- * ## Features
- * - Perfect integration with react-hook-form
- * - Support for horizontal or vertical layout
- * - Automatic validation error display
- * - Support for option descriptions
+ * ## 功能特性
+ * - 與 react-hook-form 完美整合
+ * - 支援水平或垂直排列
+ * - 自動顯示驗證錯誤
+ * - 支援選項說明文字
  *
- * ## Use Cases
- * - Single choice questions
- * - Gender selection
- * - Plan selection
+ * ## 使用情境
+ * - 單選題
+ * - 性別選擇
+ * - 方案選擇
  */
 const meta = {
   title: 'Shared/Molecules/RadioGroup',
@@ -29,8 +29,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Radio button group component with perfect react-hook-form integration.',
+        component: '單選按鈕群組元件，與 react-hook-form 完美整合。',
       },
     },
   },
@@ -47,7 +46,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-// Common option data
+// 常用選項資料
 const genderOptions = [
   { value: 'male', label: 'Male' },
   { value: 'female', label: 'Female' },
@@ -58,17 +57,17 @@ const subscriptionOptions = [
   {
     value: 'free',
     label: 'Free Plan',
-    description: 'Basic features, suitable for personal use',
+    description: '基本功能，適合個人使用',
   },
   {
     value: 'pro',
     label: 'Professional Plan',
-    description: 'NT$ 299/month, full features',
+    description: '每月 NT$ 299，完整功能',
   },
   {
     value: 'enterprise',
     label: 'Enterprise Plan',
-    description: 'Custom requirements, please contact us',
+    description: '客製化需求，請與我們聯絡',
   },
 ];
 
@@ -79,8 +78,8 @@ const paymentOptions = [
 ];
 
 /**
- * Basic Usage
- * Vertically arranged radio buttons
+ * 基本用法
+ * 垂直排列的單選按鈕
  */
 export const Default: Story = {
   args: {
@@ -91,8 +90,8 @@ export const Default: Story = {
 };
 
 /**
- * With Default Value
- * Shows pre-selected option
+ * 含預設值
+ * 顯示預先選取的選項
  */
 export const WithDefaultValue: Story = {
   args: {
@@ -104,8 +103,8 @@ export const WithDefaultValue: Story = {
 };
 
 /**
- * With Error Message
- * Displays validation error
+ * 含錯誤訊息
+ * 顯示驗證錯誤
  */
 export const WithError: Story = {
   args: {
@@ -116,8 +115,8 @@ export const WithError: Story = {
 };
 
 /**
- * Horizontal Layout
- * Options arranged horizontally
+ * 水平排列
+ * 選項水平排列
  */
 export const Row: Story = {
   args: {
@@ -129,8 +128,8 @@ export const Row: Story = {
 };
 
 /**
- * Required Field
- * Shows required indicator
+ * 必填欄位
+ * 顯示必填標示
  */
 export const Required: Story = {
   args: {
@@ -142,8 +141,8 @@ export const Required: Story = {
 };
 
 /**
- * Disabled State
- * Cannot be selected
+ * 停用狀態
+ * 無法選取
  */
 export const Disabled: Story = {
   args: {
@@ -156,8 +155,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Partially Disabled Options
- * Some options cannot be selected
+ * 部分選項停用
+ * 部分選項無法選取
  */
 export const WithDisabledOptions: Story = {
   args: {
@@ -176,8 +175,8 @@ export const WithDisabledOptions: Story = {
 };
 
 /**
- * Options with Descriptions
- * Each option has explanation text
+ * 含說明文字的選項
+ * 每個選項都附帶說明文字
  */
 export const WithDescription: Story = {
   args: {
@@ -188,8 +187,8 @@ export const WithDescription: Story = {
 };
 
 /**
- * Complete Form Example
- * Using react-hook-form + Zod validation
+ * 完整表單範例
+ * 使用 react-hook-form + Zod 驗證
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
@@ -283,8 +282,8 @@ export const FormExample: Story = {
 };
 
 /**
- * Survey Example
- * Multiple single-choice question groups
+ * 問卷範例
+ * 多組單選題
  */
 export const SurveyExample: Story = {
   render: function SurveyExampleComponent() {
@@ -398,8 +397,8 @@ export const SurveyExample: Story = {
 };
 
 /**
- * Size Comparison
- * Radio buttons in different sizes
+ * 尺寸比較
+ * 不同尺寸的單選按鈕
  */
 export const Sizes: Story = {
   render: () => (

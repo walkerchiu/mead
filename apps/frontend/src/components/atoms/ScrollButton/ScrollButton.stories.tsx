@@ -12,24 +12,24 @@ const meta = {
     direction: {
       control: 'select',
       options: ['up', 'down', 'toTop', 'toBottom'],
-      description: 'Button direction',
+      description: '按鈕方向',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Button size',
+      description: '按鈕尺寸',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether the button is disabled',
+      description: '按鈕是否停用',
     },
     visible: {
       control: 'boolean',
-      description: 'Whether the button is visible',
+      description: '按鈕是否顯示',
     },
     tooltip: {
       control: 'text',
-      description: 'Tooltip text',
+      description: '工具提示文字',
     },
   },
 } satisfies Meta<typeof ScrollButton>;

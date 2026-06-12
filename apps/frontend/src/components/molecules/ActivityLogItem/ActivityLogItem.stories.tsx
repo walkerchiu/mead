@@ -17,8 +17,7 @@ const meta: Meta<typeof ActivityLogItem> = {
     layout: 'padded',
     docs: {
       description: {
-        component:
-          'Unified timeline row element used across every activity feed.',
+        component: '統一的時間軸列元素，用於所有活動動態。',
       },
     },
   },

@@ -7,8 +7,8 @@ import { ThemeMode } from '@/components/atoms/ThemeToggleButton';
 /**
  * ThemeSelector - Atomic Design: Molecule
  *
- * Theme selector that combines a title and multiple ThemeToggleButton (Atom) components.
- * Provides Light, Dark, and System theme switching functionality.
+ * 主題選擇器，結合標題與多個 ThemeToggleButton（Atom）元件。
+ * 提供 Light、Dark 與 System 主題切換功能。
  */
 const meta = {
   title: 'Shared/Molecules/ThemeSelector',
@@ -44,7 +44,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style - Includes all theme switching functionality (Light, Dark, System)
+ * 預設樣式 - 包含所有主題切換功能（Light、Dark、System）
  */
 export const Default: Story = {
   args: {
@@ -54,7 +54,7 @@ export const Default: Story = {
 };
 
 /**
- * Custom title
+ * 自訂標題
  */
 export const CustomTitle: Story = {
   args: {
@@ -65,7 +65,7 @@ export const CustomTitle: Story = {
 };
 
 /**
- * Without title
+ * 不含標題
  */
 export const WithoutTitle: Story = {
   args: {
@@ -76,7 +76,7 @@ export const WithoutTitle: Story = {
 };
 
 /**
- * Custom theme option labels
+ * 自訂主題選項標籤
  */
 export const CustomLabels: Story = {
   args: {
@@ -91,7 +91,7 @@ export const CustomLabels: Story = {
 };
 
 /**
- * Interactive example - Theme switching
+ * 互動範例 - 主題切換
  */
 export const Interactive: Story = {
   render: () => {
@@ -128,7 +128,7 @@ export const Interactive: Story = {
 };
 
 /**
- * Interactive example with Chinese labels
+ * 含中文標籤的互動範例
  */
 export const InteractiveZhTW: Story = {
   render: () => {
@@ -170,7 +170,7 @@ export const InteractiveZhTW: Story = {
 };
 
 /**
- * Usage example in menu context
+ * 選單情境中的使用範例
  */
 export const InMenuContext: Story = {
   render: () => {

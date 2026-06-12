@@ -37,22 +37,21 @@ const meta: Meta<typeof Demo> = {
     docs: {
       description: {
         component:
-          'Shared Diff Modal that opens when an activity log entry is clicked. Built on top of the shared `Modal` organism and used across all *EditHistory-driven activity feeds.',
+          '共用的 Diff Modal，於點擊活動日誌項目時開啟。以共用的 `Modal` organism 為基礎建構，並用於所有由 *EditHistory 驅動的活動動態。',
       },
     },
   },
   tags: ['autodocs'],
   argTypes: {
-    fieldLabel: { control: 'text', description: 'Translated field label' },
-    oldValue: { control: 'text', description: 'Value before the change' },
-    newValue: { control: 'text', description: 'Value after the change' },
-    actorName: { control: 'text', description: 'Actor display name' },
-    timestamp: { control: 'date', description: 'When the change happened' },
+    fieldLabel: { control: 'text', description: '已翻譯的欄位標籤' },
+    oldValue: { control: 'text', description: '變更前的值' },
+    newValue: { control: 'text', description: '變更後的值' },
+    actorName: { control: 'text', description: '操作者顯示名稱' },
+    timestamp: { control: 'date', description: '變更發生的時間' },
     mode: {
       control: 'inline-radio',
       options: ['text', 'markdown'],
-      description:
-        'text = plain text; markdown = monospaced, preserves formatting',
+      description: 'text＝純文字；markdown＝等寬字體，保留格式',
     },
   },
 };

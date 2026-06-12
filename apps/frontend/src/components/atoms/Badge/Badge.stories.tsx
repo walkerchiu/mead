@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     badgeContent: {
       control: 'text',
-      description: 'Badge content',
+      description: '徽章內容',
     },
     color: {
       control: 'select',
@@ -25,12 +25,12 @@ const meta = {
         'success',
         'warning',
       ],
-      description: 'Color',
+      description: '顏色',
     },
     variant: {
       control: 'select',
       options: ['standard', 'dot'],
-      description: 'Variant',
+      description: '變體',
     },
   },
 } satisfies Meta<typeof Badge>;

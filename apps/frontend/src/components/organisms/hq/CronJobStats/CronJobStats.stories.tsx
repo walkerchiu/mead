@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Statistics cards for cron job executions, showing totals, success rate, failure count, and average duration.',
+          'cron job 執行統計卡片，顯示總數、成功率、失敗數與平均耗時。',
       },
     },
   },
@@ -35,7 +35,7 @@ const mockStatistics = {
 };
 
 /**
- * Default state with realistic statistics data.
+ * 含真實統計資料的預設狀態。
  */
 export const Default: Story = {
   args: {
@@ -45,7 +45,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state — shows skeleton cards while data is being fetched.
+ * 載入中狀態 — 在取得資料期間顯示骨架卡片。
  */
 export const Loading: Story = {
   args: {
@@ -55,7 +55,7 @@ export const Loading: Story = {
 };
 
 /**
- * Empty stats — all values are zero (no executions recorded yet).
+ * 空統計 — 所有數值皆為零（尚無執行紀錄）。
  */
 export const EmptyStats: Story = {
   args: {
@@ -78,7 +78,7 @@ export const EmptyStats: Story = {
 };
 
 /**
- * High success rate — 99%+ success across many executions.
+ * 高成功率 — 大量執行中成功率達 99% 以上。
  */
 export const HighSuccessRate: Story = {
   args: {
@@ -97,7 +97,7 @@ export const HighSuccessRate: Story = {
 };
 
 /**
- * High failure rate — many failures requiring attention.
+ * 高失敗率 — 大量失敗需要注意。
  */
 export const HighFailureRate: Story = {
   args: {

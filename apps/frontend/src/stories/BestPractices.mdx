@@ -2,17 +2,17 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Introduction/Best Practices" />
 
-# Component Development Best Practices
+# 元件開發最佳實踐
 
-This guide provides best practices and conventions for developing MEAD components.
+本指南提供開發 MEAD 元件的最佳實踐與慣例。
 
 ---
 
-## 📋 Development Process
+## 📋 開發流程
 
-### 1. Story-First Development
+### 1. Story-First 開發
 
-**Write Stories first, then implement components**
+**先撰寫 Story，再實作元件**
 
 ```tsx
 // ✅ Good practice
@@ -31,18 +31,18 @@ export function Button({ children, loading, ...props }) {
 }
 ```
 
-**Why?**
+**為什麼？**
 
-- ✅ Instant visual feedback
-- ✅ Easier to discover design issues
-- ✅ Automatic documentation generation
-- ✅ Better collaboration and communication
+- ✅ 即時的視覺回饋
+- ✅ 更容易發現設計問題
+- ✅ 自動產生文件
+- ✅ 更好的協作與溝通
 
 ---
 
-## 🎯 Component Design Principles
+## 🎯 元件設計原則
 
-### 1. Keep Components Pure
+### 1. 保持元件純粹
 
 ```tsx
 // ❌ Bad: Side effects inside component
@@ -75,9 +75,9 @@ function LoginPage() {
 }
 ```
 
-### 2. Props Design Principles
+### 2. Props 設計原則
 
-#### Keep It Simple
+#### 保持簡單
 
 ```tsx
 // ❌ Bad: Too many props
@@ -94,7 +94,7 @@ function LoginPage() {
 </Button>
 ```
 
-#### Use Meaningful Names
+#### 使用有意義的命名
 
 ```tsx
 // ❌ Bad
@@ -104,7 +104,7 @@ function LoginPage() {
 <FormField error="Field is required" helperText="Please enter your email" />
 ```
 
-#### Provide Default Values
+#### 提供預設值
 
 ```tsx
 export interface ButtonProps {
@@ -123,9 +123,9 @@ export function Button({
 }
 ```
 
-### 3. TypeScript Usage
+### 3. TypeScript 用法
 
-#### Explicit Type Definitions
+#### 明確的型別定義
 
 ```tsx
 // ✅ Good: Explicit types
@@ -142,7 +142,7 @@ export type LoginFormData = {
 };
 ```
 
-#### Avoid any
+#### 避免使用 any
 
 ```tsx
 // ❌ Bad
@@ -154,9 +154,9 @@ function handleSubmit(data: LoginFormData) {}
 
 ---
 
-## 📝 Stories Writing Guidelines
+## 📝 Story 撰寫準則
 
-### 1. Create Story for Each State
+### 1. 為每個狀態建立 Story
 
 ```tsx
 // ✅ Complete Stories example
@@ -181,7 +181,7 @@ export const Error: Story = {
 };
 ```
 
-### 2. Provide Interactive Examples
+### 2. 提供互動範例
 
 ```tsx
 export const Interactive: Story = {
@@ -195,7 +195,7 @@ export const Interactive: Story = {
 };
 ```
 
-### 3. Add Documentation
+### 3. 加入文件說明
 
 ````tsx
 /**
@@ -220,9 +220,9 @@ export const Primary: Story = {
 
 ---
 
-## 🎨 Styling Guidelines
+## 🎨 樣式準則
 
-### 1. Use MUI sx prop
+### 1. 使用 MUI 的 sx prop
 
 ```tsx
 // ✅ Good: Use sx
@@ -244,7 +244,7 @@ export const Primary: Story = {
 </Box>
 ```
 
-### 2. Responsive Design
+### 2. 響應式設計
 
 ```tsx
 <Box
@@ -257,7 +257,7 @@ export const Primary: Story = {
 </Box>
 ```
 
-### 3. Use Theme Variables
+### 3. 使用主題變數
 
 ```tsx
 // ✅ Good: Use theme
@@ -269,19 +269,19 @@ export const Primary: Story = {
 
 ---
 
-## 🧪 Testing Guidelines
+## 🧪 測試準則
 
-### 1. Test in Storybook
+### 1. 在 Storybook 中測試
 
-Each component should have:
+每個元件都應具備：
 
-- ✅ Default story (default state)
-- ✅ Loading story (loading state)
-- ✅ Error story (error state)
-- ✅ Disabled story (disabled state)
-- ✅ Interactive story (interactive example)
+- ✅ Default story（預設狀態）
+- ✅ Loading story（載入中狀態）
+- ✅ Error story（錯誤狀態）
+- ✅ Disabled story（停用狀態）
+- ✅ Interactive story（互動範例）
 
-### 2. Use MSW to Mock API
+### 2. 使用 MSW 模擬 API
 
 ```tsx
 export const WithAPICall: Story = {
@@ -301,9 +301,9 @@ export const WithAPICall: Story = {
 
 ---
 
-## 📦 Component Organization
+## 📦 元件組織
 
-### 1. File Structure
+### 1. 檔案結構
 
 ```text
 ComponentName/
@@ -313,7 +313,7 @@ ComponentName/
 └── index.ts                # Exports
 ```
 
-### 2. Export Convention
+### 2. 匯出慣例
 
 ```tsx
 // ComponentName/index.ts
@@ -327,9 +327,9 @@ export * from './TextField';
 
 ---
 
-## ⚡ Performance Optimization
+## ⚡ 效能最佳化
 
-### 1. Use React.memo
+### 1. 使用 React.memo
 
 ```tsx
 // For pure presentational components
@@ -338,7 +338,7 @@ export const Button = React.memo(function Button({ children, ...props }) {
 });
 ```
 
-### 2. Avoid Unnecessary Re-renders
+### 2. 避免不必要的重新渲染
 
 ```tsx
 // ❌ Bad: Creates new object every time
@@ -354,9 +354,9 @@ const handleClick = useCallback(() => {
 
 ---
 
-## 🔍 Accessibility (a11y)
+## 🔍 無障礙設計（a11y）
 
-### 1. Semantic HTML
+### 1. 語意化 HTML
 
 ```tsx
 // ✅ Good
@@ -366,7 +366,7 @@ const handleClick = useCallback(() => {
 <div onClick={handleSubmit}>Submit</div>
 ```
 
-### 2. ARIA Labels
+### 2. ARIA 標籤
 
 ```tsx
 <IconButton aria-label="Close dialog" onClick={onClose}>
@@ -374,15 +374,15 @@ const handleClick = useCallback(() => {
 </IconButton>
 ```
 
-### 3. Keyboard Navigation
+### 3. 鍵盤導覽
 
-Ensure all interactive elements are keyboard accessible.
+確保所有互動元素皆可透過鍵盤操作。
 
 ---
 
-## 📚 Documentation Guidelines
+## 📚 文件撰寫準則
 
-### 1. JSDoc Comments
+### 1. JSDoc 註解
 
 ````tsx
 /**
@@ -402,7 +402,7 @@ export function Button({ children, loading, ...props }: ButtonProps) {
 }
 ````
 
-### 2. Props Description
+### 2. Props 說明
 
 ```tsx
 export interface ButtonProps {
@@ -427,40 +427,40 @@ export interface ButtonProps {
 
 ---
 
-## ✅ Checklist
+## ✅ 檢查清單
 
-When developing a new component, ensure:
+開發新元件時，請確保：
 
-- [ ] Follows Atomic Design principles, placed in correct level
-- [ ] Component is pure (no side effects)
-- [ ] Provides complete TypeScript types
-- [ ] Creates multiple Stories showing different states
-- [ ] Adds JSDoc comments
-- [ ] Supports responsive design
-- [ ] Meets accessibility standards
-- [ ] Uses theme variables (no hard-coded colors)
-- [ ] Provides reasonable default values
-- [ ] Tests all states in Storybook
-
----
-
-## 🎓 Learning Resources
-
-- [Storybook Best Practices](https://storybook.js.org/docs/react/writing-stories/introduction)
-- [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
-- [MUI Customization Guide](https://mui.com/material-ui/customization/how-to-customize/)
-- [Atomic Design Methodology](https://bradfrost.com/blog/post/atomic-web-design/)
+- [ ] 遵循 Atomic Design 原則，放置於正確的層級
+- [ ] 元件保持純粹（無副作用）
+- [ ] 提供完整的 TypeScript 型別
+- [ ] 建立多個 Story 以展示不同狀態
+- [ ] 加入 JSDoc 註解
+- [ ] 支援響應式設計
+- [ ] 符合無障礙標準
+- [ ] 使用主題變數（不寫死顏色）
+- [ ] 提供合理的預設值
+- [ ] 在 Storybook 中測試所有狀態
 
 ---
 
-## 💡 Tips
+## 🎓 學習資源
 
-**Remember: Good components should be**
+- [Storybook 最佳實踐](https://storybook.js.org/docs/react/writing-stories/introduction)
+- [React TypeScript 速查表](https://react-typescript-cheatsheet.netlify.app/)
+- [MUI 客製化指南](https://mui.com/material-ui/customization/how-to-customize/)
+- [Atomic Design 方法論](https://bradfrost.com/blog/post/atomic-web-design/)
 
-- 📦 **Reusable** - Can be used in multiple places
-- 🧪 **Testable** - Easy to write tests for
-- 📖 **Documented** - Clear usage instructions
-- 🎨 **Consistent** - Follows design system
-- ⚡ **Performant** - Good performance
+---
 
-Start building your components! 🚀
+## 💡 提示
+
+**請記住：好的元件應該是**
+
+- 📦 **可重用** - 可在多處使用
+- 🧪 **可測試** - 容易為其撰寫測試
+- 📖 **有文件** - 使用說明清晰
+- 🎨 **一致** - 遵循設計系統
+- ⚡ **高效能** - 效能良好
+
+開始建構你的元件吧！🚀

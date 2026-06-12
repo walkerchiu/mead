@@ -177,20 +177,20 @@ const SampleContent = () => (
 );
 
 /**
- * DashboardLayout is a complete dashboard layout template
+ * DashboardLayout 是完整的儀表板版面範本
  *
- * **Features**:
- * - Combines MainAppBar + Sidebar + Content Area
- * - Responsive design (automatically hides Sidebar on mobile)
- * - Sidebar supports three states: Open/Mini/Closed
- * - Fixed AppBar and Sidebar
- * - Main content area automatically fills remaining space
- * - Content area automatically adjusts margin based on Sidebar state
+ * **功能特性**：
+ * - 結合 MainAppBar + Sidebar + 內容區
+ * - 響應式設計（行動裝置上自動隱藏 Sidebar）
+ * - Sidebar 支援三種狀態：Open／Mini／Closed
+ * - 固定的 AppBar 與 Sidebar
+ * - 主內容區自動填滿剩餘空間
+ * - 內容區依 Sidebar 狀態自動調整邊距
  *
- * **Use Cases**:
- * - HQ dashboard interface
- * - Dashboard pages
- * - Applications requiring side navigation
+ * **使用情境**：
+ * - HQ 儀表板介面
+ * - 儀表板頁面
+ * - 需要側邊導覽的應用程式
  */
 const meta = {
   title: 'HQ Scope/Templates/DashboardLayout',
@@ -200,7 +200,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Complete dashboard layout template combining MainAppBar, Sidebar, and content area. Supports responsive design and Sidebar state switching.',
+          '完整的儀表板版面範本，結合 MainAppBar、Sidebar 與內容區。支援響應式設計與 Sidebar 狀態切換。',
       },
     },
   },
@@ -209,35 +209,35 @@ const meta = {
     sidebarInitialState: {
       control: 'select',
       options: ['open', 'mini', 'closed'],
-      description: 'Sidebar initial state',
+      description: 'Sidebar 初始狀態',
       table: {
         defaultValue: { summary: 'open' },
       },
     },
     sidebarWidth: {
       control: 'number',
-      description: 'Width when Sidebar is fully expanded',
+      description: 'Sidebar 完全展開時的寬度',
       table: {
         defaultValue: { summary: '240' },
       },
     },
     showUserName: {
       control: 'boolean',
-      description: 'Show user name',
+      description: '顯示使用者名稱',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     showUserStatus: {
       control: 'boolean',
-      description: 'Show user status',
+      description: '顯示使用者狀態',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     userIconMode: {
       control: 'boolean',
-      description: 'Use icon mode',
+      description: '使用圖示模式',
       table: {
         defaultValue: { summary: 'true' },
       },
@@ -245,7 +245,7 @@ const meta = {
     currentTheme: {
       control: 'select',
       options: ['light', 'dark', 'system'],
-      description: 'Current theme',
+      description: '目前主題',
       table: {
         defaultValue: { summary: 'light' },
       },
@@ -257,7 +257,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default layout - Sidebar fully expanded
+ * 預設版面 - Sidebar 完全展開
  */
 export const Default: Story = {
   args: {
@@ -296,8 +296,8 @@ export const Default: Story = {
 };
 
 /**
- * Full-featured demo
- * All features enabled, showcasing complete dashboard experience
+ * 完整功能示範
+ * 啟用所有功能，展示完整的儀表板體驗
  */
 export const FullFeatured: Story = {
   args: {
@@ -357,8 +357,8 @@ export const FullFeatured: Story = {
 };
 
 /**
- * Mini Sidebar mode
- * Sidebar in semi-expanded state, showing only icons
+ * Mini Sidebar 模式
+ * Sidebar 處於半展開狀態，僅顯示圖示
  */
 export const WithMiniSidebar: Story = {
   args: {
@@ -397,8 +397,8 @@ export const WithMiniSidebar: Story = {
 };
 
 /**
- * Sidebar closed
- * Sidebar completely hidden, content area spans full width
+ * Sidebar 已關閉
+ * Sidebar 完全隱藏，內容區佔滿完整寬度
  */
 export const WithClosedSidebar: Story = {
   args: {
@@ -436,8 +436,8 @@ export const WithClosedSidebar: Story = {
 };
 
 /**
- * Custom content
- * Demonstrates layout flexibility
+ * 自訂內容
+ * 示範版面彈性
  */
 export const CustomContent: Story = {
   args: {

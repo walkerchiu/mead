@@ -22,42 +22,42 @@ import {
 /**
  * Drawer - Atomic Design: Organism
  *
- * A flexible drawer/sidebar component that supports three display states and three behavior modes.
- * Perfect for navigation sidebars, settings panels, and collapsible content areas in responsive applications.
+ * 彈性的 drawer／sidebar 元件，支援三種顯示狀態與三種行為模式。
+ * 非常適合響應式應用程式中的導覽側邊欄、設定面板與可收合的內容區。
  *
- * ## Key Features
+ * ## 主要功能
  *
- * - **Three Variants**: temporary (overlay), persistent (push content), permanent (always visible)
- * - **Three States**: closed, mini (icon-only), open (full width)
- * - **Smooth Transitions**: Animated state changes with Material-UI transitions
- * - **Responsive**: Automatically adapts layout based on variant
- * - **Customizable**: Custom widths, header, footer, and toggle button
+ * - **三種變體**：temporary（覆蓋）、persistent（推移內容）、permanent（恆常顯示）
+ * - **三種狀態**：closed、mini（僅圖示）、open（完整寬度）
+ * - **流暢轉場**：以 Material-UI 轉場呈現狀態變化動畫
+ * - **響應式**：依變體自動調整版面
+ * - **可自訂**：自訂寬度、頁首、頁尾與切換按鈕
  *
- * ## When to Use
+ * ## 何時使用
  *
- * - **temporary**: Mobile navigation menus, modal-like side panels
- * - **persistent**: Desktop application sidebars that can be toggled
- * - **permanent**: Always-visible navigation in desktop dashboards
+ * - **temporary**：行動裝置導覽選單、類似 modal 的側邊面板
+ * - **persistent**：可切換的桌面應用程式側邊欄
+ * - **permanent**：桌面儀表板中恆常顯示的導覽
  *
- * ## Behavior Details
+ * ## 行為細節
  *
- * **States**:
- * - `closed`: Completely hidden (temporary and persistent only)
- * - `mini`: Collapsed view showing only icons (56-80px wide)
- * - `open`: Fully expanded showing complete content (240-320px wide)
+ * **狀態**：
+ * - `closed`：完全隱藏（僅限 temporary 與 persistent）
+ * - `mini`：收合檢視，僅顯示圖示（寬 56-80px）
+ * - `open`：完全展開，顯示完整內容（寬 240-320px）
  *
- * **Variants**:
- * - `temporary`: Overlays content, dismissible by clicking outside or close button
- * - `persistent`: Pushes main content aside, toggleable via button
- * - `permanent`: Always visible, can switch between open and mini states
+ * **變體**：
+ * - `temporary`：覆蓋於內容上，可點擊外部或關閉按鈕關閉
+ * - `persistent`：將主內容推至一旁，可透過按鈕切換
+ * - `permanent`：恆常顯示，可在 open 與 mini 狀態間切換
  *
- * ## Common Use Cases
+ * ## 常見使用情境
  *
- * - Application navigation sidebar
- * - Dashboard side panels
- * - Settings and configuration panels
- * - Document outline viewers
- * - Multi-level navigation menus
+ * - 應用程式導覽側邊欄
+ * - 儀表板側邊面板
+ * - 設定與組態面板
+ * - 文件大綱檢視器
+ * - 多層級導覽選單
  */
 const meta = {
   title: 'Shared/Organisms/Drawer',
@@ -67,7 +67,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A flexible drawer/sidebar component with support for three behavioral modes (temporary, persistent, permanent) and three display states (closed, mini, open). Perfect for responsive navigation and collapsible side panels.',
+          '彈性的 drawer／sidebar 元件，支援三種行為模式（temporary、persistent、permanent）與三種顯示狀態（closed、mini、open）。非常適合響應式導覽與可收合的側邊面板。',
       },
     },
   },
@@ -76,7 +76,7 @@ const meta = {
     state: {
       control: 'select',
       options: ['closed', 'mini', 'open'],
-      description: 'Display state of the drawer',
+      description: 'Drawer 的顯示狀態',
       table: {
         defaultValue: { summary: 'open' },
       },
@@ -84,7 +84,7 @@ const meta = {
     variant: {
       control: 'select',
       options: ['temporary', 'persistent', 'permanent'],
-      description: 'Drawer behavior mode',
+      description: 'Drawer 行為模式',
       table: {
         defaultValue: { summary: 'persistent' },
       },
@@ -92,28 +92,28 @@ const meta = {
     anchor: {
       control: 'select',
       options: ['left', 'right'],
-      description: 'Side of the screen where drawer appears',
+      description: 'Drawer 出現的螢幕側邊',
       table: {
         defaultValue: { summary: 'left' },
       },
     },
     width: {
       control: 'number',
-      description: 'Width when fully opened (px)',
+      description: '完全開啟時的寬度（px）',
       table: {
         defaultValue: { summary: '240' },
       },
     },
     miniWidth: {
       control: 'number',
-      description: 'Width when in mini state (px)',
+      description: '迷你狀態時的寬度（px）',
       table: {
         defaultValue: { summary: '64' },
       },
     },
     showToggleButton: {
       control: 'boolean',
-      description: 'Show toggle button to change state',
+      description: '顯示用於切換狀態的按鈕',
       table: {
         defaultValue: { summary: 'true' },
       },
@@ -163,12 +163,12 @@ const SampleMenuContent = () => (
 );
 
 /**
- * Default persistent drawer - starts closed, toggle to open.
+ * 預設 persistent drawer - 起始為關閉，切換即可開啟。
  *
- * The persistent drawer pushes the main content aside when open. Use the Controls panel
- * below to change the state to 'open' or 'mini'. This is the most common variant for desktop applications.
+ * persistent drawer 在開啟時會將主內容推至一旁。請使用 Controls 面板
+ * 以將狀態變更為 'open' 或 'mini'。這是桌面應用程式最常見的變體。
  *
- * **Note**: Switch to Canvas view above to interact with this example.
+ * **注意**：請切換至上方的 Canvas 檢視以與此範例互動。
  */
 export const Default: Story = {
   render: (args) => (
@@ -184,7 +184,7 @@ export const Default: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Persistent drawer example. Use the Controls below to change the state.
         </Typography>
@@ -194,7 +194,7 @@ export const Default: Story = {
   args: {
     state: 'closed',
     variant: 'persistent',
-    header: <Typography variant="h6">My App</Typography>,
+    header: <Typography variant="h6">我的應用程式</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -207,12 +207,12 @@ export const Default: Story = {
 };
 
 /**
- * Mini (collapsed) state showing only icons.
+ * Mini（收合）狀態，僅顯示圖示。
  *
- * In mini state, the drawer displays a narrow column with icons only, saving screen space
- * while keeping navigation accessible. Perfect for maximizing content area on desktop.
+ * 在 mini 狀態下，drawer 顯示僅含圖示的窄欄，節省螢幕空間
+ * 同時維持導覽的可存取性。非常適合在桌面上最大化內容區。
  *
- * **Note**: Switch to Canvas view above to see the full example.
+ * **注意**：請切換至上方的 Canvas 檢視以查看完整範例。
  */
 export const Mini: Story = {
   render: (args) => (
@@ -228,15 +228,15 @@ export const Mini: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
-        <Typography>Mini (collapsed) drawer showing only icons.</Typography>
+        <Typography variant="h5">主要內容</Typography>
+        <Typography>迷你（收合）抽屜，僅顯示圖示。</Typography>
       </Box>
     </Box>
   ),
   args: {
     state: 'mini',
     variant: 'persistent',
-    header: <Typography variant="h6">My App</Typography>,
+    header: <Typography variant="h6">我的應用程式</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -250,12 +250,12 @@ export const Mini: Story = {
 };
 
 /**
- * Temporary drawer (mobile style) - starts closed.
+ * Temporary drawer（行動裝置樣式）- 起始為關閉。
  *
- * The temporary drawer slides over the content like a modal. Use the Controls below to set
- * state to 'open' to see it appear. Can be dismissed by clicking outside. Ideal for mobile navigation menus.
+ * temporary drawer 會如同 modal 一般滑過內容之上。請使用下方的 Controls 設定
+ * 狀態設為 'open' 即可看到它出現。可點擊外部關閉。非常適合行動裝置導覽選單。
  *
- * **Note**: Switch to Canvas view above to interact with this example.
+ * **注意**：請切換至上方的 Canvas 檢視以與此範例互動。
  */
 export const Temporary: Story = {
   render: (args) => (
@@ -271,7 +271,7 @@ export const Temporary: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ p: 3, bgcolor: 'grey.50', height: '100%' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Temporary drawer example. Use the Controls below to open it.
         </Typography>
@@ -281,7 +281,7 @@ export const Temporary: Story = {
   args: {
     state: 'closed',
     variant: 'temporary',
-    header: <Typography variant="h6">My App</Typography>,
+    header: <Typography variant="h6">我的應用程式</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -295,13 +295,13 @@ export const Temporary: Story = {
 };
 
 /**
- * Permanent drawer - starts in mini state.
+ * Permanent drawer - 起始為 mini 狀態。
  *
- * The permanent drawer is always visible and cannot be completely closed. It can toggle
- * between open and mini states. Use the Controls below to switch to 'open' state.
- * Best for desktop dashboards with persistent navigation.
+ * permanent drawer 恆常顯示且無法完全關閉。它可切換
+ * 於 open 與 mini 狀態之間。請使用下方的 Controls 切換至 'open' 狀態。
+ * 最適合具備恆常導覽的桌面儀表板。
  *
- * **Note**: Switch to Canvas view above to interact with this example.
+ * **注意**：請切換至上方的 Canvas 檢視以與此範例互動。
  */
 export const Permanent: Story = {
   render: (args) => (
@@ -317,7 +317,7 @@ export const Permanent: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Permanent drawer example. Use the Controls below to expand it.
         </Typography>
@@ -327,7 +327,7 @@ export const Permanent: Story = {
   args: {
     state: 'mini',
     variant: 'permanent',
-    header: <Typography variant="h6">My App</Typography>,
+    header: <Typography variant="h6">我的應用程式</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -341,11 +341,11 @@ export const Permanent: Story = {
 };
 
 /**
- * Right-anchored drawer - starts closed.
+ * 靠右錨定的 drawer - 起始為關閉。
  *
- * The drawer can be anchored to the right side of the screen instead of the left.
- * Use the Controls below to set state to 'open' or 'mini'.
- * Useful for settings panels, filters, or secondary navigation.
+ * drawer 可錨定於螢幕右側而非左側。
+ * 請使用下方的 Controls 將狀態設為 'open' 或 'mini'。
+ * 適用於設定面板、篩選或次要導覽。
  */
 export const RightAnchor: Story = {
   render: (args) => (
@@ -358,7 +358,7 @@ export const RightAnchor: Story = {
       }}
     >
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Right-anchored drawer example. Use the Controls below to open it.
         </Typography>
@@ -372,7 +372,7 @@ export const RightAnchor: Story = {
     state: 'closed',
     variant: 'persistent',
     anchor: 'right',
-    header: <Typography variant="h6">Settings</Typography>,
+    header: <Typography variant="h6">設定</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -386,10 +386,10 @@ export const RightAnchor: Story = {
 };
 
 /**
- * Drawer with custom widths - starts in mini state.
+ * 含自訂寬度的 drawer - 起始為 mini 狀態。
  *
- * You can customize both the open width and mini width to fit your design needs.
- * This example shows a wider drawer (320px open, 80px mini). Use the Controls below to expand it.
+ * 你可自訂 open 寬度與 mini 寬度以符合設計需求。
+ * 此範例展示較寬的 drawer（open 320px、mini 80px）。請使用下方的 Controls 展開它。
  */
 export const CustomWidth: Story = {
   render: (args) => (
@@ -405,7 +405,7 @@ export const CustomWidth: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Custom width drawer (320px open, 80px mini). Use the Controls below.
         </Typography>
@@ -417,7 +417,7 @@ export const CustomWidth: Story = {
     variant: 'persistent',
     width: 320,
     miniWidth: 80,
-    header: <Typography variant="h6">Wide Drawer</Typography>,
+    header: <Typography variant="h6">寬版抽屜</Typography>,
   },
   parameters: {
     layout: 'padded',
@@ -431,10 +431,10 @@ export const CustomWidth: Story = {
 };
 
 /**
- * Drawer with custom header and footer - starts in mini state.
+ * 含自訂頁首與頁尾的 drawer - 起始為 mini 狀態。
  *
- * Add custom header content (like app name, logo) and footer content (like version info,
- * copyright) to create a complete branded navigation experience. Use the Controls below to expand.
+ * 加入自訂頁首內容（例如應用程式名稱、Logo）與頁尾內容（例如版本資訊、
+ * copyright），以打造完整的品牌化導覽體驗。請使用下方的 Controls 展開。
  */
 export const WithHeaderFooter: Story = {
   render: (args) => (
@@ -450,7 +450,7 @@ export const WithHeaderFooter: Story = {
         <SampleMenuContent />
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Drawer with custom header and footer. Use the Controls below.
         </Typography>
@@ -486,10 +486,10 @@ export const WithHeaderFooter: Story = {
 };
 
 /**
- * Side-by-side comparison of all three drawer variants.
+ * 三種 drawer 變體的並列比較。
  *
- * This example demonstrates the visual and behavioral differences between temporary,
- * persistent, and permanent drawers to help you choose the right variant for your use case.
+ * 此範例展示 temporary、
+ * persistent 與 permanent drawer 之間的視覺與行為差異，協助你為使用情境選擇正確的變體。
  */
 export const VariantComparison: Story = {
   render: () => {
@@ -541,7 +541,7 @@ export const VariantComparison: Story = {
                 <SampleMenuContent />
               </Drawer>
               <Box sx={{ flexGrow: 1, p: 2, bgcolor: 'grey.100' }}>
-                <Typography variant="body2">Main Content</Typography>
+                <Typography variant="body2">主要內容</Typography>
               </Box>
             </Box>
           </Box>
@@ -561,7 +561,7 @@ export const VariantComparison: Story = {
                 <SampleMenuContent />
               </Drawer>
               <Box sx={{ flexGrow: 1, p: 2, bgcolor: 'grey.100' }}>
-                <Typography variant="body2">Main Content</Typography>
+                <Typography variant="body2">主要內容</Typography>
               </Box>
             </Box>
           </Box>
@@ -581,11 +581,11 @@ export const VariantComparison: Story = {
 };
 
 /**
- * Interactive example with state control - fully functional.
+ * 含狀態控制的互動範例 - 功能完整。
  *
- * This example starts in mini state. Click the toggle button inside the drawer (arrow icon)
- * to switch between open and mini states. This demonstrates how the drawer integrates with
- * your application state management. The current state is displayed in the main content area.
+ * 此範例起始為 mini 狀態。請點擊 drawer 內的切換按鈕（箭頭圖示）
+ * 以在 open 與 mini 狀態間切換。這示範了 drawer 如何與
+ * 你的應用程式狀態管理整合。目前狀態會顯示於主內容區。
  */
 export const Interactive: Story = {
   render: (args) => {
@@ -604,25 +604,23 @@ export const Interactive: Story = {
           {...args}
           state={state}
           onStateChange={setState}
-          header={<Typography variant="h6">My App</Typography>}
+          header={<Typography variant="h6">我的應用程式</Typography>}
         >
           <SampleMenuContent />
         </Drawer>
 
         <Box sx={{ flexGrow: 1, p: 3 }}>
           <Typography variant="h5" gutterBottom>
-            Main Content Area
+            主要內容區
           </Typography>
           <Typography paragraph>
-            Current drawer state: <strong>{state}</strong>
+            目前抽屜狀態：<strong>{state}</strong>
           </Typography>
           <Typography paragraph>
-            Click the toggle button (arrow icon) in the drawer to switch between
-            states.
+            點選抽屜中的切換按鈕（箭頭圖示）即可在各狀態 之間切換。
           </Typography>
           <Typography>
-            In <strong>persistent</strong> mode, the drawer pushes the main
-            content.
+            在 <strong>persistent</strong> 模式下，抽屜會推開主要 內容。
           </Typography>
         </Box>
       </Box>
@@ -643,11 +641,11 @@ export const Interactive: Story = {
 };
 
 /**
- * Complete application layout with AppBar and permanent drawer - fully functional.
+ * 含 AppBar 與 permanent drawer 的完整應用程式版面 - 功能完整。
  *
- * This example shows a real-world dashboard layout combining a top AppBar with a permanent
- * drawer navigation. The drawer starts in mini state. Click the toggle button (arrow icon)
- * inside the drawer to expand it. This is a common pattern for hq dashboards and web applications.
+ * 此範例展示結合頂端 AppBar 與 permanent
+ * drawer 導覽。drawer 起始為 mini 狀態。請點擊切換按鈕（箭頭圖示）
+ * 於 drawer 內以展開它。這是 HQ 儀表板與網頁應用程式常見的模式。
  */
 export const ApplicationLayout: Story = {
   render: () => {

@@ -4,42 +4,42 @@ import { AuditLogFilters } from './AuditLogFilters';
 import { Box, Typography, Paper } from '@mui/material';
 
 /**
- * AuditLogFilters is an advanced filter component for hq audit log management.
+ * AuditLogFilters 是 HQ 稽核日誌管理的進階篩選元件。
  *
- * ## When to Use
- * - HQ audit log page
- * - Security monitoring dashboards
- * - Compliance reporting interfaces
- * - When filtering large numbers of audit logs
+ * ## 何時使用
+ * - HQ 稽核日誌頁面
+ * - 安全監控儀表板
+ * - 合規報表介面
+ * - 篩選大量稽核日誌時
  *
- * ## Features
- * - Unified user search (email, name, or ID)
- * - Action filter (LOGIN, LOGOUT, CREATE, UPDATE, DELETE, etc.)
- * - Entity filter (User, Session, Role, etc.)
- * - Status filter (SUCCESS, FAILURE, PENDING)
- * - Collapsible panel
- * - Filter chips for active filters
- * - Debounced search (500ms delay)
- * - Result count display
+ * ## 功能特性
+ * - 統一的使用者搜尋（email、姓名或 ID）
+ * - 操作篩選（LOGIN、LOGOUT、CREATE、UPDATE、DELETE 等）
+ * - entity 篩選（User、Session、Role 等）
+ * - 狀態篩選（SUCCESS、FAILURE、PENDING）
+ * - 可收合面板
+ * - 啟用中篩選的標籤
+ * - 防抖搜尋（延遲 500ms）
+ * - 結果數量顯示
  *
- * ## Filter Fields
- * - **userSearch**: Search by email, username, or user ID
- * - **action**: Filter by action type (LOGIN, LOGOUT, CREATE, UPDATE, DELETE)
- * - **entity**: Filter by entity type (User, Session, Role, Permission)
- * - **status**: Filter by log status (SUCCESS, FAILURE, PENDING)
+ * ## 篩選欄位
+ * - **userSearch**：依 email、使用者名稱或使用者 ID 搜尋
+ * - **action**：依操作類型篩選（LOGIN、LOGOUT、CREATE、UPDATE、DELETE）
+ * - **entity**：依 entity 類型篩選（User、Session、Role、Permission）
+ * - **status**：依日誌狀態篩選（SUCCESS、FAILURE、PENDING）
  *
- * ## Use Cases
- * - **Security Audits**: Find failed login attempts
- * - **Compliance**: Track specific user actions
- * - **Troubleshooting**: Filter by entity and action
- * - **Reporting**: Generate filtered audit reports
+ * ## 使用情境
+ * - **安全稽核**：找出失敗的登入嘗試
+ * - **合規**：追蹤特定使用者操作
+ * - **疑難排解**：依 entity 與 action 篩選
+ * - **報表**：產生經篩選的稽核報表
  *
- * ## Best Practices
- * - Start with collapsed state for clean UI
- * - Show result count to provide feedback
- * - Use debouncing to reduce server load
- * - Clear filters easily with one click
- * - Show active filters as chips
+ * ## 最佳實踐
+ * - 以收合狀態起始，保持介面簡潔
+ * - 顯示結果數量以提供回饋
+ * - 使用防抖以降低伺服器負載
+ * - 一鍵輕鬆清除篩選
+ * - 以標籤顯示啟用中的篩選
  */
 const meta = {
   title: 'HQ Scope/Organisms/Audit Logs/Filters',
@@ -49,7 +49,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Advanced filter component for hq audit log management with debounced search, collapsible panel, and active filter chips.',
+          'HQ 稽核日誌管理的進階篩選元件，具備防抖搜尋、可收合面板與啟用中篩選標籤。',
       },
     },
   },
@@ -57,7 +57,7 @@ const meta = {
   argTypes: {
     defaultExpanded: {
       control: 'boolean',
-      description: 'Whether the filter panel is expanded by default',
+      description: '篩選面板預設是否展開',
       table: {
         type: { summary: 'boolean' },
         defaultValue: { summary: 'true' },
@@ -65,14 +65,14 @@ const meta = {
     },
     resultCount: {
       control: 'number',
-      description: 'Number of filtered results',
+      description: '篩選結果數量',
       table: {
         type: { summary: 'number' },
       },
     },
     totalCount: {
       control: 'number',
-      description: 'Total number of audit logs before filtering',
+      description: '篩選前的稽核日誌總數',
       table: {
         type: { summary: 'number' },
       },
@@ -84,8 +84,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
- * Filters panel expanded with no active filters
+ * 預設狀態
+ * 篩選面板展開且無啟用中的篩選
  */
 export const Default: Story = {
   args: {
@@ -98,8 +98,8 @@ export const Default: Story = {
 };
 
 /**
- * Collapsed state
- * Filters panel collapsed by default
+ * 收合狀態
+ * 篩選面板預設為收合
  */
 export const Collapsed: Story = {
   args: {
@@ -112,8 +112,8 @@ export const Collapsed: Story = {
 };
 
 /**
- * With active filters
- * Shows filter chips for active filters
+ * 含啟用中的篩選
+ * 以標籤顯示啟用中的篩選
  */
 export const WithActiveFilters: Story = {
   args: {
@@ -130,8 +130,8 @@ export const WithActiveFilters: Story = {
 };
 
 /**
- * Security audit - Failed logins
- * Find all failed login attempts
+ * 安全稽核 - 失敗的登入
+ * 找出所有失敗的登入嘗試
  */
 export const SecurityAuditFailedLogins: Story = {
   args: {
@@ -147,8 +147,8 @@ export const SecurityAuditFailedLogins: Story = {
 };
 
 /**
- * User activity tracking
- * Track specific user's actions
+ * 使用者活動追蹤
+ * 追蹤特定使用者的操作
  */
 export const UserActivityTracking: Story = {
   args: {
@@ -164,8 +164,8 @@ export const UserActivityTracking: Story = {
 };
 
 /**
- * Delete operations audit
- * Find all delete operations
+ * 刪除操作稽核
+ * 找出所有刪除操作
  */
 export const DeleteOperationsAudit: Story = {
   args: {
@@ -181,8 +181,8 @@ export const DeleteOperationsAudit: Story = {
 };
 
 /**
- * All filters active
- * Maximum filters applied
+ * 所有篩選皆啟用
+ * 已套用最多篩選
  */
 export const AllFiltersActive: Story = {
   args: {
@@ -200,8 +200,8 @@ export const AllFiltersActive: Story = {
 };
 
 /**
- * No results
- * Filters applied but no matching results
+ * 無結果
+ * 已套用篩選但無相符結果
  */
 export const NoResults: Story = {
   args: {
@@ -217,8 +217,8 @@ export const NoResults: Story = {
 };
 
 /**
- * Large dataset
- * Filtering from a large number of audit logs
+ * 大型資料集
+ * 從大量稽核日誌中篩選
  */
 export const LargeDataset: Story = {
   args: {
@@ -233,8 +233,8 @@ export const LargeDataset: Story = {
 };
 
 /**
- * Interactive example
- * Fully interactive filter demonstration
+ * 互動範例
+ * 完全可互動的篩選展示
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -320,8 +320,8 @@ export const Interactive: Story = {
 };
 
 /**
- * Action types comparison
- * Shows different action filter states
+ * 操作類型比較
+ * 顯示不同的操作篩選狀態
  */
 export const ActionTypes: Story = {
   render: () => (
@@ -378,8 +378,8 @@ export const ActionTypes: Story = {
 };
 
 /**
- * Status comparison
- * Shows different status filter states
+ * 狀態比較
+ * 顯示不同的狀態篩選狀態
  */
 export const StatusComparison: Story = {
   render: () => (
@@ -436,8 +436,8 @@ export const StatusComparison: Story = {
 };
 
 /**
- * Mobile view
- * Optimized for mobile devices
+ * 行動裝置檢視
+ * 針對行動裝置最佳化
  */
 export const MobileView: Story = {
   args: {
@@ -458,8 +458,8 @@ export const MobileView: Story = {
 };
 
 /**
- * Dark mode
- * Display in dark theme
+ * 深色模式
+ * 在深色主題中顯示
  */
 export const DarkMode: Story = {
   args: {
@@ -486,8 +486,8 @@ export const DarkMode: Story = {
 };
 
 /**
- * Compliance reporting
- * Example of compliance-focused filtering
+ * 合規報表
+ * 以合規為重點的篩選範例
  */
 export const ComplianceReporting: Story = {
   render: () => (

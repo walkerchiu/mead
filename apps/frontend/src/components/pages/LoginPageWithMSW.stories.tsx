@@ -9,9 +9,9 @@ import Box from '@mui/material/Box';
 import { mockTokens } from '@/mocks/fixtures/users';
 
 /**
- * LoginPage with MSW integration example
+ * LoginPage 搭配 MSW 整合範例
  *
- * Demonstrates how to use MSW to simulate different API response scenarios.
+ * 示範如何使用 MSW 模擬不同的 API 回應情境。
  */
 
 const meta = {
@@ -20,8 +20,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Complete login page flow demonstration using MSW to simulate API.',
+        component: '使用 MSW 模擬 API 的完整登入頁面流程示範。',
       },
     },
   },
@@ -32,11 +31,11 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Successful login (without 2FA)
+ * 成功登入（不含 2FA）
  *
- * Test account:
- * - Email: user@example.com
- * - Password: password
+ * 測試帳號：
+ * - Email：user@example.com
+ * - 密碼：password
  */
 export const SuccessLogin: Story = {
   render: () => {
@@ -133,12 +132,12 @@ export const SuccessLogin: Story = {
 };
 
 /**
- * Requires 2FA verification
+ * 需要 2FA 驗證
  *
- * Test account:
- * - Email: hq@example.com
- * - Password: password
- * - 2FA verification code: 123456
+ * 測試帳號：
+ * - Email：hq@example.com
+ * - 密碼：password
+ * - 2FA 驗證碼：123456
  */
 export const Requires2FA: Story = {
   render: () => {
@@ -298,7 +297,7 @@ export const Requires2FA: Story = {
 };
 
 /**
- * Login failed - Wrong password
+ * 登入失敗 - 密碼錯誤
  */
 export const LoginError: Story = {
   render: () => (

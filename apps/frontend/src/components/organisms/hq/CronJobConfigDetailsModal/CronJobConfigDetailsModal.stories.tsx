@@ -8,7 +8,7 @@ import type { CronJobConfig } from '@/hooks/useCronJobs';
 const successConfig: CronJobConfig = {
   jobName: 'session-cleanup',
   displayName: 'Session Cleanup',
-  description: 'Removes expired sessions from the database',
+  description: '從資料庫移除過期的 session',
   jobType: 'cleanup',
   category: 'maintenance',
   cronExpression: '0 2 * * *',
@@ -32,7 +32,7 @@ const successConfig: CronJobConfig = {
 const failedDisabledConfig: CronJobConfig = {
   jobName: 'notification-sender',
   displayName: 'Notification Sender',
-  description: 'Sends pending email notifications',
+  description: '寄送待發送的 email 通知',
   jobType: 'notification',
   category: 'communication',
   cronExpression: '*/5 * * * *',
@@ -61,7 +61,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog displaying full configuration details of a cron job, with the ability to toggle the enabled state.',
+          '顯示 cron job 完整設定詳情的 modal 對話框，可切換啟用狀態。',
       },
     },
   },
@@ -72,7 +72,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open with a successfully-running enabled job.
+ * 預設 — 以成功執行中的已啟用任務開啟。
  */
 export const Default: Story = {
   args: {
@@ -84,7 +84,7 @@ export const Default: Story = {
 };
 
 /**
- * Disabled job — shows a disabled job with recent failures.
+ * 已停用的任務 — 顯示一個近期有失敗紀錄的已停用任務。
  */
 export const DisabledJob: Story = {
   args: {
@@ -96,7 +96,7 @@ export const DisabledJob: Story = {
 };
 
 /**
- * Interactive — open the modal with a button and handle enable toggle.
+ * 互動 — 以按鈕開啟 modal 並處理啟用切換。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

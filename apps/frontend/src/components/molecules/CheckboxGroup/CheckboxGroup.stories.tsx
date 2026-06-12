@@ -10,20 +10,20 @@ import Alert from '@mui/material/Alert';
 import { useState } from 'react';
 
 /**
- * CheckboxGroup combines checkboxes with error handling.
+ * CheckboxGroup 將核取方塊與錯誤處理結合在一起。
  *
- * ## Features
- * - Perfect integration with react-hook-form
- * - Support for horizontal or vertical layout
- * - Automatic validation error display
- * - Support for option descriptions
- * - Support for multiple selection
+ * ## 功能特性
+ * - 與 react-hook-form 完美整合
+ * - 支援水平或垂直版面
+ * - 自動顯示驗證錯誤
+ * - 支援選項說明文字
+ * - 支援多選
  *
- * ## Use Cases
- * - Multiple choice questions
- * - Feature preferences
- * - Interest selection
- * - Permission management
+ * ## 使用情境
+ * - 複選題
+ * - 功能偏好
+ * - 興趣選擇
+ * - 權限管理
  */
 const meta = {
   title: 'Shared/Molecules/CheckboxGroup',
@@ -32,8 +32,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Checkbox group component with perfect react-hook-form integration.',
+        component: '核取方塊群組元件，與 react-hook-form 完美整合。',
       },
     },
   },
@@ -62,17 +61,17 @@ const featureOptions = [
   {
     value: 'notifications',
     label: 'Receive Notifications',
-    description: 'Receive important notifications via email',
+    description: '透過 email 接收重要通知',
   },
   {
     value: 'newsletter',
     label: 'Subscribe to Newsletter',
-    description: 'Receive weekly updates',
+    description: '接收每週更新',
   },
   {
     value: 'marketing',
     label: 'Marketing Info',
-    description: 'Receive promotional offers and event updates',
+    description: '接收優惠活動與活動更新',
   },
 ];
 
@@ -84,8 +83,8 @@ const permissionOptions = [
 ];
 
 /**
- * Basic usage
- * Checkboxes arranged vertically
+ * 基本用法
+ * 垂直排列的核取方塊
  */
 export const Default: Story = {
   render: () => {
@@ -108,8 +107,8 @@ export const Default: Story = {
 };
 
 /**
- * With default value
- * Display preselected options
+ * 含預設值
+ * 顯示預先選取的選項
  */
 export const WithDefaultValue: Story = {
   render: () => {
@@ -135,8 +134,8 @@ export const WithDefaultValue: Story = {
 };
 
 /**
- * With error message
- * Display validation errors
+ * 含錯誤訊息
+ * 顯示驗證錯誤
  */
 export const WithError: Story = {
   args: {
@@ -147,8 +146,8 @@ export const WithError: Story = {
 };
 
 /**
- * Horizontal layout
- * Options arranged horizontally
+ * 水平版面
+ * 選項水平排列
  */
 export const Row: Story = {
   render: () => {
@@ -172,8 +171,8 @@ export const Row: Story = {
 };
 
 /**
- * Required field
- * Display required indicator
+ * 必填欄位
+ * 顯示必填標示
  */
 export const Required: Story = {
   args: {
@@ -185,8 +184,8 @@ export const Required: Story = {
 };
 
 /**
- * Disabled state
- * Not selectable
+ * 停用狀態
+ * 無法選取
  */
 export const Disabled: Story = {
   render: () => {
@@ -204,8 +203,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Some options disabled
- * Some options not selectable
+ * 部分選項已停用
+ * 部分選項無法選取
  */
 export const WithDisabledOptions: Story = {
   render: () => {
@@ -241,8 +240,8 @@ export const WithDisabledOptions: Story = {
 };
 
 /**
- * With descriptions
- * Each option has descriptive text
+ * 含說明文字
+ * 每個選項都附帶說明文字
  */
 export const WithDescription: Story = {
   render: () => {
@@ -263,8 +262,8 @@ export const WithDescription: Story = {
 };
 
 /**
- * Select All / Deselect All feature
- * Provides one-click select all
+ * 全選／取消全選功能
+ * 提供一鍵全選
  */
 export const WithSelectAll: Story = {
   render: function WithSelectAllComponent() {
@@ -298,8 +297,8 @@ export const WithSelectAll: Story = {
 };
 
 /**
- * Conditional Display Example
- * Dynamically display content based on selection
+ * 條件式顯示範例
+ * 依選取內容動態顯示
  */
 export const ConditionalDisplay: Story = {
   render: function ConditionalDisplayComponent() {
@@ -350,8 +349,8 @@ export const ConditionalDisplay: Story = {
 };
 
 /**
- * Minimum / Maximum Selection Limits
- * Limit selection quantity
+ * 最少／最多選取限制
+ * 限制選取數量
  */
 export const WithLimits: Story = {
   render: function WithLimitsComponent() {
@@ -407,8 +406,8 @@ export const WithLimits: Story = {
 };
 
 /**
- * Complete form example
- * Using react-hook-form + Zod validation
+ * 完整表單範例
+ * 使用 react-hook-form + Zod 驗證
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
@@ -536,8 +535,8 @@ export const FormExample: Story = {
 };
 
 /**
- * Survey Example
- * Multiple checkbox question groups
+ * 問卷範例
+ * 多組核取方塊題目
  */
 export const SurveyExample: Story = {
   render: function SurveyExampleComponent() {

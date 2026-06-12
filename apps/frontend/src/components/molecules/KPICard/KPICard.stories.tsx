@@ -37,20 +37,20 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dashboard KPI card — displays a single key metric with support for icon, value, subtitle, hint, click-through navigation, and loading skeleton.',
+          '儀表板 KPI 卡片 — 顯示單一關鍵指標，支援圖示、數值、副標題、提示、點擊導向與載入中骨架。',
       },
     },
   },
   tags: ['autodocs'],
   argTypes: {
-    title: { control: 'text', description: 'Card title' },
+    title: { control: 'text', description: '卡片標題' },
     value: {
       control: 'text',
-      description: 'Main value (number | string | ReactNode)',
+      description: '主要數值（number | string | ReactNode）',
     },
     subtitle: {
       control: 'text',
-      description: 'Subtitle (usually a unit or state description)',
+      description: '副標題（通常為單位或狀態說明）',
     },
     accentColor: {
       control: 'select',
@@ -62,19 +62,19 @@ const meta = {
         'info.main',
         'success.main',
       ],
-      description: 'Accent color for the icon and hover border',
+      description: '圖示與滑鼠移入邊框的強調色',
       table: { defaultValue: { summary: 'primary.main' } },
     },
     href: {
       control: 'text',
-      description: 'Click-through path (mutually exclusive with onClick)',
+      description: '點擊導向路徑（與 onClick 互斥）',
     },
-    loading: { control: 'boolean', description: 'Loading skeleton' },
-    hint: { control: 'text', description: 'Hint text at bottom-right' },
+    loading: { control: 'boolean', description: '載入中骨架' },
+    hint: { control: 'text', description: '右下角的提示文字' },
     hintColor: {
       control: 'select',
       options: ['default', 'warning', 'error', 'success'],
-      description: 'Hint text color tone',
+      description: '提示文字色調',
       table: { defaultValue: { summary: 'default' } },
     },
   },
@@ -90,7 +90,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Basic card */
+/** 基本卡片 */
 export const Default: Story = {
   args: {
     title: 'Active Sessions',
@@ -101,7 +101,7 @@ export const Default: Story = {
   },
 };
 
-/** Loading skeleton */
+/** 載入中骨架 */
 export const Loading: Story = {
   args: {
     title: 'Active Sessions',
@@ -110,7 +110,7 @@ export const Loading: Story = {
   },
 };
 
-/** With warning hint (e.g. items needing attention) */
+/** 含警告提示（例如需要注意的項目） */
 export const WithWarningHint: Story = {
   args: {
     title: 'Cron Jobs',
@@ -124,7 +124,7 @@ export const WithWarningHint: Story = {
   },
 };
 
-/** Success hint (cleared state) */
+/** 成功提示（已清除狀態） */
 export const WithSuccessHint: Story = {
   args: {
     title: 'Pending Review',
@@ -136,7 +136,7 @@ export const WithSuccessHint: Story = {
   },
 };
 
-/** No value (degrades to link card) */
+/** 無數值（退化為連結卡片） */
 export const NoValue: Story = {
   args: {
     title: 'Activity Log',

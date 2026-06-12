@@ -4,18 +4,18 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Button } from './Button';
 
 /**
- * Button is the most basic interactive component used to trigger actions.
+ * Button 是用於觸發操作的最基本互動元件。
  *
- * ## When to Use
- * - Submit forms
- * - Trigger dialogs
- * - Navigate to other pages
- * - Execute any user action
+ * ## 何時使用
+ * - 送出表單
+ * - 觸發對話框
+ * - 導向其他頁面
+ * - 執行任意使用者操作
  *
- * ## Variant Selection
- * - **contained**: Most important actions (e.g., "Submit", "Confirm")
- * - **outlined**: Secondary actions (e.g., "Cancel", "Back")
- * - **text**: Less important actions (e.g., "Learn More")
+ * ## 變體選擇
+ * - **contained**：最重要的操作（例如「Submit」、「Confirm」）
+ * - **outlined**：次要操作（例如「Cancel」、「Back」）
+ * - **text**：較不重要的操作（例如「Learn More」）
  */
 const meta = {
   title: 'Shared/Atoms/Button',
@@ -24,8 +24,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Wrapper around MUI Button providing unified button styles and loading state support.',
+        component: 'MUI Button 的封裝，提供統一的按鈕樣式並支援載入中狀態。',
       },
     },
   },
@@ -42,24 +41,24 @@ const meta = {
         'tagText',
         'iconGradient',
       ],
-      description: 'Visual style of the button',
+      description: '按鈕的視覺樣式',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Size of the button',
+      description: '按鈕的尺寸',
     },
     loading: {
       control: 'boolean',
-      description: 'Whether to show loading state',
+      description: '是否顯示載入中狀態',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether button is disabled',
+      description: '按鈕是否停用',
     },
     fullWidth: {
       control: 'boolean',
-      description: 'Whether button spans full width of parent container',
+      description: '按鈕是否佔滿父容器寬度',
     },
   },
 } satisfies Meta<typeof Button>;
@@ -68,8 +67,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Primary button style (Contained)
- * Used for most important actions, such as form submission, confirmation, etc.
+ * 主要按鈕樣式（Contained）
+ * 用於最重要的操作，例如表單送出、確認等。
  */
 export const Primary: Story = {
   args: {
@@ -80,8 +79,8 @@ export const Primary: Story = {
 };
 
 /**
- * Secondary button style (Outlined)
- * Used for secondary actions, such as cancel, back, etc.
+ * 次要按鈕樣式（Outlined）
+ * 用於次要操作，例如取消、返回等。
  */
 export const Secondary: Story = {
   args: {
@@ -92,8 +91,8 @@ export const Secondary: Story = {
 };
 
 /**
- * Text button
- * Used for less important actions
+ * 文字按鈕
+ * 用於較不重要的操作
  */
 export const Text: Story = {
   args: {
@@ -103,8 +102,8 @@ export const Text: Story = {
 };
 
 /**
- * Loading state
- * Displayed when executing asynchronous operations
+ * 載入中狀態
+ * 執行非同步操作時顯示
  */
 export const Loading: Story = {
   args: {
@@ -114,8 +113,8 @@ export const Loading: Story = {
 };
 
 /**
- * Disabled state
- * When action is temporarily unavailable
+ * 停用狀態
+ * 當操作暫時無法使用時
  */
 export const Disabled: Story = {
   args: {
@@ -125,8 +124,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Full width button
- * Spans the entire width of parent container
+ * 完整寬度按鈕
+ * 佔滿父容器的完整寬度
  */
 export const FullWidth: Story = {
   args: {
@@ -143,8 +142,8 @@ export const FullWidth: Story = {
 };
 
 /**
- * All sizes
- * Three sizes: small, medium, large
+ * 所有尺寸
+ * 三種尺寸：small、medium、large
  */
 export const Sizes: Story = {
   render: () => (
@@ -194,8 +193,8 @@ export const WithAddIcon: Story = {
 };
 
 /**
- * All variant combinations
- * Contained, Outlined, Text, Elevated, Tag, Icon Gradient
+ * 所有變體組合
+ * Contained、Outlined、Text、Elevated、Tag、Icon Gradient
  */
 export const Variants: Story = {
   render: () => (
@@ -227,8 +226,8 @@ export const Variants: Story = {
 };
 
 /**
- * Form actions example
- * Typical form submit and cancel button combination
+ * 表單操作範例
+ * 典型的表單送出與取消按鈕組合
  */
 export const FormActions: Story = {
   render: () => (

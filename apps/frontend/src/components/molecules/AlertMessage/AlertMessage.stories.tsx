@@ -7,18 +7,18 @@ import { Button } from '@/components/atoms';
 import Box from '@mui/material/Box';
 
 /**
- * AlertMessage is used to display important messages to users.
+ * AlertMessage 用於向使用者顯示重要訊息。
  *
- * ## Use Cases
- * - **Success**: Operation completed successfully
- * - **Error**: Operation failed or error occurred
- * - **Warning**: Warning messages that require attention
- * - **Info**: General information prompts
+ * ## 使用情境
+ * - **Success**：操作成功完成
+ * - **Error**：操作失敗或發生錯誤
+ * - **Warning**：需要注意的警告訊息
+ * - **Info**：一般資訊提示
  *
- * ## Best Practices
- * - Use clear and concise text
- * - Use title for important messages
- * - Provide close button (for non-critical messages)
+ * ## 最佳實踐
+ * - 使用清楚簡潔的文字
+ * - 重要訊息請使用 title
+ * - 提供關閉按鈕（用於非關鍵訊息）
  */
 const meta = {
   title: 'Shared/Molecules/AlertMessage',
@@ -28,7 +28,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Unified message display component supporting four types: success, error, warning, and info.',
+          '統一的訊息顯示元件，支援四種類型：success、error、warning 與 info。',
       },
     },
   },
@@ -37,16 +37,16 @@ const meta = {
     severity: {
       control: 'select',
       options: ['success', 'error', 'warning', 'info'],
-      description: 'Message type',
+      description: '訊息類型',
     },
     closable: {
       control: 'boolean',
-      description: 'Show close button',
+      description: '顯示關閉按鈕',
     },
     variant: {
       control: 'select',
       options: ['filled', 'outlined', 'standard'],
-      description: 'Visual style',
+      description: '視覺樣式',
     },
   },
   decorators: [
@@ -62,8 +62,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Success message
- * Used for successful operation feedback
+ * 成功訊息
+ * 用於操作成功的回饋
  */
 export const Success: Story = {
   args: {
@@ -73,8 +73,8 @@ export const Success: Story = {
 };
 
 /**
- * Error message
- * Used for operation failures or errors
+ * 錯誤訊息
+ * 用於操作失敗或錯誤
  */
 export const Error: Story = {
   args: {
@@ -84,8 +84,8 @@ export const Error: Story = {
 };
 
 /**
- * Warning message
- * Used for situations that require attention
+ * 警告訊息
+ * 用於需要注意的情況
  */
 export const Warning: Story = {
   args: {
@@ -95,8 +95,8 @@ export const Warning: Story = {
 };
 
 /**
- * Info message
- * Used for general prompts
+ * 資訊訊息
+ * 用於一般提示
  */
 export const Info: Story = {
   args: {
@@ -106,8 +106,8 @@ export const Info: Story = {
 };
 
 /**
- * All severity types
- * Shows all four message types
+ * 所有嚴重程度類型
+ * 顯示全部四種訊息類型
  */
 export const AllSeverities: Story = {
   render: () => (
@@ -129,8 +129,8 @@ export const AllSeverities: Story = {
 };
 
 /**
- * Different variants
- * Three styles: Filled, Outlined, Standard
+ * 不同變體
+ * 三種樣式：Filled、Outlined、Standard
  */
 export const Variants: Story = {
   render: () => (
@@ -149,8 +149,8 @@ export const Variants: Story = {
 };
 
 /**
- * With title
- * Provides more detailed message structure
+ * 含標題
+ * 提供更詳細的訊息結構
  */
 export const WithTitle: Story = {
   args: {
@@ -161,8 +161,8 @@ export const WithTitle: Story = {
 };
 
 /**
- * Closable
- * Shows close button
+ * 可關閉
+ * 顯示關閉按鈕
  */
 export const Closable: Story = {
   args: {
@@ -174,8 +174,8 @@ export const Closable: Story = {
 };
 
 /**
- * Multi-line content
- * Display longer messages
+ * 多行內容
+ * 顯示較長的訊息
  */
 export const LongContent: Story = {
   args: {
@@ -197,8 +197,8 @@ export const LongContent: Story = {
 };
 
 /**
- * With retry button
- * Provides retry functionality when API request fails
+ * 含重試按鈕
+ * 在 API 請求失敗時提供重試功能
  */
 export const WithRetry: Story = {
   render: function WithRetryExample() {
@@ -244,8 +244,8 @@ export const WithRetry: Story = {
 };
 
 /**
- * Custom action button
- * Provides additional action options
+ * 自訂操作按鈕
+ * 提供額外的操作選項
  */
 export const WithCustomAction: Story = {
   args: {
@@ -262,8 +262,8 @@ export const WithCustomAction: Story = {
 };
 
 /**
- * Interactive example
- * Closable message
+ * 互動範例
+ * 可關閉的訊息
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -293,8 +293,8 @@ export const Interactive: Story = {
 };
 
 /**
- * Form validation example
- * Displays validation results
+ * 表單驗證範例
+ * 顯示驗證結果
  */
 export const FormValidation: Story = {
   render: function FormValidationExample() {
@@ -344,8 +344,8 @@ export const FormValidation: Story = {
 };
 
 /**
- * API error handling example
- * Real-world API error handling scenario
+ * API 錯誤處理範例
+ * 實際的 API 錯誤處理情境
  */
 export const ApiErrorHandling: Story = {
   render: function ApiErrorExample() {
@@ -408,8 +408,8 @@ export const ApiErrorHandling: Story = {
 };
 
 /**
- * Form validation errors
- * Display multiple validation errors
+ * 表單驗證錯誤
+ * 顯示多個驗證錯誤
  */
 export const FormValidationErrors: Story = {
   render: () => (
@@ -430,8 +430,8 @@ export const FormValidationErrors: Story = {
 };
 
 /**
- * Notification stack
- * Multiple messages displayed simultaneously
+ * 通知堆疊
+ * 同時顯示多則訊息
  */
 export const NotificationStack: Story = {
   render: function NotificationStackExample() {

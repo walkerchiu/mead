@@ -23,24 +23,24 @@ import { NotificationBadge } from '@/components/atoms';
 /**
  * NotificationCenter Storybook Stories
  *
- * **Important Note**:
- * Differences between NotificationCenter and NotificationMenu:
+ * **重要說明**：
+ * NotificationCenter 與 NotificationMenu 之間的差異：
  *
- * - **NotificationCenter**: Complete solution with integrated data layer
- *   - Uses useNotifications hook to automatically fetch data from GraphQL
- *   - Supports real-time subscriptions (WebSocket)
- *   - Automatically handles state management, error handling, loading states
- *   - Used in real applications
+ * - **NotificationCenter**：整合資料層的完整解決方案
+ *   - 使用 useNotifications hook 自動從 GraphQL 取得資料
+ *   - 支援即時訂閱（WebSocket）
+ *   - 自動處理狀態管理、錯誤處理與載入中狀態
+ *   - 用於實際應用
  *
- * - **NotificationMenu**: Pure UI component
- *   - Receives notifications as props
- *   - Does not handle data fetching
- *   - Can be reused anywhere (as long as data is provided)
+ * - **NotificationMenu**：純 UI 元件
+ *   - 透過 props 接收 notifications
+ *   - 不處理資料取得
+ *   - 可在任何地方重用（只要提供資料即可）
  *
- * **Limitations of these Stories**:
- * For reliable demonstration in Storybook, we use direct prop passing to simulate data,
- * rather than real GraphQL integration. In real applications, NotificationCenter
- * automatically handles all data fetching and state management.
+ * **這些 Story 的限制**：
+ * 為了在 Storybook 中可靠地展示，我們以直接傳入 prop 的方式模擬資料，
+ * 而非真正的 GraphQL 整合。在實際應用中，NotificationCenter
+ * 自動處理所有資料取得與狀態管理。
  */
 
 // Helper function to log actions
@@ -176,7 +176,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Complete notification center that integrates with NotificationMenu. ' +
+          '完整的通知中心，與 NotificationMenu 整合。' +
           'Provides notification management with mark as read, clear, and real-time updates. ' +
           'These stories use direct props for demonstration purposes.',
       },
@@ -187,20 +187,20 @@ const meta = {
     color: {
       control: 'select',
       options: ['inherit', 'primary', 'secondary', 'default'],
-      description: 'Button color',
+      description: '按鈕顏色',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Icon button size',
+      description: '圖示按鈕尺寸',
     },
     showSettings: {
       control: 'boolean',
-      description: 'Show settings button in notification menu header',
+      description: '在通知選單標題列顯示設定按鈕',
     },
     maxDisplay: {
       control: 'number',
-      description: 'Maximum number of notifications to display in menu',
+      description: '選單中最多顯示的通知數量',
     },
   },
 } satisfies Meta<typeof NotificationCenter>;
@@ -209,19 +209,19 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default notification center in AppBar (Mocked Data)
+ * AppBar 中的預設通知中心（模擬資料）
  *
- * **What this Story demonstrates**: UI appearance and interaction behavior
+ * **此 Story 展示的內容**：UI 外觀與互動行為
  *
- * **Try these interactions:**
- * - Click the notification bell to open the menu
- * - Click "Notifications" title to navigate to notification center
- * - Click settings icon to go to notification settings
- * - Click "Mark All as Read" to mark all notifications as read
- * - Click "Clear" to delete all read notifications
+ * **試試這些互動：**
+ * - 點擊通知鈴鐺即可開啟選單
+ * - 點擊「Notifications」標題即可導向通知中心
+ * - 點擊設定圖示即可前往通知設定
+ * - 點擊「Mark All as Read」即可將所有通知標為已讀
+ * - 點擊「Clear」即可刪除所有已讀通知
  *
- * **Note**: This uses mocked data to demonstrate the UI. In real applications,
- * NotificationCenter will use useNotifications hook to automatically fetch data from GraphQL.
+ * **注意**：此處使用模擬資料來展示 UI。在實際應用中，
+ * NotificationCenter 將使用 useNotifications hook 自動從 GraphQL 取得資料。
  */
 export const Default: Story = {
   render: () => (
@@ -239,9 +239,9 @@ export const Default: Story = {
 };
 
 /**
- * Empty state - No notifications
+ * 空狀態 - 沒有通知
  *
- * Shows empty state when user has no notifications
+ * 當使用者沒有通知時顯示空狀態
  */
 export const Empty: Story = {
   render: () => (
@@ -259,10 +259,10 @@ export const Empty: Story = {
 };
 
 /**
- * Loading state (Visual Mock)
+ * 載入中狀態（視覺模擬）
  *
- * Shows how the UI looks while fetching notifications from the server.
- * This is a visual mock to demonstrate the intended UX.
+ * 展示從伺服器取得通知期間 UI 的外觀。
+ * 這是用於展示預期使用體驗的視覺模擬。
  */
 export const Loading: Story = {
   render: () => {
@@ -374,10 +374,10 @@ export const Loading: Story = {
 };
 
 /**
- * Error state (Visual Mock)
+ * 錯誤狀態（視覺模擬）
  *
- * Shows how the UI looks when the API fails to load notifications.
- * This is a visual mock to demonstrate error handling UX.
+ * 展示當 API 無法載入通知時 UI 的外觀。
+ * 這是用於展示錯誤處理使用體驗的視覺模擬。
  */
 export const Error: Story = {
   render: () => {
@@ -466,11 +466,10 @@ export const Error: Story = {
                 <Box sx={{ p: 2 }}>
                   <Alert severity="error" sx={{ mb: 2 }}>
                     <Typography variant="body2" gutterBottom>
-                      <strong>Failed to load notifications</strong>
+                      <strong>載入通知失敗</strong>
                     </Typography>
                     <Typography variant="caption">
-                      Unable to connect to the server. Please check your
-                      internet connection and try again.
+                      無法連線至伺服器。請檢查你的網路連線後 再試一次。
                     </Typography>
                   </Alert>
                   <Button
@@ -480,7 +479,7 @@ export const Error: Story = {
                     startIcon={<RefreshIcon />}
                     onClick={() => logAction('retry')()}
                   >
-                    Retry
+                    重試
                   </Button>
                 </Box>
               </Menu>
@@ -493,9 +492,9 @@ export const Error: Story = {
 };
 
 /**
- * All read notifications
+ * 全部為已讀通知
  *
- * All notifications have been read (badge shows 0)
+ * 所有通知皆已讀（徽章顯示 0）
  */
 export const AllRead: Story = {
   render: () => {
@@ -519,9 +518,9 @@ export const AllRead: Story = {
 };
 
 /**
- * Unread only notifications
+ * 僅未讀通知
  *
- * Shows only unread notifications (useful filter scenario)
+ * 僅顯示未讀通知（實用的篩選情境）
  */
 export const UnreadOnly: Story = {
   render: () => {
@@ -542,7 +541,7 @@ export const UnreadOnly: Story = {
 };
 
 /**
- * Without settings button
+ * 不含設定按鈕
  */
 export const WithoutSettings: Story = {
   render: () => (
@@ -560,9 +559,9 @@ export const WithoutSettings: Story = {
 };
 
 /**
- * Minimal configuration
+ * 最簡設定
  *
- * No settings button, no view all callback
+ * 無設定按鈕、無檢視全部回呼
  */
 export const Minimal: Story = {
   render: () => (
@@ -579,7 +578,7 @@ export const Minimal: Story = {
 };
 
 /**
- * Different sizes
+ * 不同尺寸
  */
 export const Sizes: Story = {
   render: () => (
@@ -619,7 +618,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors
+ * 不同顏色
  */
 export const Colors: Story = {
   render: () => (
@@ -711,9 +710,9 @@ export const Colors: Story = {
 };
 
 /**
- * Custom max display
+ * 自訂最多顯示數量
  *
- * Only shows the 2 most recent notifications in the menu
+ * 選單中僅顯示最近的 2 則通知
  */
 export const CustomMaxDisplay: Story = {
   render: () => (
@@ -732,9 +731,9 @@ export const CustomMaxDisplay: Story = {
 };
 
 /**
- * Many notifications
+ * 大量通知
  *
- * Tests scrolling behavior with many notifications
+ * 以大量通知測試捲動行為
  */
 export const ManyNotifications: Story = {
   render: () => {
@@ -771,9 +770,9 @@ export const ManyNotifications: Story = {
 };
 
 /**
- * Long content notifications
+ * 長內容通知
  *
- * Tests text overflow handling with very long titles and messages
+ * 以極長的標題與訊息測試文字溢出處理
  */
 export const LongContent: Story = {
   render: () => {
@@ -816,50 +815,44 @@ export const LongContent: Story = {
 };
 
 /**
- * Real Usage Example (For Documentation)
+ * 實際使用範例（供文件參考）
  *
- * **What this Story demonstrates**: Real usage of NotificationCenter
+ * **此 Story 展示的內容**：NotificationCenter 的實際使用
  *
- * **Difference from NotificationMenu**:
- * - NotificationCenter automatically fetches data from GraphQL (no need to pass notifications prop)
- * - Supports real-time subscriptions (autoSubscribe=true)
- * - Automatically handles loading and error states
- * - NotificationMenu requires external notifications data
+ * **與 NotificationMenu 的差異**：
+ * - NotificationCenter 自動從 GraphQL 取得資料（無需傳入 notifications prop）
+ * - 支援即時訂閱（autoSubscribe=true）
+ * - 自動處理載入中與錯誤狀態
+ * - NotificationMenu 需要外部傳入的 notifications 資料
  *
- * **Note**: This Story won't work properly in Storybook environment (no real GraphQL backend),
- * but it demonstrates how to use NotificationCenter in real applications.
+ * **注意**：此 Story 在 Storybook 環境中無法正常運作（沒有真正的 GraphQL 後端），
+ * 但它示範了如何在實際應用中使用 NotificationCenter。
  */
 export const RealUsageExample: Story = {
   render: () => (
     <Box sx={{ width: '100%', minWidth: 800 }}>
       <Alert severity="info" sx={{ mb: 2 }}>
         <Typography variant="subtitle2" gutterBottom>
-          <strong>Difference: NotificationCenter vs NotificationMenu:</strong>
+          <strong>差異：NotificationCenter vs NotificationMenu：</strong>
         </Typography>
         <Typography variant="body2" component="div" sx={{ mt: 1 }}>
-          <strong>1. NotificationCenter (shown below)</strong>:
+          <strong>1. NotificationCenter（如下所示）</strong>：
           <ul style={{ marginTop: 8, marginBottom: 8 }}>
+            <li>自動從 GraphQL 取得通知資料（使用 useNotifications hook）</li>
+            <li>支援即時訂閱（WebSocket），新通知會 自動推送</li>
+            <li>內建錯誤處理與載入中狀態</li>
             <li>
-              Automatically fetches notification data from GraphQL (uses
-              useNotifications hook)
-            </li>
-            <li>
-              Supports real-time subscriptions (WebSocket), new notifications
-              pushed automatically
-            </li>
-            <li>Built-in error handling and loading states</li>
-            <li>
-              Usage: <code>&lt;NotificationCenter /&gt;</code> (no need to pass
-              notifications)
+              用法：<code>&lt;NotificationCenter /&gt;</code>（無須傳入
+              notifications）
             </li>
           </ul>
-          <strong>2. NotificationMenu</strong>:
+          <strong>2. NotificationMenu</strong>：
           <ul style={{ marginTop: 8, marginBottom: 8 }}>
-            <li>Pure UI component, requires external notifications data</li>
-            <li>Does not handle data fetching or subscriptions</li>
-            <li>Can be reused anywhere (as long as data is provided)</li>
+            <li>純 UI 元件，需要外部傳入 notifications 資料</li>
+            <li>不處理資料取得或訂閱</li>
+            <li>可在任何地方重用（只要提供資料即可）</li>
             <li>
-              Usage:{' '}
+              用法：{' '}
               <code>
                 &lt;NotificationMenu notifications=&#123;data&#125; /&gt;
               </code>
@@ -867,15 +860,14 @@ export const RealUsageExample: Story = {
           </ul>
         </Typography>
         <Typography variant="body2" sx={{ mt: 1, color: 'warning.main' }}>
-          ⚠️ In Storybook environment, NotificationCenter will show empty state
-          due to lack of real backend. In real applications, it will
-          automatically load notification data.
+          ⚠️ 在 Storybook 環境中，由於缺少真正的後端，NotificationCenter
+          會顯示空狀態。在實際應用中，它會自動 載入通知資料。
         </Typography>
       </Alert>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Real NotificationCenter (will show empty state)
+            真實的 NotificationCenter（會顯示空狀態）
           </Typography>
           <NotificationCenter
             color="inherit"
@@ -891,7 +883,7 @@ export const RealUsageExample: Story = {
       <Box sx={{ p: 2, mt: 2 }}>
         <Alert severity="success">
           <Typography variant="body2">
-            <strong>Code example in real application:</strong>
+            <strong>實際應用中的程式碼範例：</strong>
           </Typography>
           <pre style={{ marginTop: 8, fontSize: '0.875rem' }}>
             {`// In real applications, simply use it like this:
@@ -920,13 +912,13 @@ function AppBar() {
 };
 
 /**
- * Side-by-Side Comparison
+ * 並列比較
  *
- * **Visual Difference Demonstration**: NotificationCenter vs NotificationMenu
+ * **視覺差異展示**：NotificationCenter 與 NotificationMenu
  *
- * This Story shows both components side by side to help understand their differences:
- * - Left: NotificationMenu (requires data to be passed)
- * - Right: NotificationCenter (automatically fetches data, but shows empty state in Storybook)
+ * 此 Story 並列顯示兩個元件，協助理解它們之間的差異：
+ * - 左側：NotificationMenu（需要傳入資料）
+ * - 右側：NotificationCenter（自動取得資料，但在 Storybook 中顯示空狀態）
  */
 export const Comparison: Story = {
   render: () => {
@@ -1074,21 +1066,18 @@ export const Comparison: Story = {
 
         <Alert severity="warning" sx={{ mt: 3 }}>
           <Typography variant="body2">
-            <strong>Why is the right side empty?</strong>
+            <strong>為什麼右側是空的？</strong>
             <br />
-            NotificationCenter in real applications will use the
-            useNotifications hook to automatically fetch data from GraphQL. But
-            in the Storybook environment, it shows an empty state due to the
-            lack of connection to a real backend server.
+            在實際應用中，NotificationCenter 會使用 useNotifications hook 自動從
+            GraphQL 取得資料。但在 Storybook 環境中，由於沒有
+            連線至真正的後端伺服器，它會顯示空狀態。
             <br />
             <br />
-            <strong>In real applications:</strong>
+            <strong>在實際應用中：</strong>
             <br />
-            NotificationCenter will automatically load notifications, subscribe
-            to new notification pushes, and handle errors and loading states.
-            This is the key difference from NotificationMenu - it is a complete
-            data integration solution, while NotificationMenu is just a UI
-            component.
+            NotificationCenter 會自動載入通知、訂閱新通知推送，
+            並處理錯誤與載入中狀態。這正是它與 NotificationMenu 的
+            關鍵差異－它是完整的資料整合方案，而 NotificationMenu 只是 UI 元件。
           </Typography>
         </Alert>
       </Box>

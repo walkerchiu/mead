@@ -18,17 +18,17 @@ import {
 } from '@mui/icons-material';
 
 /**
- * FormField combines TextField with error handling.
+ * FormField 將 TextField 與錯誤處理結合在一起。
  *
- * ## Features
- * - Perfect integration with react-hook-form
- * - Automatic validation error display
- * - Support for Zod schema validation
- * - Retains all TextField functionality
+ * ## 功能特性
+ * - 與 react-hook-form 完美整合
+ * - 自動顯示驗證錯誤
+ * - 支援 Zod schema 驗證
+ * - 保留所有 TextField 功能
  *
- * ## Use Cases
- * - Any form field requiring validation
- * - Use with react-hook-form
+ * ## 使用情境
+ * - 任何需要驗證的表單欄位
+ * - 搭配 react-hook-form 使用
  */
 const meta = {
   title: 'Shared/Molecules/FormField',
@@ -38,7 +38,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Form field combining TextField and error handling with perfect react-hook-form integration.',
+          '結合 TextField 與錯誤處理的表單欄位，與 react-hook-form 完美整合。',
       },
     },
   },
@@ -60,8 +60,8 @@ type Story = StoryObj<typeof meta>;
 // ============================================
 
 /**
- * Basic usage
- * Normal state without errors
+ * 基本用法
+ * 無錯誤的正常狀態
  */
 export const Default: Story = {
   args: {
@@ -76,8 +76,8 @@ export const Default: Story = {
 // ============================================
 
 /**
- * With error message
- * Display validation errors
+ * 含錯誤訊息
+ * 顯示驗證錯誤
  */
 export const WithError: Story = {
   args: {
@@ -88,8 +88,8 @@ export const WithError: Story = {
 };
 
 /**
- * react-hook-form error object
- * Accepts FieldError object
+ * react-hook-form 的 error 物件
+ * 接受 FieldError 物件
  */
 export const WithFieldError: Story = {
   args: {
@@ -104,7 +104,7 @@ export const WithFieldError: Story = {
 };
 
 /**
- * Required field
+ * 必填欄位
  */
 export const Required: Story = {
   args: {
@@ -119,13 +119,13 @@ export const Required: Story = {
 // ============================================
 
 /**
- * Text Alignment
- * Demonstrates different alignment options
+ * 文字對齊
+ * 示範不同的對齊選項
  */
 export const TextAlignment: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Text Alignment</Typography>
+      <Typography variant="h6">文字對齊</Typography>
 
       <FormField
         label="Left aligned (default)"
@@ -179,8 +179,8 @@ export const TextAlignment: Story = {
 // ============================================
 
 /**
- * With start adornment
- * Display unit or label before the field (numbers auto-align right)
+ * 含前側裝飾
+ * 在欄位前顯示單位或標籤（數字自動靠右對齊）
  */
 export const WithStartAdornment: Story = {
   args: {
@@ -193,8 +193,8 @@ export const WithStartAdornment: Story = {
 };
 
 /**
- * With end adornment
- * Display unit after the field
+ * 含後側裝飾
+ * 在欄位後顯示單位
  */
 export const WithEndAdornment: Story = {
   args: {
@@ -207,8 +207,8 @@ export const WithEndAdornment: Story = {
 };
 
 /**
- * With both adornments
- * Display currency symbol and unit
+ * 含前後兩側裝飾
+ * 顯示貨幣符號與單位
  */
 export const WithBothAdornments: Story = {
   args: {
@@ -222,13 +222,13 @@ export const WithBothAdornments: Story = {
 };
 
 /**
- * Various Unit Examples
- * Demonstrates different unit labels
+ * 各種單位範例
+ * 示範不同的單位標籤
  */
 export const UnitsExamples: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Various Unit Examples</Typography>
+      <Typography variant="h6">各式單位範例</Typography>
 
       <FormField
         label="Price"
@@ -280,8 +280,8 @@ export const UnitsExamples: Story = {
 // ============================================
 
 /**
- * With icon start
- * Using MUI icon as prefix
+ * 含前側圖示
+ * 使用 MUI 圖示作為前綴
  */
 export const WithIconStart: Story = {
   args: {
@@ -292,8 +292,8 @@ export const WithIconStart: Story = {
 };
 
 /**
- * With icon end
- * Using MUI icon as suffix
+ * 含後側圖示
+ * 使用 MUI 圖示作為後綴
  */
 export const WithIconEnd: Story = {
   args: {
@@ -304,13 +304,13 @@ export const WithIconEnd: Story = {
 };
 
 /**
- * Various Icon Examples
- * Demonstrates different icon decorations
+ * 各種圖示範例
+ * 示範不同的圖示裝飾
  */
 export const IconExamples: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Various Icon Examples</Typography>
+      <Typography variant="h6">各式圖示範例</Typography>
 
       <FormField
         label="Search"
@@ -351,8 +351,8 @@ export const IconExamples: Story = {
 // ============================================
 
 /**
- * Number Formatting - Basic Thousands
- * Auto-add thousands separator
+ * 數字格式化 - 基本千分位
+ * 自動加入千分位分隔符號
  */
 export const NumberFormatting: Story = {
   args: {
@@ -365,13 +365,13 @@ export const NumberFormatting: Story = {
 };
 
 /**
- * Number Formatting - Comparison
- * Comparison between formatted and unformatted
+ * 數字格式化 - 比較
+ * 格式化與未格式化的比較
  */
 export const NumberFormattingComparison: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Formatting Comparison</Typography>
+      <Typography variant="h6">格式化比較</Typography>
 
       <FormField
         label="Unformatted"
@@ -398,13 +398,13 @@ export const NumberFormattingComparison: Story = {
 };
 
 /**
- * Number Formatting - Different Locales
- * Demonstrates formatting rules for different locales
+ * 數字格式化 - 不同語系
+ * 示範不同語系的格式化規則
  */
 export const NumberFormattingLocales: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Formatting for Different Locales</Typography>
+      <Typography variant="h6">不同地區的格式化</Typography>
 
       <FormField
         label="US Format (en-US)"
@@ -442,13 +442,13 @@ export const NumberFormattingLocales: Story = {
 };
 
 /**
- * Number Formatting - Decimal Places Control
- * Control the number of decimal places displayed
+ * 數字格式化 - 小數位數控制
+ * 控制顯示的小數位數
  */
 export const NumberFormattingDecimalPlaces: Story = {
   render: () => (
     <Stack spacing={2}>
-      <Typography variant="h6">Decimal Places Control</Typography>
+      <Typography variant="h6">小數位數控制</Typography>
 
       <FormField
         label="No decimal limit"
@@ -488,8 +488,8 @@ export const NumberFormattingDecimalPlaces: Story = {
 };
 
 /**
- * Number Formatting - Interactive Demo
- * Real-time formatting effect display
+ * 數字格式化 - 互動示範
+ * 即時格式化效果顯示
  */
 export const NumberFormattingInteractive: Story = {
   render: function NumberFormattingInteractiveComponent() {
@@ -512,7 +512,7 @@ export const NumberFormattingInteractive: Story = {
 
     return (
       <Stack spacing={2}>
-        <Typography variant="h6">Interactive Formatting Demo</Typography>
+        <Typography variant="h6">互動格式化示範</Typography>
 
         <Controller
           name="amount"
@@ -531,13 +531,13 @@ export const NumberFormattingInteractive: Story = {
 
         <Alert severity="info">
           <Typography variant="body2">
-            <strong>Current Input Value:</strong>
+            <strong>目前輸入值：</strong>
             {amount}
             <br />
-            <strong>Numeric Value:</strong>
+            <strong>數值：</strong>
             {numericValue}
             <br />
-            <strong>Formatted Display:</strong>
+            <strong>格式化顯示：</strong>
             {numericValue.toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -547,12 +547,12 @@ export const NumberFormattingInteractive: Story = {
 
         <Alert severity="warning">
           <Typography variant="body2">
-            <strong>Usage Tips:</strong>
+            <strong>使用提示：</strong>
             <br />
-            • When focused, displays raw numeric value for easier editing
+            • 聚焦時會顯示原始數值，以便編輯
             <br />
-            • When blurred, automatically formats the display
-            <br />• Form submission receives raw numeric value (without commas)
+            • 失焦時會自動格式化顯示
+            <br />• 表單送出時會取得原始數值（不含千分位逗號）
           </Typography>
         </Alert>
       </Stack>
@@ -565,8 +565,8 @@ export const NumberFormattingInteractive: Story = {
 // ============================================
 
 /**
- * Complete form example
- * Using react-hook-form + Zod validation
+ * 完整表單範例
+ * 使用 react-hook-form + Zod 驗證
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
@@ -642,8 +642,8 @@ export const FormExample: Story = {
 };
 
 /**
- * Login form example
- * Simple Email + Password form
+ * 登入表單範例
+ * 簡單的 email + 密碼表單
  */
 export const LoginForm: Story = {
   render: function LoginFormComponent() {
@@ -704,8 +704,8 @@ export const LoginForm: Story = {
 };
 
 /**
- * Login Form with Icons
- * Practical application with icon decoration
+ * 含圖示的登入表單
+ * 含圖示裝飾的實際應用
  */
 export const LoginWithIcons: Story = {
   render: function LoginWithIconsComponent() {
@@ -768,8 +768,8 @@ export const LoginWithIcons: Story = {
 };
 
 /**
- * Realtime validation
- * Using mode: 'onChange' for realtime validation
+ * 即時驗證
+ * 使用 mode: 'onChange' 進行即時驗證
  */
 export const RealtimeValidation: Story = {
   render: function RealtimeValidationComponent() {
@@ -817,8 +817,8 @@ export const RealtimeValidation: Story = {
 };
 
 /**
- * Currency Input Example
- * Actual amount input application
+ * 貨幣輸入範例
+ * 實際金額輸入應用
  */
 export const CurrencyInput: Story = {
   render: function CurrencyInputComponent() {
@@ -949,8 +949,8 @@ export const CurrencyInput: Story = {
 };
 
 /**
- * Product Specification Form
- * Actual product information input application
+ * 產品規格表單
+ * 實際產品資訊輸入應用
  */
 export const ProductSpecForm: Story = {
   render: function ProductSpecFormComponent() {
@@ -1148,8 +1148,8 @@ export const ProductSpecForm: Story = {
 };
 
 /**
- * Number Formatting - Real World Example
- * Complete form with formatting
+ * 數字格式化 - 實際應用範例
+ * 含格式化的完整表單
  */
 export const NumberFormattingRealWorld: Story = {
   render: function NumberFormattingRealWorldComponent() {
@@ -1279,9 +1279,9 @@ export const NumberFormattingRealWorld: Story = {
 };
 
 /**
- * Department Form Example
- * Real-world example from department management
- * Demonstrates proper usage of multiline textarea with external label
+ * 部門表單範例
+ * 來自部門管理的實際範例
+ * 示範搭配外部標籤的多行 textarea 正確用法
  */
 export const DepartmentForm: Story = {
   render: function DepartmentFormComponent() {
@@ -1385,10 +1385,9 @@ export const DepartmentForm: Story = {
 
           <Alert severity="info">
             <Typography variant="body2">
-              <strong>Note:</strong> The description field uses an external
-              FormLabel (with component="div") instead of the built-in label
-              prop. This is the recommended approach for multiline textarea to
-              avoid positioning issues.
+              <strong>備註：</strong>description 欄位使用外部的 FormLabel（搭配
+              component="div"），而非內建的 label prop。對於多行
+              textarea，這是建議做法，可避免 定位問題。
             </Typography>
           </Alert>
 

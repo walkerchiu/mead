@@ -7,21 +7,21 @@ import Typography from '@mui/material/Typography';
 import Chip from '@mui/material/Chip';
 
 /**
- * DataTable is a fully-featured data table component.
+ * DataTable 是功能完整的資料表格元件。
  *
- * ## Features
- * - Supports sorting (customizable sorting logic)
- * - Supports filtering (customizable filtering logic)
- * - Supports row highlighting
- * - Supports expand/collapse
- * - Supports multi-select
- * - Supports pagination
- * - Full TypeScript type support
+ * ## 功能特性
+ * - 支援排序（可自訂排序邏輯）
+ * - 支援篩選（可自訂篩選邏輯）
+ * - 支援列高亮
+ * - 支援展開／收合
+ * - 支援多選
+ * - 支援分頁
+ * - 完整的 TypeScript 型別支援
  *
- * ## Use Cases
- * - Data list display
- * - HQ backend tables
- * - Complex data query interfaces
+ * ## 使用情境
+ * - 資料列表顯示
+ * - HQ 後台表格
+ * - 複雜的資料查詢介面
  */
 const meta = {
   title: 'Shared/Molecules/DataTable',
@@ -30,8 +30,7 @@ const meta = {
     layout: 'padded',
     docs: {
       description: {
-        component:
-          'Fully-featured data table component with sorting, filtering, highlighting, expand, and other features.',
+        component: '功能完整的資料表格元件，具備排序、篩選、高亮、展開等功能。',
       },
     },
   },
@@ -115,8 +114,8 @@ const basicColumns: DataTableColumn<User>[] = [
 ];
 
 /**
- * Basic table
- * Simplest data table display
+ * 基本表格
+ * 最簡單的資料表格顯示
  */
 export const Basic: Story = {
   args: {
@@ -127,7 +126,7 @@ export const Basic: Story = {
 
 /**
  * loadingStatus
- * Display loading indicator
+ * 顯示載入指示器
  */
 export const Loading: Story = {
   args: {
@@ -138,8 +137,8 @@ export const Loading: Story = {
 };
 
 /**
- * empty dataStatus
- * Display when no data
+ * 空的 dataStatus
+ * 無資料時顯示
  */
 export const Empty: Story = {
   args: {
@@ -150,8 +149,8 @@ export const Empty: Story = {
 };
 
 /**
- * Sortable table
- * Click column header to sort
+ * 可排序的表格
+ * 點擊欄位標題即可排序
  */
 export const Sortable: Story = {
   args: {
@@ -167,8 +166,8 @@ export const Sortable: Story = {
 };
 
 /**
- * Filterable table
- * Each column has a filter input
+ * 可篩選的表格
+ * 每個欄位都有篩選輸入
  */
 export const Filterable: Story = {
   args: {
@@ -189,8 +188,8 @@ export const Filterable: Story = {
 };
 
 /**
- * Selectable table
- * Supports multi-select rows
+ * 可選取的表格
+ * 支援多選列
  */
 export const Selectable: Story = {
   render: function SelectableTable() {
@@ -220,8 +219,8 @@ export const Selectable: Story = {
 };
 
 /**
- * Expandable table
- * Click expand button to show details
+ * 可展開的表格
+ * 點擊展開按鈕即可顯示詳情
  */
 export const Expandable: Story = {
   args: {
@@ -274,8 +273,8 @@ export const Expandable: Story = {
 };
 
 /**
- * Paginated table
- * Display pagination controls
+ * 分頁表格
+ * 顯示分頁控制項
  */
 export const WithPagination: Story = {
   render: function PaginatedTable() {
@@ -300,8 +299,8 @@ export const WithPagination: Story = {
 };
 
 /**
- * Custom rendering
- * Use render function to customize column display
+ * 自訂渲染
+ * 使用 render 函式自訂欄位顯示
  */
 export const CustomRender: Story = {
   args: {
@@ -343,8 +342,8 @@ export const CustomRender: Story = {
 };
 
 /**
- * Highlight rows
- * Highlight specific rows based on conditions
+ * 高亮列
+ * 依條件高亮特定列
  */
 export const HighlightRows: Story = {
   args: {
@@ -382,8 +381,8 @@ export const HighlightRows: Story = {
 };
 
 /**
- * Fixed header
- * Header fixed at top when scrolling
+ * 固定頁首
+ * 捲動時頁首固定於頂端
  */
 export const StickyHeader: Story = {
   args: {
@@ -400,8 +399,8 @@ export const StickyHeader: Story = {
 };
 
 /**
- * Expand icon style - downward
- * Change expand icon to downward/upward style
+ * 展開圖示樣式 - 向下
+ * 將展開圖示改為向下／向上樣式
  */
 export const ExpandIconDown: Story = {
   args: {
@@ -423,8 +422,8 @@ export const ExpandIconDown: Story = {
 };
 
 /**
- * WithNewRowAnimation - Demonstrates animated highlighting for newly inserted rows
- * Simulates real-time data updates (like WebSocket subscriptions)
+ * WithNewRowAnimation - 展示新插入列的高亮動畫
+ * 模擬即時資料更新（例如 WebSocket 訂閱）
  */
 export const WithNewRowAnimation: Story = {
   render: () => {

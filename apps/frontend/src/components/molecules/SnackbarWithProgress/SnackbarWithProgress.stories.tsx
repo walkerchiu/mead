@@ -4,14 +4,14 @@ import { SnackbarWithProgress } from './SnackbarWithProgress';
 import { Button, Box, Stack, Typography, Paper } from '@mui/material';
 
 /**
- * SnackbarWithProgress provides visual feedback with a countdown progress bar.
+ * SnackbarWithProgress 以倒數進度條提供視覺回饋。
  *
- * Features:
- * - Visual countdown with linear progress bar
- * - Manual close button
- * - Auto-dismiss after duration
- * - Supports all Material-UI Alert severities
- * - Smooth animations
+ * 功能特性：
+ * - 以線性進度條呈現視覺倒數
+ * - 手動關閉按鈕
+ * - 經過指定時間後自動關閉
+ * - 支援所有 Material-UI Alert 嚴重程度
+ * - 流暢的動畫
  */
 const meta = {
   title: 'Shared/Molecules/SnackbarWithProgress',
@@ -21,7 +21,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A custom snackbar component with countdown progress bar. Shows remaining time visually and allows manual dismissal.',
+          '附帶倒數進度條的自訂 snackbar 元件，以視覺方式顯示剩餘時間並允許手動關閉。',
       },
     },
   },
@@ -53,7 +53,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Demo component to trigger snackbars
+ * 用於觸發 snackbar 的示範元件
  */
 function SnackbarDemo({
   variant,
@@ -81,7 +81,7 @@ function SnackbarDemo({
 }
 
 /**
- * Success notification with progress bar
+ * 含進度條的成功通知
  */
 export const Success: Story = {
   render: () => (
@@ -93,7 +93,7 @@ export const Success: Story = {
 };
 
 /**
- * Error notification with progress bar
+ * 含進度條的錯誤通知
  */
 export const Error: Story = {
   render: () => (
@@ -105,7 +105,7 @@ export const Error: Story = {
 };
 
 /**
- * Warning notification with progress bar
+ * 含進度條的警告通知
  */
 export const Warning: Story = {
   render: () => (
@@ -117,7 +117,7 @@ export const Warning: Story = {
 };
 
 /**
- * Info notification with progress bar
+ * 含進度條的資訊通知
  */
 export const Info: Story = {
   render: () => (
@@ -129,7 +129,7 @@ export const Info: Story = {
 };
 
 /**
- * Short duration (3 seconds)
+ * 短持續時間（3 秒）
  */
 export const ShortDuration: Story = {
   render: () => (
@@ -142,7 +142,7 @@ export const ShortDuration: Story = {
 };
 
 /**
- * Long duration (10 seconds)
+ * 長持續時間（10 秒）
  */
 export const LongDuration: Story = {
   render: () => (
@@ -155,7 +155,7 @@ export const LongDuration: Story = {
 };
 
 /**
- * Multiple notifications
+ * 多則通知
  */
 export const Multiple: Story = {
   render: () => {
@@ -180,7 +180,7 @@ export const Multiple: Story = {
 };
 
 /**
- * All variants comparison
+ * 所有變體比較
  */
 export const AllVariants: Story = {
   render: () => {
@@ -208,7 +208,7 @@ export const AllVariants: Story = {
 };
 
 /**
- * Real-world login example
+ * 實際的登入範例
  */
 export const LoginExample: Story = {
   render: () => {
@@ -238,7 +238,7 @@ export const LoginExample: Story = {
 };
 
 /**
- * Interactive playground
+ * 互動沙盒
  */
 export const Interactive: Story = {
   render: () => {
@@ -301,7 +301,7 @@ export const Interactive: Story = {
 };
 
 /**
- * Features demonstration
+ * 功能展示
  */
 export const Features: Story = {
   render: () => {

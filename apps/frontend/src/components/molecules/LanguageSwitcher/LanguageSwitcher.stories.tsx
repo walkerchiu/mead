@@ -3,14 +3,14 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { AppBar, Toolbar, Typography, Box, Paper } from '@mui/material';
 
 /**
- * LanguageSwitcher allows users to change the application language.
+ * LanguageSwitcher 讓使用者切換應用程式語言。
  *
- * Features:
- * - Displays current language with flag
- * - Dropdown menu with all available languages
- * - Seamless language switching without page reload
- * - Supports multiple display modes (icon-only or with label)
- * - Accessible with ARIA labels
+ * 功能特性：
+ * - 以國旗顯示目前語言
+ * - 下拉選單列出所有可用語言
+ * - 無需重新整理頁面即可順暢切換語言
+ * - 支援多種顯示模式（純圖示或含標籤）
+ * - 具備 ARIA 標籤，符合無障礙需求
  */
 const meta = {
   title: 'Shared/Molecules/LanguageSwitcher',
@@ -20,7 +20,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A language switcher component that allows users to change the application language. Built with Material-UI and next-intl.',
+          '語言切換元件，讓使用者切換應用程式語言。以 Material-UI 與 next-intl 建構。',
       },
     },
   },
@@ -28,7 +28,7 @@ const meta = {
   argTypes: {
     showLabel: {
       control: 'boolean',
-      description: 'Show language name next to icon',
+      description: '在圖示旁顯示語言名稱',
       table: {
         defaultValue: { summary: 'false' },
       },
@@ -36,7 +36,7 @@ const meta = {
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Size of the icon button',
+      description: '圖示按鈕的尺寸',
       table: {
         defaultValue: { summary: 'medium' },
       },
@@ -44,7 +44,7 @@ const meta = {
     color: {
       control: 'select',
       options: ['inherit', 'primary', 'secondary', 'default'],
-      description: 'Color of the button',
+      description: '按鈕的顏色',
       table: {
         defaultValue: { summary: 'inherit' },
       },
@@ -56,14 +56,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default icon-only display
+ * 預設純圖示顯示
  */
 export const Default: Story = {
   args: {},
 };
 
 /**
- * Small size button
+ * 小尺寸按鈕
  */
 export const Small: Story = {
   args: {
@@ -73,7 +73,7 @@ export const Small: Story = {
 };
 
 /**
- * Large size button
+ * 大尺寸按鈕
  */
 export const Large: Story = {
   args: {
@@ -83,7 +83,7 @@ export const Large: Story = {
 };
 
 /**
- * Icon-only with primary color
+ * 純圖示，主要色
  */
 export const Primary: Story = {
   args: {
@@ -92,7 +92,7 @@ export const Primary: Story = {
 };
 
 /**
- * Icon-only with secondary color
+ * 純圖示，次要色
  */
 export const Secondary: Story = {
   args: {
@@ -101,7 +101,7 @@ export const Secondary: Story = {
 };
 
 /**
- * With language label displayed
+ * 顯示語言標籤
  */
 export const WithLabel: Story = {
   args: {
@@ -111,7 +111,7 @@ export const WithLabel: Story = {
 };
 
 /**
- * Different sizes comparison
+ * 不同尺寸比較
  */
 export const SizeComparison: Story = {
   render: () => (
@@ -139,7 +139,7 @@ export const SizeComparison: Story = {
 };
 
 /**
- * Color variants comparison
+ * 顏色變體比較
  */
 export const ColorVariants: Story = {
   render: () => (
@@ -182,7 +182,7 @@ export const ColorVariants: Story = {
 };
 
 /**
- * In AppBar (typical use case)
+ * 置於 AppBar 中（典型使用情境）
  */
 export const InAppBar: Story = {
   args: {
@@ -205,7 +205,7 @@ export const InAppBar: Story = {
 };
 
 /**
- * In AppBar with label
+ * 置於 AppBar 中並含標籤
  */
 export const InAppBarWithLabel: Story = {
   args: {
@@ -229,7 +229,7 @@ export const InAppBarWithLabel: Story = {
 };
 
 /**
- * In settings panel
+ * 置於設定面板中
  */
 export const InSettingsPanel: Story = {
   args: {
@@ -257,7 +257,7 @@ export const InSettingsPanel: Story = {
 };
 
 /**
- * Interactive example with instructions
+ * 含操作說明的互動範例
  */
 export const Interactive: Story = {
   args: {
@@ -285,7 +285,7 @@ export const Interactive: Story = {
 };
 
 /**
- * Real-world example in a dashboard header
+ * 儀表板標題列中的實際應用範例
  */
 export const DashboardHeader: Story = {
   render: () => (

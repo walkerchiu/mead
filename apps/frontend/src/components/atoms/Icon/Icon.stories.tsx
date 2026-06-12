@@ -13,7 +13,7 @@ const meta = {
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Icon size',
+      description: '圖示尺寸',
     },
     color: {
       control: 'select',
@@ -27,7 +27,7 @@ const meta = {
         'success',
         'disabled',
       ],
-      description: 'Icon color',
+      description: '圖示顏色',
     },
   },
 } satisfies Meta<typeof Icon>;

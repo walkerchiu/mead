@@ -20,17 +20,17 @@ const meta = {
     variant: {
       control: 'select',
       options: ['default', 'standard', 'outline'],
-      description: 'Action button variant',
+      description: '操作按鈕變體',
     },
     shape: {
       control: 'select',
       options: ['circle', 'pill'],
-      description: 'Outline shape',
+      description: '外框形狀',
     },
     size: {
       control: 'select',
       options: ['sm', 'lg'],
-      description: 'Size (sm=32, lg=40) for pill shape only',
+      description: '尺寸（sm=32、lg=40），僅適用於 pill 形狀',
     },
     children: {
       control: false,
@@ -38,7 +38,7 @@ const meta = {
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether to disable',
+      description: '是否停用',
     },
   },
 } satisfies Meta<typeof ActionButton>;

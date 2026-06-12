@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Displays help and documentation content including a quick-start guide, expandable FAQ accordion, common feature descriptions, and contact information. Designed to be used inside a Modal or as standalone scrollable content. Responds to the active locale.',
+          '顯示說明與文件內容，包含快速入門指南、可展開的 FAQ 摺疊面板、常見功能說明與聯絡資訊。設計用於 Modal 內或作為獨立的可捲動內容，並會依目前語系調整。',
       },
     },
   },

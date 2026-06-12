@@ -8,7 +8,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'session-cleanup',
     displayName: 'Session Cleanup',
-    description: 'Removes expired sessions from the database',
+    description: '從資料庫移除過期的 session',
     jobType: 'cleanup',
     category: 'maintenance',
     cronExpression: '0 2 * * *',
@@ -31,7 +31,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'audit-log-archive',
     displayName: 'Audit Log Archive',
-    description: 'Archives old audit logs to cold storage',
+    description: '將舊的稽核日誌封存至冷儲存',
     jobType: 'archive',
     category: 'maintenance',
     cronExpression: '0 3 * * 0',
@@ -56,7 +56,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'notification-sender',
     displayName: 'Notification Sender',
-    description: 'Sends pending email notifications',
+    description: '寄送待發送的 email 通知',
     jobType: 'notification',
     category: 'communication',
     cronExpression: '*/5 * * * *',
@@ -86,7 +86,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Filter panel for the cron job list, supporting category and job type filters with active filter chips.',
+          'cron job 列表的篩選面板，支援分類與任務類型篩選，並含啟用中篩選標籤。',
       },
     },
   },
@@ -97,7 +97,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state — expanded with no active filters.
+ * 預設狀態 — 展開且無啟用中的篩選。
  */
 export const Default: Story = {
   args: {
@@ -110,7 +110,7 @@ export const Default: Story = {
 };
 
 /**
- * Collapsed state — filter panel collapsed by default.
+ * 收合狀態 — 篩選面板預設為收合。
  */
 export const Collapsed: Story = {
   args: {
@@ -123,7 +123,7 @@ export const Collapsed: Story = {
 };
 
 /**
- * With category filter — showing only maintenance jobs.
+ * 含分類篩選 — 僅顯示維護類任務。
  */
 export const WithCategoryFilter: Story = {
   args: {
@@ -136,7 +136,7 @@ export const WithCategoryFilter: Story = {
 };
 
 /**
- * With job type filter — showing only cleanup jobs.
+ * 含任務類型篩選 — 僅顯示清理類任務。
  */
 export const WithTypeFilter: Story = {
   args: {
@@ -149,7 +149,7 @@ export const WithTypeFilter: Story = {
 };
 
 /**
- * Interactive — fully interactive filter demonstration with live state.
+ * 互動 — 含即時狀態、完全可互動的篩選展示。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

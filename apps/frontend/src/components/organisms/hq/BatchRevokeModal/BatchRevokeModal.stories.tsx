@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog for batch-revoking multiple sessions at once, supporting criteria-based and user-list-based revocation.',
+          '用於一次批次撤銷多個 session 的 modal 對話框，支援依條件與依使用者清單撤銷。',
       },
     },
   },
@@ -31,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open batch revoke modal.
+ * 預設 — 開啟批次撤銷 modal。
  */
 export const Default: Story = {
   args: {
@@ -42,7 +42,7 @@ export const Default: Story = {
 };
 
 /**
- * Interactive — open the modal with a button and handle success callback.
+ * 互動 — 以按鈕開啟 modal 並處理成功回呼。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

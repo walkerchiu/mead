@@ -4,23 +4,23 @@ import { DashboardSkeleton } from './DashboardSkeleton';
 import Box from '@mui/material/Box';
 
 /**
- * DashboardSkeleton is the loading skeleton component for Dashboard pages.
+ * DashboardSkeleton 是儀表板頁面的載入骨架元件。
  *
- * ## When to Use
- * - When Dashboard page is loading
- * - During authentication check for protected pages
- * - During data fetching
+ * ## 何時使用
+ * - 當儀表板頁面載入時
+ * - 在受保護頁面進行身分驗證檢查期間
+ * - 在取得資料期間
  *
- * ## Features
- * - Simulates AppBar and content area
- * - Includes title, description, button skeletons
- * - Semi-transparent background
- * - Material UI Skeleton animation
+ * ## 功能特性
+ * - 模擬 AppBar 與內容區
+ * - 包含標題、說明、按鈕骨架
+ * - 半透明背景
+ * - Material UI Skeleton 動畫
  *
- * ## Best Practices
- * - Use in ProtectedRoute component
- * - Display before data loads
- * - Improve page loading experience
+ * ## 最佳實踐
+ * - 在 ProtectedRoute 元件中使用
+ * - 在資料載入前顯示
+ * - 改善頁面載入體驗
  */
 const meta = {
   title: 'Shared/Atoms/Skeleton/DashboardSkeleton',
@@ -30,7 +30,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dashboard page loading skeleton that simulates complete Dashboard structure, providing visual feedback during loading.',
+          '儀表板頁面載入骨架，模擬完整的 Dashboard 結構，於載入期間提供視覺回饋。',
       },
     },
   },
@@ -41,14 +41,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default display
- * Standard Dashboard skeleton
+ * 預設顯示
+ * 標準的儀表板骨架
  */
 export const Default: Story = {};
 
 /**
- * Dark background
- * Display effect on dark background
+ * 深色背景
+ * 在深色背景上的顯示效果
  */
 export const DarkBackground: Story = {
   decorators: [
@@ -61,8 +61,8 @@ export const DarkBackground: Story = {
 };
 
 /**
- * Light background
- * Display effect on light background
+ * 淺色背景
+ * 在淺色背景上的顯示效果
  */
 export const LightBackground: Story = {
   decorators: [
@@ -75,8 +75,8 @@ export const LightBackground: Story = {
 };
 
 /**
- * Full page example
- * Simulate actual loading scenario
+ * 整頁範例
+ * 模擬實際的載入情境
  */
 export const FullPageExample: Story = {
   render: () => (
@@ -87,8 +87,8 @@ export const FullPageExample: Story = {
 };
 
 /**
- * Multiple skeletons
- * Show multiple continuous skeletons (simulate multiple reloads)
+ * 多個骨架
+ * 顯示多個連續骨架（模擬多次重新載入）
  */
 export const Multiple: Story = {
   render: () => (
@@ -101,8 +101,8 @@ export const Multiple: Story = {
 };
 
 /**
- * Comparison with actual content
- * Show correspondence between skeleton and actual content
+ * 與實際內容的比較
+ * 顯示骨架與實際內容之間的對應關係
  */
 export const ComparisonWithActual: Story = {
   render: () => (
@@ -151,15 +151,14 @@ export const ComparisonWithActual: Story = {
                   cursor: 'pointer',
                 }}
               >
-                Logout
+                登出
               </button>
             </div>
           </Box>
           <Box sx={{ p: 4 }}>
-            <h1 style={{ marginTop: 0 }}>Welcome to Dashboard</h1>
+            <h1 style={{ marginTop: 0 }}>歡迎使用 Dashboard</h1>
             <p style={{ color: '#666' }}>
-              This is your personal dashboard. Manage your settings and view
-              your data here.
+              這是你的個人 dashboard。可在此管理你的設定並 檢視你的資料。
             </p>
             <div style={{ display: 'flex', gap: 16, marginTop: 32 }}>
               <button
@@ -172,7 +171,7 @@ export const ComparisonWithActual: Story = {
                   cursor: 'pointer',
                 }}
               >
-                Security Settings
+                安全設定
               </button>
               <button
                 style={{
@@ -184,7 +183,7 @@ export const ComparisonWithActual: Story = {
                   cursor: 'pointer',
                 }}
               >
-                Back to Home
+                返回首頁
               </button>
             </div>
           </Box>
@@ -198,8 +197,8 @@ export const ComparisonWithActual: Story = {
 };
 
 /**
- * Loading sequence animation
- * Simulate transition from skeleton to actual content
+ * 載入序列動畫
+ * 模擬從骨架過渡到實際內容
  */
 export const LoadingSequence: Story = {
   render: function LoadingSequenceExample() {
@@ -246,7 +245,7 @@ export const LoadingSequence: Story = {
                 cursor: 'pointer',
               }}
             >
-              Reload
+              重新載入
             </button>
           </div>
         </Box>
@@ -259,10 +258,9 @@ export const LoadingSequence: Story = {
               boxShadow: '0 1px 3px rgba(0,0,0,0.12)',
             }}
           >
-            <h1 style={{ marginTop: 0 }}>Welcome to Dashboard</h1>
+            <h1 style={{ marginTop: 0 }}>歡迎使用 Dashboard</h1>
             <p style={{ color: '#666' }}>
-              Content loaded successfully! Click "Reload" to see the skeleton
-              again.
+              內容已成功載入！點選「重新載入」即可再次檢視 骨架畫面。
             </p>
             <div style={{ display: 'flex', gap: 16, marginTop: 32 }}>
               <button
@@ -275,7 +273,7 @@ export const LoadingSequence: Story = {
                   cursor: 'pointer',
                 }}
               >
-                Security Settings
+                安全設定
               </button>
               <button
                 style={{
@@ -287,7 +285,7 @@ export const LoadingSequence: Story = {
                   cursor: 'pointer',
                 }}
               >
-                Back to Home
+                返回首頁
               </button>
             </div>
           </Box>
@@ -298,8 +296,8 @@ export const LoadingSequence: Story = {
 };
 
 /**
- * Different viewport sizes
- * Show performance on different screen sizes
+ * 不同的視窗尺寸
+ * 展示在不同螢幕尺寸上的表現
  */
 export const DifferentViewportSizes: Story = {
   render: () => (

@@ -10,7 +10,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component: 'Reset password page where users can set a new password.',
+        component: '重設密碼頁面，使用者可在此設定新密碼。',
       },
     },
   },
@@ -21,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
+ * 預設狀態
  */
 export const Default: Story = {
   render: () => (
@@ -40,7 +40,7 @@ export const Default: Story = {
 };
 
 /**
- * With error
+ * 含錯誤
  */
 export const WithError: Story = {
   render: () => (
@@ -57,7 +57,7 @@ export const WithError: Story = {
 };
 
 /**
- * Success state
+ * 成功狀態
  */
 export const Success: Story = {
   render: () => (
@@ -71,7 +71,7 @@ export const Success: Story = {
 };
 
 /**
- * Invalid token
+ * 無效的 token
  */
 export const TokenInvalid: Story = {
   render: () => (
@@ -85,7 +85,7 @@ export const TokenInvalid: Story = {
 };
 
 /**
- * Full flow
+ * 完整流程
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {

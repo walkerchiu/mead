@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Skeleton placeholder for filter toolbars shown while content is loading. Supports an optional search bar and a configurable number of filter dropdowns.',
+          '內容載入時顯示於篩選工具列的骨架佔位元件。支援選用的搜尋列，以及可設定數量的篩選下拉選單。',
       },
     },
   },
@@ -17,14 +17,14 @@ const meta = {
   argTypes: {
     showSearch: {
       control: 'boolean',
-      description: 'Whether to show the search field skeleton',
+      description: '是否顯示搜尋欄位骨架',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     filterCount: {
       control: { type: 'number', min: 0, max: 8 },
-      description: 'Number of filter skeleton items to display',
+      description: '要顯示的篩選骨架項目數量',
       table: {
         defaultValue: { summary: '2' },
       },

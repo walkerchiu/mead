@@ -13,17 +13,17 @@ const meta = {
     orientation: {
       control: 'select',
       options: ['horizontal', 'vertical'],
-      description: 'Divider orientation',
+      description: '分隔線方向',
     },
     variant: {
       control: 'select',
       options: ['fullWidth', 'inset', 'middle'],
-      description: 'Divider variant',
+      description: '分隔線變體',
     },
     textAlign: {
       control: 'select',
       options: ['left', 'center', 'right'],
-      description: 'Text alignment',
+      description: '文字對齊',
     },
   },
 } satisfies Meta<typeof Divider>;

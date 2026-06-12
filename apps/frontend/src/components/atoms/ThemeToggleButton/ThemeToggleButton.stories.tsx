@@ -6,7 +6,7 @@ import { Box, Typography } from '@mui/material';
 /**
  * ThemeToggleButton - Atomic Design: Atom
  *
- * Single theme toggle button for selecting Light, Dark, or System theme.
+ * 單一主題切換按鈕，用於選擇 Light、Dark 或 System 主題。
  */
 const meta = {
   title: 'Shared/Atoms/ThemeToggleButton',
@@ -30,7 +30,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Light theme button (unselected)
+ * 淺色主題按鈕（未選取）
  */
 export const Light: Story = {
   args: {
@@ -42,7 +42,7 @@ export const Light: Story = {
 };
 
 /**
- * Dark theme button (unselected)
+ * 深色主題按鈕（未選取）
  */
 export const Dark: Story = {
   args: {
@@ -54,7 +54,7 @@ export const Dark: Story = {
 };
 
 /**
- * System theme button (unselected)
+ * 系統主題按鈕（未選取）
  */
 export const System: Story = {
   args: {
@@ -66,7 +66,7 @@ export const System: Story = {
 };
 
 /**
- * Light theme button (selected)
+ * 淺色主題按鈕（已選取）
  */
 export const LightSelected: Story = {
   args: {
@@ -78,7 +78,7 @@ export const LightSelected: Story = {
 };
 
 /**
- * Dark theme button (selected)
+ * 深色主題按鈕（已選取）
  */
 export const DarkSelected: Story = {
   args: {
@@ -90,7 +90,7 @@ export const DarkSelected: Story = {
 };
 
 /**
- * System theme button (selected)
+ * 系統主題按鈕（已選取）
  */
 export const SystemSelected: Story = {
   args: {
@@ -102,7 +102,7 @@ export const SystemSelected: Story = {
 };
 
 /**
- * Interactive example - Complete theme toggle group
+ * 互動範例 - 完整的主題切換群組
  */
 export const InteractiveGroup: Story = {
   render: () => {
@@ -139,7 +139,7 @@ export const InteractiveGroup: Story = {
 };
 
 /**
- * All three buttons displayed side by side (unselected state)
+ * 三個按鈕並列顯示（未選取狀態）
  */
 export const AllUnselected: Story = {
   render: () => (
@@ -167,7 +167,7 @@ export const AllUnselected: Story = {
 };
 
 /**
- * Light theme selected state
+ * 淺色主題已選取狀態
  */
 export const LightThemeSelected: Story = {
   render: () => (
@@ -195,7 +195,7 @@ export const LightThemeSelected: Story = {
 };
 
 /**
- * Dark theme selected state
+ * 深色主題已選取狀態
  */
 export const DarkThemeSelected: Story = {
   render: () => (
@@ -223,7 +223,7 @@ export const DarkThemeSelected: Story = {
 };
 
 /**
- * System theme selected state
+ * 系統主題已選取狀態
  */
 export const SystemThemeSelected: Story = {
   render: () => (

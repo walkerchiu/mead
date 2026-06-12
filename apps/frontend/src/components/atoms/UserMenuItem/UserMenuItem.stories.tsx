@@ -13,7 +13,7 @@ import { Box } from '@mui/material';
 /**
  * UserMenuItem - Atomic Design: Atom
  *
- * Single user menu item that supports icon, label, click events, and danger styling.
+ * 單一使用者選單項目，支援圖示、標籤、點擊事件與 danger 樣式。
  */
 const meta = {
   title: 'Shared/Atoms/UserMenuItem',
@@ -48,7 +48,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style
+ * 預設樣式
  */
 export const Default: Story = {
   args: {
@@ -59,7 +59,7 @@ export const Default: Story = {
 };
 
 /**
- * Different icon examples
+ * 不同圖示範例
  */
 export const WithPersonIcon: Story = {
   args: {
@@ -94,7 +94,7 @@ export const WithHelpIcon: Story = {
 };
 
 /**
- * Danger variant - For logout or delete actions
+ * Danger 變體 - 用於登出或刪除操作
  */
 export const DangerVariant: Story = {
   args: {
@@ -106,7 +106,7 @@ export const DangerVariant: Story = {
 };
 
 /**
- * Without icon
+ * 不含圖示
  */
 export const WithoutIcon: Story = {
   args: {
@@ -116,7 +116,7 @@ export const WithoutIcon: Story = {
 };
 
 /**
- * Using href for navigation
+ * 使用 href 進行導覽
  */
 export const WithHref: Story = {
   args: {
@@ -127,7 +127,7 @@ export const WithHref: Story = {
 };
 
 /**
- * Multiple items combined display
+ * 多個項目組合顯示
  */
 export const MenuItemList: Story = {
   render: () => (

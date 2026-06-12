@@ -94,8 +94,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'HQ session management table with pagination, filtering, and revocation capabilities.',
+        component: 'HQ session 管理表格，具備分頁、篩選與撤銷功能。',
       },
     },
   },
@@ -113,7 +112,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state - Table with sessions data.
+ * 預設狀態 - 含 session 資料的表格。
  */
 export const Default: Story = {
   args: {
@@ -127,7 +126,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state.
+ * 載入中狀態。
  */
 export const Loading: Story = {
   args: {
@@ -140,7 +139,7 @@ export const Loading: Story = {
 };
 
 /**
- * Empty state - No sessions found.
+ * 空狀態 - 找不到 session。
  */
 export const Empty: Story = {
   args: {
@@ -161,7 +160,7 @@ export const Empty: Story = {
 };
 
 /**
- * Single session - Only one active session.
+ * 單一 session - 僅一個啟用中的 session。
  */
 export const SingleSession: Story = {
   args: {
@@ -182,7 +181,7 @@ export const SingleSession: Story = {
 };
 
 /**
- * Many sessions - Full table with pagination.
+ * 大量 session - 含分頁的完整表格。
  */
 export const ManySessions: Story = {
   args: {
@@ -209,7 +208,7 @@ export const ManySessions: Story = {
 };
 
 /**
- * With revoked sessions - Mix of active and revoked sessions.
+ * 含已撤銷 session - 啟用中與已撤銷 session 混合。
  */
 export const WithRevokedSessions: Story = {
   args: {
@@ -231,7 +230,7 @@ export const WithRevokedSessions: Story = {
 };
 
 /**
- * Last page - Final page of pagination.
+ * 最後一頁 - 分頁的最末頁。
  */
 export const LastPage: Story = {
   args: {
@@ -252,14 +251,14 @@ export const LastPage: Story = {
 };
 
 /**
- * Column Alignment Demo - Demonstrates the column alignment configuration.
+ * 欄位對齊示範 - 展示欄位對齊設定。
  *
- * This story showcases how columns are aligned in the session table:
- * - **Left-aligned**: User, Device, Revoked Method, Created At, Last Used At (text content and timestamps)
- * - **Center-aligned**: Status, IP Address, Location (badges and status indicators)
- * - **Right-aligned**: Actions (action buttons typically align right)
+ * 此 story 展示 session 表格中欄位的對齊方式：
+ * - **靠左對齊**：User、Device、Revoked Method、Created At、Last Used At（文字內容與時間戳）
+ * - **置中對齊**：Status、IP Address、Location（徽章與狀態指示器）
+ * - **靠右對齊**：Actions（操作按鈕通常靠右對齊）
  *
- * The alignment is configured in the component's column definitions via the `align` property.
+ * 對齊方式透過元件欄位定義中的 `align` 屬性設定。
  */
 export const ColumnAlignmentDemo: Story = {
   args: {
@@ -274,7 +273,7 @@ export const ColumnAlignmentDemo: Story = {
     docs: {
       description: {
         story:
-          'Demonstrates column alignment: Left (User, Device, Revoked Method, Timestamps), Center (Status, IP, Location), Right (Actions)',
+          '示範欄位對齊：靠左（User、Device、Revoked Method、Timestamps）、置中（Status、IP、Location）、靠右（Actions）',
       },
     },
   },

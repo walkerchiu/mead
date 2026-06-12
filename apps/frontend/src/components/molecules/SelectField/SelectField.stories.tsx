@@ -9,23 +9,23 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 /**
- * SelectField combines TextField Select with error handling.
+ * SelectField 將 TextField Select 與錯誤處理結合在一起。
  *
- * ## Features
- * - Supports single and multiple selection
- * - Perfectly integrated with react-hook-form
- * - Supports option grouping
- * - Supports options with icons (Icon/Emoji)
- * - Supports search filtering (using Autocomplete)
- * - Multiple selection can be displayed as Chips
- * - Automatically displays validation errors
+ * ## 功能特性
+ * - 支援單選與多選
+ * - 與 react-hook-form 完美整合
+ * - 支援選項分組
+ * - 支援含圖示的選項（Icon／Emoji）
+ * - 支援搜尋篩選（使用 Autocomplete）
+ * - 多選可顯示為 Chip
+ * - 自動顯示驗證錯誤
  *
- * ## Use Cases
- * - Dropdown menus
- * - Multiple selection menus
- * - Grouped option menus
- * - Searchable long list menus
- * - Option menus with icons
+ * ## 使用情境
+ * - 下拉選單
+ * - 多選選單
+ * - 分組選項選單
+ * - 可搜尋的長列表選單
+ * - 含圖示的選項選單
  */
 const meta = {
   title: 'Shared/Molecules/SelectField',
@@ -35,7 +35,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dropdown menu component combining TextField Select with error handling, perfectly integrated with react-hook-form.',
+          '結合 TextField Select 與錯誤處理的下拉選單元件，與 react-hook-form 完美整合。',
       },
     },
   },
@@ -85,8 +85,8 @@ const interestOptions = [
 ];
 
 /**
- * Basic single selection
- * Simplest dropdown menu
+ * 基本單選
+ * 最簡單的下拉選單
  */
 export const Default: Story = {
   args: {
@@ -98,8 +98,8 @@ export const Default: Story = {
 };
 
 /**
- * With default value
- * Display pre-selected value
+ * 含預設值
+ * 顯示預先選取的值
  */
 export const WithDefaultValue: Story = {
   args: {
@@ -111,8 +111,8 @@ export const WithDefaultValue: Story = {
 };
 
 /**
- * With Placeholder
- * Prompt user to make a selection
+ * 含佔位文字
+ * 提示使用者進行選擇
  */
 export const WithPlaceholder: Story = {
   args: {
@@ -124,8 +124,8 @@ export const WithPlaceholder: Story = {
 };
 
 /**
- * With error message
- * Display validation error
+ * 含錯誤訊息
+ * 顯示驗證錯誤
  */
 export const WithError: Story = {
   args: {
@@ -137,8 +137,8 @@ export const WithError: Story = {
 };
 
 /**
- * Disabled state
- * Cannot be selected
+ * 停用狀態
+ * 無法選取
  */
 export const Disabled: Story = {
   args: {
@@ -151,8 +151,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Required field
- * Display asterisk marker
+ * 必填欄位
+ * 顯示星號標記
  */
 export const Required: Story = {
   args: {
@@ -165,8 +165,8 @@ export const Required: Story = {
 };
 
 /**
- * Various variants
- * Display different styled menus
+ * 各種變體
+ * 顯示不同樣式的選單
  */
 export const Variants: Story = {
   render: () => (
@@ -204,8 +204,8 @@ export const Variants: Story = {
 };
 
 /**
- * Various sizes
- * Display different sized menus and compare with FormField
+ * 各種尺寸
+ * 顯示不同尺寸的選單並與 FormField 比較
  */
 export const Sizes: Story = {
   render: () => (
@@ -280,8 +280,8 @@ export const Sizes: Story = {
 };
 
 /**
- * Full width
- * Occupy full container width
+ * 完整寬度
+ * 佔滿容器寬度
  */
 export const FullWidth: Story = {
   args: {
@@ -295,8 +295,8 @@ export const FullWidth: Story = {
 };
 
 /**
- * Grouped options
- * Options categorized by groups
+ * 分組選項
+ * 依群組分類的選項
  */
 export const GroupedOptions: Story = {
   args: {
@@ -308,8 +308,8 @@ export const GroupedOptions: Story = {
 };
 
 /**
- * Partially disabled options
- * Some options cannot be selected
+ * 部分選項停用
+ * 部分選項無法選取
  */
 export const WithDisabledOptions: Story = {
   args: {
@@ -327,8 +327,8 @@ export const WithDisabledOptions: Story = {
 };
 
 /**
- * Multiple selection menu
- * Can select multiple options
+ * 多選選單
+ * 可選取多個選項
  */
 export const Multiple: Story = {
   args: {
@@ -342,8 +342,8 @@ export const Multiple: Story = {
 };
 
 /**
- * Multiple selection - Display Chips
- * Show selected items as chips
+ * 多選 - 顯示 Chip
+ * 以 chip 顯示已選取的項目
  */
 export const MultipleWithChips: Story = {
   args: {
@@ -358,8 +358,8 @@ export const MultipleWithChips: Story = {
 };
 
 /**
- * Multiple selection - Without Checkbox
- * Clean multiple selection style
+ * 多選 - 不含核取方塊
+ * 簡潔的多選樣式
  */
 export const MultipleWithoutCheckbox: Story = {
   args: {
@@ -375,8 +375,8 @@ export const MultipleWithoutCheckbox: Story = {
 };
 
 /**
- * Multiple selection - Without Chips
- * Display as text list
+ * 多選 - 不含 Chip
+ * 顯示為文字列表
  */
 export const MultipleWithoutChips: Story = {
   args: {
@@ -391,8 +391,8 @@ export const MultipleWithoutChips: Story = {
 };
 
 /**
- * Options with icons
- * Options can include icons
+ * 含圖示的選項
+ * 選項可包含圖示
  */
 export const WithIcons: Story = {
   args: {
@@ -410,8 +410,8 @@ export const WithIcons: Story = {
 };
 
 /**
- * Grouped options with icons
- * Grouped options can include icons
+ * 含圖示的分組選項
+ * 分組選項可包含圖示
  */
 export const GroupedWithIcons: Story = {
   args: {
@@ -468,8 +468,8 @@ export const GroupedWithIcons: Story = {
 };
 
 /**
- * Searchable menu
- * Enable search functionality to filter options by keywords
+ * 可搜尋的選單
+ * 啟用搜尋功能以關鍵字篩選選項
  */
 export const Searchable: Story = {
   args: {
@@ -493,8 +493,8 @@ export const Searchable: Story = {
 };
 
 /**
- * Searchable + Icons
- * Combine search functionality with icons
+ * 可搜尋 + 圖示
+ * 結合搜尋功能與圖示
  */
 export const SearchableWithIcons: Story = {
   args: {
@@ -515,8 +515,8 @@ export const SearchableWithIcons: Story = {
 };
 
 /**
- * Searchable + Grouped
- * Search functionality supports grouped options
+ * 可搜尋 + 分組
+ * 搜尋功能支援分組選項
  */
 export const SearchableGrouped: Story = {
   args: {
@@ -542,8 +542,8 @@ export const SearchableGrouped: Story = {
 };
 
 /**
- * Searchable multiple selection
- * Search functionality supports multiple selection
+ * 可搜尋的多選
+ * 搜尋功能支援多選
  */
 export const SearchableMultiple: Story = {
   args: {
@@ -570,8 +570,8 @@ export const SearchableMultiple: Story = {
 };
 
 /**
- * Number value options
- * Option values are numeric type
+ * 數值型選項
+ * 選項值為數值型
  */
 export const NumberValues: Story = {
   render: function NumberValuesComponent() {
@@ -637,8 +637,8 @@ export const NumberValues: Story = {
 };
 
 /**
- * Full features demonstration
- * Searchable + Grouped + Icons + Multiple selection
+ * 完整功能展示
+ * 可搜尋 + 分組 + 圖示 + 多選
  */
 export const FullFeatures: Story = {
   args: {
@@ -724,8 +724,8 @@ export const FullFeatures: Story = {
 };
 
 /**
- * Text Alignment Check
- * Verify that text is properly aligned in SelectField
+ * 文字對齊檢查
+ * 驗證文字在 SelectField 中是否正確對齊
  */
 export const TextAlignment: Story = {
   render: () => (
@@ -775,8 +775,8 @@ export const TextAlignment: Story = {
 };
 
 /**
- * Style Consistency
- * Demonstrating that SelectField matches FormField styles
+ * 樣式一致性
+ * 示範 SelectField 與 FormField 樣式相符
  */
 export const StyleConsistency: Story = {
   render: function StyleConsistencyComponent() {
@@ -897,8 +897,8 @@ export const StyleConsistency: Story = {
 };
 
 /**
- * Complete form example
- * Using react-hook-form + Zod validation
+ * 完整表單範例
+ * 使用 react-hook-form + Zod 驗證
  */
 export const FormExample: Story = {
   render: function FormExampleComponent() {
@@ -997,8 +997,8 @@ export const FormExample: Story = {
 };
 
 /**
- * Dependent selects example
- * Second select changes based on first select value
+ * 連動選擇範例
+ * 第二個選單依第一個選單的值而變動
  */
 export const DependentSelects: Story = {
   render: function DependentSelectsComponent() {

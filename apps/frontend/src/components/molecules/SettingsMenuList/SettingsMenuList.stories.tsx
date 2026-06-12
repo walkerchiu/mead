@@ -13,7 +13,7 @@ import { Box } from '@mui/material';
 /**
  * SettingsMenuList - Atomic Design: Molecule
  *
- * Settings menu item list that combines multiple SettingsMenuItem (Atom) components.
+ * 結合多個 SettingsMenuItem（Atom）元件的設定選單項目列表。
  */
 const meta = {
   title: 'Shared/Molecules/SettingsMenuList',
@@ -42,7 +42,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style - Basic menu items
+ * 預設樣式 - 基本選單項目
  */
 export const Default: Story = {
   args: {
@@ -64,7 +64,7 @@ export const Default: Story = {
 };
 
 /**
- * Menu with dividers
+ * 含分隔線的選單
  */
 export const WithDividers: Story = {
   args: {
@@ -106,7 +106,7 @@ export const WithDividers: Story = {
 };
 
 /**
- * Menu using href for navigation
+ * 使用 href 導覽的選單
  */
 export const WithHrefNavigation: Story = {
   args: {
@@ -134,7 +134,7 @@ export const WithHrefNavigation: Story = {
 };
 
 /**
- * Menu mixing onClick and href
+ * 混用 onClick 與 href 的選單
  */
 export const MixedNavigation: Story = {
   args: {
@@ -169,7 +169,7 @@ export const MixedNavigation: Story = {
 };
 
 /**
- * Menu items without icons
+ * 不含圖示的選單項目
  */
 export const WithoutIcons: Story = {
   args: {
@@ -194,7 +194,7 @@ export const WithoutIcons: Story = {
 };
 
 /**
- * Single item only
+ * 僅單一項目
  */
 export const SingleItem: Story = {
   args: {
@@ -210,7 +210,7 @@ export const SingleItem: Story = {
 };
 
 /**
- * Empty list
+ * 空列表
  */
 export const Empty: Story = {
   args: {
@@ -219,7 +219,7 @@ export const Empty: Story = {
 };
 
 /**
- * Chinese labels example
+ * 中文標籤範例
  */
 export const ChineseLabels: Story = {
   args: {
@@ -254,7 +254,7 @@ export const ChineseLabels: Story = {
 };
 
 /**
- * External links example
+ * 外部連結範例
  */
 export const ExternalLinks: Story = {
   args: {
@@ -282,7 +282,7 @@ export const ExternalLinks: Story = {
 };
 
 /**
- * Complete settings menu example
+ * 完整的設定選單範例
  */
 export const CompleteSettingsMenu: Story = {
   args: {

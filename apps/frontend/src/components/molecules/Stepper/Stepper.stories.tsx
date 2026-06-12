@@ -47,10 +47,10 @@ export const WithDescription: Story = {
   args: {
     activeStep: 1,
     steps: [
-      { label: 'Account Setup', description: 'Create your account' },
-      { label: 'Personal Info', description: 'Fill in basic information' },
-      { label: 'Verification', description: 'Verify your email' },
-      { label: 'Complete', description: 'Start using' },
+      { label: 'Account Setup', description: '建立你的帳號' },
+      { label: 'Personal Info', description: '填寫基本資訊' },
+      { label: 'Verification', description: '驗證你的 email' },
+      { label: 'Complete', description: '開始使用' },
     ],
   },
 };
@@ -136,19 +136,19 @@ export const Vertical: Story = {
     steps: [
       {
         label: 'Choose Event Type',
-        description: 'Select the type of event you want to create',
+        description: '選擇你要建立的活動類型',
       },
       {
         label: 'Fill Event Details',
-        description: 'Provide basic information about the event',
+        description: '提供活動的基本資訊',
       },
       {
         label: 'Set Time and Location',
-        description: 'Choose the date, time, and location of the event',
+        description: '選擇活動的日期、時間與地點',
       },
       {
         label: 'Review and Publish',
-        description: 'Check all information and publish the event',
+        description: '確認所有資訊並發布活動',
       },
     ],
   },
@@ -252,10 +252,10 @@ export const RegistrationFlow: Story = {
     const [activeStep, setActiveStep] = useState(0);
 
     const steps = [
-      { label: 'Create Account', description: 'Enter email and password' },
-      { label: 'Personal Info', description: 'Provide basic information' },
-      { label: 'Verification', description: 'Verify your email' },
-      { label: 'Complete', description: 'Start using the service' },
+      { label: 'Create Account', description: '輸入 email 與密碼' },
+      { label: 'Personal Info', description: '提供基本資訊' },
+      { label: 'Verification', description: '驗證你的 email' },
+      { label: 'Complete', description: '開始使用服務' },
     ];
 
     return (

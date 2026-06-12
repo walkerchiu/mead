@@ -6,19 +6,19 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 
 /**
- * CodeInput is a component specifically designed for verification code input.
+ * CodeInput 是專為驗證碼輸入設計的元件。
  *
- * ## Features
- * - Auto-focus to next input box
- * - Support pasting complete verification code
- * - Backspace auto-returns to previous box
- * - Only allow numeric input
- * - Auto-trigger callback on completion
+ * ## 功能特性
+ * - 自動聚焦至下一個輸入框
+ * - 支援貼上完整驗證碼
+ * - Backspace 自動回到上一個輸入框
+ * - 僅允許數字輸入
+ * - 完成時自動觸發回呼
  *
- * ## Use Cases
- * - 2FA two-factor authentication
- * - Email or SMS verification code
- * - Password reset verification
+ * ## 使用情境
+ * - 2FA 雙因素驗證
+ * - email 或簡訊驗證碼
+ * - 密碼重設驗證
  */
 const meta = {
   title: 'Shared/Atoms/CodeInput',
@@ -27,8 +27,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Component designed for verification code input, providing smooth input experience.',
+        component: '專為驗證碼輸入設計的元件，提供流暢的輸入體驗。',
       },
     },
   },
@@ -43,21 +42,21 @@ const meta = {
   argTypes: {
     length: {
       control: { type: 'number', min: 4, max: 8 },
-      description: 'Verification code length',
+      description: '驗證碼長度',
     },
     error: {
       control: 'boolean',
-      description: 'Whether to show error state',
+      description: '是否顯示錯誤狀態',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether to disable input',
+      description: '是否停用輸入',
     },
     onChange: {
-      description: 'Callback when verification code changes',
+      description: '驗證碼變更時的回呼',
     },
     onComplete: {
-      description: 'Callback when input is complete',
+      description: '輸入完成時的回呼',
     },
   },
 } satisfies Meta<typeof CodeInput>;
@@ -66,8 +65,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Basic usage
- * 6-digit verification code input
+ * 基本用法
+ * 6 位數驗證碼輸入
  */
 export const Default: Story = {
   render: function DefaultExample() {
@@ -101,8 +100,8 @@ export const Default: Story = {
 };
 
 /**
- * 4-digit verification code
- * Shorter verification code (e.g., PIN code)
+ * 4 位數驗證碼
+ * 較短的驗證碼（例如 PIN 碼）
  */
 export const FourDigits: Story = {
   render: function FourDigitsExample() {
@@ -135,8 +134,8 @@ export const FourDigits: Story = {
 };
 
 /**
- * 8-digit verification code
- * Longer verification code
+ * 8 位數驗證碼
+ * 較長的驗證碼
  */
 export const EightDigits: Story = {
   render: function EightDigitsExample() {
@@ -170,8 +169,8 @@ export const EightDigits: Story = {
 };
 
 /**
- * Error state
- * Display red border when verification fails
+ * 錯誤狀態
+ * 驗證失敗時顯示紅色邊框
  */
 export const Error: Story = {
   args: {
@@ -182,8 +181,8 @@ export const Error: Story = {
 };
 
 /**
- * Disabled state
- * Input boxes are not editable
+ * 停用狀態
+ * 輸入框無法編輯
  */
 export const Disabled: Story = {
   args: {
@@ -194,8 +193,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Interactive Example
- * Demonstrate callback after completion
+ * 互動範例
+ * 示範完成後的回呼
  */
 export const Interactive: Story = {
   render: function InteractiveCodeInput() {
@@ -238,8 +237,8 @@ export const Interactive: Story = {
 };
 
 /**
- * Verification Flow Example
- * Complete verification code input and verification flow
+ * 驗證流程範例
+ * 完整的驗證碼輸入與驗證流程
  */
 export const VerificationFlow: Story = {
   render: function VerificationFlowExample() {
@@ -308,8 +307,8 @@ export const VerificationFlow: Story = {
 };
 
 /**
- * Paste Test
- * Test the paste complete verification code feature
+ * 貼上測試
+ * 測試貼上完整驗證碼的功能
  */
 export const PasteTest: Story = {
   render: function PasteTestExample() {

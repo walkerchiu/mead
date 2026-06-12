@@ -7,9 +7,9 @@ import { AlertMessage } from '@/components/molecules';
 import Box from '@mui/material/Box';
 
 /**
- * LoginPage - Complete login page flow
+ * LoginPage - 完整的登入頁面流程
  *
- * Demonstrates the complete flow from login to 2FA verification.
+ * 示範從登入到 2FA 驗證的完整流程。
  */
 
 const meta = {
@@ -18,8 +18,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Complete login page including login form and 2FA verification flow.',
+        component: '完整的登入頁面，包含登入表單與 2FA 驗證流程。',
       },
     },
   },
@@ -30,7 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Standard login page
+ * 標準的登入頁面
  */
 export const Default: Story = {
   render: () => (
@@ -46,7 +45,7 @@ export const Default: Story = {
 };
 
 /**
- * Login error state
+ * 登入錯誤狀態
  */
 export const WithError: Story = {
   render: () => (
@@ -60,7 +59,7 @@ export const WithError: Story = {
 };
 
 /**
- * Loading state
+ * 載入中狀態
  */
 export const Loading: Story = {
   render: () => (
@@ -71,8 +70,8 @@ export const Loading: Story = {
 };
 
 /**
- * Full interactive flow
- * Demonstrates the complete flow: Login → 2FA → Success
+ * 完整互動流程
+ * 示範完整流程：登入 → 2FA → 成功
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {
@@ -189,7 +188,7 @@ export const FullFlow: Story = {
 };
 
 /**
- * Solid background
+ * 純色背景
  */
 export const SolidBackground: Story = {
   render: () => (
@@ -204,7 +203,7 @@ export const SolidBackground: Story = {
 };
 
 /**
- * No logo
+ * 無 Logo
  */
 export const NoLogo: Story = {
   render: () => (

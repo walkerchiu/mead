@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Avatar component for displaying user pictures or text initials. Supports multiple sizes, shapes, and avatar group features.',
+          '頭像元件，用於顯示使用者圖片或文字縮寫。支援多種尺寸、形狀與頭像群組功能。',
       },
     },
   },
@@ -17,25 +17,25 @@ const meta = {
   argTypes: {
     src: {
       control: 'text',
-      description: 'Image source',
+      description: '圖片來源',
     },
     alt: {
       control: 'text',
-      description: 'Alternative text',
+      description: '替代文字',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Avatar size',
+      description: '頭像尺寸',
     },
     variant: {
       control: 'select',
       options: ['circular', 'rounded', 'square'],
-      description: 'Avatar shape',
+      description: '頭像形狀',
     },
     children: {
       control: 'text',
-      description: 'Text content or initials',
+      description: '文字內容或縮寫',
     },
   },
 } satisfies Meta<typeof Avatar>;

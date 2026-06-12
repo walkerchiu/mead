@@ -4,39 +4,39 @@ import { SessionFilters } from './SessionFilters';
 import { Box, Typography, Paper } from '@mui/material';
 
 /**
- * SessionFilters is an advanced filter component for hq session management.
+ * SessionFilters 是 HQ session 管理的進階篩選元件。
  *
- * ## When to Use
- * - HQ session management page
- * - When filtering large numbers of sessions
- * - When searching for specific user sessions
+ * ## 何時使用
+ * - HQ session 管理頁面
+ * - 篩選大量 session 時
+ * - 搜尋特定使用者 session 時
  *
- * ## Features
- * - Unified user search (email, name, or ID)
- * - Status filter (ACTIVE, EXPIRED, REVOKED)
- * - IP address filter
- * - Device info filter
- * - Location filter
- * - Revoked method filter (conditional)
- * - Collapsible panel
- * - Filter chips for active filters
- * - Debounced search (500ms delay)
- * - Result count display
+ * ## 功能特性
+ * - 統一的使用者搜尋（email、姓名或 ID）
+ * - 狀態篩選（ACTIVE、EXPIRED、REVOKED）
+ * - IP 位址篩選
+ * - 裝置資訊篩選
+ * - 位置篩選
+ * - 撤銷方式篩選（條件式）
+ * - 可收合面板
+ * - 啟用中篩選的標籤
+ * - 防抖搜尋（延遲 500ms）
+ * - 結果數量顯示
  *
- * ## Filter Fields
- * - **userSearch**: Search by email, username, or user ID
- * - **status**: Filter by session status (ACTIVE, EXPIRED, REVOKED)
- * - **ipAddress**: Filter by IP address
- * - **deviceInfo**: Filter by device information
- * - **location**: Filter by geographic location
- * - **revokedMethod**: Filter by revocation method (only when status is REVOKED)
+ * ## 篩選欄位
+ * - **userSearch**：依 email、使用者名稱或使用者 ID 搜尋
+ * - **status**：依 session 狀態篩選（ACTIVE、EXPIRED、REVOKED）
+ * - **ipAddress**：依 IP 位址篩選
+ * - **deviceInfo**：依裝置資訊篩選
+ * - **location**：依地理位置篩選
+ * - **revokedMethod**：依撤銷方式篩選（僅當狀態為 REVOKED 時）
  *
- * ## Best Practices
- * - Start with collapsed state for clean UI
- * - Show result count to provide feedback
- * - Use debouncing to reduce server load
- * - Clear filters easily with one click
- * - Show active filters as chips
+ * ## 最佳實踐
+ * - 以收合狀態起始，保持介面簡潔
+ * - 顯示結果數量以提供回饋
+ * - 使用防抖以降低伺服器負載
+ * - 一鍵輕鬆清除篩選
+ * - 以標籤顯示啟用中的篩選
  */
 const meta = {
   title: 'HQ Scope/Organisms/Sessions/Filters',
@@ -46,7 +46,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Advanced filter component for hq session management with debounced search, collapsible panel, and active filter chips.',
+          'HQ session 管理的進階篩選元件，具備防抖搜尋、可收合面板與啟用中篩選標籤。',
       },
     },
   },
@@ -54,7 +54,7 @@ const meta = {
   argTypes: {
     defaultExpanded: {
       control: 'boolean',
-      description: 'Whether the filter panel is expanded by default',
+      description: '篩選面板預設是否展開',
       table: {
         type: { summary: 'boolean' },
         defaultValue: { summary: 'true' },
@@ -62,14 +62,14 @@ const meta = {
     },
     resultCount: {
       control: 'number',
-      description: 'Number of filtered results',
+      description: '篩選結果數量',
       table: {
         type: { summary: 'number' },
       },
     },
     totalCount: {
       control: 'number',
-      description: 'Total number of sessions before filtering',
+      description: '篩選前的 session 總數',
       table: {
         type: { summary: 'number' },
       },
@@ -81,8 +81,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
- * Filters panel expanded with no active filters
+ * 預設狀態
+ * 篩選面板展開且無啟用中的篩選
  */
 export const Default: Story = {
   args: {
@@ -95,8 +95,8 @@ export const Default: Story = {
 };
 
 /**
- * Collapsed state
- * Filters panel collapsed by default
+ * 收合狀態
+ * 篩選面板預設為收合
  */
 export const Collapsed: Story = {
   args: {
@@ -109,8 +109,8 @@ export const Collapsed: Story = {
 };
 
 /**
- * With active filters
- * Shows filter chips for active filters
+ * 含啟用中的篩選
+ * 以標籤顯示啟用中的篩選
  */
 export const WithActiveFilters: Story = {
   args: {
@@ -127,8 +127,8 @@ export const WithActiveFilters: Story = {
 };
 
 /**
- * Revoked sessions filter
- * Shows revoked method filter when status is REVOKED
+ * 已撤銷 session 篩選
+ * 當狀態為 REVOKED 時顯示撤銷方式篩選
  */
 export const RevokedSessionsFilter: Story = {
   args: {
@@ -144,8 +144,8 @@ export const RevokedSessionsFilter: Story = {
 };
 
 /**
- * All filters active
- * Maximum filters applied
+ * 所有篩選皆啟用
+ * 已套用最多篩選
  */
 export const AllFiltersActive: Story = {
   args: {
@@ -165,8 +165,8 @@ export const AllFiltersActive: Story = {
 };
 
 /**
- * No results
- * Filters applied but no matching results
+ * 無結果
+ * 已套用篩選但無相符結果
  */
 export const NoResults: Story = {
   args: {
@@ -181,8 +181,8 @@ export const NoResults: Story = {
 };
 
 /**
- * Large dataset
- * Filtering from a large number of sessions
+ * 大型資料集
+ * 從大量 session 中篩選
  */
 export const LargeDataset: Story = {
   args: {
@@ -197,8 +197,8 @@ export const LargeDataset: Story = {
 };
 
 /**
- * Interactive example
- * Fully interactive filter demonstration
+ * 互動範例
+ * 完全可互動的篩選展示
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {
@@ -267,8 +267,8 @@ export const Interactive: Story = {
 };
 
 /**
- * Status transitions
- * Shows different status filter states
+ * 狀態轉換
+ * 顯示不同的狀態篩選狀態
  */
 export const StatusTransitions: Story = {
   render: () => (
@@ -313,8 +313,8 @@ export const StatusTransitions: Story = {
 };
 
 /**
- * Mobile view
- * Optimized for mobile devices
+ * 行動裝置檢視
+ * 針對行動裝置最佳化
  */
 export const MobileView: Story = {
   args: {
@@ -335,8 +335,8 @@ export const MobileView: Story = {
 };
 
 /**
- * Dark mode
- * Display in dark theme
+ * 深色模式
+ * 在深色主題中顯示
  */
 export const DarkMode: Story = {
   args: {

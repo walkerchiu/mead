@@ -38,31 +38,31 @@ PageHeader component provides a consistent page title area following Material De
   argTypes: {
     title: {
       control: 'text',
-      description: 'Page title',
+      description: '頁面標題',
     },
     description: {
       control: 'text',
-      description: 'Page description',
+      description: '頁面說明',
     },
     showBackButton: {
       control: 'boolean',
-      description: 'Whether to show back button',
+      description: '是否顯示返回按鈕',
     },
     elevated: {
       control: 'boolean',
-      description: 'Whether to use card style',
+      description: '是否使用卡片樣式',
     },
     icon: {
       control: false,
-      description: 'Page icon',
+      description: '頁面圖示',
     },
     breadcrumbs: {
       control: 'object',
-      description: 'Breadcrumb navigation',
+      description: '麵包屑導覽',
     },
     actions: {
       control: false,
-      description: 'Right side action buttons',
+      description: '右側操作按鈕',
     },
   },
 } satisfies Meta<typeof PageHeader>;
@@ -71,7 +71,7 @@ export default meta;
 type Story = StoryObj<typeof PageHeader>;
 
 /**
- * Basic usage - Title only
+ * 基本用法 - 僅標題
  */
 export const Basic: Story = {
   args: {
@@ -85,13 +85,12 @@ export const Basic: Story = {
 };
 
 /**
- * With description
+ * 含說明
  */
 export const WithDescription: Story = {
   args: {
     title: 'Page Title',
-    description:
-      'This is a description text that explains the main features and purpose of this page.',
+    description: '這是一段說明文字，用於闡述此頁面的主要功能與用途。',
   },
   render: (args) => (
     <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '400px' }}>
@@ -101,13 +100,12 @@ export const WithDescription: Story = {
 };
 
 /**
- * With icon
+ * 含圖示
  */
 export const WithIcon: Story = {
   args: {
     title: 'Audit Logs',
-    description:
-      'View system operation records, user activities, and security events',
+    description: '檢視系統操作記錄、使用者活動與安全事件',
     icon: '📊',
   },
   render: (args) => (
@@ -118,12 +116,12 @@ export const WithIcon: Story = {
 };
 
 /**
- * With back button
+ * 含返回按鈕
  */
 export const WithBackButton: Story = {
   args: {
     title: 'Detail Page',
-    description: 'View detailed information',
+    description: '檢視詳細資訊',
     showBackButton: true,
     onBack: () => alert('Back to previous page'),
     backAriaLabel: 'Back to list',
@@ -136,13 +134,12 @@ export const WithBackButton: Story = {
 };
 
 /**
- * With breadcrumbs
+ * 含麵包屑
  */
 export const WithBreadcrumbs: Story = {
   args: {
     title: 'Audit Logs',
-    description:
-      'View system operation records, user activities, and security events',
+    description: '檢視系統操作記錄、使用者活動與安全事件',
     icon: <AssessmentIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />,
     breadcrumbs: [
       { label: 'Home', href: '/', onClick: () => console.log('Home') },
@@ -158,13 +155,12 @@ export const WithBreadcrumbs: Story = {
 };
 
 /**
- * With single action button
+ * 含單一操作按鈕
  */
 export const WithSingleAction: Story = {
   args: {
     title: 'Session Management',
-    description:
-      'Manage user login status, revoke sessions, and monitor device activity',
+    description: '管理使用者登入狀態、撤銷 session 並監控裝置活動',
     icon: <ComputerIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />,
     showBackButton: true,
     onBack: () => alert('Back'),
@@ -182,13 +178,12 @@ export const WithSingleAction: Story = {
 };
 
 /**
- * With multiple action buttons
+ * 含多個操作按鈕
  */
 export const WithMultipleActions: Story = {
   args: {
     title: 'Audit Logs',
-    description:
-      'View system operation records, user activities, and security events',
+    description: '檢視系統操作記錄、使用者活動與安全事件',
     icon: <AssessmentIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />,
     showBackButton: true,
     onBack: () => alert('Back'),
@@ -219,12 +214,12 @@ export const WithMultipleActions: Story = {
 };
 
 /**
- * Non-elevated style (flat)
+ * 非浮起樣式（扁平）
  */
 export const NonElevated: Story = {
   args: {
     title: 'Flat Style Title',
-    description: 'No card style, displayed directly on the background',
+    description: '無卡片樣式，直接顯示於背景上',
     icon: '🎨',
     elevated: false,
     actions: (
@@ -241,13 +236,12 @@ export const NonElevated: Story = {
 };
 
 /**
- * Audit Logs complete example
+ * 稽核日誌完整範例
  */
 export const AuditLogsExample: Story = {
   args: {
     title: 'Audit Logs',
-    description:
-      'View system operation records, user activities, and security events',
+    description: '檢視系統操作記錄、使用者活動與安全事件',
     icon: <AssessmentIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />,
     showBackButton: true,
     onBack: () => alert('Back to Dashboard'),
@@ -270,20 +264,19 @@ export const AuditLogsExample: Story = {
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', p: 3 }}>
       <PageHeader {...args} />
       <Box sx={{ mt: 3, p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-        <p>Page content area...</p>
+        <p>頁面內容區……</p>
       </Box>
     </Box>
   ),
 };
 
 /**
- * Session Management complete example
+ * Session 管理完整範例
  */
 export const SessionsExample: Story = {
   args: {
     title: 'Session Management',
-    description:
-      'Manage user login status, revoke sessions, and monitor device activity',
+    description: '管理使用者登入狀態、撤銷 session 並監控裝置活動',
     icon: <ComputerIcon sx={{ fontSize: '2rem', color: 'primary.main' }} />,
     showBackButton: true,
     onBack: () => alert('Back to Dashboard'),
@@ -306,19 +299,19 @@ export const SessionsExample: Story = {
     <Box sx={{ bgcolor: 'background.default', minHeight: '100vh', p: 3 }}>
       <PageHeader {...args} />
       <Box sx={{ mt: 3, p: 3, bgcolor: 'background.paper', borderRadius: 2 }}>
-        <p>Page content area...</p>
+        <p>頁面內容區……</p>
       </Box>
     </Box>
   ),
 };
 
 /**
- * Responsive demonstration
+ * 響應式展示
  */
 export const Responsive: Story = {
   args: {
     title: 'Responsive Title',
-    description: 'Automatically adjusts style based on different screen sizes',
+    description: '依不同螢幕尺寸自動調整樣式',
     icon: '📱',
     showBackButton: true,
     onBack: () => alert('Back'),
@@ -332,7 +325,7 @@ export const Responsive: Story = {
     <Box sx={{ bgcolor: 'background.default', minHeight: '400px', p: 3 }}>
       <PageHeader {...args} />
       <Box sx={{ mt: 2, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
-        <p>💡 Tip: Resize your browser window to see responsive effects</p>
+        <p>💡 提示：調整瀏覽器視窗大小即可觀察響應式效果</p>
       </Box>
     </Box>
   ),

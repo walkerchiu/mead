@@ -3,9 +3,9 @@ import { Box, Typography, Paper } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 /**
- * Colors Design System
+ * Colors 設計系統
  *
- * Displays all colors used in the application, including primary colors, secondary colors, state colors, etc.
+ * 顯示應用程式中使用的所有顏色，包含主要色、次要色、狀態色等。
  */
 
 const ColorPalette = () => {
@@ -74,17 +74,16 @@ const ColorPalette = () => {
   return (
     <Box sx={{ p: 3, maxWidth: 1200 }}>
       <Typography variant="h4" gutterBottom>
-        Color System
+        色彩系統
       </Typography>
       <Typography variant="body1" color="text.secondary" paragraph>
-        Complete color system used in the application, based on Material-UI
-        theme configuration.
+        應用程式中所使用的完整色彩系統，以 Material-UI 主題設定為基礎。
       </Typography>
 
       {/* Primary Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          Primary Colors
+          主要色彩
         </Typography>
         <Box
           sx={{
@@ -153,7 +152,7 @@ const ColorPalette = () => {
       {/* Text Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          Text Colors
+          文字色彩
         </Typography>
         <Box
           sx={{
@@ -177,7 +176,7 @@ const ColorPalette = () => {
                 mb: 1,
               }}
             >
-              <Typography color="text.primary">Primary Text</Typography>
+              <Typography color="text.primary">主要文字</Typography>
             </Box>
             <Typography variant="subtitle2">Text Primary</Typography>
             <Typography variant="caption" color="text.secondary">
@@ -199,7 +198,7 @@ const ColorPalette = () => {
                 mb: 1,
               }}
             >
-              <Typography color="text.secondary">Secondary Text</Typography>
+              <Typography color="text.secondary">次要文字</Typography>
             </Box>
             <Typography variant="subtitle2">Text Secondary</Typography>
             <Typography variant="caption" color="text.secondary">
@@ -221,7 +220,7 @@ const ColorPalette = () => {
                 mb: 1,
               }}
             >
-              <Typography color="text.disabled">Disabled Text</Typography>
+              <Typography color="text.disabled">停用文字</Typography>
             </Box>
             <Typography variant="subtitle2">Text Disabled</Typography>
             <Typography variant="caption" color="text.secondary">
@@ -234,7 +233,7 @@ const ColorPalette = () => {
       {/* Background Colors */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          Background Colors
+          背景色彩
         </Typography>
         <Box
           sx={{
@@ -259,7 +258,7 @@ const ColorPalette = () => {
       {/* Grayscale */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          Grayscale
+          灰階
         </Typography>
         <Box
           sx={{
@@ -285,7 +284,7 @@ const ColorPalette = () => {
       {/* Usage Examples */}
       <Box sx={{ mb: 6 }}>
         <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 3 }}>
-          Usage Examples
+          使用範例
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Paper
@@ -295,8 +294,8 @@ const ColorPalette = () => {
               color: 'primary.contrastText',
             }}
           >
-            <Typography variant="h6">Primary Background</Typography>
-            <Typography>This is text on primary background</Typography>
+            <Typography variant="h6">主要背景</Typography>
+            <Typography>這是主要背景上的文字</Typography>
           </Paper>
           <Paper
             sx={{
@@ -305,14 +304,14 @@ const ColorPalette = () => {
               color: 'secondary.contrastText',
             }}
           >
-            <Typography variant="h6">Secondary Background</Typography>
-            <Typography>This is text on secondary background</Typography>
+            <Typography variant="h6">次要背景</Typography>
+            <Typography>這是次要背景上的文字</Typography>
           </Paper>
           <Paper
             sx={{ p: 3, bgcolor: 'error.main', color: 'error.contrastText' }}
           >
-            <Typography variant="h6">Error Background</Typography>
-            <Typography>This is text on error background</Typography>
+            <Typography variant="h6">錯誤背景</Typography>
+            <Typography>這是錯誤背景上的文字</Typography>
           </Paper>
           <Paper
             sx={{
@@ -321,8 +320,8 @@ const ColorPalette = () => {
               color: 'success.contrastText',
             }}
           >
-            <Typography variant="h6">Success Background</Typography>
-            <Typography>This is text on success background</Typography>
+            <Typography variant="h6">成功背景</Typography>
+            <Typography>這是成功背景上的文字</Typography>
           </Paper>
         </Box>
       </Box>

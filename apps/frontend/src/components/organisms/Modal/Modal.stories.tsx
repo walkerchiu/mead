@@ -18,22 +18,22 @@ import {
 } from '@mui/material';
 
 /**
- * Modal component provides various common dialog patterns.
+ * Modal 元件提供多種常見的對話框樣式。
  *
- * **Features**:
- * - Multiple variants (default, confirm, alert, warning, error, info, success)
- * - Custom sizes (xs, sm, md, lg, xl)
- * - Fullscreen mode
- * - Scrollable content
- * - Custom action buttons (with loading state)
- * - Responsive design (auto fullscreen on mobile)
+ * **功能特性**：
+ * - 多種變體（default、confirm、alert、warning、error、info、success）
+ * - 自訂尺寸（xs、sm、md、lg、xl）
+ * - 全螢幕模式
+ * - 可捲動內容
+ * - 自訂操作按鈕（含載入中狀態）
+ * - 響應式設計（行動裝置上自動全螢幕）
  *
- * **Common Use Cases**:
- * - Confirmation dialogs
- * - Form input dialogs
- * - Warning/error alerts
- * - Information display
- * - Content preview
+ * **常見使用情境**：
+ * - 確認對話框
+ * - 表單輸入對話框
+ * - 警告／錯誤提示
+ * - 資訊顯示
+ * - 內容預覽
  */
 const meta = {
   title: 'Shared/Organisms/Modal',
@@ -43,7 +43,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Flexible modal component built on MUI Dialog, supporting various common patterns like confirm dialogs, alerts, forms, and more.',
+          '以 MUI Dialog 建構的彈性 modal 元件，支援確認對話框、警示、表單等多種常見樣式。',
       },
     },
   },
@@ -51,7 +51,7 @@ const meta = {
   argTypes: {
     open: {
       control: 'boolean',
-      description: 'Whether the modal is open',
+      description: 'Modal 是否開啟',
     },
     variant: {
       control: 'select',
@@ -64,19 +64,19 @@ const meta = {
         'info',
         'success',
       ],
-      description: 'Modal variant (affects icon and styling)',
+      description: 'Modal 變體（影響圖示與樣式）',
     },
     maxWidth: {
       control: 'select',
       options: ['xs', 'sm', 'md', 'lg', 'xl', false],
-      description: 'Maximum width of the modal',
+      description: 'Modal 的最大寬度',
       table: {
         defaultValue: { summary: 'sm' },
       },
     },
     fullScreen: {
       control: 'boolean',
-      description: 'Show modal in fullscreen',
+      description: '以全螢幕顯示 Modal',
       table: {
         defaultValue: { summary: 'false' },
       },
@@ -84,35 +84,35 @@ const meta = {
     scroll: {
       control: 'select',
       options: ['paper', 'body'],
-      description: 'Scroll behavior',
+      description: '捲動行為',
       table: {
         defaultValue: { summary: 'paper' },
       },
     },
     showCloseButton: {
       control: 'boolean',
-      description: 'Show close button in title',
+      description: '在標題列顯示關閉按鈕',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     fullWidth: {
       control: 'boolean',
-      description: 'Whether modal takes full width',
+      description: 'Modal 是否佔滿寬度',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     loading: {
       control: 'boolean',
-      description: 'Loading state',
+      description: '載入中狀態',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     dividers: {
       control: 'boolean',
-      description: 'Show dividers between sections',
+      description: '在區段之間顯示分隔線',
       table: {
         defaultValue: { summary: 'false' },
       },
@@ -124,7 +124,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Basic modal with title and content
+ * 含標題與內容的基本 modal
  */
 export const Default: Story = {
   render: () => {
@@ -162,7 +162,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading state modal
+ * 載入中狀態 modal
  */
 export const LoadingState: Story = {
   render: () => {
@@ -203,7 +203,7 @@ export const LoadingState: Story = {
             },
           ]}
         >
-          <Typography>Click "Process" to see the loading state.</Typography>
+          <Typography>點選「Process」即可檢視載入中狀態。</Typography>
         </Modal>
       </Box>
     );
@@ -211,7 +211,7 @@ export const LoadingState: Story = {
 };
 
 /**
- * Interactive comparison of all variants
+ * 所有變體的互動比較
  */
 export const AllVariants: Story = {
   render: () => {
@@ -274,7 +274,7 @@ export const AllVariants: Story = {
 };
 
 /**
- * Size comparison
+ * 尺寸比較
  */
 export const SizeComparison: Story = {
   render: () => {
@@ -312,7 +312,7 @@ export const SizeComparison: Story = {
 };
 
 /**
- * Fullscreen modal
+ * 全螢幕 modal
  */
 export const Fullscreen: Story = {
   render: () => {
@@ -358,7 +358,7 @@ export const Fullscreen: Story = {
 };
 
 /**
- * Form dialog for user input
+ * 供使用者輸入的表單對話框
  */
 export const FormDialog: Story = {
   render: () => {
@@ -422,7 +422,7 @@ export const FormDialog: Story = {
 };
 
 /**
- * Confirm dialog with description
+ * 含說明的確認對話框
  */
 export const ConfirmDialog: Story = {
   render: () => {
@@ -460,7 +460,7 @@ export const ConfirmDialog: Story = {
 };
 
 /**
- * Warning alert dialog
+ * 警告警示對話框
  */
 export const WarningAlert: Story = {
   render: () => {
@@ -502,7 +502,7 @@ export const WarningAlert: Story = {
 };
 
 /**
- * Error alert dialog
+ * 錯誤警示對話框
  */
 export const ErrorAlert: Story = {
   render: () => {
@@ -535,7 +535,7 @@ export const ErrorAlert: Story = {
 };
 
 /**
- * Info alert dialog
+ * 資訊警示對話框
  */
 export const InfoAlert: Story = {
   render: () => {
@@ -568,7 +568,7 @@ export const InfoAlert: Story = {
 };
 
 /**
- * Success alert dialog
+ * 成功警示對話框
  */
 export const SuccessAlert: Story = {
   render: () => {
@@ -605,7 +605,7 @@ export const SuccessAlert: Story = {
 };
 
 /**
- * Scrollable content modal
+ * 可捲動內容的 modal
  */
 export const ScrollableContent: Story = {
   render: () => {
@@ -656,7 +656,7 @@ export const ScrollableContent: Story = {
 };
 
 /**
- * Modal with list content
+ * 含列表內容的 modal
  */
 export const WithListContent: Story = {
   render: () => {
@@ -725,7 +725,7 @@ export const WithListContent: Story = {
 };
 
 /**
- * Modal with radio buttons
+ * 含單選按鈕的 modal
  */
 export const WithRadioButtons: Story = {
   render: () => {
@@ -785,7 +785,7 @@ export const WithRadioButtons: Story = {
 };
 
 /**
- * Modal without close button
+ * 不含關閉按鈕的 modal
  */
 export const NoCloseButton: Story = {
   render: () => {
@@ -824,7 +824,7 @@ export const NoCloseButton: Story = {
 };
 
 /**
- * Real-world example: Delete confirmation with cascading effects
+ * 實際範例：含連帶影響的刪除確認
  */
 export const DeleteConfirmationExample: Story = {
   render: () => {

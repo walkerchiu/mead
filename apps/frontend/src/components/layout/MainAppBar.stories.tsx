@@ -55,25 +55,25 @@ const mockNotifications: UnifiedNotification[] = [
 ];
 
 /**
- * MainAppBar is a unified application navigation bar component
+ * MainAppBar 是統一的應用程式導覽列元件
  *
- * **Features**:
- * - Supports text title or Logo
- * - Title/Logo can be set as a hyperlink
- * - Notification center (bell icon + Badge)
- * - Language switcher
- * - User menu (avatar + personal actions)
- * - Settings menu (theme toggle + help + about)
- * - Responsive design
+ * **功能特性**：
+ * - 支援文字標題或 Logo
+ * - 標題／Logo 可設為超連結
+ * - 通知中心（鈴鐺圖示 + 徽章）
+ * - 語言切換器
+ * - 使用者選單（頭像 + 個人操作）
+ * - 設定選單（主題切換 + 說明 + 關於）
+ * - 響應式設計
  *
- * **Design Principles**:
- * - AppBar is for global navigation, always displays site title/Logo
- * - Page-level actions (like back buttons) should be placed in the page content area, not in the AppBar
+ * **設計原則**：
+ * - AppBar 用於全域導覽，恆常顯示網站標題／Logo
+ * - 頁面層級的操作（例如返回按鈕）應放在頁面內容區，而非 AppBar 中
  *
- * **Use Cases**:
- * - Application top navigation bar
- * - HQ panel page header
- * - Dashboard page header
+ * **使用情境**：
+ * - 應用程式頂端導覽列
+ * - HQ 面板頁面標題
+ * - 儀表板頁面標題
  */
 const meta = {
   title: 'HQ Scope/Layout/MainAppBar',
@@ -83,7 +83,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Unified application navigation bar with notifications, language switcher, user menu, and settings menu.',
+          '統一的應用程式導覽列，包含通知、語言切換器、使用者選單與設定選單。',
       },
     },
   },
@@ -91,58 +91,57 @@ const meta = {
   argTypes: {
     title: {
       control: 'text',
-      description: 'Page title text',
+      description: '頁面標題文字',
     },
     titleLink: {
       control: 'text',
-      description: 'Link URL for title/logo (optional)',
+      description: '標題／標誌的連結 URL（選用）',
     },
     showNotifications: {
       control: 'boolean',
-      description: 'Show notification bell',
+      description: '顯示通知鈴鐺',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     showUserMenu: {
       control: 'boolean',
-      description: 'Show user menu',
+      description: '顯示使用者選單',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     showSettings: {
       control: 'boolean',
-      description: 'Show settings menu',
+      description: '顯示設定選單',
       table: {
         defaultValue: { summary: 'true' },
       },
     },
     showUserName: {
       control: 'boolean',
-      description: 'Show user name in user menu',
+      description: '在使用者選單中顯示使用者名稱',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     showUserStatus: {
       control: 'boolean',
-      description: 'Show user online status',
+      description: '顯示使用者線上狀態',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     useButtonDividers: {
       control: 'boolean',
-      description:
-        'Use dividers between notification, user, and settings buttons',
+      description: '在通知、使用者與設定按鈕之間使用分隔線',
       table: {
         defaultValue: { summary: 'false' },
       },
     },
     separateLanguageSwitcher: {
       control: 'boolean',
-      description: 'Show divider before language switcher',
+      description: '在語言切換器前顯示分隔線',
       table: {
         defaultValue: { summary: 'true' },
       },
@@ -154,14 +153,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default text title style (without user information)
+ * 預設文字標題樣式（不含使用者資訊）
  */
 export const Default: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Page content goes here...</p>
+        <p>頁面內容置於此處……</p>
       </Box>
     </Box>
   ),
@@ -171,20 +170,20 @@ export const Default: Story = {
 };
 
 /**
- * Full featured display: notifications + user + settings + language
+ * 完整功能顯示：通知 + 使用者 + 設定 + 語言
  */
 export const FullFeatured: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
-        <h2>Welcome to Dashboard</h2>
-        <p>All features enabled with new button order:</p>
+        <h2>歡迎使用 Dashboard</h2>
+        <p>已啟用所有功能，並採用新的按鈕排序：</p>
         <ul>
-          <li>🔔 Notification bell with 3 unread</li>
-          <li>👤 User menu with avatar and name</li>
-          <li>⚙️ Settings menu with theme toggle</li>
-          <li>| 🌐 Language switcher (separated by divider, default)</li>
+          <li>🔔 通知鈴鐺，含 3 則未讀</li>
+          <li>👤 使用者選單，含頭像與名稱</li>
+          <li>⚙️ 設定選單，含主題切換</li>
+          <li>| 🌐 語言切換器（以分隔線區隔，預設）</li>
         </ul>
       </Box>
     </Box>
@@ -216,21 +215,21 @@ export const FullFeatured: Story = {
 };
 
 /**
- * All buttons with dividers
+ * 所有按鈕（含分隔線）
  */
 export const WithAllDividers: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
-        <h2>All Buttons with Dividers</h2>
-        <p>All button groups are separated with dividers:</p>
+        <h2>所有按鈕（含分隔線）</h2>
+        <p>所有按鈕群組皆以分隔線區隔：</p>
         <ul>
           <li>🔔 | 👤 | ⚙️ | 🌐</li>
         </ul>
         <p>
           <strong>
-            Both useButtonDividers and separateLanguageSwitcher are enabled
+            同時啟用 useButtonDividers 與 separateLanguageSwitcher
           </strong>
         </p>
       </Box>
@@ -257,14 +256,14 @@ export const WithAllDividers: Story = {
 };
 
 /**
- * Without dividers (compact layout)
+ * 不含分隔線（精簡版面）
  */
 export const WithoutDividers: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>All buttons without dividers (compact layout):</p>
+        <p>所有按鈕皆不含分隔線（精簡版面）：</p>
         <p>🔔 👤 ⚙️ 🌐</p>
       </Box>
     </Box>
@@ -287,14 +286,14 @@ export const WithoutDividers: Story = {
 };
 
 /**
- * Only language switcher separated (default)
+ * 僅語言切換器分隔（預設）
  */
 export const OnlyLanguageSeparated: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Only language switcher is separated (default behavior):</p>
+        <p>僅語言切換器以分隔線區隔（預設行為）：</p>
         <p>🔔 👤 ⚙️ | 🌐</p>
       </Box>
     </Box>
@@ -317,15 +316,15 @@ export const OnlyLanguageSeparated: Story = {
 };
 
 /**
- * With notifications and user information
+ * 含通知與使用者資訊
  */
 export const WithNotificationsAndUser: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Click notification bell to see 5 notifications</p>
-        <p>Click user avatar to access profile and settings</p>
+        <p>點選通知鈴鐺即可檢視 5 則通知</p>
+        <p>點選使用者頭像即可存取個人檔案與設定</p>
       </Box>
     </Box>
   ),
@@ -352,14 +351,14 @@ export const WithNotificationsAndUser: Story = {
 };
 
 /**
- * User menu displays name
+ * 使用者選單顯示姓名
  */
 export const WithUserName: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>User name is displayed next to avatar (desktop view)</p>
+        <p>使用者名稱顯示於頭像旁（桌面檢視）</p>
       </Box>
     </Box>
   ),
@@ -388,14 +387,14 @@ export const WithUserName: Story = {
 };
 
 /**
- * Without user avatar (shows initials)
+ * 不含使用者頭像（顯示縮寫）
  */
 export const WithoutUserAvatar: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>User without avatar shows initials</p>
+        <p>沒有頭像的使用者會顯示姓名縮寫</p>
       </Box>
     </Box>
   ),
@@ -428,14 +427,14 @@ export const WithoutUserAvatar: Story = {
 };
 
 /**
- * Notification count over 99
+ * 通知數量超過 99
  */
 export const ManyNotifications: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Badge shows 99+ for counts over 99</p>
+        <p>數量超過 99 時，徽章會顯示 99+</p>
       </Box>
     </Box>
   ),
@@ -462,17 +461,16 @@ export const ManyNotifications: Story = {
 };
 
 /**
- * No notifications
+ * 沒有通知
  */
 export const NoNotifications: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Notification menu shows empty state</p>
+        <p>通知選單顯示空狀態</p>
         <p>
-          <strong>Note</strong>: Settings button is still visible in the
-          notification menu even when there are no notifications
+          <strong>備註</strong>：即使沒有任何通知，設定按鈕仍會顯示於 通知選單中
         </p>
       </Box>
     </Box>
@@ -500,14 +498,14 @@ export const NoNotifications: Story = {
 };
 
 /**
- * Title with link
+ * 含連結的標題
  */
 export const WithTitleLink: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Click the title to navigate to home page</p>
+        <p>點選標題即可導向首頁</p>
       </Box>
     </Box>
   ),
@@ -535,14 +533,14 @@ export const WithTitleLink: Story = {
 };
 
 /**
- * With Logo (text logo example)
+ * 含 Logo（文字 Logo 範例）
  */
 export const WithLogo: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Using a custom logo with title</p>
+        <p>搭配自訂 logo 與標題使用</p>
       </Box>
     </Box>
   ),
@@ -588,14 +586,14 @@ export const WithLogo: Story = {
 };
 
 /**
- * Hide notifications feature
+ * 隱藏通知功能
  */
 export const WithoutNotifications: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Notification bell is hidden</p>
+        <p>已隱藏通知鈴鐺</p>
       </Box>
     </Box>
   ),
@@ -607,17 +605,16 @@ export const WithoutNotifications: Story = {
 };
 
 /**
- * Hide user menu
+ * 隱藏使用者選單
  */
 export const WithoutUserMenu: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>User menu is hidden (e.g., public pages)</p>
+        <p>已隱藏使用者選單（例如公開頁面）</p>
         <p>
-          <strong>Note</strong>: Notification settings button still available
-          even without user menu
+          <strong>備註</strong>：即使沒有使用者選單，通知設定按鈕 仍然可用
         </p>
       </Box>
     </Box>
@@ -638,17 +635,16 @@ export const WithoutUserMenu: Story = {
 };
 
 /**
- * Hide settings menu
+ * 隱藏設定選單
  */
 export const WithoutSettings: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Settings menu is hidden</p>
+        <p>已隱藏設定選單</p>
         <p>
-          <strong>Note</strong>: Notification settings button still available in
-          notification menu
+          <strong>備註</strong>：通知設定按鈕仍可於通知選單中 使用
         </p>
       </Box>
     </Box>
@@ -672,7 +668,7 @@ export const WithoutSettings: Story = {
 };
 
 /**
- * HQ View example
+ * HQ 檢視範例
  */
 export const HQView: Story = {
   render: (args) => (
@@ -680,16 +676,16 @@ export const HQView: Story = {
       <MainAppBar {...args} />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
         <h2>HQ Panel</h2>
-        <p>Full featured hq navigation bar with:</p>
+        <p>功能完整的 HQ 導覽列，包含：</p>
         <ul>
-          <li>Logo and title with link</li>
-          <li>12 unread notifications</li>
-          <li>HQ user with status</li>
-          <li>Dark theme selected</li>
+          <li>含連結的 logo 與標題</li>
+          <li>12 則未讀通知</li>
+          <li>含狀態的 HQ 使用者</li>
+          <li>已選用深色主題</li>
         </ul>
         <p>
-          <strong>Note:</strong> Page-level actions like back buttons should be
-          placed in the page content area, not in the AppBar.
+          <strong>備註：</strong>返回按鈕等頁面層級操作應置於 頁面內容區，而非
+          AppBar 中。
         </p>
       </Box>
     </Box>
@@ -738,18 +734,18 @@ export const HQView: Story = {
 };
 
 /**
- * Responsive design example (mobile view)
+ * 響應式設計範例（行動裝置檢視）
  */
 export const MobileView: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Resize window to see responsive behavior:</p>
+        <p>調整視窗大小即可觀察響應式行為：</p>
         <ul>
-          <li>Smaller button sizes on mobile</li>
-          <li>User name hidden on mobile</li>
-          <li>Reduced gap between buttons</li>
+          <li>行動裝置上採用較小的按鈕尺寸</li>
+          <li>行動裝置上隱藏使用者名稱</li>
+          <li>縮小按鈕之間的間距</li>
         </ul>
       </Box>
     </Box>
@@ -784,7 +780,7 @@ export const MobileView: Story = {
 };
 
 /**
- * Complete Dashboard Header example (consistent with frontend implementation)
+ * 完整的儀表板標題列範例（與前端實作一致）
  */
 export const DashboardHeader: Story = {
   render: () => (
@@ -830,19 +826,18 @@ export const DashboardHeader: Story = {
         }
       />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
-        <h2>Welcome to Dashboard</h2>
-        <p>This is the actual dashboard implementation pattern:</p>
+        <h2>歡迎使用 Dashboard</h2>
+        <p>這是實際的 dashboard 實作模式：</p>
         <ul>
-          <li>📊 Logo (emoji) with link to dashboard</li>
-          <li>Title: "Dashboard" (from i18n)</li>
-          <li>🔔 3 unread notifications</li>
-          <li>👤 User menu in icon-only mode (userIconMode=true)</li>
-          <li>⚙️ Settings menu with Help and About</li>
-          <li>| 🌐 Language switcher (separated by divider)</li>
+          <li>📊 含連結至 dashboard 的 logo（emoji）</li>
+          <li>標題：「Dashboard」（取自 i18n）</li>
+          <li>🔔 3 則未讀通知</li>
+          <li>👤 使用者選單採純圖示模式（userIconMode=true）</li>
+          <li>⚙️ 含說明與關於的設定選單</li>
+          <li>| 🌐 語言切換器（以分隔線區隔）</li>
         </ul>
         <p>
-          <strong>Note:</strong> This matches the actual frontend implementation
-          in dashboard/page.tsx
+          <strong>備註：</strong>此範例對應 dashboard/page.tsx 中的 實際前端實作
         </p>
       </Box>
     </Box>
@@ -850,14 +845,14 @@ export const DashboardHeader: Story = {
 };
 
 /**
- * Logo only without title
+ * 僅 Logo 不含標題
  */
 export const LogoOnly: Story = {
   render: (args) => (
     <Box>
       <MainAppBar {...args} />
       <Box sx={{ p: 3 }}>
-        <p>Only logo, no title text</p>
+        <p>僅顯示 logo，不含標題文字</p>
       </Box>
     </Box>
   ),
@@ -896,11 +891,11 @@ export const LogoOnly: Story = {
 };
 
 /**
- * Settings page example (correct navigation pattern)
+ * 設定頁面範例（正確的導覽模式）
  *
- * Demonstrates the correct design pattern:
- * - AppBar displays site title/Logo (global navigation)
- * - Back button placed in page content area (page-level action)
+ * 示範正確的設計模式：
+ * - AppBar 顯示網站標題／Logo（全域導覽）
+ * - 返回按鈕放在頁面內容區（頁面層級操作）
  */
 export const SettingsPagePattern: Story = {
   render: () => (
@@ -956,34 +951,30 @@ export const SettingsPagePattern: Story = {
             <ArrowBack />
           </IconButton>
           <Box>
-            <Typography variant="h4">Account Settings</Typography>
+            <Typography variant="h4">帳號設定</Typography>
           </Box>
         </Box>
         <Typography variant="body2" color="text.secondary" paragraph>
-          This is an example of the correct design pattern:
+          這是正確設計模式的範例：
         </Typography>
         <ul>
           <li>
-            <strong>AppBar</strong> - Displays site title "MEAD Dashboard"
-            (global navigation, consistent across all pages)
+            <strong>AppBar</strong>－顯示網站標題「MEAD Dashboard」
+            （全域導覽，在所有頁面中保持一致）
           </li>
           <li>
-            <strong>Back button</strong> - Placed in page content area
-            (page-level action)
+            <strong>返回按鈕</strong>－置於頁面內容區 （頁面層級操作）
           </li>
           <li>
-            <strong>Page title</strong> - Displayed in content area, not in
-            AppBar
+            <strong>頁面標題</strong>－顯示於內容區，而非 AppBar 中
           </li>
         </ul>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-          This design helps users clearly distinguish:
+          此設計能協助使用者清楚區分：
         </Typography>
         <ul>
-          <li>
-            Click AppBar Logo/title on the left → Return to home/Dashboard
-          </li>
-          <li>Click back button in page → Return to previous page</li>
+          <li>點選左側 AppBar 的 Logo／標題 → 返回首頁／Dashboard</li>
+          <li>點選頁面中的返回按鈕 → 回到上一頁</li>
         </ul>
       </Container>
     </Box>
@@ -991,14 +982,14 @@ export const SettingsPagePattern: Story = {
 };
 
 /**
- * Notification Features - Interactive Demo
+ * 通知功能 - 互動示範
  *
- * Demonstrates all notification-related features:
- * - Click notification bell to view notifications
- * - Click individual notification to mark as read
- * - Click "Mark All as Read" to mark all as read
- * - Click "View All" to navigate to notification center
- * - Click "Clear" to remove read notifications
+ * 示範所有與通知相關的功能：
+ * - 點擊通知鈴鐺即可檢視通知
+ * - 點擊個別通知即可標為已讀
+ * - 點擊「Mark All as Read」即可全部標為已讀
+ * - 點擊「View All」即可導向通知中心
+ * - 點擊「Clear」即可移除已讀通知
  */
 export const NotificationFeatures: Story = {
   render: () => (
@@ -1040,53 +1031,52 @@ export const NotificationFeatures: Story = {
       />
       <Box sx={{ p: 3, bgcolor: 'grey.50', minHeight: '400px' }}>
         <Typography variant="h5" gutterBottom>
-          Notification Features Demo
+          通知功能示範
         </Typography>
         <Typography variant="body1" paragraph>
-          Click the notification bell (🔔) in the AppBar to try these features:
+          點選 AppBar 中的通知鈴鐺（🔔）即可試用以下功能：
         </Typography>
         <Box component="ul" sx={{ pl: 3 }}>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>View Notifications</strong>: Click the bell icon to open
-              the notification menu
+              <strong>檢視通知</strong>：點選鈴鐺圖示即可開啟 通知選單
             </Typography>
           </li>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>Click Individual Notification</strong>: Click any
-              notification to view details and mark as read
+              <strong>點選個別通知</strong>：點選任一則通知
+              即可檢視詳情並標為已讀
             </Typography>
           </li>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>Mark All as Read</strong>: Click "Mark All as Read" button
-              in the menu footer (shown when there are unread notifications)
+              <strong>全部標為已讀</strong>：點選選單頁尾的
+              「全部標為已讀」按鈕（有未讀通知時才會顯示）
             </Typography>
           </li>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>View All Notifications</strong>: Click "Notifications"
-              title in menu header to navigate to notification center
+              <strong>檢視全部通知</strong>：點選選單頁首的
+              「通知」標題即可導向通知中心
             </Typography>
           </li>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>Clear Read Notifications</strong>: Click "Clear" button in
-              menu header to remove all read notifications
+              <strong>清除已讀通知</strong>：點選選單頁首的
+              「清除」按鈕即可移除所有已讀通知
             </Typography>
           </li>
           <li>
             <Typography variant="body2" gutterBottom>
-              <strong>Notification Settings</strong>: Click settings icon (⚙️)
-              in menu header to navigate to notification settings
+              <strong>通知設定</strong>：點選選單頁首的設定圖示（⚙️）
+              即可導向通知設定
             </Typography>
           </li>
         </Box>
         <Box sx={{ mt: 3, p: 2, bgcolor: 'info.light', borderRadius: 1 }}>
           <Typography variant="body2">
-            <strong>Current State</strong>: {mockNotifications.length} total
-            notifications, 3 unread
+            <strong>目前狀態</strong>：共 {mockNotifications.length} 則 通知，3
+            則未讀
           </Typography>
         </Box>
       </Box>
@@ -1095,9 +1085,9 @@ export const NotificationFeatures: Story = {
 };
 
 /**
- * Notification Types - All Types Demo
+ * 通知類型 - 所有類型示範
  *
- * Shows all different notification types with their respective icons and colors
+ * 顯示所有不同的通知類型及其對應的圖示與顏色
  */
 export const NotificationTypes: Story = {
   render: () => {
@@ -1205,9 +1195,9 @@ export const NotificationTypes: Story = {
 };
 
 /**
- * Notification States - Read vs Unread
+ * 通知狀態 - 已讀與未讀
  *
- * Demonstrates the visual difference between read and unread notifications
+ * 示範已讀與未讀通知之間的視覺差異
  */
 export const NotificationStates: Story = {
   render: () => {
@@ -1270,33 +1260,33 @@ export const NotificationStates: Story = {
         />
         <Box sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Notification States Demo
+            通知狀態示範
           </Typography>
           <Typography variant="body2" paragraph>
-            This demo shows 4 notifications: 2 unread and 2 read
+            此示範顯示 4 則通知：2 則未讀與 2 則已讀
           </Typography>
           <Typography variant="body2">
-            <strong>Visual Differences:</strong>
+            <strong>視覺差異：</strong>
           </Typography>
           <Box component="ul" sx={{ mt: 1 }}>
             <li>
               <Typography variant="body2">
-                Unread notifications have a <strong>blue dot indicator</strong>
+                未讀通知會有<strong>藍點指示</strong>
               </Typography>
             </li>
             <li>
               <Typography variant="body2">
-                Unread notifications have <strong>stronger text weight</strong>
+                未讀通知的<strong>文字字重較粗</strong>
               </Typography>
             </li>
             <li>
               <Typography variant="body2">
-                Read notifications have <strong>lighter text color</strong>
+                已讀通知的<strong>文字色彩較淺</strong>
               </Typography>
             </li>
             <li>
               <Typography variant="body2">
-                Badge shows <strong>unread count (2)</strong>
+                徽章會顯示<strong>未讀數量（2）</strong>
               </Typography>
             </li>
           </Box>
@@ -1307,9 +1297,9 @@ export const NotificationStates: Story = {
 };
 
 /**
- * Empty Notification State
+ * 空通知狀態
  *
- * Shows the empty state when there are no notifications
+ * 當沒有通知時顯示空狀態
  */
 export const EmptyNotifications: Story = {
   render: () => (

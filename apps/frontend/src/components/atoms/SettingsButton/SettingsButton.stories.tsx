@@ -5,7 +5,7 @@ import { SettingsButton } from './SettingsButton';
 /**
  * SettingsButton - Atomic Design: Atom
  *
- * Trigger button for settings menu, can display icon only or with text label.
+ * 設定選單的觸發按鈕，可僅顯示圖示或含文字標籤。
  */
 const meta = {
   title: 'Shared/Atoms/SettingsButton',
@@ -41,7 +41,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style - Icon only
+ * 預設樣式 - 僅圖示
  */
 export const Default: Story = {
   args: {
@@ -50,7 +50,7 @@ export const Default: Story = {
 };
 
 /**
- * With text label
+ * 含文字標籤
  */
 export const WithLabel: Story = {
   args: {
@@ -61,7 +61,7 @@ export const WithLabel: Story = {
 };
 
 /**
- * Custom label text
+ * 自訂標籤文字
  */
 export const CustomLabel: Story = {
   args: {
@@ -72,7 +72,7 @@ export const CustomLabel: Story = {
 };
 
 /**
- * Different sizes - Icon only and with label
+ * 不同尺寸 - 僅圖示與含標籤
  */
 export const Sizes: Story = {
   render: () => (
@@ -157,7 +157,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors
+ * 不同顏色
  */
 export const Colors: Story = {
   render: () => (
@@ -194,7 +194,7 @@ export const Colors: Story = {
 };
 
 /**
- * With Tooltip
+ * 含工具提示
  */
 export const WithTooltip: Story = {
   args: {

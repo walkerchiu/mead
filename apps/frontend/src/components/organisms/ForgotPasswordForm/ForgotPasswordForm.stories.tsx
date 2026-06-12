@@ -11,7 +11,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Forgot password form for requesting password reset link.',
+        component: '忘記密碼表單，用於申請密碼重設連結。',
       },
     },
   },
@@ -29,7 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
+ * 預設狀態
  */
 export const Default: Story = {
   args: {
@@ -41,7 +41,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading
+ * 載入中
  */
 export const Loading: Story = {
   args: {
@@ -51,7 +51,7 @@ export const Loading: Story = {
 };
 
 /**
- * With error
+ * 含錯誤
  */
 export const WithError: Story = {
   args: {
@@ -61,8 +61,8 @@ export const WithError: Story = {
 };
 
 /**
- * Success state
- * Show email sent message
+ * 成功狀態
+ * 顯示已寄送 email 的訊息
  */
 export const Success: Story = {
   args: {
@@ -72,7 +72,7 @@ export const Success: Story = {
 };
 
 /**
- * With default email
+ * 含預設 email
  */
 export const WithDefaultEmail: Story = {
   args: {
@@ -82,8 +82,8 @@ export const WithDefaultEmail: Story = {
 };
 
 /**
- * Interactive example
- * Simulates complete flow
+ * 互動範例
+ * 模擬完整流程
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

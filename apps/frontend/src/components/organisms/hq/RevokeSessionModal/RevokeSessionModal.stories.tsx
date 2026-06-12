@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog for revoking a specific user session, with optional reason, notification, and custom message fields.',
+          '用於撤銷特定使用者 session 的 modal 對話框，可選填原因、通知與自訂訊息欄位。',
       },
     },
   },
@@ -31,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open with session user info.
+ * 預設 — 以 session 使用者資訊開啟。
  */
 export const Default: Story = {
   render: function DefaultExample() {
@@ -57,7 +57,7 @@ export const Default: Story = {
 };
 
 /**
- * Without user info — no session user provided.
+ * 不含使用者資訊 — 未提供 session 使用者。
  */
 export const WithoutUser: Story = {
   args: {
@@ -69,7 +69,7 @@ export const WithoutUser: Story = {
 };
 
 /**
- * Interactive — open and close the modal with a button.
+ * 互動 — 以按鈕開啟與關閉 modal。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

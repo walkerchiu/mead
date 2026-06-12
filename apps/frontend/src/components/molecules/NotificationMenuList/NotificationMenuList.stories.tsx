@@ -5,13 +5,13 @@ import { NotificationType } from '@/types/notification';
 /**
  * NotificationMenuList - Atomic Design: Molecule
  *
- * Notification list component designed for dropdown menus, using MenuItem to display notifications.
- * This component is designed to be used within NotificationMenu (Organism).
+ * 為下拉選單設計的通知列表元件，使用 MenuItem 顯示通知。
+ * 此元件設計用於 NotificationMenu（Organism）之中。
  *
- * Following Atomic Design architecture:
- * - Atom: MenuItem (MUI component)
- * - Molecule: NotificationMenuList (composes multiple MenuItems)
- * - Organism: NotificationMenu (uses NotificationMenuList + NotificationBadge + Header/Footer)
+ * 遵循 Atomic Design 架構：
+ * - Atom: MenuItem（MUI 元件）
+ * - Molecule: NotificationMenuList（組合多個 MenuItem）
+ * - Organism: NotificationMenu（使用 NotificationMenuList + NotificationBadge + Header/Footer）
  */
 const meta = {
   title: 'Shared/Molecules/NotificationMenuList',
@@ -23,16 +23,16 @@ const meta = {
   argTypes: {
     maxDisplay: {
       control: 'number',
-      description: 'Maximum number of items to display',
+      description: '最多顯示的項目數量',
     },
     locale: {
       control: 'select',
       options: ['en', 'zh-TW'],
-      description: 'Locale code (for date formatting)',
+      description: '語系代碼（用於日期格式化）',
     },
     emptyIconSize: {
       control: 'number',
-      description: 'Empty state icon size',
+      description: '空狀態圖示尺寸',
     },
   },
 } satisfies Meta<typeof NotificationMenuList>;
@@ -86,7 +86,7 @@ const sampleNotifications = [
 ];
 
 /**
- * Default style - Display multiple notifications
+ * 預設樣式 - 顯示多則通知
  */
 export const Default: Story = {
   args: {
@@ -99,7 +99,7 @@ export const Default: Story = {
 };
 
 /**
- * All notification types
+ * 所有通知類型
  */
 export const AllTypes: Story = {
   args: {
@@ -152,7 +152,7 @@ export const AllTypes: Story = {
 };
 
 /**
- * Unread only
+ * 僅未讀
  */
 export const UnreadOnly: Story = {
   args: {
@@ -165,7 +165,7 @@ export const UnreadOnly: Story = {
 };
 
 /**
- * Limited display (only show 3)
+ * 限制顯示數量（僅顯示 3 則）
  */
 export const LimitedDisplay: Story = {
   args: {
@@ -178,7 +178,7 @@ export const LimitedDisplay: Story = {
 };
 
 /**
- * Single notification
+ * 單則通知
  */
 export const SingleNotification: Story = {
   args: {
@@ -190,7 +190,7 @@ export const SingleNotification: Story = {
 };
 
 /**
- * Long content handling
+ * 長內容處理
  */
 export const LongContent: Story = {
   args: {
@@ -221,7 +221,7 @@ export const LongContent: Story = {
 };
 
 /**
- * Chinese locale
+ * 中文語系
  */
 export const ChineseLocale: Story = {
   args: {
@@ -260,7 +260,7 @@ export const ChineseLocale: Story = {
 };
 
 /**
- * Empty state - No notifications
+ * 空狀態 - 沒有通知
  */
 export const Empty: Story = {
   args: {
@@ -271,7 +271,7 @@ export const Empty: Story = {
 };
 
 /**
- * Custom empty state
+ * 自訂空狀態
  */
 export const CustomEmpty: Story = {
   args: {

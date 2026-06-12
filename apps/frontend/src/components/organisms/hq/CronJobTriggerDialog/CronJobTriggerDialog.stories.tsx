@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Confirmation dialog for triggering a cron job manually, with options for normal or forced execution.',
+          '用於手動觸發 cron job 的確認對話框，提供一般或強制執行的選項。',
       },
     },
   },
@@ -23,7 +23,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open dialog for an enabled job.
+ * 預設 — 為已啟用的任務開啟對話框。
  */
 export const Default: Story = {
   render: function InteractiveExample() {
@@ -50,7 +50,7 @@ export const Default: Story = {
 };
 
 /**
- * Disabled job — normal execution button is disabled; force execution is still available.
+ * 已停用的任務 — 一般執行按鈕已停用；仍可使用強制執行。
  */
 export const DisabledJob: Story = {
   render: function DisabledJobExample() {
@@ -77,7 +77,7 @@ export const DisabledJob: Story = {
 };
 
 /**
- * Triggering state — shows loading indicator while the job is being triggered.
+ * 觸發中狀態 — 在任務觸發期間顯示載入指示器。
  */
 export const Triggering: Story = {
   args: {
@@ -92,7 +92,7 @@ export const Triggering: Story = {
 };
 
 /**
- * Interactive — open the dialog with a button and handle confirmation.
+ * 互動 — 以按鈕開啟對話框並處理確認。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

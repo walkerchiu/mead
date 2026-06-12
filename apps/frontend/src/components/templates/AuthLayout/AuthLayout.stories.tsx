@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Unified layout template for authentication pages, providing centered card, responsive design, and brand identity.',
+          '認證頁面的統一版面範本，提供置中卡片、響應式設計與品牌識別。',
       },
     },
   },
@@ -24,7 +24,7 @@ const meta = {
     background: {
       control: 'select',
       options: ['gradient', 'solid', 'image'],
-      description: 'Background style',
+      description: '背景樣式',
     },
   },
 } satisfies Meta<typeof AuthLayout>;
@@ -33,8 +33,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style
- * Gradient background
+ * 預設樣式
+ * 漸層背景
  */
 export const Default: Story = {
   args: {
@@ -45,7 +45,7 @@ export const Default: Story = {
 };
 
 /**
- * Without Logo
+ * 不含 Logo
  */
 export const NoLogo: Story = {
   args: {
@@ -55,7 +55,7 @@ export const NoLogo: Story = {
 };
 
 /**
- * Without Footer
+ * 不含頁尾
  */
 export const NoFooter: Story = {
   args: {
@@ -66,7 +66,7 @@ export const NoFooter: Story = {
 };
 
 /**
- * Solid background
+ * 純色背景
  */
 export const SolidBackground: Story = {
   args: {
@@ -77,8 +77,8 @@ export const SolidBackground: Story = {
 };
 
 /**
- * Complete Login page
- * Demonstrates actual login form
+ * 完整的登入頁面
+ * 示範實際的登入表單
  */
 export const LoginPage: Story = {
   args: {
@@ -96,7 +96,7 @@ export const LoginPage: Story = {
 };
 
 /**
- * Two-Factor Authentication page
+ * 雙因素驗證頁面
  */
 export const TwoFactorPage: Story = {
   args: {
@@ -114,7 +114,7 @@ export const TwoFactorPage: Story = {
 };
 
 /**
- * Forgot Password page
+ * 忘記密碼頁面
  */
 export const ForgotPasswordPage: Story = {
   args: {
@@ -132,7 +132,7 @@ export const ForgotPasswordPage: Story = {
 };
 
 /**
- * Reset Password page
+ * 重設密碼頁面
  */
 export const ResetPasswordPage: Story = {
   args: {
@@ -150,8 +150,8 @@ export const ResetPasswordPage: Story = {
 };
 
 /**
- * Custom content
- * Demonstrates flexibility
+ * 自訂內容
+ * 示範彈性
  */
 export const CustomContent: Story = {
   args: {
@@ -170,7 +170,7 @@ export const CustomContent: Story = {
 };
 
 /**
- * Small width
+ * 小寬度
  */
 export const SmallWidth: Story = {
   args: {
@@ -186,7 +186,7 @@ export const SmallWidth: Story = {
 };
 
 /**
- * Large width
+ * 大寬度
  */
 export const LargeWidth: Story = {
   args: {
@@ -201,8 +201,8 @@ export const LargeWidth: Story = {
 };
 
 /**
- * Responsive test
- * Test with different window sizes
+ * 響應式測試
+ * 以不同的視窗尺寸測試
  */
 export const ResponsiveTest: Story = {
   args: {

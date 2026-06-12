@@ -5,7 +5,7 @@ import { UserButton } from './UserButton';
 /**
  * UserButton - Atomic Design: Atom
  *
- * Trigger button for user menu, can display user avatar or icon, supports displaying name and online status.
+ * 使用者選單的觸發按鈕，可顯示使用者頭像或圖示，支援顯示姓名與線上狀態。
  */
 const meta = {
   title: 'Shared/Atoms/UserButton',
@@ -54,7 +54,7 @@ const defaultUser = {
 };
 
 /**
- * Default style - Avatar only
+ * 預設樣式 - 僅頭像
  */
 export const Default: Story = {
   args: {
@@ -63,7 +63,7 @@ export const Default: Story = {
 };
 
 /**
- * Display user name
+ * 顯示使用者名稱
  */
 export const WithName: Story = {
   args: {
@@ -73,7 +73,7 @@ export const WithName: Story = {
 };
 
 /**
- * Display online status indicator
+ * 顯示線上狀態指示器
  */
 export const WithStatus: Story = {
   args: {
@@ -83,7 +83,7 @@ export const WithStatus: Story = {
 };
 
 /**
- * Full mode - Display name and status
+ * 完整模式 - 顯示姓名與狀態
  */
 export const Full: Story = {
   args: {
@@ -94,7 +94,7 @@ export const Full: Story = {
 };
 
 /**
- * Icon mode - Use unified icon instead of avatar
+ * 圖示模式 - 使用統一圖示取代頭像
  */
 export const IconMode: Story = {
   args: {
@@ -104,7 +104,7 @@ export const IconMode: Story = {
 };
 
 /**
- * Icon mode + Display name
+ * 圖示模式 + 顯示姓名
  */
 export const IconModeWithName: Story = {
   args: {
@@ -115,7 +115,7 @@ export const IconModeWithName: Story = {
 };
 
 /**
- * User without avatar (display initials)
+ * 無頭像的使用者（顯示縮寫）
  */
 export const WithoutAvatar: Story = {
   args: {
@@ -129,7 +129,7 @@ export const WithoutAvatar: Story = {
 };
 
 /**
- * Different sizes comparison
+ * 不同尺寸比較
  */
 export const Sizes: Story = {
   render: () => (
@@ -172,7 +172,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors comparison
+ * 不同顏色比較
  */
 export const Colors: Story = {
   render: () => (
@@ -204,7 +204,7 @@ export const Colors: Story = {
 };
 
 /**
- * All status indicators comparison
+ * 所有狀態指示器比較
  */
 export const AllStatuses: Story = {
   render: () => (

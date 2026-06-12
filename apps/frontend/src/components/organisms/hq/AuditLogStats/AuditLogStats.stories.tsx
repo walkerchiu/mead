@@ -53,7 +53,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Statistics cards for audit logs, showing total count, success rate, failure count, and top action — fetched via Apollo.',
+          '稽核日誌統計卡片，顯示總數、成功率、失敗數與熱門操作 — 透過 Apollo 取得。',
       },
     },
   },
@@ -64,7 +64,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — statistics loaded with realistic data.
+ * 預設 — 已載入真實資料的統計。
  */
 export const Default: Story = {
   decorators: [
@@ -77,7 +77,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading — empty mocks keep the component in its loading skeleton state.
+ * 載入中 — 空的 mock 讓元件維持在載入骨架狀態。
  */
 export const Loading: Story = {
   decorators: [
@@ -90,7 +90,7 @@ export const Loading: Story = {
 };
 
 /**
- * No data — all counts are zero (fresh installation or empty database).
+ * 無資料 — 所有計數皆為零（全新安裝或空資料庫）。
  */
 export const NoData: Story = {
   decorators: [

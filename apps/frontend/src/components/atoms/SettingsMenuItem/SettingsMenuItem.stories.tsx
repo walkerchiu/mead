@@ -12,7 +12,7 @@ import { Box } from '@mui/material';
 /**
  * SettingsMenuItem - Atomic Design: Atom
  *
- * Single settings menu item that supports icon, label, click events, and link navigation.
+ * 單一設定選單項目，支援圖示、標籤、點擊事件與連結導覽。
  */
 const meta = {
   title: 'Shared/Atoms/SettingsMenuItem',
@@ -41,7 +41,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default style
+ * 預設樣式
  */
 export const Default: Story = {
   args: {
@@ -52,7 +52,7 @@ export const Default: Story = {
 };
 
 /**
- * Different icon examples
+ * 不同圖示範例
  */
 export const WithInfoIcon: Story = {
   args: {
@@ -87,7 +87,7 @@ export const WithDocumentIcon: Story = {
 };
 
 /**
- * Without icon
+ * 不含圖示
  */
 export const WithoutIcon: Story = {
   args: {
@@ -97,7 +97,7 @@ export const WithoutIcon: Story = {
 };
 
 /**
- * Using href for navigation
+ * 使用 href 進行導覽
  */
 export const WithHref: Story = {
   args: {
@@ -108,7 +108,7 @@ export const WithHref: Story = {
 };
 
 /**
- * External link
+ * 外部連結
  */
 export const ExternalLink: Story = {
   args: {
@@ -119,7 +119,7 @@ export const ExternalLink: Story = {
 };
 
 /**
- * Multiple items combined display
+ * 多個項目組合顯示
  */
 export const MenuItemList: Story = {
   render: () => (

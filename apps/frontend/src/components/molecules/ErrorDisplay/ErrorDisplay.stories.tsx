@@ -8,28 +8,28 @@ import LoginIcon from '@mui/icons-material/Login';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 /**
- * ErrorDisplay is a page-level error display component.
+ * ErrorDisplay 是頁面層級的錯誤顯示元件。
  *
- * **Purpose: Page-level error display**
+ * **用途：頁面層級的錯誤顯示**
  *
- * ## When to Use
- * - **404 Error**: Page not found
- * - **403 Error**: Insufficient permissions
- * - **500 Error**: Server error
- * - **Network Error**: Unable to connect
- * - **Session Expired**: Need to log in again
- * - **Data Load Failed**: Entire page cannot be displayed
+ * ## 何時使用
+ * - **404 錯誤**：找不到頁面
+ * - **403 錯誤**：權限不足
+ * - **500 錯誤**：伺服器錯誤
+ * - **網路錯誤**：無法連線
+ * - **Session 過期**：需要重新登入
+ * - **資料載入失敗**：整個頁面無法顯示
  *
- * ## Severity Levels
- * - **error**: Serious error, requires user action
- * - **warning**: Warning message, may affect functionality
- * - **info**: Information notice, does not affect functionality
+ * ## 嚴重程度等級
+ * - **error**：嚴重錯誤，需要使用者處理
+ * - **warning**：警告訊息，可能影響功能
+ * - **info**：資訊提示，不影響功能
  *
- * **Note**: For inline messages within forms or pages, use the AlertMessage component
+ * **注意**：若需表單或頁面內的行內訊息，請使用 AlertMessage 元件
  *
- * ## Difference from AlertMessage
- * - **ErrorDisplay**: Page-level, occupies large space, large icon (80px), centered display
- * - **AlertMessage**: Inline, lightweight, small icon, suitable for forms and page notifications
+ * ## 與 AlertMessage 的差異
+ * - **ErrorDisplay**：頁面層級、佔用較大空間、大型圖示（80px）、置中顯示
+ * - **AlertMessage**：行內、輕量、小圖示，適合表單與頁面提示
  */
 const meta = {
   title: 'Shared/Molecules/ErrorDisplay',
@@ -39,7 +39,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Page-level error display component that occupies large space and displays a large icon and error message in the center. Suitable for entire pages or main content area error notifications. For inline messages within forms, use the AlertMessage component.',
+          '頁面層級的錯誤顯示元件，佔用較大空間，並於中央顯示大型圖示與錯誤訊息。適用於整頁或主要內容區的錯誤提示。若需表單內的行內訊息，請使用 AlertMessage 元件。',
       },
     },
   },
@@ -48,22 +48,22 @@ const meta = {
     severity: {
       control: 'select',
       options: ['error', 'warning', 'info'],
-      description: 'Error severity',
+      description: '錯誤嚴重程度',
     },
     showRetry: {
       control: 'boolean',
-      description: 'Whether to show retry button',
+      description: '是否顯示重試按鈕',
     },
     iconSize: {
       control: 'number',
-      description: 'Icon size (px)',
+      description: '圖示尺寸（px）',
       table: {
         defaultValue: { summary: '80' },
       },
     },
     minHeight: {
       control: 'text',
-      description: 'Minimum height',
+      description: '最小高度',
       table: {
         defaultValue: { summary: '50vh' },
       },
@@ -75,7 +75,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * All Severity Levels
+ * 所有嚴重程度等級
  */
 export const AllSeverities: Story = {
   render: () => (
@@ -103,7 +103,7 @@ export const AllSeverities: Story = {
 };
 
 /**
- * 404 Page Not Found
+ * 404 找不到頁面
  */
 export const PageNotFound: Story = {
   args: {
@@ -117,7 +117,7 @@ export const PageNotFound: Story = {
 };
 
 /**
- * 403 Access Denied
+ * 403 拒絕存取
  */
 export const AccessDenied: Story = {
   args: {
@@ -131,7 +131,7 @@ export const AccessDenied: Story = {
 };
 
 /**
- * 500 Server Error
+ * 500 伺服器錯誤
  */
 export const ServerError: Story = {
   args: {
@@ -145,7 +145,7 @@ export const ServerError: Story = {
 };
 
 /**
- * Network Connection Failed
+ * 網路連線失敗
  */
 export const NetworkError: Story = {
   args: {
@@ -160,7 +160,7 @@ export const NetworkError: Story = {
 };
 
 /**
- * Session Expired
+ * Session 過期
  */
 export const SessionExpired: Story = {
   args: {
@@ -178,7 +178,7 @@ export const SessionExpired: Story = {
 };
 
 /**
- * Data Load Failed
+ * 資料載入失敗
  */
 export const DataLoadFailed: Story = {
   args: {
@@ -192,7 +192,7 @@ export const DataLoadFailed: Story = {
 };
 
 /**
- * Maintenance Notice
+ * 維護通知
  */
 export const MaintenanceMode: Story = {
   args: {
@@ -206,7 +206,7 @@ export const MaintenanceMode: Story = {
 };
 
 /**
- * With Multiple Action Buttons
+ * 含多個操作按鈕
  */
 export const WithMultipleActions: Story = {
   args: {
@@ -229,7 +229,7 @@ export const WithMultipleActions: Story = {
 };
 
 /**
- * Custom Icon Size
+ * 自訂圖示尺寸
  */
 export const CustomIconSize: Story = {
   args: {
@@ -243,7 +243,7 @@ export const CustomIconSize: Story = {
 };
 
 /**
- * Custom Height
+ * 自訂高度
  */
 export const CustomHeight: Story = {
   args: {
@@ -255,7 +255,7 @@ export const CustomHeight: Story = {
 };
 
 /**
- * Real World Example: 404 Page
+ * 實際應用範例：404 頁面
  */
 export const RealWorld404: Story = {
   render: () => (
@@ -279,7 +279,7 @@ export const RealWorld404: Story = {
 };
 
 /**
- * Real World Example: Access Denied
+ * 實際應用範例：拒絕存取
  */
 export const RealWorldAccessDenied: Story = {
   render: () => (
@@ -310,7 +310,7 @@ export const RealWorldAccessDenied: Story = {
 };
 
 /**
- * Real World Example: Network Error
+ * 實際應用範例：網路錯誤
  */
 export const RealWorldNetworkError: Story = {
   render: function NetworkErrorExample() {

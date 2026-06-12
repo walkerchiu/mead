@@ -8,7 +8,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'session-cleanup',
     displayName: 'Session Cleanup',
-    description: 'Removes expired sessions from the database',
+    description: '從資料庫移除過期的 session',
     jobType: 'cleanup',
     category: 'maintenance',
     cronExpression: '0 2 * * *',
@@ -31,7 +31,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'audit-log-archive',
     displayName: 'Audit Log Archive',
-    description: 'Archives old audit logs to cold storage',
+    description: '將舊的稽核日誌封存至冷儲存',
     jobType: 'archive',
     category: 'maintenance',
     cronExpression: '0 3 * * 0',
@@ -56,7 +56,7 @@ const mockCronJobConfigs: CronJobConfig[] = [
   {
     jobName: 'notification-sender',
     displayName: 'Notification Sender',
-    description: 'Sends pending email notifications',
+    description: '寄送待發送的 email 通知',
     jobType: 'notification',
     category: 'communication',
     cronExpression: '*/5 * * * *',
@@ -86,7 +86,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Filter panel for cron job execution history, supporting job name and status filters with active filter chips.',
+          'cron job 執行歷史的篩選面板，支援任務名稱與狀態篩選，並含啟用中篩選標籤。',
       },
     },
   },
@@ -97,7 +97,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state — expanded with no active filters.
+ * 預設狀態 — 展開且無啟用中的篩選。
  */
 export const Default: Story = {
   args: {
@@ -110,7 +110,7 @@ export const Default: Story = {
 };
 
 /**
- * Collapsed state — filter panel collapsed by default.
+ * 收合狀態 — 篩選面板預設為收合。
  */
 export const Collapsed: Story = {
   args: {
@@ -123,7 +123,7 @@ export const Collapsed: Story = {
 };
 
 /**
- * With job name filter applied.
+ * 已套用任務名稱篩選。
  */
 export const WithJobFilter: Story = {
   args: {
@@ -136,7 +136,7 @@ export const WithJobFilter: Story = {
 };
 
 /**
- * With status filter — showing only failed executions.
+ * 含狀態篩選 — 僅顯示失敗的執行。
  */
 export const WithStatusFilter: Story = {
   args: {
@@ -149,7 +149,7 @@ export const WithStatusFilter: Story = {
 };
 
 /**
- * All filters applied — both job name and status set.
+ * 已套用所有篩選 — 任務名稱與狀態皆已設定。
  */
 export const AllFilters: Story = {
   args: {
@@ -162,7 +162,7 @@ export const AllFilters: Story = {
 };
 
 /**
- * Interactive — fully interactive filter demonstration with live state.
+ * 互動 — 含即時狀態、完全可互動的篩選展示。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

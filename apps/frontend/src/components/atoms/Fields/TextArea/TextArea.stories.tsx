@@ -3,19 +3,19 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { TextArea } from './TextArea';
 
 /**
- * TextArea is a multiline text input component for entering longer text content.
+ * TextArea 是用於輸入較長文字內容的多行文字輸入元件。
  *
- * ## When to Use
- * - Comments and feedback
- * - Descriptions and notes
- * - Messages and content creation
- * - Any text input requiring multiple lines
+ * ## 何時使用
+ * - 留言與意見回饋
+ * - 說明與備註
+ * - 訊息與內容建立
+ * - 任何需要多行的文字輸入
  *
- * ## Best Practices
- * - Always provide a clear label
- * - Set appropriate number of rows based on expected content length
- * - Use helperText for character limits or instructions
- * - Show specific error messages when validation fails
+ * ## 最佳實踐
+ * - 一律提供清楚的標籤
+ * - 依預期內容長度設定適當的列數
+ * - 使用 helperText 提供字數限制或說明
+ * - 驗證失敗時顯示具體的錯誤訊息
  */
 const meta = {
   title: 'Shared/Atoms/Fields/TextArea',
@@ -25,7 +25,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Specialized multiline text input component built on MUI TextField, optimized for textarea use cases.',
+          '以 MUI TextField 建構的多行文字輸入元件，針對 textarea 使用情境最佳化。',
       },
     },
   },
@@ -39,40 +39,40 @@ const meta = {
     },
     label: {
       control: 'text',
-      description: 'Label for the textarea',
+      description: '文字區域的標籤',
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text for the textarea',
+      description: '文字區域的佔位文字',
     },
     helperText: {
       control: 'text',
-      description: 'Helper text or error message',
+      description: '輔助文字或錯誤訊息',
     },
     error: {
       control: 'boolean',
-      description: 'Whether to show error state',
+      description: '是否顯示錯誤狀態',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether textarea is disabled',
+      description: '文字區域是否停用',
     },
     required: {
       control: 'boolean',
-      description: 'Whether field is required',
+      description: '欄位是否必填',
     },
     fullWidth: {
       control: 'boolean',
-      description: 'Whether to span full width of parent container',
+      description: '是否佔滿父容器寬度',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Size of the textarea',
+      description: '文字區域的尺寸',
     },
     rows: {
       control: 'number',
-      description: 'Number of rows to display',
+      description: '要顯示的列數',
     },
   },
   decorators: [
@@ -88,8 +88,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Basic usage
- * Simple multiline text input
+ * 基本用法
+ * 簡單的多行文字輸入
  */
 export const Default: Story = {
   args: {
@@ -100,8 +100,8 @@ export const Default: Story = {
 };
 
 /**
- * With default value
- * Shows how textarea displays existing content
+ * 含預設值
+ * 展示 textarea 如何顯示既有內容
  */
 export const WithValue: Story = {
   args: {
@@ -114,8 +114,8 @@ export const WithValue: Story = {
 };
 
 /**
- * With character limit
- * Displays character count guidance
+ * 含字數限制
+ * 顯示字數指引
  */
 export const WithCharacterLimit: Story = {
   args: {
@@ -130,8 +130,8 @@ export const WithCharacterLimit: Story = {
 };
 
 /**
- * Required field
- * Marked as required
+ * 必填欄位
+ * 標示為必填
  */
 export const Required: Story = {
   args: {
@@ -144,8 +144,8 @@ export const Required: Story = {
 };
 
 /**
- * Error state
- * Shows validation error
+ * 錯誤狀態
+ * 顯示驗證錯誤
  */
 export const Error: Story = {
   args: {
@@ -158,8 +158,8 @@ export const Error: Story = {
 };
 
 /**
- * Disabled state
- * Non-editable textarea
+ * 停用狀態
+ * 無法編輯的 textarea
  */
 export const Disabled: Story = {
   args: {
@@ -172,8 +172,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Different row heights
- * Demonstrates various textarea heights
+ * 不同的列高
+ * 示範各種 textarea 高度
  */
 export const DifferentRows: Story = {
   render: () => (
@@ -191,8 +191,8 @@ export const DifferentRows: Story = {
 };
 
 /**
- * Size variations
- * Small, Medium, and Large sizes
+ * 尺寸變化
+ * Small、Medium 與 Large 尺寸
  */
 export const Sizes: Story = {
   render: () => (
@@ -220,8 +220,8 @@ export const Sizes: Story = {
 };
 
 /**
- * Auto-expanding textarea
- * Grows with content using minRows and maxRows
+ * 自動展開的 textarea
+ * 使用 minRows 與 maxRows 隨內容增長
  */
 export const AutoExpanding: Story = {
   args: {
@@ -234,8 +234,8 @@ export const AutoExpanding: Story = {
 };
 
 /**
- * Form example
- * Typical feedback form textarea
+ * 表單範例
+ * 典型的意見回饋表單 textarea
  */
 export const FormExample: Story = {
   render: () => (

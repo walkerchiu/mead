@@ -44,7 +44,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog displaying full details of an audit log entry, including request/response data and metadata tabs.',
+          '顯示稽核日誌項目完整詳情的 modal 對話框，包含 request／response 資料與 metadata 分頁。',
       },
     },
   },
@@ -62,7 +62,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open with a full audit log entry.
+ * 預設 — 以完整的稽核日誌項目開啟。
  */
 export const Default: Story = {
   args: {
@@ -73,7 +73,7 @@ export const Default: Story = {
 };
 
 /**
- * Failed log — shows a failed audit log entry.
+ * 失敗的日誌 — 顯示一筆失敗的稽核日誌項目。
  */
 export const FailedLog: Story = {
   args: {
@@ -93,7 +93,7 @@ export const FailedLog: Story = {
 };
 
 /**
- * Null log — modal should render nothing when log is null.
+ * Null 日誌 — 當 log 為 null 時，modal 不應渲染任何內容。
  */
 export const NullLog: Story = {
   args: {
@@ -104,7 +104,7 @@ export const NullLog: Story = {
 };
 
 /**
- * Interactive — open the modal with a button.
+ * 互動 — 以按鈕開啟 modal。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

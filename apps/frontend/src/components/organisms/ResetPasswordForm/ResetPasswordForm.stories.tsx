@@ -11,7 +11,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'Reset password form for setting a new password.',
+        component: '重設密碼表單，用於設定新密碼。',
       },
     },
   },
@@ -29,7 +29,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
+ * 預設狀態
  */
 export const Default: Story = {
   args: {
@@ -41,7 +41,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading
+ * 載入中
  */
 export const Loading: Story = {
   args: {
@@ -51,7 +51,7 @@ export const Loading: Story = {
 };
 
 /**
- * With error
+ * 含錯誤
  */
 export const WithError: Story = {
   args: {
@@ -61,7 +61,7 @@ export const WithError: Story = {
 };
 
 /**
- * Success state
+ * 成功狀態
  */
 export const Success: Story = {
   args: {
@@ -71,7 +71,7 @@ export const Success: Story = {
 };
 
 /**
- * Token invalid
+ * token 無效
  */
 export const TokenInvalid: Story = {
   args: {
@@ -81,7 +81,7 @@ export const TokenInvalid: Story = {
 };
 
 /**
- * Interactive example
+ * 互動範例
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

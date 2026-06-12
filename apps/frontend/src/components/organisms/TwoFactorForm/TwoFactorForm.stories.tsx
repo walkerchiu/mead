@@ -12,8 +12,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Two-factor authentication form for entering 6-digit verification code or backup code.',
+        component: '雙因素驗證表單，用於輸入 6 位數驗證碼或備用碼。',
       },
     },
   },
@@ -31,8 +30,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
- * Standard 2FA verification form
+ * 預設狀態
+ * 標準的 2FA 驗證表單
  */
 export const Default: Story = {
   args: {
@@ -44,8 +43,8 @@ export const Default: Story = {
 };
 
 /**
- * Loading
- * Loading state during verification process
+ * 載入中
+ * 驗證過程中的載入中狀態
  */
 export const Loading: Story = {
   args: {
@@ -55,8 +54,8 @@ export const Loading: Story = {
 };
 
 /**
- * With error
- * Display verification failure message
+ * 含錯誤
+ * 顯示驗證失敗訊息
  */
 export const WithError: Story = {
   args: {
@@ -66,8 +65,8 @@ export const WithError: Story = {
 };
 
 /**
- * With back button
- * Show return to login link
+ * 含返回按鈕
+ * 顯示返回登入連結
  */
 export const WithBackButton: Story = {
   args: {
@@ -77,8 +76,8 @@ export const WithBackButton: Story = {
 };
 
 /**
- * Backup code mode
- * Use backup code for verification
+ * 備用碼模式
+ * 使用備用碼進行驗證
  */
 export const BackupCodeMode: Story = {
   render: function BackupCodeExample() {
@@ -100,8 +99,8 @@ export const BackupCodeMode: Story = {
 };
 
 /**
- * Various error states
- * Demonstrates different error messages
+ * 各種錯誤狀態
+ * 示範不同的錯誤訊息
  */
 export const ErrorStates: Story = {
   render: () => (
@@ -134,8 +133,8 @@ export const ErrorStates: Story = {
 };
 
 /**
- * Interactive example
- * Simulates complete 2FA verification flow
+ * 互動範例
+ * 模擬完整的 2FA 驗證流程
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

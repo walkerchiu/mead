@@ -5,8 +5,8 @@ import { Box, Typography } from '@mui/material';
 /**
  * UserMenuHeader - Atomic Design: Molecule
  *
- * User menu header that displays user avatar, name, email, role, and online status.
- * Combines Avatar (Atom) and Badge (Atom).
+ * 使用者選單頁首，顯示使用者頭像、姓名、email、角色與線上狀態。
+ * 結合 Avatar（Atom）與 Badge（Atom）。
  */
 const meta = {
   title: 'Shared/Molecules/UserMenuHeader',
@@ -54,7 +54,7 @@ const defaultUser = {
 };
 
 /**
- * Default style - Shows name and email
+ * 預設樣式 - 顯示姓名與 email
  */
 export const Default: Story = {
   args: {
@@ -63,7 +63,7 @@ export const Default: Story = {
 };
 
 /**
- * Full information - Shows all fields
+ * 完整資訊 - 顯示所有欄位
  */
 export const Full: Story = {
   args: {
@@ -75,7 +75,7 @@ export const Full: Story = {
 };
 
 /**
- * Name only
+ * 僅姓名
  */
 export const NameOnly: Story = {
   args: {
@@ -87,7 +87,7 @@ export const NameOnly: Story = {
 };
 
 /**
- * With name and role
+ * 含姓名與角色
  */
 export const WithRole: Story = {
   args: {
@@ -99,7 +99,7 @@ export const WithRole: Story = {
 };
 
 /**
- * With name and status
+ * 含姓名與狀態
  */
 export const WithStatus: Story = {
   args: {
@@ -111,7 +111,7 @@ export const WithStatus: Story = {
 };
 
 /**
- * All status variants displayed side by side
+ * 所有狀態變體並列顯示
  */
 export const AllStatuses: Story = {
   decorators: [
@@ -209,7 +209,7 @@ export const AllStatuses: Story = {
 };
 
 /**
- * All role variants displayed side by side
+ * 所有角色變體並列顯示
  */
 export const AllRoles: Story = {
   decorators: [
@@ -284,7 +284,7 @@ export const AllRoles: Story = {
 };
 
 /**
- * User without avatar (shows initials)
+ * 無頭像的使用者（顯示縮寫）
  */
 export const WithoutAvatar: Story = {
   args: {
@@ -301,7 +301,7 @@ export const WithoutAvatar: Story = {
 };
 
 /**
- * User without role
+ * 無角色的使用者
  */
 export const WithoutRole: Story = {
   args: {
@@ -317,7 +317,7 @@ export const WithoutRole: Story = {
 };
 
 /**
- * Long name and email
+ * 長姓名與 email
  */
 export const LongContent: Story = {
   args: {

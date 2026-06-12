@@ -10,8 +10,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Complete 2FA management component with enable/disable functionality and backup codes.',
+        component: '完整的 2FA 管理元件，具備啟用／停用功能與備用碼。',
       },
     },
   },
@@ -29,7 +28,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state - 2FA disabled.
+ * 預設狀態 - 2FA 已停用。
  */
 export const Disabled: Story = {
   parameters: {
@@ -52,7 +51,7 @@ export const Disabled: Story = {
 };
 
 /**
- * 2FA enabled state.
+ * 2FA 啟用狀態。
  */
 export const Enabled: Story = {
   parameters: {
@@ -75,7 +74,7 @@ export const Enabled: Story = {
 };
 
 /**
- * Loading state.
+ * 載入中狀態。
  */
 export const Loading: Story = {
   parameters: {
@@ -98,7 +97,7 @@ export const Loading: Story = {
 };
 
 /**
- * Enable request - Shows QR code and secret key.
+ * 啟用請求 - 顯示 QR code 與密鑰。
  */
 export const EnableRequest: Story = {
   parameters: {
@@ -137,7 +136,7 @@ export const EnableRequest: Story = {
 };
 
 /**
- * Enable confirmation - Enter verification code.
+ * 啟用確認 - 輸入驗證碼。
  */
 export const EnableConfirm: Story = {
   parameters: {
@@ -177,7 +176,7 @@ export const EnableConfirm: Story = {
 };
 
 /**
- * Disable request - Confirm disabling 2FA.
+ * 停用請求 - 確認停用 2FA。
  */
 export const DisableRequest: Story = {
   parameters: {
@@ -210,7 +209,7 @@ export const DisableRequest: Story = {
 };
 
 /**
- * Error: Invalid verification code.
+ * 錯誤：驗證碼無效。
  */
 export const InvalidCode: Story = {
   parameters: {
@@ -246,7 +245,7 @@ export const InvalidCode: Story = {
 };
 
 /**
- * Backup codes display.
+ * 備用碼顯示。
  */
 export const BackupCodes: Story = {
   parameters: {
@@ -279,7 +278,7 @@ export const BackupCodes: Story = {
 };
 
 /**
- * Error: Network error.
+ * 錯誤：網路錯誤。
  */
 export const NetworkError: Story = {
   parameters: {

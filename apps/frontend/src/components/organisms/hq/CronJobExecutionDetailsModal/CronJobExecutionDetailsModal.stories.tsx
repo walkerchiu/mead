@@ -59,7 +59,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog displaying full details of a cron job execution, including timing, counts, and error information.',
+          '顯示 cron job 執行完整詳情的 modal 對話框，包含時間、次數與錯誤資訊。',
       },
     },
   },
@@ -70,7 +70,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Successful execution — shows all processed counts and timing.
+ * 成功的執行 — 顯示所有處理計數與耗時。
  */
 export const SuccessExecution: Story = {
   args: {
@@ -81,7 +81,7 @@ export const SuccessExecution: Story = {
 };
 
 /**
- * Failed execution — shows error message and stack trace.
+ * 失敗的執行 — 顯示錯誤訊息與堆疊追蹤。
  */
 export const FailedExecution: Story = {
   args: {
@@ -92,7 +92,7 @@ export const FailedExecution: Story = {
 };
 
 /**
- * Running execution — no completion time or duration yet.
+ * 執行中 — 尚無完成時間或耗時。
  */
 export const RunningExecution: Story = {
   args: {
@@ -103,7 +103,7 @@ export const RunningExecution: Story = {
 };
 
 /**
- * Interactive — open the modal with a button.
+ * 互動 — 以按鈕開啟 modal。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

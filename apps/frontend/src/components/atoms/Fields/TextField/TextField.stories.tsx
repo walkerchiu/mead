@@ -5,19 +5,19 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { TextField } from './TextField';
 
 /**
- * TextField is the basic text input component.
+ * TextField 是基本的文字輸入元件。
  *
- * ## When to Use
- * - Single-line text input (name, email, phone, etc.)
- * - Password input
- * - Number input
- * - Date selection
+ * ## 何時使用
+ * - 單行文字輸入（姓名、email、電話等）
+ * - 密碼輸入
+ * - 數字輸入
+ * - 日期選擇
  *
- * ## Best Practices
- * - Always provide a clear label
- * - Use helperText to provide additional instructions
- * - Show specific error messages when there are errors
- * - Use appropriate type attribute (email, password, number, etc.)
+ * ## 最佳實踐
+ * - 一律提供清楚的標籤
+ * - 使用 helperText 提供額外說明
+ * - 發生錯誤時顯示具體的錯誤訊息
+ * - 使用適當的 type 屬性（email、password、number 等）
  */
 const meta = {
   title: 'Shared/Atoms/Fields/TextField',
@@ -26,8 +26,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Wrapper around MUI TextField providing unified input field styles and behavior.',
+        component: 'MUI TextField 的封裝，提供統一的輸入欄位樣式與行為。',
       },
     },
   },
@@ -41,41 +40,41 @@ const meta = {
     },
     label: {
       control: 'text',
-      description: 'Label for the input field',
+      description: '輸入欄位的標籤',
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text for the input field',
+      description: '輸入欄位的佔位文字',
     },
     helperText: {
       control: 'text',
-      description: 'Helper text or error message',
+      description: '輔助文字或錯誤訊息',
     },
     error: {
       control: 'boolean',
-      description: 'Whether to show error state',
+      description: '是否顯示錯誤狀態',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether input field is disabled',
+      description: '輸入欄位是否停用',
     },
     required: {
       control: 'boolean',
-      description: 'Whether field is required',
+      description: '欄位是否必填',
     },
     fullWidth: {
       control: 'boolean',
-      description: 'Whether to span full width of parent container',
+      description: '是否佔滿父容器寬度',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Size of the input field',
+      description: '輸入欄位的尺寸',
     },
     type: {
       control: 'select',
       options: ['text', 'email', 'password', 'number', 'tel', 'url'],
-      description: 'Input type',
+      description: '輸入類型',
     },
   },
   decorators: [
@@ -91,8 +90,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Basic usage
- * Simple text input field
+ * 基本用法
+ * 簡單的文字輸入欄位
  */
 export const Default: Story = {
   args: {
@@ -102,8 +101,8 @@ export const Default: Story = {
 };
 
 /**
- * With helper text
- * Provides additional instructions or hints
+ * 含輔助文字
+ * 提供額外的說明或提示
  */
 export const WithHelperText: Story = {
   args: {
@@ -115,8 +114,8 @@ export const WithHelperText: Story = {
 };
 
 /**
- * Required field
- * Marked as required using the required attribute
+ * 必填欄位
+ * 使用 required 屬性標示為必填
  */
 export const Required: Story = {
   args: {
@@ -127,8 +126,8 @@ export const Required: Story = {
 };
 
 /**
- * Error state
- * Displays validation errors
+ * 錯誤狀態
+ * 顯示驗證錯誤
  */
 export const Error: Story = {
   args: {
@@ -141,8 +140,8 @@ export const Error: Story = {
 };
 
 /**
- * Disabled state
- * Input field is not editable
+ * 停用狀態
+ * 輸入欄位無法編輯
  */
 export const Disabled: Story = {
   args: {
@@ -154,8 +153,8 @@ export const Disabled: Story = {
 };
 
 /**
- * Password input
- * Uses password type to hide input content
+ * 密碼輸入
+ * 使用 password type 隱藏輸入內容
  */
 export const Password: Story = {
   args: {
@@ -168,8 +167,8 @@ export const Password: Story = {
 };
 
 /**
- * Number input
- * Uses number type to restrict to numeric input only
+ * 數字輸入
+ * 使用 number type 限制為僅數字輸入
  */
 export const Number: Story = {
   args: {
@@ -180,8 +179,8 @@ export const Number: Story = {
 };
 
 /**
- * All input types
- * Demonstrates different input types
+ * 所有輸入類型
+ * 示範不同的輸入類型
  */
 export const InputTypes: Story = {
   render: () => (
@@ -201,8 +200,8 @@ export const InputTypes: Story = {
 };
 
 /**
- * Form example
- * Typical login form fields
+ * 表單範例
+ * 典型的登入表單欄位
  */
 export const FormExample: Story = {
   render: () => (
@@ -225,8 +224,8 @@ export const FormExample: Story = {
 };
 
 /**
- * Size variations
- * Small, Medium, and Large sizes
+ * 尺寸變化
+ * Small、Medium 與 Large 尺寸
  */
 export const Sizes: Story = {
   render: () => (

@@ -12,8 +12,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Complete login form component with email, password input and validation.',
+        component: '完整的登入表單元件，包含 email、密碼輸入與驗證。',
       },
     },
     msw: {
@@ -34,8 +33,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
- * Standard login form
+ * 預設狀態
+ * 標準的登入表單
  */
 export const Default: Story = {
   args: {
@@ -47,8 +46,8 @@ export const Default: Story = {
 };
 
 /**
- * Loading
- * Loading state after form submission
+ * 載入中
+ * 表單送出後的載入中狀態
  */
 export const Loading: Story = {
   args: {
@@ -58,8 +57,8 @@ export const Loading: Story = {
 };
 
 /**
- * With error
- * Display login failure message
+ * 含錯誤
+ * 顯示登入失敗訊息
  */
 export const WithError: Story = {
   args: {
@@ -69,8 +68,8 @@ export const WithError: Story = {
 };
 
 /**
- * With default email
- * Email field is pre-filled
+ * 含預設 email
+ * email 欄位已預先填入
  */
 export const WithDefaultEmail: Story = {
   args: {
@@ -80,8 +79,8 @@ export const WithDefaultEmail: Story = {
 };
 
 /**
- * No forgot password
- * Hide forgot password link
+ * 無忘記密碼
+ * 隱藏忘記密碼連結
  */
 export const NoForgotPassword: Story = {
   args: {
@@ -91,8 +90,8 @@ export const NoForgotPassword: Story = {
 };
 
 /**
- * Various error states
- * Demonstrates different error messages
+ * 各種錯誤狀態
+ * 示範不同的錯誤訊息
  */
 export const ErrorStates: Story = {
   render: () => (
@@ -125,8 +124,8 @@ export const ErrorStates: Story = {
 };
 
 /**
- * Interactive example
- * Simulates complete login flow
+ * 互動範例
+ * 模擬完整的登入流程
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

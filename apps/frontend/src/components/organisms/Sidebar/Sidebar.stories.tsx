@@ -41,24 +41,24 @@ import {
 import { DrawerState } from '@/components/organisms';
 
 /**
- * Sidebar component is an application sidebar based on Drawer, providing navigation functionality.
+ * Sidebar 元件是以 Drawer 為基礎的應用程式側邊欄，提供導覽功能。
  *
- * **Features**:
- * - Supports fully expanded and semi-expanded (mini) modes
- * - Mini mode displays only icons, showing tooltips on hover
- * - Supports expandable submenus with three behaviors in mini mode:
- *   - 'hide': Completely hide submenus (default)
- *   - 'popover': Show floating menu on hover
- *   - 'expand': Temporarily expand Sidebar on click
- * - Responsive design: Automatically switches to temporary mode on mobile
- * - Active items automatically highlighted
- * - Supports custom header and footer
- * - Supports left and right anchor positions
+ * **功能特性**：
+ * - 支援完全展開與半展開（mini）模式
+ * - 迷你模式僅顯示圖示，滑鼠移入時顯示工具提示
+ * - 支援可展開的子選單，迷你模式下有三種行為：
+ *   - 'hide'：完全隱藏子選單（預設）
+ *   - 'popover'：滑鼠移入時顯示浮動選單
+ *   - 'expand'：點擊時暫時展開 Sidebar
+ * - 響應式設計：行動裝置上自動切換為 temporary 模式
+ * - 啟用中的項目自動高亮
+ * - 支援自訂頁首與頁尾
+ * - 支援靠左與靠右的錨定位置
  *
- * **Use Cases**:
- * - Application main navigation
- * - HQ dashboard sidebar
- * - Multi-function panels
+ * **使用情境**：
+ * - 應用程式主導覽
+ * - HQ 儀表板側邊欄
+ * - 多功能面板
  */
 const meta = {
   title: 'Shared/Organisms/Sidebar',
@@ -67,8 +67,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Application sidebar component with navigation menu, supporting responsive design and mini mode.',
+        component: '應用程式側邊欄元件，含導覽選單，支援響應式設計與迷你模式。',
       },
     },
   },
@@ -77,7 +76,7 @@ const meta = {
     state: {
       control: 'select',
       options: ['closed', 'mini', 'open'],
-      description: 'Display state',
+      description: '顯示狀態',
       table: {
         defaultValue: { summary: 'open' },
       },
@@ -85,7 +84,7 @@ const meta = {
     variant: {
       control: 'select',
       options: ['temporary', 'persistent', 'permanent'],
-      description: 'Drawer variant',
+      description: 'Drawer 變體',
       table: {
         defaultValue: { summary: 'persistent' },
       },
@@ -93,14 +92,14 @@ const meta = {
     anchor: {
       control: 'select',
       options: ['left', 'right'],
-      description: 'Side of the screen',
+      description: '螢幕側邊',
       table: {
         defaultValue: { summary: 'left' },
       },
     },
     responsive: {
       control: 'boolean',
-      description: 'Enable responsive behavior',
+      description: '啟用響應式行為',
       table: {
         defaultValue: { summary: 'true' },
       },
@@ -108,7 +107,7 @@ const meta = {
     miniExpandBehavior: {
       control: 'select',
       options: ['hide', 'popover', 'expand'],
-      description: 'Expandable menu behavior in mini mode',
+      description: '迷你模式下可展開選單的行為',
       table: {
         defaultValue: { summary: 'hide' },
       },
@@ -199,15 +198,15 @@ const simpleMenuItems: SidebarMenuItem[] = [
 ];
 
 /**
- * Default sidebar with open state
+ * open 狀態的預設側邊欄
  */
 export const Default: Story = {
   render: (args) => (
     <Box sx={{ display: 'flex', height: '500px' }}>
       <Sidebar {...args} />
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
-        <Typography>Default sidebar with full width menu items.</Typography>
+        <Typography variant="h5">主要內容</Typography>
+        <Typography>預設側邊欄，選單項目為完整寬度。</Typography>
       </Box>
     </Box>
   ),
@@ -221,14 +220,14 @@ export const Default: Story = {
 };
 
 /**
- * Mini (collapsed) state - shows only icons
+ * Mini（收合）狀態 - 僅顯示圖示
  */
 export const Mini: Story = {
   render: (args) => (
     <Box sx={{ display: 'flex', height: '500px' }}>
       <Sidebar {...args} />
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Mini mode showing only icons. Hover to see tooltips.
         </Typography>
@@ -245,14 +244,14 @@ export const Mini: Story = {
 };
 
 /**
- * Permanent sidebar - always visible
+ * Permanent 側邊欄 - 恆常顯示
  */
 export const Permanent: Story = {
   render: (args) => (
     <Box sx={{ display: 'flex', height: '500px' }}>
       <Sidebar {...args} />
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Permanent sidebar is always visible and cannot be closed.
         </Typography>
@@ -269,13 +268,13 @@ export const Permanent: Story = {
 };
 
 /**
- * Right-anchored sidebar
+ * 靠右錨定的側邊欄
  */
 export const RightAnchor: Story = {
   render: (args) => (
     <Box sx={{ display: 'flex', height: '500px' }}>
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Right-anchored sidebar for actions or notifications.
         </Typography>
@@ -310,14 +309,14 @@ export const RightAnchor: Story = {
 };
 
 /**
- * With custom header and footer
+ * 含自訂頁首與頁尾
  */
 export const WithHeaderFooter: Story = {
   render: (args) => (
     <Box sx={{ display: 'flex', height: '500px' }}>
       <Sidebar {...args} />
       <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-        <Typography variant="h5">Main Content</Typography>
+        <Typography variant="h5">主要內容</Typography>
         <Typography>
           Sidebar with customized header and footer sections.
         </Typography>
@@ -357,7 +356,7 @@ export const WithHeaderFooter: Story = {
 };
 
 /**
- * Simple expandable menu with one level
+ * 單層級的簡單可展開選單
  */
 export const SimpleExpandableMenu: Story = {
   render: () => {
@@ -406,23 +405,21 @@ export const SimpleExpandableMenu: Story = {
           state={state}
           onStateChange={setState}
           variant="permanent"
-          header={<Typography variant="h6">Simple Menu</Typography>}
+          header={<Typography variant="h6">簡易選單</Typography>}
         />
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">Simple Expandable Menu</Typography>
+          <Typography variant="h5">簡易可展開選單</Typography>
           <Typography paragraph>
-            Current state: <strong>{state}</strong>
-          </Typography>
-          <Typography paragraph>
-            Click on "Products" to expand and see sub-menu items.
+            目前狀態：<strong>{state}</strong>
           </Typography>
           <Typography paragraph>
-            Use the toggle button to switch to mini mode - expandable menus will
-            collapse and only show icons with tooltips.
+            點選「Products」即可展開並檢視子選單項目。
           </Typography>
-          <Typography>
-            The expand/collapse icon rotates smoothly when toggled.
+          <Typography paragraph>
+            使用切換按鈕即可切換至迷你模式－可展開選單會
+            收合，並僅以圖示搭配工具提示顯示。
           </Typography>
+          <Typography>切換時，展開／收合圖示會平滑旋轉。</Typography>
         </Box>
       </Box>
     );
@@ -430,7 +427,7 @@ export const SimpleExpandableMenu: Story = {
 };
 
 /**
- * Multi-level expandable menu (nested)
+ * 多層級可展開選單（巢狀）
  */
 export const MultiLevelExpandableMenu: Story = {
   render: () => {
@@ -509,27 +506,23 @@ export const MultiLevelExpandableMenu: Story = {
           state={state}
           onStateChange={setState}
           variant="permanent"
-          header={<Typography variant="h6">File Manager</Typography>}
+          header={<Typography variant="h6">檔案管理員</Typography>}
         />
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">Multi-Level Expandable Menu</Typography>
+          <Typography variant="h5">多層級可展開選單</Typography>
           <Typography paragraph>
-            Current state: <strong>{state}</strong>
+            目前狀態：<strong>{state}</strong>
+          </Typography>
+          <Typography paragraph>具有多層深度的巢狀子選單。</Typography>
+          <Typography paragraph>
+            請留意子項目如何以縮排呈現層級結構。
           </Typography>
           <Typography paragraph>
-            Nested sub-menus with multiple levels of depth.
-          </Typography>
-          <Typography paragraph>
-            Notice how sub-items are indented to show hierarchy.
-          </Typography>
-          <Typography paragraph>
-            The "Files" menu is set to defaultExpanded, so it opens
-            automatically.
+            「Files」選單已設為 defaultExpanded，因此會 自動展開。
           </Typography>
           <Typography>
-            Toggle to mini mode - all sub-menus will be hidden and only parent
-            icons will show with tooltips. Hover over icons to see the full menu
-            structure.
+            切換至迷你模式－所有子選單都會隱藏，僅以工具提示
+            顯示父層圖示。將滑鼠移至圖示上即可檢視完整的選單 結構。
           </Typography>
         </Box>
       </Box>
@@ -538,7 +531,7 @@ export const MultiLevelExpandableMenu: Story = {
 };
 
 /**
- * Mini mode behavior - Hide (Default)
+ * 迷你模式行為 - Hide（預設）
  */
 export const MiniExpandBehaviorHide: Story = {
   render: () => {
@@ -588,29 +581,26 @@ export const MiniExpandBehaviorHide: Story = {
           onStateChange={setState}
           variant="permanent"
           miniExpandBehavior="hide"
-          header={<Typography variant="h6">Hide Behavior</Typography>}
+          header={<Typography variant="h6">Hide 行為</Typography>}
         />
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">Mini Mode Behavior: Hide</Typography>
+          <Typography variant="h5">迷你模式行為：Hide</Typography>
           <Typography paragraph>
-            Current state: <strong>{state}</strong>
+            目前狀態：<strong>{state}</strong>
           </Typography>
           <Typography paragraph>
-            <strong>Behavior Description:</strong>
+            <strong>行為說明：</strong>
           </Typography>
           <Typography paragraph component="div">
             <ul>
-              <li>
-                In mini mode, items with submenus completely hide their children
-              </li>
-              <li>Clicking on items with submenus has no effect</li>
-              <li>This is the default behavior (miniExpandBehavior="hide")</li>
-              <li>Toggle to open mode to see the full submenu</li>
+              <li>在迷你模式下，含子選單的項目會完全隱藏其子項目</li>
+              <li>點選含子選單的項目不會有任何作用</li>
+              <li>這是預設行為（miniExpandBehavior="hide"）</li>
+              <li>切換至展開模式即可檢視完整的子選單</li>
             </ul>
           </Typography>
           <Typography paragraph>
-            Click the toggle button to switch to open mode and view the Products
-            submenu.
+            點選切換按鈕即可切換至展開模式，並檢視 Products 子選單。
           </Typography>
         </Box>
       </Box>
@@ -619,7 +609,7 @@ export const MiniExpandBehaviorHide: Story = {
 };
 
 /**
- * Mini mode behavior - Popover
+ * 迷你模式行為 - Popover
  */
 export const MiniExpandBehaviorPopover: Story = {
   render: () => {
@@ -679,29 +669,23 @@ export const MiniExpandBehaviorPopover: Story = {
           onStateChange={setState}
           variant="permanent"
           miniExpandBehavior="popover"
-          header={<Typography variant="h6">Popover Behavior</Typography>}
+          header={<Typography variant="h6">Popover 行為</Typography>}
         />
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">Mini Mode Behavior: Popover</Typography>
+          <Typography variant="h5">迷你模式行為：Popover</Typography>
           <Typography paragraph>
-            Current state: <strong>{state}</strong>
+            目前狀態：<strong>{state}</strong>
           </Typography>
           <Typography paragraph>
-            <strong>Behavior Description:</strong>
+            <strong>行為說明：</strong>
           </Typography>
           <Typography paragraph component="div">
             <ul>
-              <li>In mini mode, hover over items with submenus</li>
-              <li>A floating menu appears on the right showing child items</li>
-              <li>
-                This is the industry best practice
-                (miniExpandBehavior="popover")
-              </li>
-              <li>
-                Provides the best user experience without expanding the entire
-                Sidebar
-              </li>
-              <li>Try hovering over the Products or Files icons</li>
+              <li>在迷你模式下，將滑鼠移至含子選單的項目上</li>
+              <li>右側會出現浮動選單，顯示子項目</li>
+              <li>這是業界最佳實踐 （miniExpandBehavior="popover"）</li>
+              <li>在不展開整個 Sidebar 的情況下，提供最佳的 使用者體驗</li>
+              <li>試著將滑鼠移至 Products 或 Files 圖示上</li>
             </ul>
           </Typography>
         </Box>
@@ -711,7 +695,7 @@ export const MiniExpandBehaviorPopover: Story = {
 };
 
 /**
- * Mini mode behavior - Temporary Expand
+ * 迷你模式行為 - Temporary Expand
  */
 export const MiniExpandBehaviorExpand: Story = {
   render: () => {
@@ -797,33 +781,27 @@ export const MiniExpandBehaviorExpand: Story = {
           onStateChange={setState}
           variant="permanent"
           miniExpandBehavior="expand"
-          header={<Typography variant="h6">Expand Behavior</Typography>}
+          header={<Typography variant="h6">Expand 行為</Typography>}
         />
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">
-            Mini Mode Behavior: Temporary Expand
+          <Typography variant="h5">迷你模式行為：Temporary Expand</Typography>
+          <Typography paragraph>
+            目前狀態：<strong>{state}</strong>
           </Typography>
           <Typography paragraph>
-            Current state: <strong>{state}</strong>
-          </Typography>
-          <Typography paragraph>
-            <strong>Behavior Description:</strong>
+            <strong>行為說明：</strong>
           </Typography>
           <Typography paragraph component="div">
             <ul>
-              <li>In mini mode, click on items with submenus</li>
-              <li>The Sidebar temporarily expands fully to show the submenu</li>
-              <li>
-                After clicking any child item, it automatically returns to mini
-                mode
-              </li>
-              <li>This is the miniExpandBehavior="expand" behavior</li>
-              <li>Try clicking the Products or Files icons in mini mode</li>
+              <li>在迷你模式下，點選含子選單的項目</li>
+              <li>Sidebar 會暫時完全展開以顯示子選單</li>
+              <li>點選任一子項目後，會自動回到迷你 模式</li>
+              <li>這是 miniExpandBehavior="expand" 的行為</li>
+              <li>試著在迷你模式下點選 Products 或 Files 圖示</li>
             </ul>
           </Typography>
           <Typography paragraph>
-            After clicking any submenu item, the Sidebar will automatically
-            collapse back to mini mode.
+            點選任一子選單項目後，Sidebar 會自動 收合回迷你模式。
           </Typography>
         </Box>
       </Box>
@@ -832,7 +810,7 @@ export const MiniExpandBehaviorExpand: Story = {
 };
 
 /**
- * Floating toggle button outside sidebar
+ * 側邊欄外的浮動切換按鈕
  */
 export const FloatingToggleButton: Story = {
   render: () => {
@@ -846,7 +824,7 @@ export const FloatingToggleButton: Story = {
           state={state}
           onStateChange={setState}
           variant="permanent"
-          header={<Typography variant="h6">Menu</Typography>}
+          header={<Typography variant="h6">選單</Typography>}
           showToggleButton={false}
         />
         {/* Custom floating toggle button */}
@@ -873,14 +851,12 @@ export const FloatingToggleButton: Story = {
           )}
         </IconButton>
         <Box sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
-          <Typography variant="h5">Floating Toggle Button</Typography>
+          <Typography variant="h5">浮動切換按鈕</Typography>
           <Typography paragraph>
-            Places the toggle button outside the Sidebar, creating a floating
-            effect.
+            將切換按鈕置於 Sidebar 之外，營造浮動 效果。
           </Typography>
           <Typography>
-            By setting showToggleButton=false and implementing your own custom
-            toggle button.
+            做法是設定 showToggleButton=false，並自行實作你的 自訂切換按鈕。
           </Typography>
         </Box>
       </Box>
@@ -889,7 +865,7 @@ export const FloatingToggleButton: Story = {
 };
 
 /**
- * Mini mode comparison
+ * 迷你模式比較
  */
 export const MiniModeComparison: Story = {
   render: () => {
@@ -946,7 +922,7 @@ export const MiniModeComparison: Story = {
 };
 
 /**
- * Left and Right sidebars together
+ * 左側與右側側邊欄並存
  */
 export const DualSidebars: Story = {
   render: () => {
@@ -1013,7 +989,7 @@ export const DualSidebars: Story = {
 };
 
 /**
- * Interactive example - toggle between states
+ * 互動範例 - 在各狀態間切換
  */
 export const Interactive: Story = {
   render: (args) => {
@@ -1070,7 +1046,7 @@ export const Interactive: Story = {
 };
 
 /**
- * Complete application layout with AppBar and responsive behavior
+ * 含 AppBar 與響應式行為的完整應用程式版面
  */
 export const ApplicationLayout: Story = {
   render: () => {
@@ -1139,7 +1115,7 @@ export const ApplicationLayout: Story = {
                 U
               </Avatar>
               <Typography variant="caption" display="block">
-                User Name
+                使用者名稱
               </Typography>
             </Box>
           }
@@ -1149,27 +1125,22 @@ export const ApplicationLayout: Story = {
         <Box component="main" sx={{ flexGrow: 1, p: 3, bgcolor: 'grey.50' }}>
           <Toolbar />
           <Typography variant="h4" gutterBottom>
-            {items.find((i) => i.id === activeId)?.label || 'Welcome'}
+            {items.find((i) => i.id === activeId)?.label || '歡迎'}
           </Typography>
           <Typography paragraph>
-            This is an example of a complete responsive application layout.
+            這是完整響應式應用程式版面配置的範例。
           </Typography>
           <Typography paragraph>
-            <strong>Responsive Behavior:</strong>
+            <strong>響應式行為：</strong>
           </Typography>
           <ul>
+            <li>桌面：可在展開與迷你模式之間切換的常駐抽屜</li>
+            <li>行動裝置：覆蓋於內容上的臨時抽屜</li>
             <li>
-              Desktop: Persistent drawer that can toggle between open and mini
-            </li>
-            <li>Mobile: Temporary drawer that overlays content</li>
-            <li>
-              Current screen size:{' '}
-              <strong>{isMobile ? 'Mobile' : 'Desktop'}</strong>
+              目前螢幕尺寸： <strong>{isMobile ? '行動裝置' : '桌面'}</strong>
             </li>
           </ul>
-          <Typography>
-            Try resizing your browser window to see the responsive behavior!
-          </Typography>
+          <Typography>試著調整瀏覽器視窗大小，即可觀察響應式行為！</Typography>
         </Box>
       </Box>
     );

@@ -13,7 +13,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog for revoking all sessions except the current one, useful for signing out from other devices.',
+          '用於撤銷除目前以外所有 session 的 modal 對話框，適合登出其他裝置。',
       },
     },
   },
@@ -31,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open with a current session ID.
+ * 預設 — 以目前 session ID 開啟。
  */
 export const Default: Story = {
   args: {
@@ -43,7 +43,7 @@ export const Default: Story = {
 };
 
 /**
- * Interactive — open and close the modal with a button.
+ * 互動 — 以按鈕開啟與關閉 modal。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

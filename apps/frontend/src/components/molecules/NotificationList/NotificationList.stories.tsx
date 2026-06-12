@@ -62,23 +62,23 @@ const meta = {
   argTypes: {
     loading: {
       control: 'boolean',
-      description: 'Loading state',
+      description: '載入中狀態',
     },
     showFilterTabs: {
       control: 'boolean',
-      description: 'Show filter tabs (All/Unread)',
+      description: '顯示篩選分頁（全部／未讀）',
     },
     showActions: {
       control: 'boolean',
-      description: 'Show action buttons (Mark all read, Clear read)',
+      description: '顯示操作按鈕（全部標為已讀、清除已讀）',
     },
     showDeleteButton: {
       control: 'boolean',
-      description: 'Show delete button on each notification item',
+      description: '在每則通知項目上顯示刪除按鈕',
     },
     maxHeight: {
       control: 'number',
-      description: 'Maximum height of the list (scrollable)',
+      description: '列表的最大高度（可捲動）',
     },
   },
 } satisfies Meta<typeof NotificationList>;
@@ -87,7 +87,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default notification list with mixed read/unread notifications
+ * 含已讀／未讀混合通知的預設通知列表
  */
 export const Default: Story = {
   args: {
@@ -105,7 +105,7 @@ export const Default: Story = {
 };
 
 /**
- * Empty state
+ * 空狀態
  */
 export const Empty: Story = {
   args: {
@@ -121,7 +121,7 @@ export const Empty: Story = {
 };
 
 /**
- * Loading state
+ * 載入中狀態
  */
 export const Loading: Story = {
   args: {
@@ -136,7 +136,7 @@ export const Loading: Story = {
 };
 
 /**
- * Only unread notifications
+ * 僅未讀通知
  */
 export const OnlyUnread: Story = {
   args: {
@@ -154,7 +154,7 @@ export const OnlyUnread: Story = {
 };
 
 /**
- * Only read notifications
+ * 僅已讀通知
  */
 export const OnlyRead: Story = {
   args: {
@@ -172,7 +172,7 @@ export const OnlyRead: Story = {
 };
 
 /**
- * Minimal configuration (no tabs, no actions, no delete buttons)
+ * 最簡設定（無分頁、無操作、無刪除按鈕）
  */
 export const Minimal: Story = {
   args: {
@@ -190,7 +190,7 @@ export const Minimal: Story = {
 };
 
 /**
- * Without filter tabs
+ * 不含篩選分頁
  */
 export const WithoutFilterTabs: Story = {
   args: {
@@ -209,7 +209,7 @@ export const WithoutFilterTabs: Story = {
 };
 
 /**
- * Without action buttons
+ * 不含操作按鈕
  */
 export const WithoutActions: Story = {
   args: {
@@ -226,7 +226,7 @@ export const WithoutActions: Story = {
 };
 
 /**
- * Without delete buttons on items
+ * 項目不含刪除按鈕
  */
 export const WithoutDeleteButtons: Story = {
   args: {
@@ -244,7 +244,7 @@ export const WithoutDeleteButtons: Story = {
 };
 
 /**
- * Compact width (mobile-like)
+ * 精簡寬度（類似行動裝置）
  */
 export const CompactWidth: Story = {
   args: {
@@ -262,7 +262,7 @@ export const CompactWidth: Story = {
 };
 
 /**
- * Wide width (desktop-like)
+ * 寬版寬度（類似桌面）
  */
 export const WideWidth: Story = {
   args: {
@@ -280,7 +280,7 @@ export const WideWidth: Story = {
 };
 
 /**
- * Custom max height with many notifications
+ * 含大量通知的自訂最大高度
  */
 export const ScrollableList: Story = {
   args: {
@@ -341,7 +341,7 @@ export const ScrollableList: Story = {
 };
 
 /**
- * Custom unread count (override calculated value)
+ * 自訂未讀數量（覆寫計算值）
  */
 export const CustomUnreadCount: Story = {
   args: {

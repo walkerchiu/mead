@@ -18,31 +18,31 @@ const meta = {
     type: {
       control: 'select',
       options: ['INFO', 'WARNING', 'SUCCESS', 'ERROR'],
-      description: 'Notification type',
+      description: '通知類型',
     },
     title: {
       control: 'text',
-      description: 'Notification title',
+      description: '通知標題',
     },
     message: {
       control: 'text',
-      description: 'Notification message',
+      description: '通知訊息',
     },
     isRead: {
       control: 'boolean',
-      description: 'Whether the notification has been read',
+      description: '通知是否已讀',
     },
     createdAt: {
       control: 'text',
-      description: 'Creation timestamp (ISO string)',
+      description: '建立時間戳（ISO 字串）',
     },
     showDelete: {
       control: 'boolean',
-      description: 'Whether to show the delete button',
+      description: '是否顯示刪除按鈕',
     },
     avatar: {
       control: 'text',
-      description: 'Avatar URL (optional, replaces type icon)',
+      description: '頭像 URL（選用，取代類型圖示）',
     },
   },
 } satisfies Meta<typeof NotificationItem>;
@@ -51,7 +51,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default notification item with INFO type
+ * INFO 類型的預設通知項目
  */
 export const Default: Story = {
   args: {
@@ -72,7 +72,7 @@ export const Default: Story = {
 };
 
 /**
- * All notification types
+ * 所有通知類型
  */
 export const AllTypes: Story = {
   render: () => (
@@ -118,7 +118,7 @@ export const AllTypes: Story = {
 };
 
 /**
- * Different time ranges
+ * 不同的時間範圍
  */
 export const TimeRanges: Story = {
   render: () => (
@@ -173,7 +173,7 @@ export const TimeRanges: Story = {
 };
 
 /**
- * Read vs Unread states
+ * 已讀與未讀狀態
  */
 export const ReadStates: Story = {
   render: () => (
@@ -201,7 +201,7 @@ export const ReadStates: Story = {
 };
 
 /**
- * With and without delete button
+ * 含與不含刪除按鈕
  */
 export const DeleteButton: Story = {
   render: () => (
@@ -230,7 +230,7 @@ export const DeleteButton: Story = {
 };
 
 /**
- * Long content handling
+ * 長內容處理
  */
 export const LongContent: Story = {
   render: () => (
@@ -249,7 +249,7 @@ export const LongContent: Story = {
 };
 
 /**
- * Mixed notification list (realistic scenario)
+ * 混合通知列表（真實情境）
  */
 export const MixedList: Story = {
   render: () => (
@@ -308,7 +308,7 @@ export const MixedList: Story = {
 };
 
 /**
- * Real-world examples
+ * 實際範例
  */
 export const RealWorldExamples: Story = {
   render: () => (
@@ -354,7 +354,7 @@ export const RealWorldExamples: Story = {
 };
 
 /**
- * Without handlers (non-interactive)
+ * 不含處理器（不可互動）
  */
 export const NonInteractive: Story = {
   render: () => (
@@ -372,7 +372,7 @@ export const NonInteractive: Story = {
 };
 
 /**
- * With avatar (user-generated notifications)
+ * 含頭像（使用者產生的通知）
  */
 export const WithAvatar: Story = {
   render: () => (
@@ -422,7 +422,7 @@ export const WithAvatar: Story = {
 };
 
 /**
- * Mixed with and without avatars
+ * 含頭像與不含頭像混合
  */
 export const MixedAvatars: Story = {
   render: () => (

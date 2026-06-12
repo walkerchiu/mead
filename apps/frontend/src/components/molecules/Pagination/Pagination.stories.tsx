@@ -13,31 +13,31 @@ const meta = {
   argTypes: {
     count: {
       control: { type: 'number', min: 1, max: 100 },
-      description: 'Total pages',
+      description: '總頁數',
     },
     page: {
       control: { type: 'number', min: 1 },
-      description: 'Current page number',
+      description: '目前頁碼',
     },
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Component size',
+      description: '元件尺寸',
     },
     variant: {
       control: 'select',
       options: ['text', 'outlined'],
-      description: 'Component variant',
+      description: '元件變體',
     },
     shape: {
       control: 'select',
       options: ['circular', 'rounded'],
-      description: 'Button shape',
+      description: '按鈕形狀',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary', 'standard'],
-      description: 'Component color',
+      description: '元件顏色',
     },
   },
 } satisfies Meta<typeof Pagination>;

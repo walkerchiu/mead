@@ -10,18 +10,18 @@ const logAction =
   };
 
 /**
- * NotificationBadge displays a notification icon with a badge showing the unread count.
+ * NotificationBadge 顯示一個通知圖示，並附帶顯示未讀數量的徽章。
  *
- * **Features**:
- * - Badge showing unread notification count
- * - Multiple color variants
- * - Different sizes
- * - Tooltip on hover
+ * **功能特性**：
+ * - 顯示未讀通知數量的徽章
+ * - 多種顏色變體
+ * - 不同尺寸
+ * - 滑鼠移入時顯示工具提示
  *
- * **Use Cases**:
- * - Application header notification button
- * - Dashboard notification widget
- * - Any place that needs a notification indicator
+ * **使用情境**：
+ * - 應用程式標題列通知按鈕
+ * - 儀表板通知小工具
+ * - 任何需要通知指示器的位置
  */
 const meta = {
   title: 'Shared/Atoms/NotificationBadge',
@@ -30,8 +30,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'A notification badge button that displays a bell icon with unread count badge.',
+        component: '通知徽章按鈕，顯示鈴鐺圖示並附帶未讀數量徽章。',
       },
     },
   },
@@ -39,7 +38,7 @@ const meta = {
   argTypes: {
     unreadCount: {
       control: 'number',
-      description: 'Number of unread notifications',
+      description: '未讀通知數量',
       table: {
         defaultValue: { summary: '0' },
       },
@@ -47,7 +46,7 @@ const meta = {
     color: {
       control: 'select',
       options: ['inherit', 'primary', 'secondary', 'default'],
-      description: 'Button color',
+      description: '按鈕顏色',
       table: {
         defaultValue: { summary: 'inherit' },
       },
@@ -55,14 +54,14 @@ const meta = {
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Icon button size',
+      description: '圖示按鈕尺寸',
       table: {
         defaultValue: { summary: 'medium' },
       },
     },
     tooltipTitle: {
       control: 'text',
-      description: 'Tooltip text',
+      description: '工具提示文字',
       table: {
         defaultValue: { summary: 'Notifications' },
       },
@@ -74,7 +73,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default notification badge with no unread notifications
+ * 無未讀通知的預設通知徽章
  */
 export const Default: Story = {
   args: {
@@ -84,7 +83,7 @@ export const Default: Story = {
 };
 
 /**
- * Badge with unread notifications
+ * 含未讀通知的徽章
  */
 export const WithUnread: Story = {
   args: {
@@ -94,7 +93,7 @@ export const WithUnread: Story = {
 };
 
 /**
- * Badge with many unread notifications (shows 99)
+ * 含大量未讀通知的徽章（顯示 99）
  */
 export const ManyUnread: Story = {
   args: {
@@ -104,7 +103,7 @@ export const ManyUnread: Story = {
 };
 
 /**
- * Badge with over 100 unread notifications (shows 99+)
+ * 含超過 100 則未讀通知的徽章（顯示 99+）
  */
 export const OverHundred: Story = {
   args: {
@@ -114,7 +113,7 @@ export const OverHundred: Story = {
 };
 
 /**
- * In AppBar (typical use case)
+ * 置於 AppBar 中（典型使用情境）
  */
 export const InAppBar: Story = {
   args: {
@@ -139,7 +138,7 @@ export const InAppBar: Story = {
 };
 
 /**
- * Different sizes
+ * 不同尺寸
  */
 export const Sizes: Story = {
   render: () => (
@@ -179,7 +178,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors
+ * 不同顏色
  */
 export const Colors: Story = {
   render: () => (
@@ -261,7 +260,7 @@ export const Colors: Story = {
 };
 
 /**
- * Custom tooltip
+ * 自訂工具提示
  */
 export const CustomTooltip: Story = {
   args: {

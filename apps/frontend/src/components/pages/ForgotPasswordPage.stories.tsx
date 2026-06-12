@@ -10,8 +10,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Forgot password page where users can request a password reset link.',
+        component: '忘記密碼頁面，使用者可在此申請密碼重設連結。',
       },
     },
   },
@@ -22,7 +21,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state
+ * 預設狀態
  */
 export const Default: Story = {
   render: () => (
@@ -41,7 +40,7 @@ export const Default: Story = {
 };
 
 /**
- * With error
+ * 含錯誤
  */
 export const WithError: Story = {
   render: () => (
@@ -58,7 +57,7 @@ export const WithError: Story = {
 };
 
 /**
- * Success state
+ * 成功狀態
  */
 export const Success: Story = {
   render: () => (
@@ -72,7 +71,7 @@ export const Success: Story = {
 };
 
 /**
- * Full flow
+ * 完整流程
  */
 export const FullFlow: Story = {
   render: function FullFlowExample() {

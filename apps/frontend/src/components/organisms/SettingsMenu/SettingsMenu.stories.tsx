@@ -14,12 +14,12 @@ import { ThemeMode } from '@/components/atoms/ThemeToggleButton';
 /**
  * SettingsMenu - Atomic Design: Organism
  *
- * Complete settings menu component that combines:
- * - SettingsButton (Atom) - Trigger button
- * - ThemeSelector (Molecule) - Theme selector
- * - SettingsMenuList (Molecule) - Menu item list
+ * 完整的設定選單元件，結合：
+ * - SettingsButton（Atom）- 觸發按鈕
+ * - ThemeSelector（Molecule）- 主題選擇器
+ * - SettingsMenuList（Molecule）- 選單項目列表
  *
- * Fully follows the Atomic Design architecture like the Notification system.
+ * 如同 Notification 系統一般，完全遵循 Atomic Design 架構。
  */
 const meta = {
   title: 'Shared/Organisms/SettingsMenu',
@@ -77,7 +77,7 @@ const defaultMenuItems = [
 ];
 
 /**
- * Default style - without theme toggle
+ * 預設樣式 - 不含主題切換
  */
 export const Default: Story = {
   args: {
@@ -86,7 +86,7 @@ export const Default: Story = {
 };
 
 /**
- * Minimal configuration
+ * 最簡設定
  */
 export const Minimal: Story = {
   args: {
@@ -102,7 +102,7 @@ export const Minimal: Story = {
 };
 
 /**
- * Show button label
+ * 顯示按鈕標籤
  */
 export const WithLabel: Story = {
   args: {
@@ -112,7 +112,7 @@ export const WithLabel: Story = {
 };
 
 /**
- * With theme toggle functionality
+ * 含主題切換功能
  */
 export const WithThemeToggle: Story = {
   args: {
@@ -124,7 +124,7 @@ export const WithThemeToggle: Story = {
 };
 
 /**
- * With label and theme toggle
+ * 含標籤與主題切換
  */
 export const WithLabelAndTheme: Story = {
   args: {
@@ -137,7 +137,7 @@ export const WithLabelAndTheme: Story = {
 };
 
 /**
- * Different sizes - small, medium, large
+ * 不同尺寸 - small、medium、large
  */
 export const Sizes: Story = {
   render: () => (
@@ -165,7 +165,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors - primary, secondary
+ * 不同顏色 - primary、secondary
  */
 export const Colors: Story = {
   render: () => (
@@ -187,7 +187,7 @@ export const Colors: Story = {
 };
 
 /**
- * Theme variants - light, dark, system
+ * 主題變體 - light、dark、system
  */
 export const ThemeVariants: Story = {
   render: () => (
@@ -230,7 +230,7 @@ export const ThemeVariants: Story = {
 };
 
 /**
- * Only theme toggle - no other menu items
+ * 僅主題切換 - 無其他選單項目
  */
 export const OnlyThemeToggle: Story = {
   args: {
@@ -242,7 +242,7 @@ export const OnlyThemeToggle: Story = {
 };
 
 /**
- * Extended menu items
+ * 延伸的選單項目
  */
 export const ExtendedMenuItems: Story = {
   args: {
@@ -285,7 +285,7 @@ export const ExtendedMenuItems: Story = {
 };
 
 /**
- * Using href for navigation
+ * 使用 href 進行導覽
  */
 export const WithHrefNavigation: Story = {
   args: {
@@ -316,7 +316,7 @@ export const WithHrefNavigation: Story = {
 };
 
 /**
- * Chinese labels example
+ * 中文標籤範例
  */
 export const ChineseLabels: Story = {
   render: () => {
@@ -359,7 +359,7 @@ export const ChineseLabels: Story = {
 };
 
 /**
- * Interactive example - theme switching
+ * 互動範例 - 主題切換
  */
 export const Interactive: Story = {
   render: () => {
@@ -390,7 +390,7 @@ export const Interactive: Story = {
 };
 
 /**
- * Full configuration - all features enabled
+ * 完整設定 - 啟用所有功能
  */
 export const FullConfiguration: Story = {
   render: () => {

@@ -12,25 +12,25 @@ import {
 import { Box, Paper } from '@mui/material';
 
 /**
- * DetailRow is a unified detail information display component that supports three layout modes:
+ * DetailRow 是統一的詳細資訊顯示元件，支援三種版面模式：
  *
- * ## Layout Modes
- * - **horizontal**: Horizontal layout (icon-label-value arranged horizontally)
- * - **vertical**: Vertical layout (label on top, value below)
- * - **auto**: Automatic mode (chooses layout based on content length)
+ * ## 版面模式
+ * - **horizontal**：水平版面（圖示-標籤-值水平排列）
+ * - **vertical**：垂直版面（標籤在上、值在下）
+ * - **auto**：自動模式（依內容長度選擇版面）
  *
- * ## Features
- * - Optional icon display
- * - Copy functionality
- * - Custom styling
- * - Responsive layout
+ * ## 功能特性
+ * - 選用的圖示顯示
+ * - 複製功能
+ * - 自訂樣式
+ * - 響應式版面
  *
- * ## When to Use
- * - Displaying detail information in modals
- * - Showing key-value pairs in cards
- * - Presenting structured data
- * - Audit log details
- * - Session information
+ * ## 何時使用
+ * - 在 modal 中顯示詳細資訊
+ * - 在卡片中顯示鍵值對
+ * - 呈現結構化資料
+ * - 稽核日誌詳情
+ * - session 資訊
  */
 const meta = {
   title: 'Shared/Molecules/DetailRow',
@@ -58,32 +58,32 @@ Optional features include:
   argTypes: {
     icon: {
       control: false,
-      description: 'Optional icon element',
+      description: '選用的圖示元素',
     },
     label: {
       control: 'text',
-      description: 'Field label',
+      description: '欄位標籤',
     },
     value: {
       control: 'text',
-      description: 'Field value',
+      description: '欄位值',
     },
     copyable: {
       control: 'boolean',
-      description: 'Enable copy functionality',
+      description: '啟用複製功能',
     },
     fieldName: {
       control: 'text',
-      description: 'Field name for copy status tracking',
+      description: '用於追蹤複製狀態的欄位名稱',
     },
     layout: {
       control: 'select',
       options: ['horizontal', 'vertical', 'auto'],
-      description: 'Layout mode',
+      description: '版面模式',
     },
     autoThreshold: {
       control: 'number',
-      description: 'Threshold for auto mode (character count)',
+      description: 'auto 模式的門檻（字元數）',
     },
   },
 } satisfies Meta<typeof DetailRow>;
@@ -92,7 +92,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Horizontal layout mode, suitable for shorter content
+ * 水平版面模式，適合較短的內容
  */
 export const Horizontal: Story = {
   args: {
@@ -104,7 +104,7 @@ export const Horizontal: Story = {
 };
 
 /**
- * Vertical layout mode, suitable for longer content
+ * 垂直版面模式，適合較長的內容
  */
 export const Vertical: Story = {
   args: {
@@ -117,7 +117,7 @@ export const Vertical: Story = {
 };
 
 /**
- * Auto mode - short content uses horizontal layout
+ * auto 模式 - 短內容使用水平版面
  */
 export const AutoShort: Story = {
   args: {
@@ -130,7 +130,7 @@ export const AutoShort: Story = {
 };
 
 /**
- * Auto mode - long content uses vertical layout
+ * auto 模式 - 長內容使用垂直版面
  */
 export const AutoLong: Story = {
   args: {
@@ -144,7 +144,7 @@ export const AutoLong: Story = {
 };
 
 /**
- * Horizontal layout with copy functionality
+ * 含複製功能的水平版面
  */
 export const CopyableHorizontal: Story = {
   args: {
@@ -158,7 +158,7 @@ export const CopyableHorizontal: Story = {
 };
 
 /**
- * Vertical layout with copy functionality
+ * 含複製功能的垂直版面
  */
 export const CopyableVertical: Story = {
   args: {
@@ -173,7 +173,7 @@ export const CopyableVertical: Story = {
 };
 
 /**
- * Horizontal layout without icon
+ * 不含圖示的水平版面
  */
 export const WithoutIcon: Story = {
   args: {
@@ -184,7 +184,7 @@ export const WithoutIcon: Story = {
 };
 
 /**
- * Vertical layout with ReactNode value
+ * 含 ReactNode 值的垂直版面
  */
 export const WithReactNode: Story = {
   args: {
@@ -205,7 +205,7 @@ export const WithReactNode: Story = {
 };
 
 /**
- * Custom styling
+ * 自訂樣式
  */
 export const CustomStyle: Story = {
   args: {
@@ -223,7 +223,7 @@ export const CustomStyle: Story = {
 };
 
 /**
- * Multiple DetailRows combined
+ * 多個 DetailRow 組合
  */
 export const MultipleRows: Story = {
   render: () => (
@@ -267,7 +267,7 @@ export const MultipleRows: Story = {
 };
 
 /**
- * Auto mode threshold comparison
+ * auto 模式門檻比較
  */
 export const AutoThresholdComparison: Story = {
   render: () => (
@@ -324,7 +324,7 @@ export const AutoThresholdComparison: Story = {
 };
 
 /**
- * Audit log details example
+ * 稽核日誌詳情範例
  */
 export const AuditLogExample: Story = {
   render: () => (
@@ -371,7 +371,7 @@ export const AuditLogExample: Story = {
 };
 
 /**
- * Session details example
+ * Session 詳情範例
  */
 export const SessionExample: Story = {
   render: () => (

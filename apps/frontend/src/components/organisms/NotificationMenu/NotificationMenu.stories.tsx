@@ -7,27 +7,27 @@ import { UnifiedNotification, NotificationType } from '@/types/notification';
 /**
  * NotificationMenu Storybook Stories
  *
- * **Important Note**:
- * NotificationMenu is a pure UI component (Organism) that requires external data.
+ * **重要說明**：
+ * NotificationMenu 是需要外部資料的純 UI 元件（Organism）。
  *
- * **Difference: NotificationMenu vs NotificationCenter**:
+ * **差異：NotificationMenu 與 NotificationCenter**：
  *
- * - **NotificationMenu** (Stories here):
- *   - Pure UI component, does not handle data fetching
- *   - Requires external notifications, unreadCount, etc. to be passed as props
- *   - Can be reused anywhere (as long as data is provided)
- *   - Best for: When you already have a data source
+ * - **NotificationMenu**（此處的 Stories）：
+ *   - 純 UI 元件，不處理資料取得
+ *   - 需要透過 props 傳入 notifications、unreadCount 等
+ *   - 可在任何地方重用（只要提供資料即可）
+ *   - 最適合：當你已有資料來源時
  *
- * - **NotificationCenter** (See NotificationCenter Stories):
- *   - Integrates data layer, uses useNotifications hook
- *   - Automatically fetches notification data from GraphQL
- *   - Supports real-time subscriptions (WebSocket)
- *   - Built-in error handling and loading states
- *   - Best for: Standard usage scenarios in real applications
+ * - **NotificationCenter**（請參閱 NotificationCenter Stories）：
+ *   - 整合資料層，使用 useNotifications hook
+ *   - 自動從 GraphQL 取得通知資料
+ *   - 支援即時訂閱（WebSocket）
+ *   - 內建錯誤處理與載入中狀態
+ *   - 最適合：實際應用中的標準使用情境
  *
- * **Usage Recommendation**:
- * - In most cases, use NotificationCenter in your application
- * - Only use NotificationMenu directly when you need custom data sources
+ * **使用建議**：
+ * - 多數情況下，請在應用程式中使用 NotificationCenter
+ * - 僅在需要自訂資料來源時才直接使用 NotificationMenu
  */
 
 // Helper function to log actions
@@ -94,24 +94,24 @@ const mockNotifications: UnifiedNotification[] = [
 ];
 
 /**
- * NotificationMenu displays a notification bell icon with badge showing unread count
- * and provides a dropdown menu with notification list.
+ * NotificationMenu 顯示通知鈴鐺圖示，並附帶顯示未讀數量的徽章
+ * 並提供含通知列表的下拉選單。
  *
- * **Features**:
- * - Uses NotificationBadge atom as trigger button
- * - Badge showing unread notification count
- * - **Clickable title** - Click "Notifications" header to navigate to notification center
- * - **Settings button** - Optional settings icon in header for notification preferences
- * - Dropdown menu with notification list
- * - Different notification types (info, success, warning, error, system)
- * - Mark as read / Mark all as read functionality
- * - Clear all notifications
- * - Responsive time display (e.g., "5 minutes ago")
+ * **功能特性**：
+ * - 使用 NotificationBadge atom 作為觸發按鈕
+ * - 顯示未讀通知數量的徽章
+ * - **可點擊標題** - 點擊「Notifications」標題即可導向通知中心
+ * - **設定按鈕** - 頁首中選用的設定圖示，用於通知偏好設定
+ * - 含通知列表的下拉選單
+ * - 不同的通知類型（info、success、warning、error、system）
+ * - 標為已讀／全部標為已讀功能
+ * - 清除所有通知
+ * - 響應式時間顯示（例如「5 分鐘前」）
  *
- * **Architecture**:
- * - Organism component composed of NotificationBadge (atom)
- * - Directly uses MenuItem for each notification (simpler than NotificationList molecule)
- * - NotificationList molecule is reserved for full-page notification view
+ * **架構**：
+ * - 由 NotificationBadge（atom）組成的 organism 元件
+ * - 每則通知直接使用 MenuItem（比 NotificationList molecule 更簡單）
+ * - NotificationList molecule 保留給整頁通知檢視使用
  */
 const meta = {
   title: 'Shared/Organisms/NotificationMenu',
@@ -121,7 +121,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A notification menu component that displays notifications in a dropdown menu with badge counter. Composed of NotificationBadge atom.',
+          '通知選單元件，於下拉選單中顯示通知並附帶徽章計數。由 NotificationBadge atom 組成。',
       },
     },
   },
@@ -129,11 +129,11 @@ const meta = {
   argTypes: {
     unreadCount: {
       control: 'number',
-      description: 'Number of unread notifications',
+      description: '未讀通知數量',
     },
     maxDisplay: {
       control: 'number',
-      description: 'Maximum number of notifications to display in menu',
+      description: '選單中最多顯示的通知數量',
       table: {
         defaultValue: { summary: '5' },
       },
@@ -141,7 +141,7 @@ const meta = {
     size: {
       control: 'select',
       options: ['small', 'medium', 'large'],
-      description: 'Size of the icon button',
+      description: '圖示按鈕的尺寸',
       table: {
         defaultValue: { summary: 'medium' },
       },
@@ -149,14 +149,14 @@ const meta = {
     color: {
       control: 'select',
       options: ['inherit', 'primary', 'secondary', 'default'],
-      description: 'Color of the button',
+      description: '按鈕的顏色',
       table: {
         defaultValue: { summary: 'inherit' },
       },
     },
     showSettings: {
       control: 'boolean',
-      description: 'Show settings icon button in header (on the right side)',
+      description: '在標題列（右側）顯示設定圖示按鈕',
       table: {
         defaultValue: { summary: 'false' },
       },
@@ -168,9 +168,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default notification menu with unread notifications
+ * 含未讀通知的預設通知選單
  *
- * **Tip**: Click the "Notifications" title to navigate to notification center
+ * **提示**：點擊「Notifications」標題即可導向通知中心
  */
 export const Default: Story = {
   args: {
@@ -184,7 +184,7 @@ export const Default: Story = {
 };
 
 /**
- * No notifications state
+ * 無通知狀態
  */
 export const NoNotifications: Story = {
   args: {
@@ -194,9 +194,9 @@ export const NoNotifications: Story = {
 };
 
 /**
- * All read notifications
+ * 全部為已讀通知
  *
- * All notifications have been read - badge shows 0
+ * 所有通知皆已讀 - 徽章顯示 0
  */
 export const AllRead: Story = {
   args: {
@@ -210,7 +210,7 @@ export const AllRead: Story = {
 };
 
 /**
- * Many unread notifications (badge shows 99)
+ * 大量未讀通知（徽章顯示 99）
  */
 export const ManyUnread: Story = {
   args: {
@@ -222,9 +222,9 @@ export const ManyUnread: Story = {
 };
 
 /**
- * All notification types
+ * 所有通知類型
  *
- * Shows all 5 notification types with their icons and colors
+ * 顯示全部 5 種通知類型及其圖示與顏色
  */
 export const AllTypes: Story = {
   args: {
@@ -277,9 +277,9 @@ export const AllTypes: Story = {
 };
 
 /**
- * Different sizes comparison
+ * 不同尺寸比較
  *
- * Shows all available sizes side by side
+ * 並列顯示所有可用尺寸
  */
 export const Sizes: Story = {
   render: () => (
@@ -331,9 +331,9 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors comparison
+ * 不同顏色比較
  *
- * Shows all available color variants
+ * 顯示所有可用的顏色變體
  */
 export const Colors: Story = {
   render: () => (
@@ -415,7 +415,7 @@ export const Colors: Story = {
 };
 
 /**
- * In AppBar context (typical use case)
+ * 置於 AppBar 情境中（典型使用情境）
  */
 export const InAppBar: Story = {
   args: {
@@ -444,9 +444,9 @@ export const InAppBar: Story = {
 };
 
 /**
- * Without settings button
+ * 不含設定按鈕
  *
- * Simplified version without settings icon
+ * 不含設定圖示的精簡版本
  */
 export const WithoutSettings: Story = {
   args: {
@@ -459,9 +459,9 @@ export const WithoutSettings: Story = {
 };
 
 /**
- * Limited display
+ * 限制顯示數量
  *
- * Only shows 3 notifications in the dropdown
+ * 下拉選單中僅顯示 3 則通知
  */
 export const LimitedDisplay: Story = {
   args: {
@@ -486,9 +486,9 @@ export const LimitedDisplay: Story = {
 };
 
 /**
- * With many unread (badge overflow)
+ * 含大量未讀（徽章溢出）
  *
- * Badge shows "99+" when count exceeds 99
+ * 數量超過 99 時徽章顯示「99+」
  */
 export const ManyUnreadBadge: Story = {
   args: {
@@ -510,9 +510,9 @@ export const ManyUnreadBadge: Story = {
 };
 
 /**
- * Long content handling
+ * 長內容處理
  *
- * Tests text overflow with very long titles and messages
+ * 以極長的標題與訊息測試文字溢出
  */
 export const LongContent: Story = {
   args: {
@@ -543,9 +543,9 @@ export const LongContent: Story = {
 };
 
 /**
- * Interactive example with state
+ * 含狀態的互動範例
  *
- * Fully interactive example where you can mark notifications as read/unread
+ * 完全可互動的範例，你可在其中將通知標為已讀／未讀
  */
 export const Interactive: Story = {
   render: () => {
@@ -593,10 +593,10 @@ export const Interactive: Story = {
 };
 
 /**
- * Real-world Integration Example
+ * 實際整合範例
  *
- * Complete example showing NotificationMenu integrated with routing,
- * state management, and all callback handlers.
+ * 展示 NotificationMenu 與路由整合的完整範例，
+ * 狀態管理與所有回呼處理器。
  */
 export const RealWorldExample: Story = {
   render: () => {

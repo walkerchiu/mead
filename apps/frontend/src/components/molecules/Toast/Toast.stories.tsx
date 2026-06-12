@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Site-wide toast notification component built on MUI Snackbar. Supports four severity levels: success, error, warning, and info. Use the `useToast` hook to manage toast state.',
+          '以 MUI Snackbar 建構的全站 toast 通知元件。支援四種嚴重程度：success、error、warning 與 info。請使用 `useToast` hook 管理 toast 狀態。',
       },
     },
   },
@@ -20,16 +20,15 @@ const meta = {
   argTypes: {
     toast: {
       control: 'object',
-      description:
-        'Toast state object containing `open`, `message`, and `severity`',
+      description: 'Toast 狀態物件，包含 `open`、`message` 與 `severity`',
     },
     onClose: {
       action: 'onClose',
-      description: 'Callback fired when the toast is closed',
+      description: 'Toast 關閉時觸發的回呼',
     },
     autoHideDuration: {
       control: { type: 'number', min: 0, step: 500 },
-      description: 'Auto-hide duration in milliseconds',
+      description: '自動隱藏的時間（毫秒）',
       table: {
         defaultValue: { summary: '6000' },
       },

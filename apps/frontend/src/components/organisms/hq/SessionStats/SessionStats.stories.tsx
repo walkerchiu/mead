@@ -49,7 +49,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Statistics cards for session management, showing active, revoked, expired counts and top device — fetched via Apollo.',
+          'session 管理統計卡片，顯示啟用中、已撤銷、已過期數量與熱門裝置 — 透過 Apollo 取得。',
       },
     },
   },
@@ -60,7 +60,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — statistics loaded with realistic session data.
+ * 預設 — 已載入真實 session 資料的統計。
  */
 export const Default: Story = {
   decorators: [
@@ -73,7 +73,7 @@ export const Default: Story = {
 };
 
 /**
- * Loading — empty mocks keep the component in its loading skeleton state.
+ * 載入中 — 空的 mock 讓元件維持在載入骨架狀態。
  */
 export const Loading: Story = {
   decorators: [

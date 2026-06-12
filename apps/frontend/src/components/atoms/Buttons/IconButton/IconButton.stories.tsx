@@ -14,7 +14,7 @@ const meta = {
     variant: {
       control: 'select',
       options: ['default', 'tonal', 'outline', 'toggle'],
-      description: 'Icon button variant',
+      description: '圖示按鈕變體',
     },
     children: {
       control: false,
@@ -24,7 +24,7 @@ const meta = {
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether to disable',
+      description: '是否停用',
     },
   },
 } satisfies Meta<typeof IconButton>;

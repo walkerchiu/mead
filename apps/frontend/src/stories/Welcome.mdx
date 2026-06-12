@@ -2,128 +2,127 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Introduction/Welcome" />
 
-# Welcome to MEAD Storybook
+# 歡迎使用 MEAD Storybook
 
-This is the MEAD project's Storybook component library, built on **Atomic Design** principles.
+這是 MEAD 專案的 Storybook 元件庫，以 **Atomic Design** 原則為基礎建構。
 
-## 🎯 What is Atomic Design?
+## 🎯 什麼是 Atomic Design？
 
-Atomic Design is a design system methodology that organizes UI components into five levels:
+Atomic Design 是一套設計系統方法論，將 UI 元件組織為五個層級：
 
 ```
 Atoms → Molecules → Organisms → Templates → Pages
 ```
 
-### 📦 Component Levels
+### 📦 元件層級
 
 #### 1. **Atoms**
 
-The most basic UI elements that cannot be broken down further.
+最基本、無法再進一步拆解的 UI 元素。
 
-Examples:
+範例：
 
-- `Button` - Button component
-- `TextField` - Input field
-- `CodeInput` - Verification code input
+- `Button` - 按鈕元件
+- `TextField` - 輸入欄位
+- `CodeInput` - 驗證碼輸入
 
-**When to use**: When you need the most basic UI elements.
+**何時使用**：當你需要最基本的 UI 元素時。
 
 #### 2. **Molecules**
 
-Composed of multiple Atoms with specific functionality.
+由多個 Atoms 組合而成，具備特定功能。
 
-Examples:
+範例：
 
-- `FormField` - Form field (TextField + Label + Error)
-- `PasswordField` - Password input (TextField + Show/Hide button + Strength indicator)
-- `AlertMessage` - Alert message
+- `FormField` - 表單欄位（TextField + Label + Error）
+- `PasswordField` - 密碼輸入（TextField + 顯示／隱藏按鈕 + 強度指示器）
+- `AlertMessage` - 警示訊息
 
-**When to use**: When you need to combine multiple basic elements for specific functionality.
+**何時使用**：當你需要組合多個基本元素以達成特定功能時。
 
 #### 3. **Organisms**
 
-Complete functional modules composed of Molecules and Atoms.
+由 Molecules 與 Atoms 組合而成的完整功能模組。
 
-Examples:
+範例：
 
-- `LoginForm` - Login form
-- `TwoFactorForm` - Two-factor authentication form
-- `ForgotPasswordForm` - Forgot password form
+- `LoginForm` - 登入表單
+- `TwoFactorForm` - 雙因素驗證表單
+- `ForgotPasswordForm` - 忘記密碼表單
 
-**When to use**: When you need complete functional modules (forms, cards, etc.).
+**何時使用**：當你需要完整的功能模組（表單、卡片等）時。
 
 #### 4. **Templates**
 
-Define page structure and layout.
+定義頁面結構與版面配置。
 
-Examples:
+範例：
 
-- `AuthLayout` - Authentication page layout
+- `AuthLayout` - 認證頁面版面配置
 
-**When to use**: When you need unified page layouts.
+**何時使用**：當你需要統一的頁面版面配置時。
 
 #### 5. **Pages**
 
-Complete page displays (for Storybook only).
+完整的頁面呈現（僅供 Storybook 使用）。
 
-Examples:
+範例：
 
-- `LoginPage` - Complete login page flow
-- `ForgotPasswordPage` - Forgot password page
+- `LoginPage` - 完整登入頁面流程
+- `ForgotPasswordPage` - 忘記密碼頁面
 
-**When to use**: To demonstrate complete user flows and interactions.
-
----
-
-## 🚀 Quick Start
-
-### Browse Components
-
-The sidebar is organized into three top-level **scopes**, each with its own
-`Overview` page:
-
-1. **Public Scope** - Public, login-free content site (the primary near-term focus)
-2. **HQ Scope** - Back-office admin; ops tooling (audit logs, cron jobs, sessions) and HQ-only shell
-3. **Shared** - Cross-scope generic UI components and the auth flow
-
-Inside every scope, components follow the same Atomic Design layering:
-**Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages**.
-
-Scope is encoded by source folder: scope-specific components live under
-`components/public/<level>/` (Public) or `components/<level>/hq/` (HQ); generic
-shared components stay directly under `components/<level>/`. When unsure where a
-component belongs, default it to **Shared**.
-
-### Test Components
-
-Each component has multiple **Stories** (scenario displays):
-
-- **Default** - Default state
-- **Loading** - Loading state
-- **Error** - Error state
-- **Interactive** - Interactive example
-
-### Use Controls
-
-Click the **Controls** tab to adjust component props in real-time:
-
-- Modify text content
-- Toggle states (disabled, loading)
-- Adjust styles (variant, color, size)
+**何時使用**：用於展示完整的使用者流程與互動。
 
 ---
 
-## 🛠️ Development Guide
+## 🚀 快速開始
 
-### Story-First Development Flow
+### 瀏覽元件
 
-1. **Develop UI in Storybook**
+側邊欄分為三個頂層 **scope**，各自擁有專屬的 `Overview` 頁面：
+
+1. **Public Scope** - 公開、免登入的內容網站（近期主力焦點）
+2. **HQ Scope** - 後台管理；運維工具（稽核日誌、Cron Jobs、Session）與 HQ 專屬外殼
+3. **Shared** - 跨 scope 的通用 UI 元件與認證流程
+
+在每個 scope 內，元件皆遵循相同的 Atomic Design 分層：
+**Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages**。
+
+Scope 由原始碼資料夾決定：scope 專屬元件位於
+`components/public/<level>/`（Public）或 `components/<level>/hq/`（HQ）；通用的
+共用元件則直接放在 `components/<level>/` 之下。當不確定元件歸屬時，預設放入
+**Shared**。
+
+### 測試元件
+
+每個元件都有多個 **Story**（情境展示）：
+
+- **Default** - 預設狀態
+- **Loading** - 載入中狀態
+- **Error** - 錯誤狀態
+- **Interactive** - 互動範例
+
+### 使用 Controls
+
+點選 **Controls** 分頁即可即時調整元件 props：
+
+- 修改文字內容
+- 切換狀態（停用、載入中）
+- 調整樣式（variant、color、size）
+
+---
+
+## 🛠️ 開發指南
+
+### Story-First 開發流程
+
+1. **在 Storybook 中開發 UI**
 
    ```bash
    pnpm storybook
    ```
 
-2. **Create Components and Stories**
+2. **建立元件與 Story**
 
    ```tsx
    // Button.tsx
@@ -141,12 +140,12 @@ Click the **Controls** tab to adjust component props in real-time:
    };
    ```
 
-3. **Test All States**
-   - Preview in Storybook
-   - Test different props using Controls
-   - Check responsive design
+3. **測試所有狀態**
+   - 在 Storybook 中預覽
+   - 使用 Controls 測試不同的 props
+   - 檢查響應式設計
 
-4. **Integrate into Next.js Pages**
+4. **整合至 Next.js 頁面**
 
    ```tsx
    // app/login/page.tsx
@@ -157,13 +156,13 @@ Click the **Controls** tab to adjust component props in real-time:
    }
    ```
 
-### Naming Conventions
+### 命名慣例
 
-- **Components**: PascalCase (e.g., `LoginForm`)
-- **Files**: Same as component name (e.g., `LoginForm.tsx`)
-- **Stories**: ComponentName.stories.tsx (e.g., `LoginForm.stories.tsx`)
+- **元件**：PascalCase（例如 `LoginForm`）
+- **檔案**：與元件名稱相同（例如 `LoginForm.tsx`）
+- **Story**：ComponentName.stories.tsx（例如 `LoginForm.stories.tsx`）
 
-### Directory Structure
+### 目錄結構
 
 ```text
 src/components/
@@ -186,50 +185,50 @@ src/components/
 
 ---
 
-## 🎨 Design Principles
+## 🎨 設計原則
 
-### 1. Single Responsibility
+### 1. 單一職責
 
-Each component does one thing and does it well.
+每個元件只做一件事，並把它做好。
 
-### 2. Composition Over Inheritance
+### 2. 組合優於繼承
 
-Use composition rather than inheritance to build complex components.
+使用組合而非繼承來建構複雜的元件。
 
-### 3. Props-Driven
+### 3. Props 驅動
 
-Components should be stateless, controlled through props.
+元件應為無狀態，透過 props 控制。
 
-### 4. Consistency
+### 4. 一致性
 
-Maintain consistency in naming, styling, and behavior.
-
----
-
-## 🔧 Tech Stack
-
-- **Storybook 10.2.1** - Component showcase and documentation
-- **Next.js 16** - Application framework
-- **React 19** - UI library
-- **MUI 6** - Material-UI component library
-- **TypeScript** - Type safety
-- **MSW** - API mocking
-- **React Hook Form** - Form handling
-- **Zod** - Schema validation
+在命名、樣式與行為上維持一致性。
 
 ---
 
-## 📖 More Resources
+## 🔧 技術堆疊
 
-- [Storybook Documentation](https://storybook.js.org/docs)
-- [Atomic Design Principles](https://bradfrost.com/blog/post/atomic-web-design/)
-- [MUI Documentation](https://mui.com/)
-- [Next.js Documentation](https://nextjs.org/docs)
+- **Storybook 10.2.1** - 元件展示與文件
+- **Next.js 16** - 應用框架
+- **React 19** - UI 函式庫
+- **MUI 6** - Material-UI 元件庫
+- **TypeScript** - 型別安全
+- **MSW** - API 模擬
+- **React Hook Form** - 表單處理
+- **Zod** - Schema 驗證
 
 ---
 
-## 🎉 Start Exploring
+## 📖 更多資源
 
-Choose any component from the left sidebar to start exploring!
+- [Storybook 官方文件](https://storybook.js.org/docs)
+- [Atomic Design 設計原則](https://bradfrost.com/blog/post/atomic-web-design/)
+- [MUI 官方文件](https://mui.com/)
+- [Next.js 官方文件](https://nextjs.org/docs)
 
-We recommend starting with **Atoms/Button** to gradually understand the entire design system.
+---
+
+## 🎉 開始探索
+
+從左側邊欄選擇任一元件即可開始探索！
+
+我們建議從 **Atoms/Button** 開始，逐步了解整個設計系統。

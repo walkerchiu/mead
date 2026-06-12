@@ -13,12 +13,12 @@ import {
 /**
  * UserMenu - Atomic Design: Organism
  *
- * Complete user menu component that combines:
- * - UserButton (Atom) - Trigger button
- * - UserMenuHeader (Molecule) - Menu header
- * - UserMenuList (Molecule) - Menu item list
+ * 完整的使用者選單元件，結合：
+ * - UserButton（Atom）- 觸發按鈕
+ * - UserMenuHeader（Molecule）- 選單頁首
+ * - UserMenuList（Molecule）- 選單項目列表
  *
- * Fully follows the Atomic Design architecture like the Notification system.
+ * 如同 Notification 系統一般，完全遵循 Atomic Design 架構。
  */
 const meta = {
   title: 'Shared/Organisms/UserMenu',
@@ -103,7 +103,7 @@ const defaultMenuItems = [
 ];
 
 /**
- * Default style - complete user menu
+ * 預設樣式 - 完整的使用者選單
  */
 export const Default: Story = {
   args: {
@@ -113,7 +113,7 @@ export const Default: Story = {
 };
 
 /**
- * Minimal - without email and role
+ * 精簡 - 不含 email 與角色
  */
 export const Minimal: Story = {
   args: {
@@ -125,7 +125,7 @@ export const Minimal: Story = {
 };
 
 /**
- * Full information - show all fields
+ * 完整資訊 - 顯示所有欄位
  */
 export const FullInformation: Story = {
   args: {
@@ -139,7 +139,7 @@ export const FullInformation: Story = {
 };
 
 /**
- * Show user name on button
+ * 在按鈕上顯示使用者名稱
  */
 export const WithNameOnButton: Story = {
   args: {
@@ -150,7 +150,7 @@ export const WithNameOnButton: Story = {
 };
 
 /**
- * Icon mode - use unified icon instead of avatar
+ * 圖示模式 - 使用統一圖示取代頭像
  */
 export const IconMode: Story = {
   args: {
@@ -161,7 +161,7 @@ export const IconMode: Story = {
 };
 
 /**
- * Icon mode with name displayed
+ * 顯示姓名的圖示模式
  */
 export const IconModeWithName: Story = {
   args: {
@@ -173,7 +173,7 @@ export const IconModeWithName: Story = {
 };
 
 /**
- * User without avatar
+ * 無頭像的使用者
  */
 export const WithoutAvatar: Story = {
   args: {
@@ -190,7 +190,7 @@ export const WithoutAvatar: Story = {
 };
 
 /**
- * Different online statuses
+ * 不同的線上狀態
  */
 export const StatusVariants: Story = {
   render: () => (
@@ -248,7 +248,7 @@ export const StatusVariants: Story = {
 };
 
 /**
- * Different sizes
+ * 不同尺寸
  */
 export const Sizes: Story = {
   render: () => (
@@ -288,7 +288,7 @@ export const Sizes: Story = {
 };
 
 /**
- * Different colors
+ * 不同顏色
  */
 export const Colors: Story = {
   render: () => (
@@ -318,7 +318,7 @@ export const Colors: Story = {
 };
 
 /**
- * Without menu items - header only
+ * 不含選單項目 - 僅頁首
  */
 export const WithoutMenuItems: Story = {
   args: {
@@ -330,7 +330,7 @@ export const WithoutMenuItems: Story = {
 };
 
 /**
- * Extended menu items
+ * 延伸的選單項目
  */
 export const ExtendedMenuItems: Story = {
   args: {
@@ -381,7 +381,7 @@ export const ExtendedMenuItems: Story = {
 };
 
 /**
- * Customer role
+ * Customer 角色
  */
 export const CustomerRole: Story = {
   args: {
@@ -419,7 +419,7 @@ export const CustomerRole: Story = {
 };
 
 /**
- * HQ role
+ * HQ 角色
  */
 export const HQRole: Story = {
   args: {

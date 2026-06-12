@@ -31,7 +31,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Modal dialog displaying detailed information about a user session, including device, location, and revocation data.',
+          '顯示使用者 session 詳細資訊的 modal 對話框，包含裝置、位置與撤銷資料。',
       },
     },
   },
@@ -42,7 +42,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default — open with an active session and revoke handler.
+ * 預設 — 以啟用中的 session 與撤銷處理器開啟。
  */
 export const Default: Story = {
   args: {
@@ -54,7 +54,7 @@ export const Default: Story = {
 };
 
 /**
- * Revoked session — shows revocation details.
+ * 已撤銷的 session — 顯示撤銷詳情。
  */
 export const RevokedSession: Story = {
   args: {
@@ -73,7 +73,7 @@ export const RevokedSession: Story = {
 };
 
 /**
- * Current session — the session belongs to the currently authenticated user.
+ * 目前 session — 此 session 屬於目前已驗證的使用者。
  */
 export const CurrentSession: Story = {
   args: {
@@ -88,7 +88,7 @@ export const CurrentSession: Story = {
 };
 
 /**
- * Expired session — session has passed its expiry time.
+ * 過期 session — session 已超過其到期時間。
  */
 export const ExpiredSession: Story = {
   args: {
@@ -103,7 +103,7 @@ export const ExpiredSession: Story = {
 };
 
 /**
- * Interactive — open the modal with a button.
+ * 互動 — 以按鈕開啟 modal。
  */
 export const Interactive: Story = {
   render: function InteractiveExample() {

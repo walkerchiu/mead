@@ -12,38 +12,38 @@ const meta = {
   argTypes: {
     label: {
       control: 'text',
-      description: 'Slider label',
+      description: '滑桿標籤',
     },
     min: {
       control: 'number',
-      description: 'Minimum value',
+      description: '最小值',
     },
     max: {
       control: 'number',
-      description: 'Maximum value',
+      description: '最大值',
     },
     step: {
       control: 'number',
-      description: 'Step',
+      description: '間距',
     },
     disabled: {
       control: 'boolean',
-      description: 'Whether to disable',
+      description: '是否停用',
     },
     size: {
       control: 'select',
       options: ['small', 'medium'],
-      description: 'Slider size',
+      description: '滑桿尺寸',
     },
     color: {
       control: 'select',
       options: ['primary', 'secondary'],
-      description: 'Slider color',
+      description: '滑桿顏色',
     },
     valueLabelDisplay: {
       control: 'select',
       options: ['auto', 'on', 'off'],
-      description: 'Value label display mode',
+      description: '數值標籤顯示模式',
     },
   },
 } satisfies Meta<typeof Slider>;

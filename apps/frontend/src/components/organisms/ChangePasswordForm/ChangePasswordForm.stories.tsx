@@ -12,7 +12,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Form component for changing user password with validation and session revocation option.',
+          '用於變更使用者密碼的表單元件，具備驗證與撤銷 session 的選項。',
       },
     },
   },
@@ -30,7 +30,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * Default state - Standard password change form.
+ * 預設狀態 - 標準的變更密碼表單。
  */
 export const Default: Story = {
   args: {
@@ -56,7 +56,7 @@ export const Default: Story = {
 };
 
 /**
- * Success state - Password changed successfully.
+ * 成功狀態 - 密碼變更成功。
  */
 export const Success: Story = {
   args: {
@@ -86,7 +86,7 @@ export const Success: Story = {
 };
 
 /**
- * Error: Incorrect current password.
+ * 錯誤：目前密碼不正確。
  */
 export const IncorrectPassword: Story = {
   args: {
@@ -114,7 +114,7 @@ export const IncorrectPassword: Story = {
 };
 
 /**
- * Error: New password too weak.
+ * 錯誤：新密碼強度過弱。
  */
 export const WeakPassword: Story = {
   args: {
@@ -143,7 +143,7 @@ export const WeakPassword: Story = {
 };
 
 /**
- * Loading state - Submitting password change.
+ * 載入中狀態 - 正在送出密碼變更。
  */
 export const Loading: Story = {
   args: {
@@ -169,7 +169,7 @@ export const Loading: Story = {
 };
 
 /**
- * Error: Network error.
+ * 錯誤：網路錯誤。
  */
 export const NetworkError: Story = {
   args: {
