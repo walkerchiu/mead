@@ -54,7 +54,10 @@ export class PersonalAccessTokenService {
    * 檢查是否為有效的 PAT 格式
    */
   isPatToken(token: string): boolean {
-    return token.startsWith(TOKEN_PREFIX) && token.length === 37;
+    return (
+      token.startsWith(TOKEN_PREFIX) &&
+      token.length === TOKEN_PREFIX.length + 32
+    );
   }
 
   /**
