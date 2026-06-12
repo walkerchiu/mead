@@ -28,7 +28,7 @@
 
 1. **Client connection 誤報**：瀏覽器（Chrome、Safari）對某 port 留下 `CLOSE_WAIT` / `ESTABLISHED` 連線，`lsof -ti:port` 列出的是 client process 不是 server。
 2. **Docker port forward 誤報**：別的 repo 啟動 docker container 把 `127.0.0.1:5555` forward 給容器內部，這時佔住 5555 的是 `com.docker.backend`（macOS）或 `docker-proxy`（Linux），不是真正的服務。
-3. **跨 repo 同 port 誤報**：`/icp/mead-x` 的 next dev 在 3000 LISTEN，當前 repo（`/icp/mead`）的 status 仍會把它認成「自己的 Frontend 在跑」。
+3. **跨 repo 同 port 誤報**：`~/repos/mead-x` 的 next dev 在 3000 LISTEN，當前 repo（`~/repos/mead`）的 status 仍會把它認成「自己的 Frontend 在跑」。
 
 這三類誤報會讓 `status` 失去診斷價值，於是 `cli.sh` 用三層過濾來排除。
 
@@ -74,26 +74,26 @@ fi
 
 `lsof -p PID` 可以拿到 process 的 working directory。Next.js / NestJS / Storybook 等 dev server 都是從 `apps/<workspace>` 目錄啟動，cwd 會落在 `$PROJECT_ROOT/apps/...`。比對 cwd 是否在當前 `$PROJECT_ROOT` 之下就能精準判斷服務歸屬。
 
-**為什麼要 `"$PROJECT_ROOT"/*` 而不是 `"$PROJECT_ROOT"*`**：bash glob 中 `"$PROJECT_ROOT"*` 是純字串前綴匹配，`/icp/mead-x/...` 字面上以 `/icp/mead` 開頭會被誤認為「在 `mead` PROJECT_ROOT 下」。加上 `/` 邊界確保只認真正的子目錄。額外的 `"$PROC_CWD" != "$PROJECT_ROOT"` 比對處理 cwd 剛好就是 PROJECT_ROOT 本身（極少見）的邊界情況。
+**為什麼要 `"$PROJECT_ROOT"/*` 而不是 `"$PROJECT_ROOT"*`**：bash glob 中 `"$PROJECT_ROOT"*` 是純字串前綴匹配，`~/repos/mead-x/...` 字面上以 `~/repos/mead` 開頭會被誤認為「在 `mead` PROJECT_ROOT 下」。加上 `/` 邊界確保只認真正的子目錄。額外的 `"$PROC_CWD" != "$PROJECT_ROOT"` 比對處理 cwd 剛好就是 PROJECT_ROOT 本身（極少見）的邊界情況。
 
-**典型擋下的誤報**：`/icp/mead-x/apps/frontend` 的 next dev 在 3000 LISTEN，當前 repo `/icp/mead` 的 status 之前會誤報 Frontend 。加上 cwd 比對後顯示「被其他專案佔用」+ 佔用者路徑。
+**典型擋下的誤報**：`~/repos/mead-x/apps/frontend` 的 next dev 在 3000 LISTEN，當前 repo `~/repos/mead` 的 status 之前會誤報 Frontend 。加上 cwd 比對後顯示「被其他專案佔用」+ 佔用者路徑。
 
 ---
 
 ## 顯示效果（真實範例）
 
-當 `/icp/mead-x` 的服務都在跑、且 `/icp/mead` 的服務都沒跑時：
+當 `~/repos/mead-x` 的服務都在跑、且 `~/repos/mead` 的服務都沒跑時：
 
 ```text
 📦 應用服務
   ✗ Frontend  (Port 3000，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/frontend
+      佔用者: ~/repos/mead-x/apps/frontend
       啟動: ./scripts/cli.sh dev
   ✗ Backend   (Port 4000，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/backend
+      佔用者: ~/repos/mead-x/apps/backend
       啟動: ./scripts/cli.sh dev
   ✗ Storybook (Port 6006，被其他專案佔用) 未運行
-      佔用者: /Users/walkerchiu/Documents/icp/mead-x/apps/frontend
+      佔用者: ~/repos/mead-x/apps/frontend
       啟動: ./scripts/cli.sh dev
   ✗ Prisma Studio (Port 5555，被其他 docker container forward 佔用) 未運行
       啟動: ./scripts/cli.sh dev
@@ -127,7 +127,7 @@ fi
 ## 局限與不適用的情況
 
 1. **`lsof -p PID` 拿不到 cwd** —— 例如 process 啟動後 chdir 到 / 或被 `unshare` 隔離的情況。此時 cwd 比對會 silent skip（保守地視為「自己的服務」）。實務上 Next.js / NestJS / Storybook 從不會這樣做，但若用客製化 launcher 啟動服務需留意。
-2. **多個 git worktree 用同一個 PROJECT_ROOT 名稱** —— 例如 `/icp/mead` 跟 `/icp/mead-worktree-feature-x` 兩個 worktree 同時跑 dev server。cwd 比對會把 `mead-worktree-feature-x` 認成「不是 `/icp/mead`」，正確顯示為 ``。但反過來在 worktree 內跑 status，會把 `/icp/mead`（main）的服務也認成「別的專案」。這是預期行為。
+2. **多個 git worktree 用同一個 PROJECT_ROOT 名稱** —— 例如 `~/repos/mead` 跟 `~/repos/mead-worktree-feature-x` 兩個 worktree 同時跑 dev server。cwd 比對會把 `mead-worktree-feature-x` 認成「不是 `~/repos/mead`」，正確顯示為 ``。但反過來在 worktree 內跑 status，會把 `~/repos/mead`（main）的服務也認成「別的專案」。這是預期行為。
 3. **Linux 上 `ps` / `lsof` 行為差異** —— `comm=` 在 Linux 是 short name（最多 15 字元），`com.docker.backend` 比對在某些 Linux Desktop 環境可能 miss。`docker-proxy` 是 Linux 上正確的 sentinel pattern，已在 case 中處理。
 
 ---

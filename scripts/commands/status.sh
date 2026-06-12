@@ -81,8 +81,8 @@ check_service() {
     # 過濾「不在當前 repo 啟動的服務」：
     # 透過 process working directory 判斷此 PID 是否屬於當前 PROJECT_ROOT。
     # 例：3000 port 被別的 repo 的 next dev 佔用時，cwd 在別的目錄，應視為「別人在用」。
-    # 注意：要用 `$PROJECT_ROOT/*` 比對而非 `$PROJECT_ROOT*`，否則 `/icp/mead-x` 會被
-    # `/icp/mead` 的 PROJECT_ROOT 誤認為前綴相符（`mead-x` 字面前綴是 `mead`）。
+    # 注意：要用 `$PROJECT_ROOT/*` 比對而非 `$PROJECT_ROOT*`，否則 `~/repos/mead-x` 會被
+    # `~/repos/mead` 的 PROJECT_ROOT 誤認為前綴相符（`mead-x` 字面前綴是 `mead`）。
     PROC_CWD=$(lsof -p "$PID" 2>/dev/null | awk '$4 == "cwd" {print $NF}' | head -1)
     if [[ -n "$PROC_CWD" && "$PROC_CWD" != "$PROJECT_ROOT" && "$PROC_CWD" != "$PROJECT_ROOT"/* ]]; then
       echo -e "  ${RED}✗${NC} ${name} ${DIM}(Port ${port}，被其他專案佔用)${NC} ${RED}未運行${NC}"
