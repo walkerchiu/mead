@@ -22,7 +22,7 @@
   - [登入流程](#登入流程)
     - [未啟用 2FA（正常登入）](#未啟用-2fa正常登入)
     - [已啟用 2FA（兩步驟登入）](#已啟用-2fa兩步驟登入)
-      - [步驟 1：輸入 Email 和密碼](#步驟-1輸入-email-和密碼)
+      - [步驟 1：輸入帳號和密碼](#步驟-1輸入帳號和密碼)
       - [步驟 2：輸入驗證碼](#步驟-2輸入驗證碼)
   - [備用驗證碼](#備用驗證碼)
     - [何時使用](#何時使用)
@@ -238,11 +238,13 @@ mutation {
 
 ## 登入流程
 
+> 登入身分為**帳號（accountName）**；`login` 的 `email` 參數名為向後相容保留，傳入值放 accountName（如 `customer_admin`）。詳見 [Scope Routing](./SCOPE_ROUTING.md)。
+
 ### 未啟用 2FA（正常登入）
 
 ```graphql
 mutation {
-  login(email: "user@example.com", password: "Password123!") {
+  login(email: "customer_admin", password: "Password123!") {
     ... on AuthResponse {
       accessToken
       refreshToken
@@ -260,11 +262,11 @@ mutation {
 
 ### 已啟用 2FA（兩步驟登入）
 
-#### 步驟 1：輸入 Email 和密碼
+#### 步驟 1：輸入帳號和密碼
 
 ```graphql
 mutation {
-  login(email: "user@example.com", password: "Password123!") {
+  login(email: "customer_admin", password: "Password123!") {
     ... on TwoFactorLoginResponse {
       requiresTwoFactor
       temporaryToken

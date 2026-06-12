@@ -22,22 +22,21 @@
 
 ## 環境分層
 
-MEAD 規劃四層環境：
+MEAD 採六層環境（`scripts/commands/env.sh` 的 `ENVS`：local / dev / sit / uat / staging / prod）：
 
-| 環境           | 用途                            | 資料庫                     | 域名                     |
-| -------------- | ------------------------------- | -------------------------- | ------------------------ |
-| **Dev**        | 本機開發                        | 本機 TimescaleDB（Docker） | `localhost`              |
-| **UAT**        | 內部測試、使用者驗證            | 雲端 DB（測試資料）        | `uat.mead.<company>`     |
-| **Staging**    | 發布前驗證，環境等同 Production | 雲端 DB（清洗資料）        | `staging.mead.<company>` |
-| **Production** | 正式營運                        | 雲端 DB（生產資料）        | `mead.<company>`         |
+| 環境        | 用途                            | 資料庫                     | 域名                     |
+| ----------- | ------------------------------- | -------------------------- | ------------------------ |
+| **local**   | 本機開發（不依賴 Docker DB）    | 本機 / 既有 DB             | `localhost`              |
+| **dev**     | 本機開發                        | 本機 TimescaleDB（Docker） | `localhost`              |
+| **sit**     | 系統整合測試                    | 雲端 DB（測試資料）        | `sit.mead.<company>`     |
+| **uat**     | 內部測試、使用者驗證            | 雲端 DB（測試資料）        | `uat.mead.<company>`     |
+| **staging** | 發布前驗證，環境等同 production | 雲端 DB（清洗資料）        | `staging.mead.<company>` |
+| **prod**    | 正式營運                        | 雲端 DB（生產資料）        | `mead.<company>`         |
 
 對應的環境變數範本：
 
-- `.env.example` — Dev 參考
-- `.env.dev.example` — Dev
-- `.env.uat.example` — UAT
-- `.env.staging.example` — Staging
-- `.env.prod.example` — Production
+- `.env.example` — local/dev 參考
+- `.env.dev.example` / `.env.sit.example` / `.env.uat.example` / `.env.staging.example` / `.env.prod.example` — 各環境
 
 ---
 
@@ -129,11 +128,10 @@ MEAD 規劃四層環境：
   └──────────────────────────────────────────────┘
 ```
 
-**必要產出**（待實作）：
+**容器化產出**（已實作，見下方「容器化部署與 per-env override」）：
 
-- `apps/frontend/Dockerfile`（multi-stage，output: standalone）
-- `apps/backend/Dockerfile`（multi-stage）
-- `docker-compose.production.yml`
+- `apps/frontend/Dockerfile`、`apps/backend/Dockerfile`（multi-stage，前端 output: standalone）
+- base `docker-compose.yml` 的 `app` profile + per-env `docker-compose.<env>.override.yml`（不另建 `docker-compose.production.yml`，改以 base + override 疊加）
 
 ### 方案 B：容器編排（中大規模）
 
@@ -157,11 +155,12 @@ MEAD 規劃四層環境：
 ### 分層檔案
 
 ```text
-.env.example              # Dev 範本（commit）
-.env.dev.example          # Dev 範本（commit）
-.env.uat.example          # UAT 範本（commit）
-.env.staging.example      # Staging 範本（commit）
-.env.prod.example   # Production 範本（commit）
+.env.example              # local/dev 參考範本（commit）
+.env.dev.example          # dev 範本（commit）
+.env.sit.example          # sit 範本（commit）
+.env.uat.example          # uat 範本（commit）
+.env.staging.example      # staging 範本（commit）
+.env.prod.example         # prod 範本（commit）
 
 .env                      # Dev 本機（.gitignore）
 .env.docker               # Dev Docker（.gitignore）
