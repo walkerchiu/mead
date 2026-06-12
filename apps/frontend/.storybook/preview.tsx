@@ -53,23 +53,12 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        // Three top-level scopes: Public Scope (primary) / HQ Scope /
-        // Shared (cross-scope components + auth flow).
-        // method: 'alphabetical' auto-sorts anything not listed in `order`;
-        // the nested arrays in `order` fix the manual sequence per level.
-        // Each scope shares the same Atomic Design layering:
-        //   Overview → Design System → Atoms → Molecules → Organisms
-        //            → Layout → Templates → Pages
         method: 'alphabetical',
         order: [
-          // 0. Introduction
           'Introduction',
-          ['Welcome', 'Best Practices', 'Getting Started'],
-
-          // 1. Public Scope (primary — content site, no login/admin)
+          ['Welcome', 'Getting Started'],
           'Public Scope',
           [
-            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
@@ -79,26 +68,19 @@ const preview: Preview = {
             'Templates',
             'Pages',
           ],
-
-          // 2. HQ Scope (back-office admin)
           'HQ Scope',
           [
-            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
             'Molecules',
             'Organisms',
-            ['Audit Logs', 'Cron Jobs', 'Sessions'],
             'Layout',
             'Templates',
             'Pages',
           ],
-
-          // 3. Shared (cross-scope components + auth flow)
           'Shared',
           [
-            'Overview',
             'Design System',
             ['Colors', 'Typography'],
             'Atoms',
