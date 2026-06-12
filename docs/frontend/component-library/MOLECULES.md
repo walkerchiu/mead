@@ -1175,4 +1175,99 @@ function MyComponent() {
 
 ---
 
+#### AboutContent
+
+**路徑**: `components/molecules/AboutContent/`
+
+**功能**:
+
+- 展示應用程式版本、專案簡介、主要功能清單，支援英文與正體中文雙語切換
+- 根據用戶角色（HQ/Admin 權限）動態顯示技術堆疊、授權資訊等內容
+- 包含聯絡資訊與項目作者相關連結，完整呈現系統商務與技術概述
+
+**Storybook**: ✅ `AboutContent.stories.tsx`
+
+---
+
+#### ActivityDiffModal
+
+**路徑**: `components/molecules/ActivityDiffModal/`
+
+**功能**:
+
+- 以左右兩欄對比顯示欄位變更前後的內容（Diff Modal），支援純文字與 Markdown（等寬字體）兩種模式
+- 頂部顯示欄位標籤、操作人名稱與變更時間戳，提供完整變更上下文
+- 基於 `Modal` Organism 建構，享受全系統統一的 Modal 外觀與行為
+
+**Storybook**: ✅ `ActivityDiffModal.stories.tsx`
+
+---
+
+#### ActivityLogItem
+
+**路徑**: `components/molecules/ActivityLogItem/`
+
+**功能**:
+
+- 垂直時間軸樣式的活動紀錄項目，左側為顏色編碼的 Icon Dot 與連接線，右側為時間軸卡片
+- 自動計算相對時間（「5 分鐘前」）與絕對時間（「2025/01/15 14:30」），支援自訂時區格式
+- 支援點擊事件（用於開啟 Diff Modal），並通過 `isFirst`、`isLast` 控制時間軸線段顯示
+
+**Storybook**: ✅ `ActivityLogItem.stories.tsx`
+
+---
+
+#### FileUploader
+
+**路徑**: `components/molecules/FileUploader/`
+
+**功能**:
+
+- 拖放上傳區域，支援最大檔案數、最大檔案大小、檔案類型篩選，錯誤訊息動態顯示
+- 自動檢測相同檔名並替換舊檔案，防止重複，並顯示警告訊息
+- 已上傳檔案列表，每項可刪除，並顯示上傳狀態 Chip（已上傳/待上傳）
+- 檔案大小自動格式化（Bytes/KB/MB/GB），支援完整的表單整合與國際化
+
+---
+
+#### HelpContent
+
+**路徑**: `components/molecules/HelpContent/`
+
+**功能**:
+
+- 快速開始步驟引導、常見問題 FAQ 手風琴展開、常用功能列表，支援英文與正體中文雙語
+- 根據用戶權限動態顯示相應的幫助內容（如審計日誌、會話管理等 HQ/Admin 功能）
+- 聯絡資訊區段，包含項目作者與電子郵件連結，提供完整的用戶自助文檔
+
+**Storybook**: ✅ `HelpContent.stories.tsx`
+
+---
+
+#### ScrollControl
+
+**路徑**: `components/molecules/ScrollControl/`
+
+**功能**:
+
+- 組合多個 `ScrollButton` 提供完整的滾動控制組件，支援向上/向下/捲至頂/捲至底四項功能
+- 支援九種預設位置與自訂位置，通過固定定位浮動在視口邊緣
+- 自動偵測滾動位置，隱藏不可用按鈕（到頂時隱藏向上按鈕）
+- 支援自訂滾動容器、滾動偏移量、可見性閾值、滾動行為（平滑/即時）
+
+---
+
+#### StatusTransitionMenu
+
+**路徑**: `components/molecules/StatusTransitionMenu/`
+
+**功能**:
+
+- 下拉選單展示當前狀態與可用狀態轉換選項，每項狀態配有對應的顏色 Chip
+- 選擇目標狀態後彈出確認對話框，允許用戶輸入選填的轉換備註／反饋
+- 對話框顯示狀態轉換的前後對比（Chip 視覺），清晰呈現變更意圖
+- 支援異步 onTransition 回調，自動處理提交中狀態，允許自訂標籤文字
+
+---
+
 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Atoms](./ATOMS.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)

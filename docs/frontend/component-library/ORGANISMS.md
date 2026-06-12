@@ -352,6 +352,165 @@ interface DrawerComponentProps {
 
 ---
 
+##### CronJobConfigDetailsModal
+
+**路徑**: `components/organisms/hq/CronJobConfigDetailsModal/`
+
+**功能**:
+
+- 顯示 Cron Job 排程任務的完整設定資訊（名稱、類型、描述、排程表達式、時區等）
+- 提供分頁標籤展示基本資訊、配置影響說明及執行統計數據
+- 支援切換任務啟用/停用狀態並顯示實時成功率、執行統計和連續失敗次數
+- 提供 JSON 及 CSV 格式的資料匯出功能，便於外部分析
+
+**Storybook**: ✅ `CronJobConfigDetailsModal.stories.tsx`
+
+---
+
+##### CronJobExecutionDetailsModal
+
+**路徑**: `components/organisms/hq/CronJobExecutionDetailsModal/`
+
+**功能**:
+
+- 顯示單次 Cron Job 執行的完整詳情，包含執行時間、狀態、處理數據統計
+- 以分頁標籤組織基本資訊、錯誤詳情與執行詳細數據，支援動態標籤顯示
+- 展示錯誤堆疊追蹤訊息及 JSON 格式的執行詳細資訊
+- 支援執行結果的 JSON 及 CSV 匯出
+
+**Storybook**: ✅ `CronJobExecutionDetailsModal.stories.tsx`
+
+---
+
+##### CronJobExecutionHistory
+
+**路徑**: `components/organisms/hq/CronJobExecutionHistory/`
+
+**功能**:
+
+- 以表格形式展示 Cron Job 執行歷史，包含任務名稱、執行時間、耗時、狀態、處理計數
+- 支援分頁瀏覽歷史執行記錄並點擊查看單筆執行詳情
+- 動態對應 jobName 至 displayName 便於使用者識別
+- 顯示分頁資訊和執行總數
+
+**Storybook**: ✅ `CronJobExecutionHistory.stories.tsx`
+
+---
+
+##### CronJobFilters
+
+**路徑**: `components/organisms/hq/CronJobFilters/`
+
+**功能**:
+
+- 提供可展開/折疊的執行歷史篩選面板，支援依照 jobName 和執行狀態篩選
+- 動態顯示已啟用篩選條件數量及清除所有篩選功能
+- 以 Chip 標籤視覺化呈現已套用篩選，支援個別移除篩選條件
+- 顯示篩選結果數量，提升使用者導向性
+
+**Storybook**: ✅ `CronJobFilters.stories.tsx`
+
+---
+
+##### CronJobListFilters
+
+**路徑**: `components/organisms/hq/CronJobListFilters/`
+
+**功能**:
+
+- 提供 Cron Job 清單的篩選介面，支援依照類別 (category) 和任務類型 (jobType) 篩選
+- 自動從現有任務設定中提取唯一選項並排序，動態建構篩選下拉選單
+- 展示篩選條件標籤且支援逐個刪除，提供一鍵清除所有篩選
+- 顯示篩選結果計數，改善資訊查詢體驗
+
+**Storybook**: ✅ `CronJobListFilters.stories.tsx`
+
+---
+
+##### CronJobStats
+
+**路徑**: `components/organisms/hq/CronJobStats/`
+
+**功能**:
+
+- 以四個統計卡片展示 Cron Job 全局統計數據：執行總次數、成功率、失敗次數、平均耗時
+- 支援載入中狀態顯示骨架屏佔位符
+- 卡片設計包含彩色背景圖示、數值強調及副標題說明
+- 支援懸停互動效果，提升視覺反饋
+
+**Storybook**: ✅ `CronJobStats.stories.tsx`
+
+---
+
+##### CronJobTable
+
+**路徑**: `components/organisms/hq/CronJobTable/`
+
+**功能**:
+
+- 展示所有 Cron Job 設定清單，包含任務名稱、類別、類型、排程表達式、上次執行時間及狀態
+- 支援查看任務詳細設定及手動觸發執行（有正常和強制兩種模式選項）
+- 顯示成功率百分比、連續失敗計數及啟用/停用狀態
+- 內部與詳情模態框和觸發對話框整合聯動
+
+**Storybook**: ✅ `CronJobTable.stories.tsx`
+
+---
+
+##### CronJobTriggerDialog
+
+**路徑**: `components/organisms/hq/CronJobTriggerDialog/`
+
+**功能**:
+
+- 提供清楚的任務執行觸發對話框，說明正常執行和強制執行的差異
+- 強制執行模式會跳過分佈式鎖定和執行延遲檢查，適用於緊急補救
+- 顯示任務啟用狀態警告及審計日誌備註
+- 支援執行中狀態禁用按鈕及進度反饋
+
+**Storybook**: ✅ `CronJobTriggerDialog.stories.tsx`
+
+---
+
+##### UserTable
+
+**路徑**: `components/organisms/hq/UserTable/`
+
+**功能**:
+
+- 以表格展示系統使用者清單，包含名稱、信箱、存取權限、角色、最後登入時間及使用者狀態
+- 支援編輯使用者、重設密碼、管理角色、鎖定/解鎖、刪除及還原操作
+- 使用相對時間格式（如「3 天前」）顯示登入紀錄，並區分永久鎖定與臨時鎖定狀態
+- 支援分頁導航及可讀寫兩種模式（限制操作欄位）
+
+---
+
+##### UserFilters
+
+**路徑**: `components/organisms/hq/UserFilters/`
+
+**功能**:
+
+- 提供可展開的多條件使用者篩選面板，支援搜尋關鍵字、存取權限範圍、使用者狀態及角色篩選
+- 使用防抖機制優化搜尋效能，提高 UX 反應靈敏度
+- 實現角色與權限範圍的雙向聯動，自動過濾不符合範圍的角色
+- 顯示篩選結果及總計數量，視覺化呈現已啟用篩選條件標籤
+
+---
+
+##### DeleteUserModal
+
+**路徑**: `components/organisms/hq/DeleteUserModal/`
+
+**功能**:
+
+- 提供使用者軟刪除確認對話框，顯示目標使用者資訊及刪除風險警告
+- 整合 GraphQL mutation 執行刪除操作並處理相關錯誤訊息
+- 支援非同步操作中的載入狀態及禁用控制
+- 刪除成功後自動關閉對話框並觸發回呼通知外層元件
+
+---
+
 #### LoginForm
 
 **路徑**: `components/organisms/LoginForm/`
@@ -778,6 +937,19 @@ const menuItems = createUserMenuItems({
 ```
 
 **Storybook**: ✅ `UserMenu.stories.tsx`
+
+---
+
+#### ColumnManager
+
+**路徑**: `components/organisms/ColumnManager/`
+
+**功能**:
+
+- 提供表格欄位可見性與順序管理介面，支援按鈕觸發或右鍵選單兩種模式
+- 每欄可獨立切換可見性（開關），並通過上下按鈕調整欄位順序
+- 內建「重設」按鈕，一鍵恢復所有欄位至預設狀態
+- 內置 Popover 列表可捲動，支援大量欄位管理場景
 
 ---
 

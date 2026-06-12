@@ -591,4 +591,69 @@ interface TextFieldProps {
 
 ---
 
+#### GlobalLoadingProgress
+
+**路徑**: `components/atoms/GlobalLoadingProgress/`
+
+**功能**:
+
+- 訂閱 Apollo GraphQL 操作的載入狀態，顯示全站共用的頂部進度條
+- 與路由事件與認證檢查組成三層進度條覆蓋，提供統一的「頁面載入中」視覺反饋
+- 整合 `TopProgressBar` 原子元件，與其他導航進度條保持視覺一致（Navy 4px 發光效果）
+
+---
+
+#### PasswordStrengthIndicator
+
+**路徑**: `components/atoms/PasswordStrengthIndicator/`
+
+**功能**:
+
+- 顯示密碼強度進度條，根據密碼符合的要求數量動態更新強度等級與顏色
+- 列舉密碼要求檢查項目（最小長度、大小寫、數字、特殊字符），逐項標示是否符合
+- 支援 `showRequirements` 控制是否顯示要求檢查清單，可單獨展示進度條
+- 完整支援國際化翻譯，根據 `next-intl` 動態載入相應語言標籤
+
+---
+
+#### ScrollButton
+
+**路徑**: `components/atoms/ScrollButton/`
+
+**功能**:
+
+- 提供四向滾動按鈕（向上、向下、捲至頂部、捲至底部），可自訂方向與尺寸
+- 支援禁用狀態、自訂 Tooltip 文字、自訂樣式（sx）與可見性控制
+- 使用 Material-UI Fade 過渡動畫，提供平滑的顯示/隱藏效果
+
+**Storybook**: ✅ `ScrollButton.stories.tsx`
+
+---
+
+#### TopProgressBar
+
+**路徑**: `components/atoms/TopProgressBar/`
+
+**功能**:
+
+- 顯示固定在頁面頂部的不定時進度條，視覺樣式與 `NextTopLoader` 保持一致（Orange 4px 雙層發光效果）
+- 用於 ProtectedRoute 認證檢查期間，避免用戶在冷頁面載入時看到空白屏幕
+- 無障礙設計，包含 `role="progressbar"` 與 `aria-label`，並使用 `pointerEvents: none` 避免干擾交互
+
+---
+
+#### UserLink
+
+**路徑**: `components/atoms/UserLink/`
+
+**功能**:
+
+- 內聯顯示用戶頭像與名稱，支援自訂頭像尺寸、文字大小（variant）與顯示/隱藏頭像
+- 頭像使用自動生成的首字元縮寫（若無圖片），並從名稱或 Email 回退至未命名用戶
+- 文字自動省略號截斷，防止超寬溢出，適合在表格、列表、卡片等多種場景嵌入
+
+**Storybook**: ✅ `UserLink.stories.tsx`
+
+---
+
 **相關文件**：[組件庫總覽](../COMPONENT_LIBRARY.md) | [Molecules](./MOLECULES.md) | [Organisms](./ORGANISMS.md) | [Templates](./TEMPLATES.md)

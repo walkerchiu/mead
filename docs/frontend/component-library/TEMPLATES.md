@@ -167,7 +167,7 @@ interface DashboardLayoutProps {
 
 #### MainAppBar
 
-**路徑**: `components/layout/MainAppBar/`
+**路徑**: `components/layout/MainAppBar.tsx`
 
 **功能**:
 
