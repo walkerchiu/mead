@@ -34,27 +34,27 @@
 
 位於 `src/components/public/`，Storybook 歸於「Public Scope」。
 
-| 層級      | 元件                     | 用途                                                       |
-| --------- | ------------------------ | ---------------------------------------------------------- |
-| atoms     | `AnimatedSlogan`         | 逐字浮現的標語動畫                                         |
-| atoms     | `CarouselDots`           | 輪播指示點（三種星形，對應 hero 三圖形）                   |
-| atoms     | `LearnMoreButton`        | 「了解更多 ↗」白色圓角按鈕，可帶傾斜角                     |
-| atoms     | `SocialIconButton`       | 社群圖示按鈕                                               |
-| molecules | `PlanLogo`               | 計畫識別（圖標 + 中英名稱）                                |
-| molecules | `PlanStatsBar`           | 數據成果格線（響應式欄數、末項橫跨整列）                   |
-| molecules | `PlanTimeline`           | 計畫時程軸（年份 / 月份 / 軌道 / 說明氣泡）                |
-| molecules | `SocialLinkBar`          | 社群圖示半透明膠囊 + 了解更多按鈕                          |
-| molecules | `StatsMarquee`           | 數據成果跑馬燈（內容多於可視範圍時無縫循環滾動）           |
-| organisms | `DecorativeTextCloud`    | hero 文字雲（三圖形 metaball、hover 照片、橫向／直向佈局） |
-| organisms | `PlanCard`               | 計畫卡片（兩張毛玻璃卡片：識別/時程 + 數據/banner/社群）   |
-| organisms | `PlanCarousel`           | 三計畫輪播（中央卡片 + 兩側相鄰卡片預覽 + 裝飾星形照片）   |
-| organisms | `PortalIntroSection`     | 第二屏小標 + 主標                                          |
-| organisms | `PortalNarrativeSection` | 敘事三段落（錯落編輯式排版）                               |
-| organisms | `PortalFooter`           | 頁尾（品牌識別 + 三欄連結 + 版權）                         |
-| pages     | `PortalLandingPage`      | 首頁組裝                                                   |
-| pages     | `PlanDetailPage`         | 詳細頁組裝                                                 |
+| 層級      | 元件                     | 用途                                                         |
+| --------- | ------------------------ | ------------------------------------------------------------ |
+| atoms     | `AnimatedSlogan`         | 逐字浮現的標語動畫                                           |
+| atoms     | `CarouselDots`           | 輪播指示點（三種計畫形狀，與 hero／敘事共用 `planShapes`）   |
+| atoms     | `LearnMoreButton`        | 「了解更多 ↗」白色圓角按鈕，可帶傾斜角                       |
+| atoms     | `SocialIconButton`       | 社群圖示按鈕                                                 |
+| molecules | `PlanLogo`               | 計畫識別（圖標 + 中英名稱）                                  |
+| molecules | `PlanStatsBar`           | 數據成果格線（響應式欄數、末項橫跨整列）                     |
+| molecules | `PlanTimeline`           | 計畫時程軸（年份 / 月份 / 軌道 / 說明氣泡）                  |
+| molecules | `SocialLinkBar`          | 社群圖示半透明膠囊 + 了解更多按鈕                            |
+| molecules | `StatsMarquee`           | 數據成果跑馬燈（內容多於可視範圍時無縫循環滾動）             |
+| organisms | `DecorativeTextCloud`    | hero 文字雲（三圖形 metaball、hover 照片、橫向／直向佈局）   |
+| organisms | `PlanCard`               | 計畫卡片（兩張毛玻璃卡片：識別/時程 + 數據/banner/社群）     |
+| organisms | `PlanCarousel`           | 三計畫輪播（中央卡片 + 兩側相鄰卡片預覽 + 裝飾星形照片）     |
+| organisms | `PortalIntroSection`     | 第二屏小標 + 主標                                            |
+| organisms | `PortalNarrativeSection` | 敘事三段落（錯落排版；計畫名可點擊切換輪播、附下一計畫標記） |
+| organisms | `PortalFooter`           | 頁尾（品牌識別 + 三欄連結 + 版權）                           |
+| pages     | `PortalLandingPage`      | 首頁組裝                                                     |
+| pages     | `PlanDetailPage`         | 詳細頁組裝                                                   |
 
-設計 token 集中於 `src/components/public/tokens.ts`（`portalTokens`）。
+設計 token 集中於 `src/components/public/tokens.ts`（`portalTokens`）；三計畫的標記形狀集中於 `src/components/public/planShapes.ts`，供 hero 文字雲、`CarouselDots`、敘事段落圓點共用，維持全站視覺一致。
 
 ## 響應式斷點
 
@@ -69,6 +69,7 @@
 - 文字雲：`<834px` 三圖形直向堆疊、`≥834px` 橫向並排。
 - 統計列：末項自動橫跨該列剩餘欄數。
 - 頁尾：`<834px` 連結欄在品牌之上、版權併入品牌區塊；`≥834px` 並排。
+- 數據成果（`StatsMarquee`）：桌機卡片窄欄內垂直上滾、手機卡片寬橫條內水平左滾（兩端淡出遮罩）。
 
 ## 互動與動畫
 
@@ -78,7 +79,7 @@
   略縮並淡化（散落紙堆感），hover 時以底邊為軸向觀者翻起、沿 Z 軸前移上抬放大，
   帶尾段過衝，呈「從後方翻出／被抽出」的立體效果。
 - **「了解更多」按鈕**：連向該計畫官網（`plan.officialUrl`），於新分頁開啟。
-- **輪播**：自動輪播（hover 暫停）；指示點與兩側預覽卡片可切換計畫。
+- **輪播**：自動輪播（hover 暫停）；指示點、兩側預覽卡片、敘事段落內計畫名與「下一計畫」標記皆可切換計畫（站內導覽，非外部連結）。
 - 動畫均尊重 `prefers-reduced-motion`。
 
 > 頁尾「計畫連結」與卡片「了解更多」皆導向各計畫官方網站（外部，新分頁開啟）。
@@ -91,7 +92,7 @@
   "Skip to main content"，依當前語系切換），預設視覺隱藏、Tab 取得焦點時顯示
   於頁面左上、Enter 跳至 `#main-content`（globals.css 的 `.skip-link` class）。
 - **Landmark**：頁面以 `<main id="main-content">` 包覆主要內容；`PortalFooter`
-  使用 `<footer>`；`CarouselDots` 為 `role="tablist"`。
+  使用 `<footer>`；`CarouselDots` 以 `<nav>` + `<button aria-current>` 表示目前位置（WAI 推薦的非 tablist 切換器寫法）。
 - **標題層級**：
   - 首頁：`h1`（`PortalIntroSection` 主標）→ `h2`（卡片計畫 slogan）→ 區塊 `h2`。
   - 詳細頁：`h1`（計畫 slogan）→ `h2`（各區段標題）。每頁僅一個 h1。
