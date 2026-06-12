@@ -34,25 +34,25 @@
 
 位於 `src/components/public/`，Storybook 歸於「Public Scope」。
 
-| 層級      | 元件                     | 用途                                                         |
-| --------- | ------------------------ | ------------------------------------------------------------ |
-| atoms     | `AnimatedSlogan`         | 逐字浮現的標語動畫                                           |
-| atoms     | `CarouselDots`           | 輪播指示點（三種計畫形狀，與 hero／敘事共用 `planShapes`）   |
-| atoms     | `LearnMoreButton`        | 「了解更多 ↗」白色圓角按鈕，可帶傾斜角                       |
-| atoms     | `SocialIconButton`       | 社群圖示按鈕                                                 |
-| molecules | `PlanLogo`               | 計畫識別（圖標 + 中英名稱）                                  |
-| molecules | `PlanStatsBar`           | 數據成果格線（響應式欄數、末項橫跨整列）                     |
-| molecules | `PlanTimeline`           | 計畫時程軸（年份 / 月份 / 軌道 / 說明氣泡）                  |
-| molecules | `SocialLinkBar`          | 社群圖示半透明膠囊 + 了解更多按鈕                            |
-| molecules | `StatsMarquee`           | 數據成果跑馬燈（內容多於可視範圍時無縫循環滾動）             |
-| organisms | `DecorativeTextCloud`    | hero 文字雲（三圖形 metaball、hover 照片、橫向／直向佈局）   |
-| organisms | `PlanCard`               | 計畫卡片（兩張毛玻璃卡片：識別/時程 + 數據/banner/社群）     |
-| organisms | `PlanCarousel`           | 三計畫輪播（中央卡片 + 兩側相鄰卡片預覽 + 裝飾星形照片）     |
-| organisms | `PortalIntroSection`     | 第二屏小標 + 主標                                            |
-| organisms | `PortalNarrativeSection` | 敘事三段落（錯落排版；計畫名可點擊切換輪播、附下一計畫標記） |
-| organisms | `PortalFooter`           | 頁尾（品牌識別 + 三欄連結 + 版權）                           |
-| pages     | `PortalLandingPage`      | 首頁組裝                                                     |
-| pages     | `PlanDetailPage`         | 詳細頁組裝                                                   |
+| 層級      | 元件                     | 用途                                                       |
+| --------- | ------------------------ | ---------------------------------------------------------- |
+| atoms     | `AnimatedSlogan`         | 逐字浮現的標語動畫                                         |
+| atoms     | `CarouselDots`           | 輪播指示點（三種計畫形狀，與 hero／敘事共用 `planShapes`） |
+| atoms     | `LearnMoreButton`        | 「了解更多 ↗」白色圓角按鈕，可帶傾斜角                     |
+| atoms     | `SocialIconButton`       | 社群圖示按鈕                                               |
+| molecules | `PlanLogo`               | 計畫識別（圖標 + 中英名稱）                                |
+| molecules | `PlanStatsBar`           | 數據成果格線（響應式欄數、末項橫跨整列）                   |
+| molecules | `PlanTimeline`           | 計畫時程軸（年份 / 月份 / 軌道 / 說明氣泡）                |
+| molecules | `SocialLinkBar`          | 社群圖示半透明膠囊 + 了解更多按鈕                          |
+| molecules | `StatsMarquee`           | 數據成果跑馬燈（內容多於可視範圍時無縫循環滾動）           |
+| organisms | `DecorativeTextCloud`    | hero 文字雲（三圖形 metaball、hover 照片、橫向／直向佈局） |
+| organisms | `PlanCard`               | 計畫卡片（兩張毛玻璃卡片：識別/時程 + 數據/banner/社群）   |
+| organisms | `PlanCarousel`           | 三計畫輪播（中央卡片 + 兩側相鄰卡片預覽 + 裝飾星形照片）   |
+| organisms | `PortalIntroSection`     | 第二屏小標 + 主標                                          |
+| organisms | `PortalNarrativeSection` | 敘事段落（錯落排版；計畫名可點擊切換輪播、附下一計畫標記） |
+| organisms | `PortalFooter`           | 頁尾（品牌識別 + 三欄連結 + 版權）                         |
+| pages     | `PortalLandingPage`      | 首頁組裝                                                   |
+| pages     | `PlanDetailPage`         | 詳細頁組裝                                                 |
 
 設計 token 集中於 `src/components/public/tokens.ts`（`portalTokens`）；三計畫的標記形狀集中於 `src/components/public/planShapes.ts`，供 hero 文字雲、`CarouselDots`、敘事段落圓點共用，維持全站視覺一致。
 
@@ -70,6 +70,7 @@
 - 統計列：末項自動橫跨該列剩餘欄數。
 - 頁尾：`<834px` 連結欄在品牌之上、版權併入品牌區塊；`≥834px` 並排。
 - 數據成果（`StatsMarquee`）：桌機卡片窄欄內垂直上滾、手機卡片寬橫條內水平左滾（兩端淡出遮罩）。
+- 計畫時程軸（`PlanTimeline`）：寬版用 `fit` 版型；手機卡片內用 `scroll` 版型，月份列橫向滑動閱讀。
 
 ## 互動與動畫
 
