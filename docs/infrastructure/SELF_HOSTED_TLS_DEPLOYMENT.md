@@ -97,9 +97,9 @@ Caddy **內建自動續簽**（到期前約 1/3 效期自動更新），不需�
 
 ## ⚠️ HSTS preload 注意
 
-`next.config.ts` 目前帶 `Strict-Transport-Security: ...; preload`。
+`next.config.ts` 目前為 `Strict-Transport-Security: max-age=63072000; includeSubDomains`（**不含 `preload`**）。
 `preload` 一旦被瀏覽器收錄**幾乎不可逆**，若 HTTPS 尚未穩定就上線，測試期可能把網域鎖死。
-**建議初期先移除 `preload` 字樣**，待全站 HTTPS 穩定運行一段時間後再加回。
+故初期刻意不帶 `preload`；待全站 HTTPS 穩定運行一段時間後再視需要加回。
 
 ## 日後換正式／付費憑證
 
