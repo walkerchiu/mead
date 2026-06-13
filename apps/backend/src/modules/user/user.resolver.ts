@@ -249,12 +249,16 @@ export class UserResolver {
     const userAgent = Array.isArray(userAgentHeader)
       ? userAgentHeader[0]
       : userAgentHeader;
+    // 取得當前 session 的 refresh token（與 logout / refresh handler 同源），
+    // 供「登出其他裝置」時保留當前 session、只撤其他。
+    const currentRefreshToken = context.req.cookies?.refresh_token;
     return this.userService.changePasswordSelf(
       userId,
       input,
       ipAddress,
       userAgent,
       lang,
+      currentRefreshToken,
     );
   }
 

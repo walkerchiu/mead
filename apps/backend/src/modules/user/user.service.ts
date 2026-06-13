@@ -538,6 +538,7 @@ export class UserService {
     ipAddress?: string,
     userAgent?: string,
     lang?: string,
+    currentRefreshToken?: string,
   ): Promise<boolean> {
     const { currentPassword, newPassword, revokeOtherSessions } = input;
 
@@ -643,9 +644,17 @@ export class UserService {
 
     // 撤銷其他設備的 sessions（可選）
     if (revokeOtherSessions) {
-      // 撤銷所有 sessions（包含當前 session）
-      // 用戶需要重新登入
-      await this.sessionManagementService.revokeAllSessions(userId);
+      // 只撤銷「其他」session，保留當前 session（reload 不會被登出）。
+      // 需要當前 session 的 refresh token 才能辨識並保留之；
+      // 若取不到（理論上不應發生）則退回全撤以確保安全。
+      if (currentRefreshToken) {
+        await this.sessionManagementService.revokeOtherSessions(
+          currentRefreshToken,
+          userId,
+        );
+      } else {
+        await this.sessionManagementService.revokeAllSessions(userId);
+      }
     }
 
     // 發送密碼變更通知（email + 系統通知）
