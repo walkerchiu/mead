@@ -7,8 +7,21 @@
 - **Stack**：NestJS + Prisma（後端）/ Next.js + MUI + Apollo（前端）
 - **租戶模型**：單租戶
 - **Scope**：HQ（`/hq/login`）+ CUSTOMER / PUBLIC（`/login`）
-- **本 stack 的 reference repo**：**npt**（NestJS 單租戶標準；本 repo 對齊它）
+- **本 stack 的 reference repo**：**npt**（NestJS 單租戶模板；本 repo 為**產品**，shared surface 對齊 npt）
 - **Port**：backend `4000`、frontend `3000`
+
+## 本 repo 相對模板的刻意客製（divergence registry）
+
+> 以下為**有意分歧**，禁止為了與 reference repo（npt）一致而 normalize；要動先確認意圖。未列於此的分歧才視為 drift 候選，須先查證再收斂。見 `rules/product-repo-divergence`。
+
+- **SPOSAD 公開入口網**（PUBLIC scope、無認證、純展示；三計畫 SPOSAD/IDC/TISDC）：`apps/frontend/src/components/public/`、`app/[locale]/plans/[slug]`、`types/plan.ts`、`lib/portal/`、`public/data/plans.json`、`docs/frontend/SPOSAD_PORTAL.md`。
+- **自架部署 / EC2 + Caddy 自動 TLS**：`docker-compose.selfhost.yml`、`deploy/ec2/`、`docs/infrastructure/{EC2_PORTAL_DEPLOYMENT,SELF_HOSTED_TLS_DEPLOYMENT}.md`。
+- **雙語字型**：`@fontsource/noto-sans-tc` + `@fontsource/inter`。
+
+### 同步面 vs 自有面
+
+- 從 npt 同步（shared surface）：Prisma schema（與 npt 幾近一致）、認證/RBAC/2FA/scope、dashboard/HQ 頁、Storybook、共用文件。
+- product-owned（勿 normalize）：SPOSAD 入口網全套、自架/EC2 部署設定與文件。
 
 ## 鐵則（詳見 `family__skills__overview` 與 rules）
 
