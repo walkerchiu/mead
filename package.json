@@ -45,8 +45,12 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,yaml,yml,md}": [
+    "*.{json,yaml,yml}": [
       "prettier --write"
+    ],
+    "*.md": [
+      "prettier --write",
+      "npx --yes markdownlint-cli@0.48.0 --config .markdownlint.json"
     ]
   },
   "pnpm": {
