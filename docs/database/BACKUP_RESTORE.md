@@ -421,7 +421,7 @@ psql -d mead_db -c "SELECT COUNT(*) FROM roles;"
 # 測試登入
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query":"mutation { login(email:\"customer_admin\", password:\"password\") { token } }"}'
+  -d '{"query":"mutation { login(accountName:\"customer_admin\", password:\"password\") { token } }"}'
 ```
 
 #### 5. 啟動服務

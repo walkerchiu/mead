@@ -276,12 +276,12 @@ pnpm db:seed
 
 ### 步驟 2：管理員登入
 
-> `login` 的 `email` 參數名為**向後相容保留**，語意為**帳號（accountName）**。
+> `login` 的登入識別參數為 `accountName`（即**帳號**，非 email）。
 
 ```graphql
 mutation Login {
   # 傳入的是帳號（accountName），非 email
-  login(email: "hq_admin", password: "Password123!") {
+  login(accountName: "hq_admin", password: "Password123!") {
     ... on AuthResponse {
       accessToken
       user {

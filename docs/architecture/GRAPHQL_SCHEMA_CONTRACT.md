@@ -93,8 +93,16 @@ type User {
 ```graphql
 union LoginResult = AuthResponse | TwoFactorLoginResponse
 
-mutation Login($email: String!, $password: String!, $rememberMe: Boolean) {
-  login(email: $email, password: $password, rememberMe: $rememberMe) {
+mutation Login(
+  $accountName: String!
+  $password: String!
+  $rememberMe: Boolean
+) {
+  login(
+    accountName: $accountName
+    password: $password
+    rememberMe: $rememberMe
+  ) {
     ... on AuthResponse {
       accessToken
       user {
@@ -227,7 +235,7 @@ map 成扁平 `roles` 陣列。
 
 | Mutation                                                | Input / Args                               | Return                                                       |
 | ------------------------------------------------------- | ------------------------------------------ | ------------------------------------------------------------ |
-| `login(email, password, rememberMe?)`                   | flat args（`rememberMe: Boolean = false`） | `LoginResult`（union）                                       |
+| `login(accountName, password, rememberMe?)`             | flat args（`rememberMe: Boolean = false`） | `LoginResult`（union）                                       |
 | `verifyTwoFactorLogin(input)`                           | `VerifyTwoFactorInput`                     | `AuthResponse`                                               |
 | `refreshToken`                                          | （cookie，無 args）                        | `AuthResponse`                                               |
 | `registerCustomer(accountName, email, password, name?)` | flat args                                  | `AuthResponse`                                               |

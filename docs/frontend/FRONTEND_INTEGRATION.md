@@ -331,8 +331,8 @@ import { gql } from '@apollo/client';
 
 // 登入（refresh token 透過 HttpOnly Cookie 設定，不在回應中返回）
 export const LOGIN_MUTATION = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+  mutation Login($accountName: String!, $password: String!) {
+    login(accountName: $accountName, password: $password) {
       ... on AuthResponse {
         __typename
         accessToken

@@ -71,9 +71,8 @@ fallback、以及未來若要分軌視覺時都會交纏在同一路徑上。把
   `auth.invalidCredentials`（避免帳號枚舉，同時累計 IP lockout）。建立 / 註冊
   （`UserService.createUser` / `AuthService.registerCustomer` / `AuthService.registerHQ`）皆驗
   account 格式 + 唯一性。
-  > GraphQL `login(email, password)`（`apps/backend/src/auth/auth.resolver.ts`）的 `email`
-  > 參數名為**向後相容保留**，語意為 accountName；前端 `LoginForm` 的 form data 欄位名同樣沿用
-  > `email`。
+  > GraphQL `login(accountName, password)`（`apps/backend/src/auth/auth.resolver.ts`）的登入識別
+  > 參數即為 `accountName`（語意為帳號）；前端 `LoginForm` 的 form data 欄位名亦為 `accountName`。
 - **前端**：`LoginForm`（`apps/frontend/src/components/organisms/LoginForm/LoginForm.tsx`）欄位
   label 改「帳號」（`t('accountLabel')`）、`type="text"`、`autoComplete="username"`，zod 改用
   `regex(/^[a-zA-Z0-9_]{3,20}$/)` 而非 `.email()`。

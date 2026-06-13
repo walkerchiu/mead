@@ -421,7 +421,7 @@ async login(@Args('email') email: string, @Args('password') password: string) {
 union LoginResult = AuthResponse | TwoFactorLoginResponse
 
 mutation Login {
-  login(email: "customer_admin", password: "password") {
+  login(accountName: "customer_admin", password: "password") {
     ... on AuthResponse {
       __typename
       accessToken

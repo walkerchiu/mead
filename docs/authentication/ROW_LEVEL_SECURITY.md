@@ -357,7 +357,7 @@ private buildAccessScopeFilter(context?: UserQueryContext) {
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { login(email: \"hq_admin\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
+    "query": "mutation { login(accountName: \"hq_admin\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
   }'
 
 # 使用 Token 查詢
@@ -376,7 +376,7 @@ curl -X POST http://localhost:4000/graphql \
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "mutation { login(email: \"hq_admin\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
+    "query": "mutation { login(accountName: \"hq_admin\", password: \"Password123!\") { ... on AuthResponse { accessToken } } }"
   }'
 
 # 查詢（應該只看到 HQ 和 PUBLIC）

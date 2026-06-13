@@ -244,7 +244,7 @@ mutation {
 
 ```graphql
 mutation {
-  login(email: "customer_admin", password: "Password123!") {
+  login(accountName: "customer_admin", password: "Password123!") {
     ... on AuthResponse {
       accessToken
       refreshToken
@@ -266,7 +266,7 @@ mutation {
 
 ```graphql
 mutation {
-  login(email: "customer_admin", password: "Password123!") {
+  login(accountName: "customer_admin", password: "Password123!") {
     ... on TwoFactorLoginResponse {
       requiresTwoFactor
       temporaryToken
@@ -789,8 +789,8 @@ const CONFIRM_ENABLE_2FA = gql`
 
 // 3. 登入流程
 const LOGIN = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
+  mutation Login($accountName: String!, $password: String!) {
+    login(accountName: $accountName, password: $password) {
       ... on TwoFactorLoginResponse {
         __typename
         requiresTwoFactor
