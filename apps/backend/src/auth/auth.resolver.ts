@@ -178,12 +178,14 @@ export class AuthResolver {
    */
   @Mutation(() => LoginResult, {
     description:
-      '用戶登入（使用 email 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼',
+      '用戶登入（使用帳號 accountName 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼',
   })
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   async login(
-    @Args('email', { description: '註冊的電子郵件地址' })
-    email: string,
+    @Args('accountName', {
+      description: '登入帳號（accountName，3-20 英數底線）',
+    })
+    accountName: string,
     @Args('password', { description: '用戶密碼' })
     password: string,
     @Args('rememberMe', {
@@ -198,7 +200,7 @@ export class AuthResolver {
     @I18nLang() lang: string,
   ): Promise<typeof LoginResult> {
     const result = await this.authService.login(
-      email,
+      accountName,
       password,
       context.req.ip,
       context.req.headers['user-agent'],
@@ -212,7 +214,7 @@ export class AuthResolver {
       // 驗證 accessToken 是否存在
       if (!authResponse.accessToken) {
         logger.error('[AuthResolver] Login failed: accessToken is missing', {
-          email,
+          accountName,
           hasUser: !!authResponse.user,
         });
         throw new InternalServerErrorException(

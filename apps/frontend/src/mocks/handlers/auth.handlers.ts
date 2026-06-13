@@ -14,8 +14,8 @@ import {
 export const authHandlers = [
   // LOGIN - Success without 2FA
   graphql.mutation('Login', ({ variables }) => {
-    const { email, password } = variables as {
-      email: string;
+    const { accountName, password } = variables as {
+      accountName: string;
       password: string;
     };
 
@@ -33,8 +33,8 @@ export const authHandlers = [
 
     // Check if user has 2FA enabled
     const user2FA =
-      email === mockUsers.customerWith2FA.email ||
-      email === mockUsers.hqWith2FA.email;
+      accountName === mockUsers.customerWith2FA.email ||
+      accountName === mockUsers.hqWith2FA.email;
 
     if (user2FA) {
       // Return temporary token for 2FA
@@ -51,7 +51,7 @@ export const authHandlers = [
 
     // Return regular auth response
     const user =
-      email === mockUsers.hq.email ? mockUsers.hq : mockUsers.customer;
+      accountName === mockUsers.hq.email ? mockUsers.hq : mockUsers.customer;
 
     return HttpResponse.json({
       data: {

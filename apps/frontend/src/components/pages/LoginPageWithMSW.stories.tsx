@@ -101,12 +101,12 @@ export const SuccessLogin: Story = {
     msw: {
       handlers: [
         graphql.mutation('Login', ({ variables }) => {
-          const { email, password } = variables as {
-            email: string;
+          const { accountName, password } = variables as {
+            accountName: string;
             password: string;
           };
 
-          if (email === 'user@example.com' && password === 'password') {
+          if (accountName === 'user@example.com' && password === 'password') {
             return HttpResponse.json({
               data: {
                 login: {
@@ -242,12 +242,12 @@ export const Requires2FA: Story = {
     msw: {
       handlers: [
         graphql.mutation('Login', ({ variables }) => {
-          const { email, password } = variables as {
-            email: string;
+          const { accountName, password } = variables as {
+            accountName: string;
             password: string;
           };
 
-          if (email === 'hq@example.com' && password === 'password') {
+          if (accountName === 'hq@example.com' && password === 'password') {
             return HttpResponse.json({
               data: {
                 login: {

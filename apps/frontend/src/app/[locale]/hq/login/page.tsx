@@ -124,7 +124,7 @@ export default function HqLoginPage() {
     try {
       const result = await login({
         variables: {
-          email: data.email,
+          accountName: data.email,
           password: data.password,
           rememberMe: data.rememberMe ?? false,
         },
