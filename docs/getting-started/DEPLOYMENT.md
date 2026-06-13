@@ -211,7 +211,7 @@ pnpm db:generate
 
 ### UAT / Staging / Production
 
-**原則：Zero-Downtime Migration**
+#### 原則：Zero-Downtime Migration
 
 1. **相容階段**：新 schema 必須與舊程式碼相容（例：新欄位可為 NULL、新資料表無外鍵）
 2. **部署新程式碼**：開始寫入新欄位

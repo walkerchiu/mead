@@ -201,14 +201,14 @@ echo "GEOIP_DB_PATH=./data/geoip/GeoLite2-City.mmdb" >> apps/backend/.env
 
 ### 1️⃣ 註冊 MaxMind 帳號
 
-1. 訪問 https://www.maxmind.com/en/geolite2/signup
+1. 訪問 <https://www.maxmind.com/en/geolite2/signup>
 2. 創建免費帳號
-3. 登入後訪問 https://www.maxmind.com/en/accounts/current/license-key
+3. 登入後訪問 <https://www.maxmind.com/en/accounts/current/license-key>
 4. 創建 License Key（記錄 Account ID 和 License Key）
 
 ### 2️⃣ 下載 GeoLite2 數據庫
 
-**方法 1：使用 geoipupdate（推薦）**
+#### 方法 1：使用 geoipupdate（推薦）
 
 ```bash
 # macOS
@@ -229,10 +229,10 @@ EOF
 geoipupdate
 ```
 
-**方法 2：手動下載**
+#### 方法 2：手動下載
 
 1. 登入 MaxMind 網站
-2. 訪問 https://www.maxmind.com/en/accounts/current/geoip/downloads
+2. 訪問 <https://www.maxmind.com/en/accounts/current/geoip/downloads>
 3. 下載 "GeoLite2 City" (GZIP 格式)
 4. 解壓並移動到 `apps/backend/data/geoip/GeoLite2-City.mmdb`
 

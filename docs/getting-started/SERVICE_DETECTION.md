@@ -134,7 +134,7 @@ fi
 
 ## 觸碰到此邏輯的檔案
 
-```
+```text
 scripts/commands/status.sh    # check_service: 三層全套
 scripts/commands/logs.sh      # check_service_running / view_app_logs
 scripts/commands/port.sh      # port_free / port_free_all

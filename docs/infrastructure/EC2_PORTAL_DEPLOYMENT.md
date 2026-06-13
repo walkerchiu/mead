@@ -123,23 +123,23 @@ ssh -i <金鑰>.pem ubuntu@<主機IP> 'cd ~/mead-deploy && sudo docker compose u
 
 ```caddyfile
 {
-	email {$ACME_EMAIL}
-	# 排錯期可先用 staging（避免觸及 LE 正式 rate limit）：
-	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+ email {$ACME_EMAIL}
+ # 排錯期可先用 staging（避免觸及 LE 正式 rate limit）：
+ # acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
 }
 
 {$SITE_DOMAIN} {
-	encode zstd gzip
-	reverse_proxy frontend:3000 {
-		header_up Host {host}
-		header_up X-Forwarded-Host {host}
-		header_up X-Forwarded-Proto {scheme}
-		# ⚠️ 重要：Next.js standalone 在反向代理後會把內部埠 3000 寫進
-		# 轉址 Location（例 https://網域:3000/en），導致使用者打根路徑時壞掉。
-		# 在此移除回應 Location 標頭的 :3000。
-		header_down Location ":3000" ""
-	}
-	header -Server
+ encode zstd gzip
+ reverse_proxy frontend:3000 {
+  header_up Host {host}
+  header_up X-Forwarded-Host {host}
+  header_up X-Forwarded-Proto {scheme}
+  # ⚠️ 重要：Next.js standalone 在反向代理後會把內部埠 3000 寫進
+  # 轉址 Location（例 https://網域:3000/en），導致使用者打根路徑時壞掉。
+  # 在此移除回應 Location 標頭的 :3000。
+  header_down Location ":3000" ""
+ }
+ header -Server
 }
 ```
 

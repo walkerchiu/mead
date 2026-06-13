@@ -1023,7 +1023,7 @@ export const snackbarConfig: SnackbarConfig = {
 - `bottomCenter` - 下方中央（預設）
 - `bottomLeft` - 左下角
 
-**方法 2：修改 globals.css**
+##### 方法 2：修改 globals.css
 
 如需更精確的位置控制，可在 `src/app/globals.css` 中調整：
 

@@ -112,7 +112,7 @@ docker-compose ps
 
 **Image**: `rabbitmq:3.13-management`
 
-**管理介面**: http://localhost:15672
+**管理介面**: <http://localhost:15672>
 **預設帳號**: 見 .env.docker
 
 ### 3. Dragonfly (Redis)
@@ -174,9 +174,9 @@ docker-compose --env-file .env.docker --profile storage up -d
 
 **管理介面**:
 
-- Master UI: http://localhost:9333
-- Volume UI: http://localhost:8080
-- Filer UI: http://localhost:8888
+- Master UI: <http://localhost:9333>
+- Volume UI: <http://localhost:8080>
+- Filer UI: <http://localhost:8888>
 
 **詳細文檔**: 參考 [SeaweedFS Storage Guide](../infrastructure/SEAWEEDFS_STORAGE.md)
 
@@ -264,7 +264,7 @@ postgresql://postgres:YOUR_PASSWORD@localhost:5432/mead_db
 
 ### 4. 容器安全
 
-**限制資源使用**
+#### 限制資源使用
 
 ```yaml
 services:
@@ -278,7 +278,7 @@ services:
           memory: 512M
 ```
 
-**使用非 root 用戶**
+#### 使用非 root 用戶
 
 ```yaml
 services:
@@ -286,7 +286,7 @@ services:
     user: '999:999' # 非 root
 ```
 
-**啟用健康檢查**
+#### 啟用健康檢查
 
 ```yaml
 services:

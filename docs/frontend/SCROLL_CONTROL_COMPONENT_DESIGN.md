@@ -74,7 +74,7 @@ Molecules (分子組件)
 
 ### 組件層級
 
-**ScrollControl (Molecule)**
+#### ScrollControl (Molecule)
 
 ```tsx
 <ScrollControl

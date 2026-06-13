@@ -97,7 +97,7 @@
 ### 你需要的工具
 
 - **Figma**（推薦）或 Sketch、Adobe XD
-- Material Design 指南（參考）：https://m3.material.io/
+- Material Design 指南（參考）：<https://m3.material.io/>
 - 與開發團隊的溝通管道
 
 ---
@@ -209,7 +209,7 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 
 #### Semantic Colors（語意色）
 
-**Error（錯誤）**
+##### Error（錯誤）
 
 ```text
 ├── 0: #FFFFFF
@@ -226,7 +226,7 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 └── 950: #49060C
 ```
 
-**Warning（警告）**
+##### Warning（警告）
 
 ```text
 ├── 0: #FFFFFF
@@ -243,7 +243,7 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 └── 950: #451705
 ```
 
-**Info（資訊）**
+##### Info（資訊）
 
 ```text
 ├── 0: #FFFFFF
@@ -260,7 +260,7 @@ Design Token 是設計系統的**基礎變數**，定義了顏色、字體、間
 └── 950: #0A2F61
 ```
 
-**Success（成功）**
+##### Success（成功）
 
 ```text
 ├── 0: #FFFFFF
@@ -422,7 +422,7 @@ Grey Dark Scale:
 
 #### 暗色模式主題色
 
-**Primary（主色 - 品牌深藍提亮版）**
+##### Primary（主色 - 品牌深藍提亮版）
 
 ```text
 用途：主要按鈕、連結、強調元素
@@ -438,7 +438,7 @@ Grey Dark Scale:
 - 與深色背景形成舒適對比
 ```
 
-**Secondary（次要色 - 品牌亮藍提亮版）**
+##### Secondary（次要色 - 品牌亮藍提亮版）
 
 ```text
 用途：次要操作、輔助元素
@@ -449,7 +449,7 @@ Grey Dark Scale:
 └── Contrast Text: #FFFFFF
 ```
 
-**Accent（輔助強調 - 琥珀）**
+##### Accent（輔助強調 - 琥珀）
 
 ```text
 用途：標記強調、輔助視覺焦點
@@ -462,7 +462,7 @@ Grey Dark Scale:
 
 #### 暗色模式語意色 (Semantic Colors)
 
-**Error（錯誤 - 柔和紅）**
+##### Error（錯誤 - 柔和紅）
 
 ```text
 ├── Light: #FCA5A5   - 淺紅
@@ -476,7 +476,7 @@ Grey Dark Scale:
 - 錯誤訊息文字：#FCA5A5
 ```
 
-**Warning（警告 - 溫暖琥珀）**
+##### Warning（警告 - 溫暖琥珀）
 
 ```text
 ├── Light: #FCD34D   - 淺琥珀
@@ -490,7 +490,7 @@ Grey Dark Scale:
 - 警告訊息文字：#FCD34D
 ```
 
-**Info（資訊 - 品牌亮藍提亮版）**
+##### Info（資訊 - 品牌亮藍提亮版）
 
 ```text
 ├── Light: #8EC7DE   - 淺亮藍
@@ -504,7 +504,7 @@ Grey Dark Scale:
 - 資訊訊息文字：#8EC7DE
 ```
 
-**Success（成功 - 祖母綠）**
+##### Success（成功 - 祖母綠）
 
 ```text
 ├── Light: #6EE7B7   - 淺綠
@@ -551,7 +551,7 @@ Action States:
 
 #### 暗色模式按鈕系統
 
-**Contained Button（填充按鈕）**
+##### Contained Button（填充按鈕）
 
 ```text
 尺寸規格：
@@ -571,7 +571,7 @@ Action States:
 圖示間距：8px
 ```
 
-**Outlined Button（邊框按鈕）**
+##### Outlined Button（邊框按鈕）
 
 ```text
 顏色系統：
@@ -587,7 +587,7 @@ Action States:
 邊框寬度：1px
 ```
 
-**Text Button（文字按鈕）**
+##### Text Button（文字按鈕）
 
 ```text
 顏色系統：
@@ -602,7 +602,7 @@ Action States:
 
 #### 暗色模式表格與列表
 
-**DataTable 暗色模式配色**
+##### DataTable 暗色模式配色
 
 ```text
 表格結構：
@@ -636,7 +636,7 @@ Action States:
     - 文字顏色比邊框更亮,確保可讀性
 ```
 
-**Audit Log Action Colors（審計日誌動作顏色）**
+##### Audit Log Action Colors（審計日誌動作顏色）
 
 ```text
 Create（創建）：
@@ -726,7 +726,7 @@ Variable Collections:
 - 主要字體：Roboto, "Noto Sans TC", sans-serif（中文 fallback）
 - 等寬字體：`Roboto Mono`, monospace（用於代碼）
 
-**Typography 規格（English）**
+#### Typography 規格（English）
 
 | Style     | 用途     | Font Family | Weight        | Size (px) | Line-height (px) | Letter-spacing |
 | --------- | -------- | ----------- | ------------- | --------- | ---------------- | -------------- |
@@ -748,7 +748,7 @@ Variable Collections:
 
 ### 響應式斷點
 
-**裝置對應與區間**
+#### 裝置對應與區間
 
 ```text
 Large / TV：1920px+
@@ -758,7 +758,7 @@ M / Tablet：768px–1023px
 S / Mobile：360px–767px
 ```
 
-**對應 MUI Breakpoints（min-width）**
+#### 對應 MUI Breakpoints（min-width）
 
 ```text
 xs: 360
@@ -770,7 +770,7 @@ xl: 1920
 
 ### Guide（版型尺寸）
 
-**設計 Frame 區間**
+#### 設計 Frame 區間
 
 ```text
 XL / Desktop: 1920–1440
@@ -780,7 +780,7 @@ S / Mobile L: 767–480
 XS / Mobile S: 479–360
 ```
 
-**建議 Frame 寬度（Figma）**
+#### 建議 Frame 寬度（Figma）
 
 ```text
 1440 / 1024 / 768 / 480 / 360
@@ -788,7 +788,7 @@ XS / Mobile S: 479–360
 
 ### 間距系統
 
-**基於 8px 網格系統**
+#### 基於 8px 網格系統
 
 ```text
 間距比例：
@@ -808,7 +808,7 @@ XS / Mobile S: 479–360
 - 元素之間間距（Gap）
 ```
 
-**Horizontal / Vertical**
+#### Horizontal / Vertical
 
 ```text
 Spacing:1 = 8
@@ -821,7 +821,7 @@ Spacing:7 = 56
 Spacing:8 = 64
 ```
 
-**元件間距範例**
+#### 元件間距範例
 
 ```text
 Dropdown / Input spacing:
@@ -2021,49 +2021,49 @@ Badge（徽章）顯示：
 
 #### 各 Page 的詳細說明
 
-**Cover（封面頁）**
+##### Cover（封面頁）
 
 - **用途**：讓任何人打開檔案時能快速了解這是什麼專案
 - **必須包含**：專案名稱、版本號、最後更新日期、設計團隊
 - **可選包含**：快速導航連結、變更紀錄、專案目標說明
 
-**Design Tokens（設計基礎變數）**
+##### Design Tokens（設計基礎變數）
 
 - **用途**：集中管理所有設計決策，確保一致性
 - **為什麼重要**：修改一次，所有使用該 Token 的地方都會更新
 - **開發對應**：這些 Token 會直接轉換為程式碼中的變數
 
-**Components（組件庫）**
+##### Components（組件庫）
 
 - **用途**：所有可重用的 UI 元件
 - **組織原則**：從小到大（Atoms → Molecules → Organisms → Templates）
 - **為什麼分層**：避免循環依賴，小組件可組合成大組件
 
-**Responsive Examples（響應式範例）**
+##### Responsive Examples（響應式範例）
 
 - **用途**：展示同一個頁面在不同裝置上的呈現
 - **為什麼需要**：提前發現在小螢幕上的問題
 - **注意事項**：不只是縮小，而是調整佈局和優先級
 
-**States & Interactions（狀態與互動）**
+##### States & Interactions（狀態與互動）
 
 - **用途**：展示用戶操作時的視覺反饋
 - **為什麼重要**：開發者需要知道每個狀態該長什麼樣
 - **必須包含**：所有可互動組件的所有可能狀態
 
-**Color Accessibility（色彩無障礙）**
+##### Color Accessibility（色彩無障礙）
 
 - **用途**：確保色盲或視力障礙者也能正常使用
 - **標準**：WCAG AA 要求對比度至少 4.5:1
 - **工具推薦**：使用 Stark 插件檢查
 
-**Guidelines（使用指南）**
+##### Guidelines（使用指南）
 
 - **用途**：教導他人如何正確使用這些組件
 - **內容建議**：何時用 Contained Button vs Outlined Button
 - **Do & Don't**：用實際範例說明正確和錯誤用法
 
-**Handoff（交付給開發）**
+##### Handoff（交付給開發）
 
 - **用途**：把設計轉交給開發團隊時需要的所有內容
 - **包含內容**：匯出的圖示、Logo、開發註解、實作檢查表
@@ -2116,7 +2116,7 @@ Badge（徽章）顯示：
 
 #### 建立 Components 的最佳實踐
 
-**1. 命名規範**
+##### 1. 命名規範
 
 ```text
 格式：Layer / Component / Variant
@@ -2134,7 +2134,7 @@ Badge（徽章）顯示：
 - input_new
 ```
 
-**2. 使用 Variants（變體）**
+##### 2. 使用 Variants（變體）
 
 將不同狀態整理為一個 Component 的 Variants：
 
@@ -2157,7 +2157,7 @@ Button Component Properties:
 3. 設定 Properties（Type, Color, Size, State）
 4. 為每個組合設計樣式
 
-**3. 使用 Auto Layout**
+##### 3. 使用 Auto Layout
 
 **為什麼要用 Auto Layout？**
 
@@ -2188,7 +2188,7 @@ Auto Layout 設定：
 └── Alignment: Stretch (填滿寬度)
 ```
 
-**4. 標註規範**
+##### 4. 標註規範
 
 在每個組件的 Specs Frame 中：
 
@@ -2209,7 +2209,7 @@ Auto Layout 設定：
 - Annotate - 加入註解
 ```
 
-**5. 狀態展示**
+##### 5. 狀態展示
 
 為每個互動組件建立狀態展示：
 

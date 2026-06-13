@@ -121,7 +121,7 @@ pnpm storybook
    - Email 欄位（值為帳號 accountName）: `public_user`
    - Password: `Password123!`
 3. 點擊「登入」
-4. 應該看到：「✅ 登入成功！用戶: public@example.com」
+4. 應該看到：「✅ 登入成功！用戶: <public@example.com>」
 
 **如果看到錯誤**:
 

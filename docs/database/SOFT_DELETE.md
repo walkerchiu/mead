@@ -486,7 +486,7 @@ await prisma.profile.updateMany({
 
 如果有唯一索引（如 `email`），軟刪除後再建立相同 email 的 User 可能衝突。解決方案：
 
-**方案 1：複合唯一索引**
+#### 方案 1：複合唯一索引
 
 ```prisma
 model User {
@@ -497,7 +497,7 @@ model User {
 }
 ```
 
-**方案 2：清空或修改已刪除記錄的唯一欄位**
+#### 方案 2：清空或修改已刪除記錄的唯一欄位
 
 ```typescript
 await prisma.user.update({

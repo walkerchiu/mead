@@ -131,10 +131,10 @@ apps/frontend/
 
 ## 存取
 
-| 服務      | 端點                               |
-| --------- | ---------------------------------- |
-| 前端應用  | http://localhost:3000/en 或 /zh-TW |
-| Storybook | http://localhost:6006              |
+| 服務      | 端點                                 |
+| --------- | ------------------------------------ |
+| 前端應用  | <http://localhost:3000/en> 或 /zh-TW |
+| Storybook | <http://localhost:6006>              |
 
 ## 相關文件
 

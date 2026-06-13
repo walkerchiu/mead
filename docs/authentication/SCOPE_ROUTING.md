@@ -7,7 +7,7 @@ auth 與個人資料相關頁面（登入 / 忘記密碼 / 重設密碼 / 修改
 > **登入身分為「帳號（accountName）」而非 email。** 詳見 [帳號登入](#帳號登入accountname) 與
 > [登入後 scope 導向](#登入後-scope-導向resolvelandingpath) 兩節。HQ 使用者若同時擁有
 > `CUSTOMER_SCOPE`，可從任一登入頁登入並進入對應 scope（落點由「登入入口」決定）。
-
+>
 > 視覺層**未分軌**：HQ 與 customer 共用同一套 `AuthLayout` 與
 > `LoginForm` / `ForgotPasswordForm` / `ResetPasswordForm` / `ChangePasswordForm` 元件 —
 > 目前未為 customer scope 引入專屬 design tokens 與 layout 元件。後續若要分視覺軌（例如新增

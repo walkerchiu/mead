@@ -83,13 +83,13 @@ AuditLogConsumer 批次處理
 ### 服務資訊
 
 - **AMQP 端口**: 5672
-- **管理介面**: http://localhost:15672
+- **管理介面**: <http://localhost:15672>
 - **預設帳號**: hq / password
 - **佇列名稱**: `audit_logs`
 
 ### 管理介面
 
-訪問 http://localhost:15672 可以：
+訪問 <http://localhost:15672> 可以：
 
 - 查看佇列狀態
 - 監控訊息數量
@@ -329,7 +329,7 @@ export class AuditLogConsumer {
 
 ### 快取策略
 
-**1. 查詢結果快取**
+#### 1. 查詢結果快取
 
 ```typescript
 // 快取 5 分鐘
@@ -343,7 +343,7 @@ async findRecent() {
 }
 ```
 
-**2. 統計資料快取**
+#### 2. 統計資料快取
 
 ```typescript
 // 快取 1 小時
@@ -354,7 +354,7 @@ async getStatistics() {
 }
 ```
 
-**3. 手動快取控制**
+#### 3. 手動快取控制
 
 ```typescript
 // 清除特定快取

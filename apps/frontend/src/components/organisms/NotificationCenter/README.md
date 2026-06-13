@@ -14,7 +14,7 @@
 
 ## 組件架構
 
-```
+```text
 NotificationCenter (Organism)
 ├── Badge (Atom) - 未讀數量徽章
 ├── IconButton (MUI) - 觸發按鈕
@@ -25,7 +25,7 @@ NotificationCenter (Organism)
 
 ## 資料流
 
-```
+```text
 NotificationCenter
     ↓
 useNotifications Hook

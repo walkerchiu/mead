@@ -107,10 +107,10 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/mead_db?schema=publi
 
 ## 存取
 
-| 服務            | 端點                          |
-| --------------- | ----------------------------- |
-| API             | http://localhost:4000         |
-| GraphQL Sandbox | http://localhost:4000/graphql |
+| 服務            | 端點                            |
+| --------------- | ------------------------------- |
+| API             | <http://localhost:4000>         |
+| GraphQL Sandbox | <http://localhost:4000/graphql> |
 
 ## 相關文件
 

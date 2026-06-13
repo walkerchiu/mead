@@ -4,7 +4,7 @@
 
 ## 目錄結構
 
-```
+```text
 prisma/
 ├── schema.prisma          # ⚠️ 自動產生，請勿編輯
 └── schemas/               # ✅ 在這裡編輯

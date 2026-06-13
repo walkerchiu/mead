@@ -109,13 +109,13 @@ https://ethereal.email/login
 
 #### 共用變數
 
-| 變數                    | 說明                   | 開發環境                             | 生產環境                               |
-| ----------------------- | ---------------------- | ------------------------------------ | -------------------------------------- |
-| `MAIL_PROVIDER`         | 郵件發送模式           | smtp                                 | graph                                  |
-| `MAIL_FROM`             | 寄件者 Email           | noreply@ethereal.email               | noreply@example.com                    |
-| `MAIL_FROM_NAME`        | 寄件者名稱             | MEAD App                             | Your App Name                          |
-| `PASSWORD_RESET_EXPIRY` | 密碼重設有效期（分鐘） | 30                                   | 15                                     |
-| `PASSWORD_RESET_URL`    | 密碼重設頁面 URL       | http://localhost:3000/reset-password | https://app.example.com/reset-password |
+| 變數                    | 說明                   | 開發環境                               | 生產環境                                 |
+| ----------------------- | ---------------------- | -------------------------------------- | ---------------------------------------- |
+| `MAIL_PROVIDER`         | 郵件發送模式           | smtp                                   | graph                                    |
+| `MAIL_FROM`             | 寄件者 Email           | <noreply@ethereal.email>               | <noreply@example.com>                    |
+| `MAIL_FROM_NAME`        | 寄件者名稱             | MEAD App                               | Your App Name                            |
+| `PASSWORD_RESET_EXPIRY` | 密碼重設有效期（分鐘） | 30                                     | 15                                       |
+| `PASSWORD_RESET_URL`    | 密碼重設頁面 URL       | <http://localhost:3000/reset-password> | <https://app.example.com/reset-password> |
 
 #### SMTP 模式變數（`MAIL_PROVIDER=smtp`）
 
@@ -515,7 +515,7 @@ docker-compose up -d mailpit
 
 Mailpit 啟動後，開啟瀏覽器訪問：
 
-```
+```text
 http://localhost:8025
 ```
 

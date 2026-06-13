@@ -97,7 +97,7 @@
 
 ### Queries
 
-**取得用戶的角色列表**
+#### 取得用戶的角色列表
 
 ```graphql
 query UserRoles($userId: String!) {
@@ -122,7 +122,7 @@ query UserRoles($userId: String!) {
 - HQ：回傳該用戶在所有 Scope 的角色
 - 非 HQ：僅回傳該用戶在 CUSTOMER_SCOPE 的角色
 
-**取得可分配的角色列表**
+#### 取得可分配的角色列表
 
 ```graphql
 query AssignableRoles {
@@ -144,7 +144,7 @@ query AssignableRoles {
 
 ### Mutations
 
-**分配角色**
+#### 分配角色
 
 ```graphql
 mutation AssignRole($input: AssignRoleInput!) {
@@ -159,7 +159,7 @@ Input 欄位：
 
 回傳 `Boolean`（成功為 `true`）。
 
-**撤銷角色**
+#### 撤銷角色
 
 ```graphql
 mutation RevokeRole($input: RevokeRoleInput!) {
@@ -200,13 +200,13 @@ Customer 用戶管理頁面 (/users)
 
 對話框分為兩個區塊：
 
-**區塊一：目前角色**
+#### 區塊一：目前角色
 
 - 以 Chip 元件顯示用戶目前持有的角色
 - 每個 Chip 顯示角色的 `displayName`
 - 點擊 Chip 的刪除圖示可撤銷該角色（會先確認）
 
-**區塊二：分配角色**
+#### 區塊二：分配角色
 
 - Select 下拉選單列出可分配但用戶尚未持有的角色
 - 選擇角色後點擊「分配」按鈕執行分配
@@ -250,13 +250,13 @@ Role
 
 角色管理的權限檢查採用**雙層架構**：
 
-**Resolver 層**
+#### Resolver 層
 
 - 使用 `@RequiresAnyScope([HQ_SCOPE, CUSTOMER_SCOPE])` 確保用戶至少屬於其中一個 Scope
 - 手動呼叫 `PermissionService.checkPermission()` 檢查 `roles:manage`，逐一對用戶的每個 Scope 進行檢查
 - 這樣做是因為 `PermissionGuard` 的 `inferScope` 在用戶同時擁有多個 Scope 時可能無法正確推斷
 
-**Service 層**
+#### Service 層
 
 - 業務邏輯限制（OWNER 不能分配 HQ 角色等）在 Service 方法中檢查
 - 從資料庫讀取操作者的角色來判斷其層級

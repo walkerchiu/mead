@@ -240,7 +240,7 @@ query {
 
 ### 架構
 
-```
+```text
 ┌─────────────┐     快取命中     ┌────────────┐
 │   Resolver  │ ───────────────> │   Redis    │
 │             │                   │   Cache    │
@@ -579,7 +579,7 @@ export class PrismaService extends PrismaClient<
 
 **日誌輸出範例**:
 
-```
+```text
 [Prisma] Slow Query Detected {
   duration: '1523ms',
   query: 'SELECT * FROM sessions WHERE user_id = $1 AND revoked_at IS NULL',
@@ -627,7 +627,7 @@ DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=public&connection_
 
 **計算公式**:
 
-```
+```text
 最佳連線數 = (CPU 核心數 × 2) + 磁碟數量
 ```
 

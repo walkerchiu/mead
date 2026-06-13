@@ -233,7 +233,7 @@ DATABASE_SSL_MODE=require
 
 `DATABASE_URL` 的 `?connection_limit=20` 對 RDS `db.t4g.medium`（~200 max_connections）合適。若多 replica 部署：
 
-```
+```text
 replicas × connection_limit ≤ DB max_connections × 0.8
 例: 4 replica × 20 = 80 ≤ 200 × 0.8 = 160 ✓
 ```

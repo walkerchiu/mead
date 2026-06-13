@@ -4,7 +4,7 @@
 
 ## 頁面結構
 
-```
+```text
 /notifications
 ├── page.tsx          # 通知列表頁面
 └── README.md         # 說明文件
@@ -144,7 +144,7 @@ function MyComponent() {
 
 ## 頁面流程
 
-```
+```text
 MainAppBar (通知鈴鐺)
     ↓ 點擊
 NotificationCenter (下拉選單)

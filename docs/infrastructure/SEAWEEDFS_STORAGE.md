@@ -122,7 +122,7 @@ docker-compose ps
 
 **用途**: 中央協調器，管理 Volume 分配
 
-**Web UI**: http://localhost:9333
+**Web UI**: <http://localhost:9333>
 
 **功能**:
 
@@ -140,7 +140,7 @@ curl http://localhost:9333/cluster/status
 
 **用途**: 實際儲存檔案資料
 
-**Web UI**: http://localhost:8080/ui/index.html
+**Web UI**: <http://localhost:8080/ui/index.html>
 
 **功能**:
 
@@ -158,7 +158,7 @@ curl http://localhost:8080/status
 
 **用途**: 提供檔案系統語義和元數據管理
 
-**Web UI**: http://localhost:8888
+**Web UI**: <http://localhost:8888>
 
 **功能**:
 
@@ -172,7 +172,7 @@ curl http://localhost:8080/status
 
 **用途**: S3 相容 API
 
-**端點**: http://localhost:8333
+**端點**: <http://localhost:8333>
 
 **功能**:
 

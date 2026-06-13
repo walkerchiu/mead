@@ -292,22 +292,22 @@ logout → 清除 access_token / refresh_token / remember_me cookie
 
 ### 多層防護
 
-**1. 短時效 Access Token (15m)**
+#### 1. 短時效 Access Token (15m)
 
 - 最小化竊取風險窗口
 - Session 撤銷後最多影響 15 分鐘
 
-**2. 可撤銷 Refresh Token (7d)**
+#### 2. 可撤銷 Refresh Token (7d)
 
 - 即時撤銷能力
 - 資料庫級別控制
 
-**3. Session 追蹤**
+#### 3. Session 追蹤
 
 - 記錄設備、IP、位置
 - 可查詢所有活躍 Session
 
-**4. 審計日誌**
+#### 4. 審計日誌
 
 - 記錄所有撤銷操作
 - 可追溯誰、何時、為何撤銷

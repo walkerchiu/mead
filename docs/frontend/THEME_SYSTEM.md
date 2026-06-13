@@ -743,76 +743,74 @@ localStorage.setItem('theme', 'light'); // 'light' | 'dark' | 'system'
 
 1. **延遲客戶端渲染**：
 
-```typescript
-const [isClient, setIsClient] = useState(false);
+   ```typescript
+   const [isClient, setIsClient] = useState(false);
 
-useEffect(() => {
-  setIsClient(true);
-}, []);
+   useEffect(() => {
+     setIsClient(true);
+   }, []);
 
-if (!isClient) return null; // 或顯示 Loading
-```
+   if (!isClient) return null; // 或顯示 Loading
+   ```
 
 2. **預設主題**：
 
-```typescript
-const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
-```
+   ```typescript
+   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
+   ```
 
-- SSR 時使用 'light' 預設
-- 客戶端 Hydration 後立即切換
+   - SSR 時使用 'light' 預設
+   - 客戶端 Hydration 後立即切換
 
 3. **使用 CSS 變數避免 Hydration Mismatch**：
 
-**問題場景**：登入頁面（AuthLayout）背景色使用 JavaScript 動態計算，導致 SSR 與客戶端不一致
+   **問題場景**：登入頁面（AuthLayout）背景色使用 JavaScript 動態計算，導致 SSR 與客戶端不一致
 
-**解決方案**：使用 CSS 自訂屬性配合 blocking script 的 `dark-mode` class
+   **解決方案**：使用 CSS 自訂屬性配合 blocking script 的 `dark-mode` class
 
-```typescript
-// ❌ 問題寫法 - AuthLayout.tsx
-const getBackgroundStyle = () => {
-  const isDark = theme.palette.mode === 'dark';
-  return isDark
-    ? { background: 'linear-gradient(...)' } // SSR 無法取得正確值
-    : { background: 'linear-gradient(...)' };
-};
+   ```typescript
+   // ❌ 問題寫法 - AuthLayout.tsx
+   const getBackgroundStyle = () => {
+     const isDark = theme.palette.mode === 'dark';
+     return isDark
+       ? { background: 'linear-gradient(...)' } // SSR 無法取得正確值
+       : { background: 'linear-gradient(...)' };
+   };
 
-// ✅ 解決方案 - 改用 CSS 變數
-const getBackgroundStyle = () => {
-  return {
-    background: 'var(--auth-gradient-bg)', // CSS 變數
-  };
-};
-```
+   // ✅ 解決方案 - 改用 CSS 變數
+   const getBackgroundStyle = () => {
+     return {
+       background: 'var(--auth-gradient-bg)', // CSS 變數
+     };
+   };
+   ```
 
-**在 globals.css 定義 CSS 變數**：
+   **在 globals.css 定義 CSS 變數**：
 
-```css
-/* 亮色模式 */
-:root {
-  --auth-gradient-bg: linear-gradient(135deg, #ff6f00 0%, #e65100 100%);
-  --auth-solid-bg: #f5f5f5;
-}
+   ```css
+   /* 亮色模式 */
+   :root {
+     --auth-gradient-bg: linear-gradient(135deg, #ff6f00 0%, #e65100 100%);
+     --auth-solid-bg: #f5f5f5;
+   }
 
-/* 暗色模式 - 由 blocking script 添加的 class */
-html.dark-mode {
-  --auth-gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-  --auth-solid-bg: #0d0d0d;
-}
-```
+   /* 暗色模式 - 由 blocking script 添加的 class */
+   html.dark-mode {
+     --auth-gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+     --auth-solid-bg: #0d0d0d;
+   }
+   ```
 
-**優勢**：
+   **優勢**：
+   - ✅ 無需等待 React hydration，blocking script 添加 `dark-mode` class 後立即生效
+   - ✅ 避免 hydration mismatch error
+   - ✅ 視覺上無閃爍
+   - ✅ 與 body 背景色處理方式一致
 
-- ✅ 無需等待 React hydration，blocking script 添加 `dark-mode` class 後立即生效
-- ✅ 避免 hydration mismatch error
-- ✅ 視覺上無閃爍
-- ✅ 與 body 背景色處理方式一致
-
-**適用場景**：
-
-- 認證頁面（登入、註冊、忘記密碼）
-- 不依賴 React 狀態的純視覺樣式
-- 需要在 SSR 時立即顯示正確主題的元素
+   **適用場景**：
+   - 認證頁面（登入、註冊、忘記密碼）
+   - 不依賴 React 狀態的純視覺樣式
+   - 需要在 SSR 時立即顯示正確主題的元素
 
 ---
 

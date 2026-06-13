@@ -188,7 +188,7 @@ pnpm dev
 
 `DATABASE_URL` 支援以下連線池參數來優化資料庫連線效能：
 
-```
+```text
 postgresql://user:password@host:5432/database?schema=public&connection_limit=10&pool_timeout=10
 ```
 
@@ -362,7 +362,7 @@ Frontend 使用 Next.js 框架,所有環境變數都使用 `NEXT_PUBLIC_` 前綴
 
 - 留空 `NEXT_PUBLIC_SENTRY_DSN` 則不啟用 Sentry
 - 建議 UAT 和 Production 使用不同的 Sentry 專案
-- 從 https://sentry.io 取得 DSN
+- 從 <https://sentry.io> 取得 DSN
 
 #### 配置驗證
 

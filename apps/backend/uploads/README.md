@@ -13,32 +13,26 @@
 
 在 `.env` 檔案中設定:
 
-\`\`\`bash
-
+```bash
 # 儲存類型: local | seaweedfs | s3
-
 STORAGE_TYPE=local
 
 # 本地儲存路徑
-
 UPLOAD_DIR=./uploads
 
 # SeaweedFS 設定 (當 STORAGE_TYPE=seaweedfs)
-
 SEAWEEDFS_MASTER=http://localhost:9333
 
 # AWS S3 設定 (當 STORAGE_TYPE=s3)
-
 AWS_REGION=us-east-1
 AWS_S3_BUCKET=your-bucket-name
-\`\`\`
+```
 
 ## 清理
 
 定期清理舊檔案:
-\`\`\`bash
 
+```bash
 # 刪除 30 天前的檔案
-
 find ./apps/backend/uploads -type f -mtime +30 -delete
-\`\`\`
+```

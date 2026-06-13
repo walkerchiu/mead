@@ -425,7 +425,7 @@ vim prisma/schema.prisma  # 不要這樣做！
 
 如果 model 跨檔案關聯，確保兩邊都有定義：
 
-**user.prisma**
+#### user.prisma
 
 ```prisma
 model User {
@@ -433,7 +433,7 @@ model User {
 }
 ```
 
-**post.prisma**
+#### post.prisma
 
 ```prisma
 model Post {

@@ -168,11 +168,11 @@ pnpm --filter web dev
 
 所有頁面 URL 包含 locale 前綴（`/en/...` 或 `/zh-TW/...`），訪問不帶 locale 的路徑會自動重定向。
 
-- 首頁：http://localhost:3000/en 或 http://localhost:3000/zh-TW
-- 登入：http://localhost:3000/en/login 或 http://localhost:3000/zh-TW/login
-- 忘記密碼：http://localhost:3000/en/forgot-password
-- Dashboard：http://localhost:3000/en/dashboard
-- 安全設定：http://localhost:3000/en/settings/security
+- 首頁：<http://localhost:3000/en> 或 <http://localhost:3000/zh-TW>
+- 登入：<http://localhost:3000/en/login> 或 <http://localhost:3000/zh-TW/login>
+- 忘記密碼：<http://localhost:3000/en/forgot-password>
+- Dashboard：<http://localhost:3000/en/dashboard>
+- 安全設定：<http://localhost:3000/en/settings/security>
 
 ---
 

@@ -614,13 +614,13 @@ docker volume prune
 
 1. **加密備份**（生產環境）：
 
-```bash
-# 備份時加密
-pg_dump -d mead_db | gzip | gpg --encrypt > backup.sql.gz.gpg
+   ```bash
+   # 備份時加密
+   pg_dump -d mead_db | gzip | gpg --encrypt > backup.sql.gz.gpg
 
-# 還原時解密
-gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d mead_db
-```
+   # 還原時解密
+   gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d mead_db
+   ```
 
 2. **安全儲存**：
    - 不要在版本控制中保存備份
@@ -629,11 +629,11 @@ gpg --decrypt backup.sql.gz.gpg | gunzip | psql -d mead_db
 
 3. **存取控制**：
 
-```bash
-# 設定備份檔案權限
-chmod 600 backups/**/*.sql.gz
-chown postgres:postgres backups/**/*.sql.gz
-```
+   ```bash
+   # 設定備份檔案權限
+   chmod 600 backups/**/*.sql.gz
+   chown postgres:postgres backups/**/*.sql.gz
+   ```
 
 ### 審計追蹤
 

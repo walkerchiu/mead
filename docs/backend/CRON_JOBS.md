@@ -79,7 +79,7 @@ MEAD 專案使用 `@nestjs/schedule` 模組實作排程任務系統，用於自�
 
 **執行流程**：
 
-```
+```text
 Cron Trigger
   → DistributedLockService (嘗試獲取鎖)
     → Success: 執行任務 → 釋放鎖
@@ -556,7 +556,7 @@ redis-cli del "lock:cron:cleanup-expired-sessions"
 
 ### 訪問路徑
 
-```
+```text
 /hq/cron-jobs
 ```
 
@@ -1056,57 +1056,57 @@ enum CronJobStatus {
 
 1. **在 Service 中添加方法**：
 
-```typescript
-import { Injectable } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
-import { DistributedLockService } from '../cache/distributed-lock.service';
-import { logger } from '../common/services/logger.service';
+   ```typescript
+   import { Injectable } from '@nestjs/common';
+   import { Cron, CronExpression } from '@nestjs/schedule';
+   import { DistributedLockService } from '../cache/distributed-lock.service';
+   import { logger } from '../common/services/logger.service';
 
-@Injectable()
-export class YourService {
-  constructor(private distributedLockService: DistributedLockService) {}
+   @Injectable()
+   export class YourService {
+     constructor(private distributedLockService: DistributedLockService) {}
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
-    name: 'your-job-name',
-    timeZone: 'Asia/Taipei',
-  })
-  async handleYourCronJob(): Promise<void> {
-    // 使用分散式鎖執行任務
-    await this.distributedLockService.executeWithLock(
-      'cron:your-job-name',
-      async () => {
-        logger.info('[Cron] Starting your job');
+     @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, {
+       name: 'your-job-name',
+       timeZone: 'Asia/Taipei',
+     })
+     async handleYourCronJob(): Promise<void> {
+       // 使用分散式鎖執行任務
+       await this.distributedLockService.executeWithLock(
+         'cron:your-job-name',
+         async () => {
+           logger.info('[Cron] Starting your job');
 
-        try {
-          // 執行任務邏輯
-          await this.performYourTask();
+           try {
+             // 執行任務邏輯
+             await this.performYourTask();
 
-          logger.info('[Cron] Your job completed successfully');
-        } catch (error) {
-          logger.error('[Cron] Your job failed', {
-            error: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          });
-          throw error;
-        }
-      },
-      600, // TTL: 10 分鐘
-    );
-  }
+             logger.info('[Cron] Your job completed successfully');
+           } catch (error) {
+             logger.error('[Cron] Your job failed', {
+               error: error instanceof Error ? error.message : String(error),
+               stack: error instanceof Error ? error.stack : undefined,
+             });
+             throw error;
+           }
+         },
+         600, // TTL: 10 分鐘
+       );
+     }
 
-  private async performYourTask(): Promise<void> {
-    // 實際的任務邏輯
-  }
-}
-```
+     private async performYourTask(): Promise<void> {
+       // 實際的任務邏輯
+     }
+   }
+   ```
 
 2. **添加測試腳本**：
 
-在 `src/scripts/` 目錄下創建對應的測試腳本（參考現有腳本）。
+   在 `src/scripts/` 目錄下創建對應的測試腳本（參考現有腳本）。
 
 3. **更新文檔**：
 
-在本文檔中添加新 Cron Job 的說明。
+   在本文檔中添加新 Cron Job 的說明。
 
 ### Cron 表達式格式
 

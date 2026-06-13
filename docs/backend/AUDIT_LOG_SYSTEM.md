@@ -86,7 +86,7 @@
 
 **資料流向**:
 
-```
+```text
 HTTP/GraphQL Request
   → Interceptor (記錄開始時間)
     → Business Logic (處理請求)

@@ -239,12 +239,12 @@ Note:
 ## 參考資料
 
 1. How to Write a Git Commit Message
-   - https://cbea.ms/git-commit/
+   - <https://cbea.ms/git-commit/>
 2. How to Write Better Git Commit Messages – A Step-By-Step Guide
-   - https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/
+   - <https://www.freecodecamp.org/news/how-to-write-better-git-commit-messages/>
 3. commitlint
-   - https://github.com/conventional-changelog/commitlint
+   - <https://github.com/conventional-changelog/commitlint>
 4. Conventional Commits
-   - https://www.conventionalcommits.org/en
+   - <https://www.conventionalcommits.org/en>
 5. Commit Message Guide
-   - https://developers.google.com/blockly/guides/contribute/get-started/commits
+   - <https://developers.google.com/blockly/guides/contribute/get-started/commits>

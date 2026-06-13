@@ -389,7 +389,7 @@ pnpm lint --fix
 
 ### DO - 應該這樣做
 
-**1. 使用 workspace 協議**
+#### 1. 使用 workspace 協議
 
 當需要引用共用配置套件時：
 
@@ -401,7 +401,7 @@ pnpm lint --fix
 }
 ```
 
-**2. Database Schema 屬於 Backend**
+#### 2. Database Schema 屬於 Backend
 
 Database schema 和 migrations 是 backend 的內部實現細節：
 
@@ -412,7 +412,7 @@ import { PrismaClient } from '@prisma/client';
 // Prisma Client 從 apps/backend/database/prisma/schema.prisma 生成
 ```
 
-**3. 使用 Turborepo 命令**
+#### 3. 使用 Turborepo 命令
 
 ```bash
 # ✅ 好：使用 Turborepo
@@ -423,7 +423,7 @@ cd apps/frontend && pnpm build
 cd apps/backend && pnpm build
 ```
 
-**4. 統一的 Git commit**
+#### 4. 統一的 Git commit
 
 ```bash
 # ✅ 好：一次提交跨多個專案的修改
@@ -435,7 +435,7 @@ git commit -m "feat: add user profile feature"
 
 ### DON'T - 不要這樣做
 
-**1. 不要重複安裝相同依賴**
+#### 1. 不要重複安裝相同依賴
 
 ```json
 // ❌ 錯誤：在多個套件重複安裝
@@ -457,7 +457,7 @@ git commit -m "feat: add user profile feature"
 // 或建立 @mead/shared 套件
 ```
 
-**2. 不要直接引用其他應用的程式碼**
+#### 2. 不要直接引用其他應用的程式碼
 
 ```typescript
 // ❌ 錯誤：frontend 直接引用 backend
@@ -466,7 +466,7 @@ import { UserService } from '../../../backend/src/modules/user/user.service';
 // ✅ 正確：透過 GraphQL API 或建立共用套件
 ```
 
-**3. 不要忽略快取**
+#### 3. 不要忽略快取
 
 ```bash
 # ❌ 錯誤：每次都清除快取

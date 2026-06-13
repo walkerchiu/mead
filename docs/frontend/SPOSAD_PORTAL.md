@@ -28,7 +28,7 @@
 - **素材**：`public/images/plans/{01_sposad,02_tisdc,03_idc}/`（banner、photos）、
   `public/images/moe-emblem.png`（頁尾教育部識別）。
 - **i18n**：`messages/{en,zh-TW}.json` 的 `portal` 命名空間
-  （eyebrow / heading / narrative._ / footer._ / detail.\* 等）。
+  （eyebrow / heading / narrative.\_ / footer.\_ / detail.\* 等）。
 
 ## 元件結構（Atomic Design）
 

@@ -83,7 +83,7 @@
 
 #### 同頁面同步
 
-```
+```text
 1. 用戶點擊鈴鐺選單的「全部標記已讀」
    ↓
 2. useNotifications.markAllAsRead() 執行
@@ -107,7 +107,7 @@
 
 #### 跨頁面同步
 
-```
+```text
 Tab A (通知中心)                    Tab B (其他頁面)
       │                                  │
       │ 點擊「標記已讀」                  │
@@ -257,7 +257,7 @@ useEffect(() => {
 
 #### 核心測試：鈴鐺選單「全部標記已讀」同步
 
-```
+```text
 📊 初始狀態:
    All: 8 個通知
    Unread: 5 個未讀
@@ -322,52 +322,52 @@ useEffect(() => {
 
 1. **在 `notificationSync.ts` 中定義事件類型**
 
-```typescript
-export type NotificationSyncEvent =
-  | { type: 'NOTIFICATION_MARKED_READ'; id: string }
-  | { type: 'ALL_NOTIFICATIONS_MARKED_READ' }
-  | { type: 'NOTIFICATION_DELETED'; id: string }
-  | { type: 'READ_NOTIFICATIONS_CLEARED' }
-  | { type: 'YOUR_NEW_EVENT' /* ... */ }; // 新增事件
-```
+   ```typescript
+   export type NotificationSyncEvent =
+     | { type: 'NOTIFICATION_MARKED_READ'; id: string }
+     | { type: 'ALL_NOTIFICATIONS_MARKED_READ' }
+     | { type: 'NOTIFICATION_DELETED'; id: string }
+     | { type: 'READ_NOTIFICATIONS_CLEARED' }
+     | { type: 'YOUR_NEW_EVENT' /* ... */ }; // 新增事件
+   ```
 
 2. **創建廣播函數**
 
-```typescript
-export function broadcastYourNewEvent(data: any) {
-  notificationSync.broadcast({
-    type: 'YOUR_NEW_EVENT',
-    /* ... */
-  });
-}
-```
+   ```typescript
+   export function broadcastYourNewEvent(data: any) {
+     notificationSync.broadcast({
+       type: 'YOUR_NEW_EVENT',
+       /* ... */
+     });
+   }
+   ```
 
 3. **在 useNotifications hook 中調用**
 
-```typescript
-const [yourMutation] = useMutation(YOUR_MUTATION, {
-  onCompleted: () => {
-    // ... refetch logic
-    broadcastYourNewEvent(data); // ✅ 自動廣播
-  },
-});
-```
+   ```typescript
+   const [yourMutation] = useMutation(YOUR_MUTATION, {
+     onCompleted: () => {
+       // ... refetch logic
+       broadcastYourNewEvent(data); // ✅ 自動廣播
+     },
+   });
+   ```
 
 4. **在監聽器中處理事件**
 
-```typescript
-useEffect(() => {
-  const unsubscribe = notificationSync.subscribe((event) => {
-    switch (event.type) {
-      case 'YOUR_NEW_EVENT':
-        // 處理邏輯
-        refetch();
-        break;
-    }
-  });
-  return () => unsubscribe();
-}, [refetch]);
-```
+   ```typescript
+   useEffect(() => {
+     const unsubscribe = notificationSync.subscribe((event) => {
+       switch (event.type) {
+         case 'YOUR_NEW_EVENT':
+           // 處理邏輯
+           refetch();
+           break;
+       }
+     });
+     return () => unsubscribe();
+   }, [refetch]);
+   ```
 
 ---
 
@@ -377,7 +377,7 @@ useEffect(() => {
 
 同步管理器會自動輸出 console 日誌：
 
-```
+```text
 [NotificationSync] Broadcasting event: { type: 'ALL_NOTIFICATIONS_MARKED_READ' }
 [NotificationsPage] Received sync event: { type: 'ALL_NOTIFICATIONS_MARKED_READ' }
 [NotificationsPage] Refetching due to sync event

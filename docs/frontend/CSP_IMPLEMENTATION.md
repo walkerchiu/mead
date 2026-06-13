@@ -132,7 +132,7 @@
 
 傳統做法是在 CSP 中允許 `'unsafe-inline'`：
 
-```
+```text
 script-src 'self' 'unsafe-inline';  ❌ 不安全！
 ```
 
@@ -144,7 +144,7 @@ script-src 'self' 'unsafe-inline';  ❌ 不安全！
 
 **Nonce-based 解決方案**：
 
-```
+```text
 script-src 'self' 'nonce-abc123' 'strict-dynamic';  ✅ 安全！
 ```
 
@@ -388,7 +388,7 @@ export function ThemeRegistry({ children, nonce }: { children: React.ReactNode; 
 
 應該看到：
 
-```
+```text
 Content-Security-Policy: default-src 'self'; script-src 'self' 'nonce-abc123...' 'strict-dynamic'; ...
 x-nonce: abc123...
 ```
@@ -414,7 +414,7 @@ x-nonce: abc123...
 
 **常見錯誤範例**:
 
-```
+```text
 Refused to execute inline script because it violates CSP directive: "script-src 'self' 'nonce-...'".
 → 原因：腳本沒有帶正確的 nonce 屬性
 
@@ -461,7 +461,7 @@ console.log('[Layout] Nonce:', nonce); // 應該顯示一個 base64 字串
 
 **症狀**: Console 顯示 `connect-src` 違規
 
-```
+```text
 Refused to connect to 'http://localhost:4000/graphql' because it violates CSP directive
 ```
 

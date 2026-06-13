@@ -1187,7 +1187,7 @@ function MonitoredQuery() {
 
 ### 應該做的事
 
-**1. 使用環境變數管理全局配置**
+#### 1. 使用環境變數管理全局配置
 
 ```bash
 # .env.prod
@@ -1196,7 +1196,7 @@ NEXT_PUBLIC_APOLLO_MAX_RETRIES=5
 NEXT_PUBLIC_SENTRY_DSN=your-prod-dsn
 ```
 
-**2. Per-Operation 覆蓋特殊場景**
+#### 2. Per-Operation 覆蓋特殊場景
 
 ```typescript
 // 文件上傳
@@ -1206,13 +1206,13 @@ context: { timeout: 300000, maxRetries: 0 }
 context: { timeout: 5000, maxRetries: 0 }
 ```
 
-**3. 考慮操作特性**
+#### 3. 考慮操作特性
 
 - **冪等操作**：可以安全重試
 - **非冪等操作**（上傳、支付）：停用重試
 - **長時間任務**：增加超時
 
-**4. 使用 FeatureErrorBoundary 隔離功能**
+#### 4. 使用 FeatureErrorBoundary 隔離功能
 
 ```typescript
 <FeatureErrorBoundary featureName="功能名稱">
@@ -1220,21 +1220,21 @@ context: { timeout: 5000, maxRetries: 0 }
 </FeatureErrorBoundary>
 ```
 
-**5. 整合錯誤處理 Hooks**
+#### 5. 整合錯誤處理 Hooks
 
 ```typescript
 const { handleError, retry } = useErrorRecovery();
 const { handleFormError } = useFormErrorHandler({ setError });
 ```
 
-**6. 啟用 Sentry 追蹤線上錯誤**
+#### 6. 啟用 Sentry 追蹤線上錯誤
 
 ```bash
 # Production 環境必須啟用
 NEXT_PUBLIC_SENTRY_DSN=your-sentry-dsn
 ```
 
-**7. 測試不同網路條件**
+#### 7. 測試不同網路條件
 
 ```bash
 # 在 UAT 環境模擬慢速網路
@@ -1244,7 +1244,7 @@ NEXT_PUBLIC_APOLLO_MAX_RETRIES=4
 
 ### 不要做的事
 
-**1. 不要使用極端值**
+#### 1. 不要使用極端值
 
 ```typescript
 // ❌ 錯誤: 太短，會經常失敗
@@ -1263,7 +1263,7 @@ context: {
 }
 ```
 
-**2. 不要重試非冪等操作**
+#### 2. 不要重試非冪等操作
 
 ```typescript
 // ❌ 錯誤: 可能創建重複訂單
@@ -1275,7 +1275,7 @@ const [createOrder] = useMutation(CREATE_ORDER, {
 });
 ```
 
-**3. 不要忽略網路錯誤**
+#### 3. 不要忽略網路錯誤
 
 ```typescript
 // ❌ 錯誤: 靜默失敗
@@ -1286,7 +1286,7 @@ const { data, error } = useQuery(GET_DATA);
 if (error) handleError(error);
 ```
 
-**4. 不要在生產環境關閉 Sentry**
+#### 4. 不要在生產環境關閉 Sentry
 
 ```bash
 # ❌ 錯誤: 生產環境沒有錯誤追蹤

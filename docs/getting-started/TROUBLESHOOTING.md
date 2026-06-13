@@ -463,18 +463,17 @@ pnpm --filter frontend build
 
 1. **最後手段**：全清重建
 
-```bash
-./scripts/cli.sh stop
-./scripts/cli.sh clean --full      # ⚠️ 會清除 node_modules、Docker volumes
-./scripts/cli.sh init
-```
+   ```bash
+   ./scripts/cli.sh stop
+   ./scripts/cli.sh clean --full      # ⚠️ 會清除 node_modules、Docker volumes
+   ./scripts/cli.sh init
+   ```
 
 2. **回報 issue**：附上
-
-- `./scripts/cli.sh doctor` 輸出
-- `./scripts/cli.sh status` 輸出
-- 相關 log（前端 Console、後端 terminal、`./scripts/cli.sh logs`）
-- 重現步驟
+   - `./scripts/cli.sh doctor` 輸出
+   - `./scripts/cli.sh status` 輸出
+   - 相關 log（前端 Console、後端 terminal、`./scripts/cli.sh logs`）
+   - 重現步驟
 
 ---
 

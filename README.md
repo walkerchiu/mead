@@ -19,7 +19,7 @@
 ## 目錄
 
 - [架構](#架構)
-- [主要功能](#主要功能)
+- [內建功能](#內建功能)
 - [系統需求](#系統需求)
 - [快速開始](#快速開始)
 - [開發](#開發)
@@ -141,11 +141,13 @@ mead/
 ## 使用本模板開新專案
 
 1. 將本 repo 複製到您的新專案目錄並改名
+
    ```bash
    cp -R /path/to/mead /path/to/your-new-project
    cd /path/to/your-new-project
    git init && git add . && git commit -m "init from MEAD template"
    ```
+
 2. 全域取代 `mead`/`MEAD` 為您的專案代號（建議用 IDE 全域 rename）
 3. 修改 `apps/backend/database/prisma/seeds/base.ts` 中的權限與角色，加入您專案特有的 perm
 4. 修改 `apps/backend/src/modules/personal-access-token/personal-access-token.service.ts` 的 `ALLOWED_SCOPES`
@@ -308,7 +310,7 @@ pnpm dev
 <details>
 <summary><b>展開查看完整命令列表</b></summary>
 
-**開發**
+##### 開發
 
 ```bash
 pnpm dev                    # 啟動所有應用程式
@@ -317,7 +319,7 @@ pnpm backend:dev            # 僅啟動後端
 pnpm storybook              # 啟動 Storybook
 ```
 
-**建置與檢查**
+##### 建置與檢查
 
 ```bash
 pnpm build                  # 建置所有應用程式
@@ -328,7 +330,7 @@ pnpm format                 # 格式化程式碼
 pnpm test                   # 執行測試
 ```
 
-**資料庫**
+##### 資料庫
 
 ```bash
 pnpm db:generate            # 產生 Prisma Client
@@ -338,7 +340,7 @@ pnpm db:studio              # 開啟 Prisma Studio
 pnpm db:seed                # 載入初始資料
 ```
 
-**Docker**
+##### Docker
 
 ```bash
 docker-compose --env-file .env.docker --profile tools up -d  # 啟動服務（含 dev 工具）

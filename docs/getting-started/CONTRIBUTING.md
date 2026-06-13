@@ -83,7 +83,7 @@ git checkout -b feat/your-feature-name    # 或 fix/login-race-condition
 
 ### 格式
 
-```
+```text
 <Type>(<Scope>): <Subject>
 
 <Body>
@@ -135,19 +135,19 @@ git checkout -b feat/your-feature-name    # 或 fix/login-race-condition
 
 ### 範例
 
-```
+```text
 Feat(Module): Add personal access token system
 ```
 
-```
+```text
 Fix(Views): Resolve sidebar state not persisting on navigation
 ```
 
-```
+```text
 Refactor(Framework): Migrate dashboard layout to AppShell component
 ```
 
-```
+```text
 Docs(Project): Split COMPONENT_LIBRARY into atomic layers
 ```
 
@@ -160,7 +160,7 @@ Docs(Project): Split COMPONENT_LIBRARY into atomic layers
 
 ### Footer（可選）
 
-```
+```text
 BREAKING CHANGE: 說明破壞性變更
 
 Closes #123
