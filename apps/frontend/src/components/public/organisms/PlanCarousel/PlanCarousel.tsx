@@ -38,6 +38,20 @@ const DECOR_STARS: Record<string, { x: number; y: number }[]> = {
 };
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
+/** 手機版裝飾星形縮放（與 PaperFlipStar 的 mobileScale 一致） */
+const MOBILE_STAR_SCALE = 0.55;
+
+/** 24 角星 clip-path（與 PaperFlipStar 的 traceStar 幾何一致：外 50% / 內 45%、起點 -90°）。
+ *  供手機版「靜態霧化星形照片」裁形，維持與桌機星形相同輪廓。 */
+const STAR_CLIP = (() => {
+  const n = 24;
+  const pts = Array.from({ length: n }, (_, i) => {
+    const r = i % 2 === 0 ? 50 : 45;
+    const a = ((-90 + (i * 360) / n) * Math.PI) / 180;
+    return `${(50 + r * Math.cos(a)).toFixed(2)}% ${(50 + r * Math.sin(a)).toFixed(2)}%`;
+  });
+  return `polygon(${pts.join(', ')})`;
+})();
 
 // 手機版（<834px）星形排列：依設計稿（node 43:1142）於窄卡片邊緣露出。卡片在手機為
 // 滿版寬度，故以邊緣錨定的 CSS 值定位（right 用 calc），縮小至約 0.55；順序對應 3 顆星。
@@ -113,10 +127,16 @@ export function PlanCardWithStars({
   showStars = true,
   starsVisible = true,
   cardScale = 1,
+  staticStars = false,
 }: {
   plan: Plan;
   /** 卡片自適應放大倍率（≥1）；轉傳給星形以同步提高其 WebGL 解析度。 */
   cardScale?: number;
+  /**
+   * 手機版用：以「靜態霧化星形照片」取代 PaperFlipStar（WebGL 翻折互動）。
+   * 沿用相同的邊緣位置與星形輪廓，但不可互動、加上模糊霧化、不載入 WebGL。
+   */
+  staticStars?: boolean;
   /**
    * 是否渲染（掛載）周圍裝飾星形照片。環狀軌道只在「中份」卡片掛載星形，兩側
    * 複本不掛載（peek 細條不需星形、也省 WebGL context）。
@@ -145,8 +165,38 @@ export function PlanCardWithStars({
           '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
         }}
       >
-        {stars.map((s, i) =>
-          photos[i] ? (
+        {stars.map((s, i) => {
+          if (!photos[i]) return null;
+          // 手機版：靜態霧化星形照片（沿用邊緣位置與星形輪廓，不互動、不載 WebGL）。
+          if (staticStars) {
+            const m = MOBILE_STAR_LAYOUT[i];
+            if (!m) return null;
+            return (
+              <Box
+                key={i}
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  left: m.left,
+                  top: m.top,
+                  width: STAR_SIZE,
+                  height: STAR_SIZE,
+                  transform: `scale(${MOBILE_STAR_SCALE})`,
+                  transformOrigin: 'center',
+                  backgroundImage: `url("${photos[i]}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  clipPath: STAR_CLIP,
+                  // 霧化透出：模糊 + 半透明，融入卡片底下。
+                  filter: 'blur(8px)',
+                  opacity: 0.55,
+                  pointerEvents: 'none',
+                  zIndex: 0,
+                }}
+              />
+            );
+          }
+          return (
             <PaperFlipStar
               key={i}
               src={photos[i]}
@@ -159,8 +209,8 @@ export function PlanCardWithStars({
               mobileLeft={MOBILE_STAR_LAYOUT[i]?.left}
               mobileTop={MOBILE_STAR_LAYOUT[i]?.top}
             />
-          ) : null,
-        )}
+          );
+        })}
       </Box>
       {/* 作用中的計畫卡片 */}
       <Box sx={{ position: 'relative', zIndex: 1 }}>
@@ -867,7 +917,8 @@ export function PlanCarousel({
     return (
       <Box sx={{ ...outerSx, overflow: 'visible' }}>
         <Box sx={{ position: 'relative', mx: 'auto', maxWidth: 960 }}>
-          <PlanCardWithStars plan={mobilePlan} />
+          {/* 手機版：背後裝飾照片改為靜態霧化星形（無 WebGL 翻折互動） */}
+          <PlanCardWithStars plan={mobilePlan} staticStars />
         </Box>
       </Box>
     );
