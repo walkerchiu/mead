@@ -75,8 +75,6 @@ const FIT_SIDE_MARGIN = 72;
  * 看起來就是「意外的快速左右切換」。
  */
 const GESTURE_LOCK_MS = 700;
-/** 自動輪播間隔（手機 / 非捲動驅動時） */
-const AUTO_ADVANCE_MS = 6000;
 
 /**
  * 敘事內文計畫名稱連結的行內樣式 — 以 styled('span') 實作為真正的行內元素。
@@ -132,7 +130,8 @@ function NarrativePlanLink({
  *  - 三張都看過後，往下捲才放行到敘事 / 頁尾；往上捲到第一張頂端則回到 hero。
  *  - 兩側 peek 隨時可切換（會記入「已看過」）。因為要捲超過一整張卡才切換，慣性
  *    微抖動遠不及一張卡的量，故不會誤觸左右切換。
- * <834px 或 prefers-reduced-motion：不劫持捲動，原生捲動 + 自動輪播 + 指示點切換。
+ * <834px 或 prefers-reduced-motion：不劫持捲動，原生捲動；計畫切換由 hero 色塊與
+ *   敘事區標記觸發（不自動輪播）。
  */
 export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const t = useTranslations('portal');
@@ -567,22 +566,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     lockGesture,
   ]);
 
-  // 自動輪播：僅在「非捲動驅動」（手機 / 減少動態）時啟用。
-  useEffect(() => {
-    if (scrollDriven) return;
-    if (planCount <= 1) return;
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    ) {
-      return;
-    }
-    const id = window.setInterval(() => {
-      setActiveIndex((cur) => (cur + 1) % planCount);
-    }, AUTO_ADVANCE_MS);
-    return () => window.clearInterval(id);
-  }, [scrollDriven, planCount]);
-
   // 延後掛載觸發：使用者一開始捲動 / 滾輪，或入場結束（fallback timeout）後，才掛載
   // 下方計畫區。如此 hero 入場那幾秒主執行緒淨空、壓縮動畫順暢。
   useEffect(() => {
@@ -784,7 +767,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             </Box>
           </Box>
         ) : (
-          // 手機 / 減少動態：不劫持捲動，原生流；自動輪播切換計畫（依設計稿不顯示指示點）。
+          // 手機 / 減少動態：不劫持捲動，原生流；計畫切換由 hero 色塊與敘事區標記觸發
+          // （不自動輪播、依設計稿不顯示指示點）。
           // pb 預留卡片二導覽列向下懸出的空間，避免覆蓋下一段。
           <Box
             id="portal-plans"
