@@ -572,6 +572,25 @@ export function DecorativeTextCloud({
             {/* 依 Figma Union radial 終點 #D6D6D6 */}
             <stop offset="100%" stopColor="#D6D6D6" />
           </linearGradient>
+          {/* goo（metaball）濾鏡：先模糊再以 feColorMatrix 重新銳化 alpha，使三色塊
+              重疊處自然相連成連體，消弭鄰塊邊界的明顯摺痕（依業主回饋：中／右色塊
+              邊界感太明顯）；外緣輪廓大致維持。 */}
+          <filter
+            id={`goo-${uid}`}
+            filterUnits="userSpaceOnUse"
+            x="0"
+            y="0"
+            width={view.viewW}
+            height={view.viewH}
+            colorInterpolationFilters="sRGB"
+          >
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+            <feColorMatrix
+              in="blur"
+              type="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10"
+            />
+          </filter>
           {shapes.map((s, i) => (
             <clipPath key={i} id={`clip-${uid}-${i}`}>
               {/* 此多邊形為「外框遮罩」，hover 時旋轉的就是它（照片本身不轉） */}
@@ -589,11 +608,10 @@ export function DecorativeTextCloud({
           ))}
         </defs>
 
-        {/* 漸層色塊層 — 三圖以同一漸層重疊相連（依設計稿：邊緣清晰鋸齒、色塊間
-            自然凹陷，非液態橋接，故不套 goo 濾鏡，讓圖塊與 hover 露出的照片
-            邊緣形狀完全一致）。hover 的圖形隱藏漸層底以露出照片。
+        {/* 漸層色塊層 — 三圖以同一漸層重疊相連，並套 goo 濾鏡讓鄰塊重疊處自然融合
+            （依業主回饋：中／右色塊邊界感太明顯）。hover 的圖形隱藏漸層底以露出照片。
             外層 .entrance-{i} 負責入場動畫，內層 .drift-{i} 負責環境漂移。 */}
-        <g>
+        <g filter={`url(#goo-${uid})`}>
           {shapes.map((s, i) => (
             <g
               key={i}
