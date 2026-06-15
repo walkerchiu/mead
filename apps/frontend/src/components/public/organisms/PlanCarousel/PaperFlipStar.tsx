@@ -380,7 +380,8 @@ export function PaperFlipStar({
     const loop = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
-      const speed = reduced ? 200 : 4.8;
+      // 翻頁緩動速率（1/秒；越小越慢，收斂時間常數 τ≈1/speed）。
+      const speed = reduced ? 200 : 2.4;
       state.current +=
         (state.target - state.current) * (1 - Math.exp(-speed * dt));
       // z-index 隨翻折進度（非 hover）：progress>0.5 抬到卡前，回到靜止才落後。
