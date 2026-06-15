@@ -335,6 +335,20 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
 
     const onWheel = (e: WheelEvent) => {
+      // 滾輪發生在數據跑馬燈上、且該方向仍可捲動時，放行給瀏覽器原生捲動跑馬燈，
+      // 不劫持驅動卡片輪播（讓使用者能 hover 後自行捲動查看數據）。
+      const overMarquee = (e.target as Element | null)?.closest?.(
+        '[data-stats-marquee]',
+      );
+      if (overMarquee) {
+        const dy = e.deltaY;
+        const canScroll =
+          (dy < 0 && overMarquee.scrollTop > 0) ||
+          (dy > 0 &&
+            overMarquee.scrollTop + overMarquee.clientHeight <
+              overMarquee.scrollHeight - 1);
+        if (canScroll) return;
+      }
       if (!engagedRef.current) {
         const bt = blockTop();
         const dySnap = e.deltaY * (e.deltaMode === 1 ? 16 : 1);

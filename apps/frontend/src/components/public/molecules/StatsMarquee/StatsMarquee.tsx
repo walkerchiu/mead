@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
@@ -19,24 +21,58 @@ export interface StatsMarqueeProps {
 /**
  * StatsMarquee — 計畫數據成果連續滾動跑馬燈（依設計師新版稿）。
  *
- * 內容多於可視範圍時以無縫循環滾動呈現，畫面更輕、不壓縮版面。
- * 將整份清單複製一份相接，位移 0 → -50%（一份長度）即可無縫循環；
- * hover 暫停；prefers-reduced-motion 時不滾動、改為可捲動。
+ * 內容多於可視範圍時連續滾動呈現。以「捲動位置」驅動（而非 CSS transform）：
+ * 未 hover 時由 requestAnimationFrame 持續自動捲動（內容複製兩份相接，捲過一份
+ * 長度即回捲一份，無縫循環）；hover 時暫停自動捲動，使用者可自行捲動（滾輪／觸控）
+ * 瀏覽想看的數據，移開後從目前位置接續。prefers-reduced-motion 時不自動捲、僅可捲動。
  *
- * 兩種方向（依 Figma node 1:120「Stats Grid」：數字 Inter ExtraBold、單位、
- * 說明 #666 置中）：垂直用於桌機窄欄（translateY、項目下間距）；
- * 水平用於手機寬橫條（translateX、項目右間距、左右淡出遮罩）。
+ * 版面與舊版（transform 版）完全一致：垂直時外層撐滿父高、捲動視窗以絕對定位填滿，
+ * 故欄位高度仍由 banner 決定、不被資料內容撐高；水平時高度由資料列決定。
+ * 兩份內容以每項固定 margin（mb/mr）相接，一份長度 = copyRef 的尺寸（含尾端 margin）。
  */
 export function StatsMarquee({
   stats,
   direction = 'vertical',
 }: StatsMarqueeProps) {
-  if (stats.length === 0) return null;
-
   const horizontal = direction === 'horizontal';
+  const scrollerRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
+  const pausedRef = useRef(false);
 
-  // 滾動速度：每筆約 2.6s，整體隨筆數成長，維持穩定觀感。
+  // 滾動速度：每筆約 2.6s 捲過一份，整體隨筆數成長，維持穩定觀感。
   const durationSec = Math.max(12, stats.length * 2.6);
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    const copy = copyRef.current;
+    if (!el || !copy || stats.length === 0) return;
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return; // 減少動態：不自動捲，使用者仍可自行捲動
+    }
+    const axis = horizontal ? 'scrollLeft' : 'scrollTop';
+    let raf = 0;
+    let last = 0;
+    const tick = (now: number) => {
+      raf = requestAnimationFrame(tick);
+      if (!last) last = now;
+      const dt = (now - last) / 1000;
+      last = now;
+      if (pausedRef.current) return;
+      // 一份內容長度（含尾端 margin）= 兩份相接時的一輪位移。
+      const loop = horizontal ? copy.offsetWidth : copy.offsetHeight;
+      if (loop <= 0) return;
+      let next = el[axis] + (loop / durationSec) * dt;
+      if (next >= loop) next -= loop;
+      el[axis] = next;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [stats.length, horizontal, durationSec]);
+
+  if (stats.length === 0) return null;
 
   const renderItem = (stat: PlanStat, key: string) => (
     <Box
@@ -48,8 +84,7 @@ export function StatsMarquee({
         gap: '7.15px',
         textAlign: 'center',
         flexShrink: 0,
-        // 用每項固定 margin（而非 track 的 gap/padding）讓兩份相接的間距完全一致，
-        // 位移 -50% 恰等於一份長度 → 無縫循環、迴圈時不跳動。
+        // 每項固定 margin（沿用舊版間距）：兩份相接的間距與份內一致，無縫循環。
         ...(horizontal ? { mr: '40px', minWidth: 92 } : { mb: '31px' }),
       }}
     >
@@ -91,67 +126,64 @@ export function StatsMarquee({
     ? 'linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%)'
     : 'linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%)';
 
-  return (
+  const copySx = {
+    display: 'flex',
+    flexDirection: horizontal ? 'row' : 'column',
+    flexShrink: 0,
+  } as const;
+
+  // 捲動視窗：沿軸開放捲動、隱藏捲軸、淡出遮罩；hover 暫停自動捲、改由使用者捲動。
+  const scroller = (
     <Box
+      ref={scrollerRef}
       aria-label="計畫數據成果"
+      data-stats-marquee={direction}
+      onMouseEnter={() => {
+        pausedRef.current = true;
+      }}
+      onMouseLeave={() => {
+        pausedRef.current = false;
+      }}
       sx={{
-        position: 'relative',
-        overflow: 'hidden',
-        // 垂直需撐滿父容器高度後裁切；水平則由內容決定高度、滿寬即可。
-        ...(horizontal ? { width: '100%' } : { height: '100%' }),
-        // 進出視窗的數據柔和淡入淡出（非硬切）。
+        ...(horizontal
+          ? { width: '100%', overflowX: 'auto', overflowY: 'hidden' }
+          : // 垂直：絕對填滿外層 → 捲動視窗高度 = 外層（banner）高，內容於其中捲動，
+            // 不貢獻外層高度（維持舊版欄高行為）。
+            {
+              position: 'absolute',
+              inset: 0,
+              overflowY: 'auto',
+              overflowX: 'hidden',
+            }),
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        '&::-webkit-scrollbar': { display: 'none' },
         maskImage: maskGradient,
         WebkitMaskImage: maskGradient,
-        '&:hover .stats-marquee-track': { animationPlayState: 'paused' },
-        '@keyframes statsMarqueeUp': {
-          from: { transform: 'translateY(0)' },
-          to: { transform: 'translateY(-50%)' },
-        },
-        '@keyframes statsMarqueeLeft': {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-50%)' },
-        },
-        '@media (prefers-reduced-motion: reduce)': {
-          [horizontal ? 'overflowX' : 'overflowY']: 'auto',
-          maskImage: 'none',
-          WebkitMaskImage: 'none',
-        },
       }}
     >
       <Box
-        className="stats-marquee-track"
         sx={{
           display: 'flex',
-          willChange: 'transform',
-          animation: `${
-            horizontal ? 'statsMarqueeLeft' : 'statsMarqueeUp'
-          } ${durationSec}s linear infinite`,
-          ...(horizontal
-            ? {
-                flexDirection: 'row',
-                width: 'max-content',
-              }
-            : {
-                // 絕對定位：track 不貢獻外層高度，外層改由 flex 拉伸對齊 banner 高度後裁切，
-                // 避免內容把整列撐高、壓垮 banner 比例。
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                flexDirection: 'column',
-              }),
-          '@media (prefers-reduced-motion: reduce)': {
-            position: 'static',
-            animation: 'none',
-          },
+          flexDirection: horizontal ? 'row' : 'column',
+          width: horizontal ? 'max-content' : undefined,
         }}
       >
         {/* 兩份相接以無縫循環；第二份對讀屏隱藏避免重複朗讀 */}
-        {stats.map((s, i) => renderItem(s, `a-${i}`))}
-        <Box aria-hidden sx={{ display: 'contents' }}>
+        <Box ref={copyRef} sx={copySx}>
+          {stats.map((s, i) => renderItem(s, `a-${i}`))}
+        </Box>
+        <Box aria-hidden sx={copySx}>
           {stats.map((s, i) => renderItem(s, `b-${i}`))}
         </Box>
       </Box>
     </Box>
+  );
+
+  // 水平：scroller 即根（高度由資料列決定）；垂直：外層 relative 撐滿父高，scroller 絕對填滿。
+  return horizontal ? (
+    scroller
+  ) : (
+    <Box sx={{ position: 'relative', height: '100%' }}>{scroller}</Box>
   );
 }
