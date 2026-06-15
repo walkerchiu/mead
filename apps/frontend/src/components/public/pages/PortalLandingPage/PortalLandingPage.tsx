@@ -123,13 +123,14 @@ function NarrativePlanLink({
  *
  * 由上而下：hero 文字雲（佔滿首屏）→ 計畫介紹大卡 → 敘事 → 指示點 → 頁尾。
  *
- * 計畫介紹區（≥834px、非減少動態）採「釘住 + 滾輪驅動」的離散切換：
- *  - 捲到該區即釘住、鎖住頁面捲動，改由滾輪累積驅動目前卡片往上露出。
+ * 計畫介紹區（≥834px、非減少動態）以「滾輪 / 鍵盤」驅動時採「釘住 + 離散切換」：
+ *  - 以滾輪或鍵盤捲到該區即釘住、鎖住頁面捲動，改由滾輪累積驅動目前卡片往上露出。
  *  - 捲超過「卡片 + 一小段空白」後 → 切換到下一張，並把卡片重置回頂端（重新往下捲）。
- *  - 往回捲到卡頂後 → 倒退回上一張（切換觸發區在上方），可反向看完三張。
- *  - 三張都看過後，往下捲才放行到敘事 / 頁尾；往上捲到第一張頂端則回到 hero。
- *  - 兩側 peek 隨時可切換（會記入「已看過」）。因為要捲超過一整張卡才切換，慣性
- *    微抖動遠不及一張卡的量，故不會誤觸左右切換。
+ *  - 往回捲到卡頂後 → 倒退回上一張（切換觸發區在上方），可反向瀏覽三張。
+ *  - 在最後一張往下捲即放行到敘事 / 頁尾；往上捲到第一張頂端則回到 hero。
+ *  - 兩側 peek 隨時可切換。因為要捲超過一整張卡才切換，慣性微抖動遠不及一張卡的量，
+ *    故不會誤觸左右切換。
+ * 改用捲軸拖動時不釘住（或釘住中拖動即釋放），讓使用者自由捲過整頁；滾輪體驗不變。
  * <834px 或 prefers-reduced-motion：不劫持捲動，原生捲動；計畫切換由 hero 色塊與
  *   敘事區標記觸發（不自動輪播）。
  */
@@ -171,7 +172,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const engagedRef = useRef(false); // 是否釘住、攔截滾輪中
   const idxRef = useRef(0); // 目前卡片索引
   const offsetRef = useRef(0); // 目前卡片的捲動位移（0 = 卡頂；= 卡片露出量）
-  const seenRef = useRef<Set<number>>(new Set([0])); // 已看過的卡片
   const segLenRef = useRef(0); // 每張卡往下的捲動量 = 卡片可捲距離 + DWELL_PX
   const prevYRef = useRef(0); // 上一次捲動位置（判斷進入方向）
   const lockedDirRef = useRef(0); // 切換後鎖住的方向（1=往下、-1=往上、0=未鎖）；
@@ -232,7 +232,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     }
     offsetRef.current = enterOffset;
     idxRef.current = target;
-    seenRef.current.add(target);
     setActiveIndex(target);
   }, []);
 
@@ -249,7 +248,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       lockTimerRef.current = null;
     }
     idxRef.current = index;
-    seenRef.current.add(index);
     if (atTop) {
       offsetRef.current = 0;
       const wrap = cardWrapRef.current;
@@ -309,6 +307,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     if (!scrollDriven) return;
     prevYRef.current = window.scrollY;
     const blockTop = () => planSectionRef.current?.offsetTop ?? 0;
+    // 最近一次「滾輪／鍵盤」離散導覽意圖的時間戳。用來區分捲動來源：
+    // 跨越計畫區頂端時，僅在剛有此意圖時才自動釘住；純捲軸拖動（無意圖）不釘住，
+    // 讓習慣拖捲軸的使用者自由捲過整頁。
+    let lastNavIntent = 0;
 
     const release = () => {
       engagedRef.current = false;
@@ -349,6 +351,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               overMarquee.scrollHeight - 1);
         if (canScroll) return;
       }
+      lastNavIntent = Date.now();
       if (!engagedRef.current) {
         const bt = blockTop();
         const dySnap = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
@@ -414,28 +417,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           lockGesture(1);
           return;
         }
-        // 已在最後一張且三張都看過 → 整頁切到第三屏（資訊區）。
-        if (seenRef.current.size >= planCount) {
-          e.preventDefault();
-          goToInfo();
-          return;
-        }
-        // 尚未看完（例如用 peek 跳著看）→ 切到第一張還沒看過的，強制看完才放行
-        let unseen = -1;
-        for (let k = 0; k < planCount; k += 1) {
-          if (!seenRef.current.has(k)) {
-            unseen = k;
-            break;
-          }
-        }
-        if (unseen >= 0) {
-          e.preventDefault();
-          commitSwitch(unseen, 0);
-          lockGesture(1);
-        } else {
-          e.preventDefault();
-          goToInfo();
-        }
+        // 已在最後一張 → 整頁切到第三屏（資訊區）。
+        e.preventDefault();
+        goToInfo();
         return;
       }
       // dy < 0：往上（與往下對稱：一個手勢即換頁）
@@ -469,13 +453,26 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const y = window.scrollY;
       const bt = blockTop();
       if (engagedRef.current) {
-        // 釘住期間鎖住捲動（攔截滾輪外的捲動來源：鍵盤 / 捲軸）。
-        if (Math.abs(y - bt) > 1) window.scrollTo(0, bt);
+        if (Math.abs(y - bt) > 4) {
+          if (Date.now() - lastNavIntent < 700) {
+            // 滾輪／鍵盤驅動的捲動殘餘（含 hero 平滑吸附動畫）→ 維持釘住、拉回卡頂，
+            // 滾輪離散切換體驗不變。
+            window.scrollTo(0, bt);
+            prevYRef.current = bt;
+          } else {
+            // 無滾輪／鍵盤意圖卻有捲動＝使用者改用捲軸／觸控拖動 → 釋放釘住，
+            // 讓頁面自由捲過計畫區（不再強制拉回），兼顧習慣拖捲軸的使用者。
+            release();
+            prevYRef.current = y;
+          }
+          return;
+        }
         prevYRef.current = bt;
         return;
       }
       // 未釘住：偵測捲動跨越本區頂端 → 釘住並依方向進場（皆從卡頂進場、上半不被截）。
-      if (segLenRef.current > 0) {
+      // 僅在剛有滾輪／鍵盤意圖時才自動釘住；純捲軸拖動（無意圖）放行自由捲動。
+      if (segLenRef.current > 0 && Date.now() - lastNavIntent < 250) {
         if (prevYRef.current < bt && y >= bt) {
           engageAt(0); // 由上往下進入 → 第一張（不上鎖，入場即可順順往下露出）
         } else if (prevYRef.current > bt && y <= bt) {
@@ -508,6 +505,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         return;
       }
 
+      lastNavIntent = Date.now();
       const bt = blockTop();
       const y = window.scrollY;
 
@@ -537,22 +535,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         if (i < planCount - 1) {
           commitSwitch(i + 1, 0);
           lockGesture(1);
-        } else if (seenRef.current.size >= planCount) {
-          goToInfo();
         } else {
-          let unseen = -1;
-          for (let k = 0; k < planCount; k += 1) {
-            if (!seenRef.current.has(k)) {
-              unseen = k;
-              break;
-            }
-          }
-          if (unseen >= 0) {
-            commitSwitch(unseen, 0);
-            lockGesture(1);
-          } else {
-            goToInfo();
-          }
+          goToInfo();
         }
       } else if (i === 0) {
         goToHero();
@@ -638,7 +622,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const handlePlanLink = (planId: string) =>
     goToPlanIndex(orderedPlans.findIndex((p) => p.id === planId));
 
-  // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端、記入已看過），
+  // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端），
   // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
   const handlePeekNavigate = useCallback(
     (targetIndex: number) => {
