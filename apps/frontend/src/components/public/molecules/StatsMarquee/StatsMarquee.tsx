@@ -1,6 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import {
+  type PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+} from 'react';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -24,7 +28,8 @@ export interface StatsMarqueeProps {
  * 內容多於可視範圍時連續滾動呈現。以「捲動位置」驅動（而非 CSS transform）：
  * 未 hover 時由 requestAnimationFrame 持續自動捲動（內容複製兩份相接，捲過一份
  * 長度即回捲一份，無縫循環）；hover 時暫停自動捲動，使用者可自行捲動（滾輪／觸控）
- * 瀏覽想看的數據，移開後從目前位置接續。prefers-reduced-motion 時不自動捲、僅可捲動。
+ * 或以滑鼠拖曳瀏覽想看的數據，移開後從目前位置接續。prefers-reduced-motion 時不
+ * 自動捲、僅可捲動／拖曳。
  *
  * 版面與舊版（transform 版）完全一致：垂直時外層撐滿父高、捲動視窗以絕對定位填滿，
  * 故欄位高度仍由 banner 決定、不被資料內容撐高；水平時高度由資料列決定。
@@ -38,6 +43,9 @@ export function StatsMarquee({
   const scrollerRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const pausedRef = useRef(false);
+  // 滑鼠拖曳捲動狀態：拖曳起點座標與起始捲動位置。
+  const draggingRef = useRef(false);
+  const dragStartRef = useRef({ pos: 0, scroll: 0 });
 
   // 滾動速度：每筆約 2.6s 捲過一份，整體隨筆數成長，維持穩定觀感。
   const durationSec = Math.max(12, stats.length * 2.6);
@@ -60,7 +68,7 @@ export function StatsMarquee({
       if (!last) last = now;
       const dt = (now - last) / 1000;
       last = now;
-      if (pausedRef.current) return;
+      if (pausedRef.current || draggingRef.current) return;
       // 一份內容長度（含尾端 margin）= 兩份相接時的一輪位移。
       const loop = horizontal ? copy.offsetWidth : copy.offsetHeight;
       if (loop <= 0) return;
@@ -132,7 +140,38 @@ export function StatsMarquee({
     flexShrink: 0,
   } as const;
 
-  // 捲動視窗：沿軸開放捲動、隱藏捲軸、淡出遮罩；hover 暫停自動捲、改由使用者捲動。
+  // 滑鼠拖曳捲動：按下記錄起點，移動時依位移更新捲動位置（沿軸、無縫環繞），
+  // 拖曳期間暫停自動捲。與 hover 滾輪瀏覽並存。
+  const axisProp = horizontal ? 'scrollLeft' : 'scrollTop';
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    const el = scrollerRef.current;
+    if (!el) return;
+    draggingRef.current = true;
+    pausedRef.current = true;
+    dragStartRef.current = {
+      pos: horizontal ? e.clientX : e.clientY,
+      scroll: el[axisProp],
+    };
+    el.setPointerCapture?.(e.pointerId);
+  };
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    const el = scrollerRef.current;
+    const copy = copyRef.current;
+    if (!el) return;
+    const cur = horizontal ? e.clientX : e.clientY;
+    const loop = horizontal ? copy?.offsetWidth : copy?.offsetHeight;
+    let next = dragStartRef.current.scroll - (cur - dragStartRef.current.pos);
+    if (loop && loop > 0) next = ((next % loop) + loop) % loop; // 無縫環繞
+    el[axisProp] = next;
+  };
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    scrollerRef.current?.releasePointerCapture?.(e.pointerId);
+  };
+
+  // 捲動視窗：沿軸開放捲動、隱藏捲軸、淡出遮罩；hover 暫停自動捲、改由使用者捲動／拖曳。
   const scroller = (
     <Box
       ref={scrollerRef}
@@ -142,8 +181,12 @@ export function StatsMarquee({
         pausedRef.current = true;
       }}
       onMouseLeave={() => {
-        pausedRef.current = false;
+        if (!draggingRef.current) pausedRef.current = false;
       }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       sx={{
         ...(horizontal
           ? { width: '100%', overflowX: 'auto', overflowY: 'hidden' }
@@ -160,6 +203,11 @@ export function StatsMarquee({
         '&::-webkit-scrollbar': { display: 'none' },
         maskImage: maskGradient,
         WebkitMaskImage: maskGradient,
+        // 可拖曳瀏覽：grab 游標、拖曳中 grabbing；拖曳期間不選取文字。
+        cursor: 'grab',
+        userSelect: 'none',
+        touchAction: horizontal ? 'pan-y' : 'pan-x',
+        '&:active': { cursor: 'grabbing' },
       }}
     >
       <Box
