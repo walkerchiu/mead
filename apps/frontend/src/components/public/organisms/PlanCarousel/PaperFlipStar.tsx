@@ -97,34 +97,6 @@ function buildStarTexture(img: HTMLImageElement): THREE.CanvasTexture | null {
   return texture;
 }
 
-/** 紙張下方的軟陰影貼圖（徑向漸層橢圓）— 移植自 prototype makeShadowTexture */
-function makeShadowTexture(): THREE.CanvasTexture {
-  const c = document.createElement('canvas');
-  c.width = 512;
-  c.height = 256;
-  const ctx = c.getContext('2d')!;
-  const g = ctx.createRadialGradient(256, 128, 10, 256, 128, 230);
-  g.addColorStop(0, 'rgba(0,0,0,0.34)');
-  g.addColorStop(0.46, 'rgba(0,0,0,0.16)');
-  g.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, 512, 256);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
-}
-
-/** 三次貝茲（與 vertex shader 的 cubicBezier 一致），供 JS 端算陰影位置 */
-function cubicBezier1(a: number, b: number, c: number, d: number, t: number) {
-  const inv = 1 - t;
-  return (
-    inv * inv * inv * a +
-    3 * inv * inv * t * b +
-    3 * inv * t * t * c +
-    t * t * t * d
-  );
-}
-
 // 忠實移植 prototype script.js 的頂點 shader：bezier 甩弧 + 紙張捲曲 + twist + z。
 // 差異：加入 uFlipDir 讓弧線與捲曲方向可左右鏡像（背向卡片中心）。
 const VERTEX_SHADER = `
@@ -331,47 +303,8 @@ export function PaperFlipStar({
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    // 紙張下方的軟陰影（移植 prototype shadowMesh）— 隨翻折沿 bezier 移動、放大、變深。
-    const dir = flipDir >= 0 ? 1 : -1;
-    const shadowTex = makeShadowTexture();
-    const shadowMat = new THREE.MeshBasicMaterial({
-      map: shadowTex,
-      transparent: true,
-      depthWrite: false,
-      opacity: 0.22,
-    });
-    const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), shadowMat);
-    shadowMesh.position.z = -420;
-    scene.add(shadowMesh);
-
-    const startCx = startRect.x + startRect.z * 0.5 - CANVAS / 2;
-    const startCy = CANVAS / 2 - startRect.y - startRect.w * 0.5;
-    const endCx = endRect.x + endRect.z * 0.5 - CANVAS / 2;
-    const endCy = CANVAS / 2 - endRect.y - endRect.w * 0.5;
-    const c1x = startCx + 380 * dir;
-    const c1y = startCy - 118;
-    const c2x = endCx + 460 * dir;
-    const c2y = endCy - 238;
-    const updateShadow = (progress: number) => {
-      const p = progress * progress * (3 - 2 * progress);
-      const w = startRect.z + (endRect.z - startRect.z) * p;
-      const h = startRect.w + (endRect.w - startRect.w) * p;
-      const cx = cubicBezier1(startCx, c1x, c2x, endCx, p);
-      const cy = cubicBezier1(startCy, c1y, c2y, endCy, p);
-      const curl = Math.max(0, Math.sin(progress * Math.PI));
-      shadowMesh.position.x = cx + 34 * curl * dir;
-      shadowMesh.position.y = cy - h * (0.52 + 0.18 * curl);
-      shadowMesh.scale.set(
-        w * (0.74 + p * 0.24 + curl * 0.16),
-        h * (0.12 + curl * 0.08),
-        1,
-      );
-      shadowMat.opacity = 0.04 + curl * 0.075 + p * 0.025;
-    };
-
     const draw = () => {
       material.uniforms.uProgress.value = state.current;
-      updateShadow(state.current);
       renderer.render(scene, camera);
     };
     gfxRef.current = { renderer, scene, camera, material, draw };
@@ -417,9 +350,6 @@ export function PaperFlipStar({
       const tex = material.uniforms.uMap.value as THREE.Texture | null;
       tex?.dispose();
       material.dispose();
-      shadowMesh.geometry.dispose();
-      shadowMat.dispose();
-      shadowTex.dispose();
       // 只 dispose、不 forceContextLoss：StrictMode（dev）會 mount→unmount→mount，
       // forceContextLoss 會永久殺死 canvas context，導致第二次掛載渲染空白。
       renderer.dispose();
