@@ -49,6 +49,12 @@ export interface Plan {
   folderName: string;
   /** 計畫官方 logo（完整組合圖：標誌＋品牌字標）於 /public 下的路徑 */
   logoUrl?: string;
+  /**
+   * 計畫識別牌：純標誌圖＋另排名稱文字（依設計稿）。提供時識別區以「標誌圖＋名稱
+   * 文字」呈現（文字保持向量銳利、可雙語），取代 `logoUrl` 完整組合圖。
+   * `nameZh` 為依設計稿手動斷行的中文逐行；`nameEn` 為英文（隨容器自然換行）。
+   */
+  logoNameplate?: { mark: string; nameZh: string[]; nameEn: string };
   name: { zh: string; en: string | null };
   slogan: LocalizedText;
   /** 計畫介紹 */

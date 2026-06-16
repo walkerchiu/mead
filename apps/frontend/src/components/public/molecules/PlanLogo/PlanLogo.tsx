@@ -37,6 +37,11 @@ export interface PlanLogoProps {
   planId?: string;
   /** 計畫官方 logo（完整組合圖）路徑；提供時直接顯示，不再另列名稱文字 */
   logoSrc?: string;
+  /**
+   * 識別牌：純標誌圖＋另排名稱文字（依設計稿）。提供時優先於 `logoSrc`，以
+   * 「標誌圖＋中文逐行＋英文」呈現（文字為向量、銳利且可雙語）。
+   */
+  nameplate?: { mark: string; nameZh: string[]; nameEn: string };
   /** 徽記尺寸（px），預設 56；亦作為 logo 組合圖的高度上限基準 */
   size?: number;
 }
@@ -112,7 +117,56 @@ function PlanLogoImage({
  * 帶 `logoSrc` 時顯示該計畫的官方 logo 組合圖（標誌＋品牌字標已含於圖中，
  * 故不再另列計畫名稱文字）；未帶時依 `planId` 顯示替代徽記＋中英文名稱。
  */
-export function PlanLogo({ name, planId, logoSrc, size = 56 }: PlanLogoProps) {
+export function PlanLogo({
+  name,
+  planId,
+  logoSrc,
+  nameplate,
+  size = 56,
+}: PlanLogoProps) {
+  // 識別牌：純標誌圖（∞）＋另排名稱文字（依設計稿 node 374:64 / 375:76-77）。
+  // 中文逐行手動斷行、英文於固定寬內自然換行；標誌與文字垂直置中。
+  if (nameplate) {
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: '18px' }}>
+        <Box
+          component="img"
+          src={nameplate.mark}
+          alt=""
+          sx={{ height: 44, width: 'auto', flexShrink: 0, display: 'block' }}
+        />
+        <Box sx={{ minWidth: 0, maxWidth: 172 }}>
+          {nameplate.nameZh.map((line, i) => (
+            <Typography
+              key={i}
+              component="p"
+              sx={{
+                fontSize: 15.35,
+                fontWeight: 500,
+                lineHeight: 1.2,
+                color: '#000000',
+              }}
+            >
+              {line}
+            </Typography>
+          ))}
+          <Typography
+            component="p"
+            sx={{
+              mt: '6px',
+              fontSize: 10,
+              fontWeight: 500,
+              lineHeight: 1.3,
+              color: '#666666',
+            }}
+          >
+            {nameplate.nameEn}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   // 官方 logo 組合圖：依各計畫設計稿的橫向／直向比例自然呈現，高度依 size 等比縮放
   if (logoSrc) {
     return <PlanLogoImage src={logoSrc} label={name.zh} size={size} />;

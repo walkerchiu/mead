@@ -28,3 +28,15 @@ export const Tisdc: Story = {
 export const Idc: Story = {
   args: { name: idcPlan.name, planId: idcPlan.id },
 };
+
+/** 識別牌：純標誌圖（∞）＋另排名稱文字（中文逐行＋英文），依設計稿 node 1:2。 */
+export const Nameplate: Story = {
+  args: {
+    name: sposadPlan.name,
+    nameplate: {
+      mark: '/images/plans/01_sposad/logo/mark.png',
+      nameZh: ['教育部', '藝術與設計菁英', '海外培訓計畫'],
+      nameEn: 'MOE Scholarship Program for Overseas Study in Arts and Design',
+    },
+  },
+};

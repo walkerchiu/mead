@@ -215,7 +215,7 @@ export function PlanCardWithStars({
       </Box>
       {/* 作用中的計畫卡片 */}
       <Box sx={{ position: 'relative', zIndex: 1 }}>
-        <PlanCard plan={plan} />
+        <PlanCard plan={plan} active={starsVisible} />
       </Box>
     </>
   );
@@ -976,7 +976,9 @@ export function PlanCarousel({
             alignItems: 'flex-start',
             gap: `${RING_GAP}px`,
             transform: `translateX(${trackX}px)`,
-            transition: 'transform 0.62s cubic-bezier(0.22, 1, 0.36, 1)',
+            // 切換以「快速起步、長距柔和減速滑停」的 expo ease-out 收束，營造有質感的
+            // 緩衝settle感（依業主回饋：切換到停下要有緩衝感）。
+            transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
             willChange: 'transform',
             '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
           }}
@@ -1008,8 +1010,10 @@ export function PlanCarousel({
                     opacity: isCenter ? 1 : 0.42,
                     filter: isCenter ? 'none' : 'saturate(0.55)',
                     cursor: isCenter ? 'default' : 'pointer',
+                    // 與軌道滑動同步的緩衝收束（expo ease-out），讓鄰卡淡化／縮放
+                    // 與切換滑動一致地柔和停下。
                     transition:
-                      'opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease',
+                      'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                     '@media (prefers-reduced-motion: reduce)': {
                       transition: 'none',
                     },

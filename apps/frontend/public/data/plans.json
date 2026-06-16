@@ -6,6 +6,11 @@
       "slug": "sposad",
       "folderName": "01_sposad",
       "logoUrl": "/images/plans/01_sposad/logo/logo.svg",
+      "logoNameplate": {
+        "mark": "/images/plans/01_sposad/logo/mark.png",
+        "nameZh": ["教育部", "藝術與設計菁英", "海外培訓計畫"],
+        "nameEn": "MOE Scholarship Program for Overseas Study in Arts and Design"
+      },
       "name": {
         "zh": "教育部 藝術與設計菁英海外培訓計畫",
         "en": "Scholarship Program for Overseas Study in Arts & Design (SPOSAD)"

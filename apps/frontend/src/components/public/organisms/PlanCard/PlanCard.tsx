@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -18,6 +18,28 @@ import { portalTokens } from '../../tokens';
 export interface PlanCardProps {
   /** 計畫資料 */
   plan: Plan;
+  /**
+   * 是否為目前顯示（active）的卡片。切換到此卡時（active 轉為 true，或顯示的計畫改變）
+   * slogan 進場動畫播放一次；非 active 不播。預設 true。
+   */
+  active?: boolean;
+}
+
+/**
+ * slogan 重播控制：掛載時播一次（由 AnimatedSlogan 的初始 key 觸發），之後每次
+ * 「切換到此卡」（active 轉 true 或計畫改變）再播一次；不隨滑鼠互動、不輪播。
+ */
+function useSloganReplay(active: boolean, planId: string): number {
+  const [nonce, setNonce] = useState(0);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (active) setNonce((n) => n + 1);
+  }, [active, planId]);
+  return nonce;
 }
 
 /**
@@ -83,16 +105,13 @@ function getCardImage(plan: Plan): string | null {
  * 卡片二為橫向滾動數據跑馬燈、內縮 banner、社群連結列。時程與數據改為橫向呈現，
  * 讓窄版閱讀更從容、版面更輕（與桌機卡片的跑馬燈處理一致）。
  */
-function PlanCardMobile({ plan }: PlanCardProps) {
+function PlanCardMobile({ plan, active = true }: PlanCardProps) {
   const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
-  const [sloganNonce, setSloganNonce] = useState(0);
+  const sloganNonce = useSloganReplay(active, plan.id);
 
   return (
-    <Box
-      onMouseEnter={() => setSloganNonce((n) => n + 1)}
-      sx={{ position: 'relative', width: '100%' }}
-    >
+    <Box sx={{ position: 'relative', width: '100%' }}>
       {/* 卡片一 — 識別 / 簡介 / 執行單位 / 時程 */}
       <Box
         sx={{
@@ -110,6 +129,7 @@ function PlanCardMobile({ plan }: PlanCardProps) {
               name={plan.name}
               planId={plan.id}
               logoSrc={plan.logoUrl}
+              nameplate={plan.logoNameplate}
             />
             <Typography
               component="h2"
@@ -257,16 +277,13 @@ function PlanCardMobile({ plan }: PlanCardProps) {
  * - 卡片二（960×314）：左窄欄數據成果（垂直跑馬燈）＋右側大代表圖 banner；社群連結列
  *   疊於底緣。
  */
-function PlanCardDesktop({ plan }: PlanCardProps) {
+function PlanCardDesktop({ plan, active = true }: PlanCardProps) {
   const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
-  const [sloganNonce, setSloganNonce] = useState(0);
+  const sloganNonce = useSloganReplay(active, plan.id);
 
   return (
-    <Box
-      onMouseEnter={() => setSloganNonce((n) => n + 1)}
-      sx={{ position: 'relative', width: '100%' }}
-    >
+    <Box sx={{ position: 'relative', width: '100%' }}>
       {/* 卡片一 — 三欄識別／簡介／執行單位 + 時程 */}
       <Box
         sx={{
@@ -288,11 +305,12 @@ function PlanCardDesktop({ plan }: PlanCardProps) {
           }}
         >
           {/* 欄一：識別 + 標語 */}
-          <Box sx={{ minWidth: 0, flex: '0 0 218px' }}>
+          <Box sx={{ minWidth: 0, flex: '0 0 268px' }}>
             <PlanLogo
               name={plan.name}
               planId={plan.id}
               logoSrc={plan.logoUrl}
+              nameplate={plan.logoNameplate}
             />
             <Typography
               component="h2"
@@ -441,7 +459,7 @@ function PlanCardDesktop({ plan }: PlanCardProps) {
  * PlanCard — 依視窗寬度切換版面：<834px 手機版（原始版面）、≥834px 桌機版（新版）。
  * 以 CSS display 斷點切換（非 useMediaQuery）以避免 SSR / hydration 不一致。
  */
-export function PlanCard({ plan }: PlanCardProps) {
+export function PlanCard({ plan, active = true }: PlanCardProps) {
   return (
     <>
       <Box
@@ -450,7 +468,7 @@ export function PlanCard({ plan }: PlanCardProps) {
           [portalTokens.mq.tabletUp]: { display: 'none' },
         }}
       >
-        <PlanCardMobile plan={plan} />
+        <PlanCardMobile plan={plan} active={active} />
       </Box>
       <Box
         sx={{
@@ -459,7 +477,7 @@ export function PlanCard({ plan }: PlanCardProps) {
           [portalTokens.mq.tabletUp]: { display: 'block' },
         }}
       >
-        <PlanCardDesktop plan={plan} />
+        <PlanCardDesktop plan={plan} active={active} />
       </Box>
     </>
   );
