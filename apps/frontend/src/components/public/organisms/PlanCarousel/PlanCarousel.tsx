@@ -10,7 +10,6 @@ import { PlanPeekNavButton } from '../../molecules/PlanPeekNavButton';
 import { portalTokens } from '../../tokens';
 import { PlanCard } from '../PlanCard';
 import { SLOGAN_EXIT_MS } from '../PortalIntroSection/PortalIntroSection';
-import { PaperFlipStar } from './PaperFlipStar';
 
 /**
  * 卡片周圍裝飾星形照片的位置（相對卡片左上角的 px，依各計畫 Figma 桌機稿
@@ -39,11 +38,15 @@ const DECOR_STARS: Record<string, { x: number; y: number }[]> = {
 };
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
-/** 手機版裝飾星形縮放（與 PaperFlipStar 的 mobileScale 一致） */
+/** 手機版裝飾星形縮放 */
 const MOBILE_STAR_SCALE = 0.55;
+/** 桌機裝飾星形靜止時的微傾角（度，依序對應上／左／右三張），營造半掩散落感。 */
+const REST_TILT = [-4, 3, -2.5];
+/** 展開卡水平中心（960 寬卡片的一半）；決定星形 hover 往左或往右外傾。 */
+const CARD_CENTER_X = 480;
 
-/** 24 角星 clip-path（與 PaperFlipStar 的 traceStar 幾何一致：外 50% / 內 45%、起點 -90°）。
- *  供手機版「靜態霧化星形照片」裁形，維持與桌機星形相同輪廓。 */
+/** 24 角星 clip-path（外 50% / 內 45%、起點 -90°）。桌機浮出照片與手機靜態霧化
+ *  星形共用此輪廓裁形。 */
 const STAR_CLIP = (() => {
   const n = 24;
   const pts = Array.from({ length: n }, (_, i) => {
@@ -127,26 +130,22 @@ export function PlanCardWithStars({
   plan,
   showStars = true,
   starsVisible = true,
-  cardScale = 1,
   staticStars = false,
 }: {
   plan: Plan;
-  /** 卡片自適應放大倍率（≥1）；轉傳給星形以同步提高其 WebGL 解析度。 */
-  cardScale?: number;
   /**
-   * 手機版用：以「靜態霧化星形照片」取代 PaperFlipStar（WebGL 翻折互動）。
-   * 沿用相同的邊緣位置與星形輪廓，但不可互動、加上模糊霧化、不載入 WebGL。
+   * 手機版用：以「靜態霧化星形照片」取代桌機的浮出互動。沿用相同的邊緣位置與
+   * 星形輪廓，但不可互動、加上模糊霧化。
    */
   staticStars?: boolean;
   /**
    * 是否渲染（掛載）周圍裝飾星形照片。環狀軌道只在「中份」卡片掛載星形，兩側
-   * 複本不掛載（peek 細條不需星形、也省 WebGL context）。
+   * 複本不掛載（peek 細條不需星形）。
    */
   showStars?: boolean;
   /**
    * 星形是否可見。中份的非作用卡片仍掛載星形但以 opacity 0 隱藏；切換時改用
-   * opacity 淡入淡出，星形（PaperFlipStar，WebGL）全程掛載、毋需卸載重載貼圖，
-   * 即可消除「照片消失再冒出」的閃跳。
+   * opacity 淡入淡出，消除「照片消失再冒出」的閃跳。
    */
   starsVisible?: boolean;
 }) {
@@ -154,10 +153,9 @@ export function PlanCardWithStars({
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
   return (
     <>
-      {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示（PaperFlipStar 內部以
-          mq.tabletUp 控制）。平常以星形小尺寸藏在卡片後方；hover 時以紙張翻折
-          物理向觀者翻出、放大、上抬到卡片前方。以 opacity 控制可見性，
-          切換計畫時星形保持掛載、僅淡入淡出。 */}
+      {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示。平常以星形小尺寸、微傾、
+          略縮藏在卡片後方；hover 時從後方「浮出」——上抬、前移、放大並輕回彈到卡片
+          前方（不帶陰影）。以 opacity 控制可見性，切換計畫時保持掛載、僅淡入淡出。 */}
       <Box
         aria-hidden
         sx={{
@@ -197,18 +195,47 @@ export function PlanCardWithStars({
               />
             );
           }
+          // 桌機：靜止時微傾、略縮、藏在卡片後方；hover 時從後方「浮出」——
+          // 上抬、沿 Z 軸前移、放大並輕微回彈，浮到卡片前方（依設計師回饋，不帶陰影）。
+          const restTilt = REST_TILT[i % REST_TILT.length];
+          // 星形落在卡片左半 → 往左外傾；右半 → 往右外傾（強化「往外抽出」方向感）。
+          const leanOut = s.x + STAR_SIZE / 2 < CARD_CENTER_X ? -3 : 3;
           return (
-            <PaperFlipStar
+            <Box
               key={i}
+              aria-hidden
+              component="img"
               src={photos[i]}
-              size={STAR_SIZE}
-              leftPx={s.x}
-              topPx={s.y}
-              // 星形中心在 960 寬卡片的左半 → 往左甩；右半 → 往右甩（皆背向卡片）
-              flipDir={s.x + STAR_SIZE / 2 < 480 ? -1 : 1}
-              scale={cardScale}
-              mobileLeft={MOBILE_STAR_LAYOUT[i]?.left}
-              mobileTop={MOBILE_STAR_LAYOUT[i]?.top}
+              alt=""
+              sx={{
+                display: 'none',
+                [portalTokens.mq.tabletUp]: { display: 'block' },
+                position: 'absolute',
+                left: `${s.x}px`,
+                top: `${s.y}px`,
+                width: STAR_SIZE,
+                height: STAR_SIZE,
+                objectFit: 'cover',
+                clipPath: STAR_CLIP,
+                zIndex: 0,
+                transformOrigin: 'center bottom',
+                willChange: 'transform, filter',
+                transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
+                filter: 'brightness(0.94) saturate(0.95)',
+                transition:
+                  'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
+                '&:hover': {
+                  transform: `perspective(900px) rotateX(-12deg) rotateZ(${leanOut}deg) translateY(-24px) translateZ(52px) scale(1.16)`,
+                  zIndex: 3,
+                  filter: 'brightness(1.03) saturate(1.05)',
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  transform: 'none',
+                  transition: 'none',
+                  filter: 'none',
+                  '&:hover': { transform: 'none', zIndex: 3 },
+                },
+              }}
             />
           );
         })}
@@ -929,7 +956,7 @@ export function PlanCarousel({
   // 三份卡片並列（左／中／右複本），讓左右兩側永遠是真實卡片內容；active 永遠落在
   // 中份範圍內、被置中，兩側恆有完整鄰卡。切換時整條軌道以 translateX 平滑滑動 ——
   // 卡片全程掛載、不 remount，故無 pop-in、無閃跳。星形只掛在 active 卡（與設計稿
-  // 一致，peek 無星形），且照片皆已預載，切換時 PaperFlipStar 只換貼圖、不重建 context。
+  // 一致，peek 無星形），且照片皆已預載，切換時僅以 opacity 淡入淡出、不重載。
   const RING_CARD_W = 960;
   // peek 露出量（螢幕 px）：兩側鄰卡露出的寬度。卡距以視窗寬反推，讓各螢幕寬下
   // peek 露出量大致一致（zoom 內 px = 螢幕 px / cardScale）。
@@ -1021,7 +1048,6 @@ export function PlanCarousel({
                 >
                   <PlanCardWithStars
                     plan={plan}
-                    cardScale={cardScale}
                     showStars={isCenter}
                     starsVisible={isCenter}
                   />
