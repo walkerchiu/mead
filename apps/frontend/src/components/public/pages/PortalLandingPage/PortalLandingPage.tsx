@@ -707,33 +707,88 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         >
           {t('viewingPlan', { name: activePlan.name.zh })}
         </Box>
-        {/* 第一屏 — 文字雲佔滿整個視窗高度 */}
+        {/* 第一屏 — 文字雲佔滿整個視窗高度；底部置一列站名識別。 */}
         <Box
           sx={{
             minHeight: '100vh',
             display: 'flex',
-            // <834px（手機）：靠頂對齊，讓 hero 色塊頂塊上緣切齊視窗頂（依手機稿）；
-            // ≥834px（桌機）：維持垂直置中。
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            [portalTokens.mq.tabletUp]: { alignItems: 'center' },
+            flexDirection: 'column',
             // 文字雲側邊圖片略微溢出時裁掉水平方向，避免出現橫向捲軸
             overflowX: 'clip',
           }}
         >
-          {/* 桌機：固定設計寬 + zoom 等比縮放（色塊與文字一起）填滿一屏；手機回原生寬。 */}
+          {/* 文字雲區：佔滿剩餘高度並置中（手機靠頂、桌機垂直置中）。 */}
           <Box
             sx={{
-              width: '100%',
-              zoom: heroScale !== 1 ? heroScale : undefined,
-              [portalTokens.mq.tabletUp]: { width: HERO_DESIGN_W },
+              flex: 1,
+              minHeight: 0,
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'center',
+              [portalTokens.mq.tabletUp]: { alignItems: 'center' },
             }}
           >
-            <DecorativeTextCloud
-              shapeContents={heroShapeContents}
-              defaultIndex={activeIndex}
-              language={language}
+            {/* 桌機：固定設計寬 + zoom 等比縮放（色塊與文字一起）填滿一屏；手機回原生寬。 */}
+            <Box
+              sx={{
+                width: '100%',
+                zoom: heroScale !== 1 ? heroScale : undefined,
+                [portalTokens.mq.tabletUp]: { width: HERO_DESIGN_W },
+              }}
+            >
+              <DecorativeTextCloud
+                shapeContents={heroShapeContents}
+                defaultIndex={activeIndex}
+                language={language}
+              />
+            </Box>
+          </Box>
+          {/* hero 底部站名識別（依設計稿 node 1:2 / 43:1142）：教育部圓徽 + 入口網站名。
+              手機：站名靠左、圓徽靠右（兩端分置）；桌機：圓徽 + 站名相鄰、靠左下。 */}
+          <Box
+            aria-hidden
+            sx={{
+              flexShrink: 0,
+              px: '24px',
+              pb: 'clamp(20px, 4vh, 40px)',
+              display: 'flex',
+              alignItems: 'center',
+              // 手機：DOM[圓徽,站名] 以 row-reverse + space-between → 站名左、圓徽右。
+              flexDirection: 'row-reverse',
+              justifyContent: 'space-between',
+              [portalTokens.mq.tabletUp]: {
+                // 桌機：圓徽 + 站名相鄰、靠左下；左側內縮約對齊 hero 內容。
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                gap: '11px',
+                pl: 'clamp(24px, 22vw, 320px)',
+                pr: 0,
+                pb: 'clamp(24px, 6vh, 56px)',
+              },
+            }}
+          >
+            <Box
+              component="img"
+              src="/images/moe-emblem.png"
+              alt=""
+              sx={{
+                width: 22,
+                height: 22,
+                flexShrink: 0,
+                [portalTokens.mq.tabletUp]: { width: 29, height: 29 },
+              }}
             />
+            <Box
+              component="span"
+              sx={{
+                fontSize: 12.23,
+                fontWeight: 500,
+                color: '#000000',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {t('heroSiteName')}
+            </Box>
           </Box>
         </Box>
 
