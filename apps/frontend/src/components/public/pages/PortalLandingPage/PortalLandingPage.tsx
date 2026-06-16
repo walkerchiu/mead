@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  type ReactNode,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -77,46 +76,15 @@ const FIT_SIDE_MARGIN = 72;
 const GESTURE_LOCK_MS = 700;
 
 /**
- * 敘事內文計畫名稱連結的行內樣式 — 以 styled('span') 實作為真正的行內元素。
+ * 敘事內文計畫名稱的行內樣式 — 以 styled('span') 實作為真正的行內元素，純品牌橘標示
+ * （非連結、無互動）。
  *
- * 不可用 <button>：button 為 inline-block 原子盒，會讓前面的開引號「被孤立
- * 斷在行尾；行內 span 讓文字連續流動，中文禁則（line-break: strict）才能把
- * 「留在下一行開頭。品牌橘、hover / focus 加粗並加底線。
+ * 不可用 <button>：button 為 inline-block 原子盒，會讓前面的開引號「被孤立斷在行尾；
+ * 行內 span 讓文字連續流動，中文禁則（line-break: strict）才能把「留在下一行開頭。
  */
-const NarrativePlanLinkSpan = styled('span')({
+const NarrativePlanName = styled('span')({
   color: portalTokens.color.brandOrange,
-  cursor: 'pointer',
-  textUnderlineOffset: '0.2em',
-  '&:hover, &:focus-visible': {
-    fontWeight: 700,
-    textDecoration: 'underline',
-  },
-  '&:focus-visible': portalTokens.focusRing,
 });
-
-function NarrativePlanLink({
-  onClick,
-  children,
-}: {
-  onClick: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <NarrativePlanLinkSpan
-      role="button"
-      tabIndex={0}
-      onClick={onClick}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onClick();
-        }
-      }}
-    >
-      {children}
-    </NarrativePlanLinkSpan>
-  );
-}
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -619,8 +587,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
-  const handlePlanLink = (planId: string) =>
-    goToPlanIndex(orderedPlans.findIndex((p) => p.id === planId));
 
   // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端），
   // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
@@ -796,23 +762,17 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             paragraphs={[
               t.rich('narrative.body1', {
                 link: (chunks) => (
-                  <NarrativePlanLink onClick={() => handlePlanLink('sposad')}>
-                    {chunks}
-                  </NarrativePlanLink>
+                  <NarrativePlanName>{chunks}</NarrativePlanName>
                 ),
               }),
               t.rich('narrative.body2', {
                 link: (chunks) => (
-                  <NarrativePlanLink onClick={() => handlePlanLink('idc')}>
-                    {chunks}
-                  </NarrativePlanLink>
+                  <NarrativePlanName>{chunks}</NarrativePlanName>
                 ),
               }),
               t.rich('narrative.body3', {
                 link: (chunks) => (
-                  <NarrativePlanLink onClick={() => handlePlanLink('tisdc')}>
-                    {chunks}
-                  </NarrativePlanLink>
+                  <NarrativePlanName>{chunks}</NarrativePlanName>
                 ),
               }),
               t('narrative.body4'),
