@@ -6,6 +6,7 @@ import Box from '@mui/material/Box';
 
 import type { Plan } from '@/types/plan';
 
+import { PlanPeekNavButton } from '../../molecules/PlanPeekNavButton';
 import { portalTokens } from '../../tokens';
 import { PlanCard } from '../PlanCard';
 import { SLOGAN_EXIT_MS } from '../PortalIntroSection/PortalIntroSection';
@@ -942,6 +943,8 @@ export function PlanCarousel({
   const mid = Math.floor(count / 2);
   // 置中 active：以「中份的中央計畫」為 translateX=0 基準，平移 (active - mid) 步。
   const trackX = -(expandedIndex - mid) * RING_STEP;
+  const prevIndex = (expandedIndex - 1 + count) % count;
+  const nextIndex = (expandedIndex + 1) % count;
 
   // 點某張鄰卡 → 切換到該計畫（捲動驅動交由上層 onPeekNavigate，否則直接改索引）。
   const navigateTo = (target: number) => {
@@ -1024,6 +1027,24 @@ export function PlanCarousel({
           )}
         </Box>
       </Box>
+      {/* 左右探頭導覽鈕 — 貼第二屏左右緣、於兩側 peek 細條上半部探出，明確指向
+          上一個 / 下一個計畫並可點擊切換（與卡片下方指示點、敘事區標記同一形狀語彙）。 */}
+      {count > 1 && (
+        <>
+          <PlanPeekNavButton
+            direction="prev"
+            planName={plans[prevIndex]?.name.zh ?? ''}
+            markSrc={`/images/plans/${plans[prevIndex]?.folderName}/logo/mark.png`}
+            onClick={() => navigateTo(prevIndex)}
+          />
+          <PlanPeekNavButton
+            direction="next"
+            planName={plans[nextIndex]?.name.zh ?? ''}
+            markSrc={`/images/plans/${plans[nextIndex]?.folderName}/logo/mark.png`}
+            onClick={() => navigateTo(nextIndex)}
+          />
+        </>
+      )}
     </Box>
   );
 }
