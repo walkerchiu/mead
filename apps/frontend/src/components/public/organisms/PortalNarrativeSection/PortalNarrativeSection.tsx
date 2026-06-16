@@ -37,7 +37,9 @@ export interface PortalNarrativeSectionProps {
 // lineBreak: strict — 套用中文禁則：開引號「（不留行尾、收尾標點」）、，。不落行首，
 // 避免標點被孤立換行。
 const bodySx = {
-  fontSize: 14,
+  // 流體字級：隨視窗寬在可讀範圍內微縮放（比照第二屏的可視大小調整，但設上下限
+  // 避免過大／過小傷可讀性）。基準 14px（≈1440 寬），下限 14、上限 16.5。
+  fontSize: 'clamp(14px, 1.02vw, 16.5px)',
   lineHeight: 1.8,
   color: '#000000',
   textAlign: 'left',
@@ -142,7 +144,8 @@ export function PortalNarrativeSection({
               [portalTokens.mq.tabletUp]: {
                 writingMode: 'vertical-rl',
                 textOrientation: 'upright',
-                fontSize: 21,
+                // 流體字級：隨視窗在可讀範圍內微縮放（基準 21px、下限 20、上限 26）。
+                fontSize: 'clamp(20px, 1.5vw, 26px)',
                 lineHeight: 1,
               },
             }}

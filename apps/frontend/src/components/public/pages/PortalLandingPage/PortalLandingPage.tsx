@@ -68,6 +68,16 @@ const MAX_CARD_SCALE = 2;
 const CARD_BASE_W = 960;
 /** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
 const FIT_SIDE_MARGIN = 72;
+
+/** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。 */
+const HERO_DESIGN_W = 1440;
+const HERO_DESIGN_H = 620;
+/** hero 縮放與視窗邊緣的左右／上下淨空（px）。 */
+const HERO_SIDE_MARGIN = 48;
+const HERO_V_MARGIN = 40;
+/** hero 縮放上下限：下限避免極小視窗縮到難讀，上限避免大螢幕過度放大。 */
+const HERO_MIN_SCALE = 0.6;
+const HERO_MAX_SCALE = 1.7;
 /**
  * 切換後鎖住滾輪的時間（ms）：吸收觸控板 / 滑鼠的慣性殘餘 wheel 事件，確保「一次
  * 手勢只切一張」。沒有這道鎖，一次快速滑動的動量會連續累加、一口氣衝過好幾張卡，
@@ -111,12 +121,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   // 桌機 + 非減少動態 → 啟用「釘住 + 滾輪驅動」。
   const [scrollDriven, setScrollDriven] = useState(false);
-  // 延後掛載下方計畫區（含 WebGL 星形與 banner 圖）：首屏 hero 入場那幾秒不掛載，
-  // 避免 Three.js / 圖片在主執行緒初始化卡住入場動畫（壓縮會頓成「跳一段」）。
+  // 延後掛載下方計畫區（含裝飾星形照片與 banner 圖）：首屏 hero 入場那幾秒不掛載，
+  // 避免圖片在主執行緒初始化卡住入場動畫（壓縮會頓成「跳一段」）。
   // 使用者一開始捲動或入場結束後才掛載。
   const [mountPlans, setMountPlans] = useState(false);
   // 自適應第二屏：卡片內容高於一屏時的等比縮放倍率（≤1）；量測後設定。
   const [cardScale, setCardScale] = useState(1);
+  // 自適應第一屏（hero）：依視窗等比縮放整個 hero 畫布（色塊＋文字一起），比照第二屏
+  // 填滿一屏；桌機才縮放，手機維持原生（vertical 佈局自行撐滿寬）。
+  const [heroScale, setHeroScale] = useState(1);
   // 目前已套用的縮放倍率（用 zoom 實作，zoom 會影響 scrollHeight）；量測時用它把
   // 讀到的（已縮放）高度還原成自然高度，避免「量到縮放後高度 → 再算縮放」的回饋。
   const appliedScaleRef = useRef(1);
@@ -162,6 +175,31 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     return () => {
       mqDesktop.removeEventListener('change', update);
       mqMotion.removeEventListener('change', update);
+    };
+  }, []);
+
+  // 自適應第一屏：以 hero 設計畫布（1440×620）對視窗做 contain-fit 縮放（取寬高較小者），
+  // 比照第二屏卡片「填滿一屏」；桌機（≥834px）才縮放，手機回 1（vertical 佈局自撐寬）。
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mqDesktop = window.matchMedia('(min-width:834px)');
+    const compute = () => {
+      if (!mqDesktop.matches) {
+        setHeroScale(1);
+        return;
+      }
+      const s = Math.min(
+        (window.innerWidth - 2 * HERO_SIDE_MARGIN) / HERO_DESIGN_W,
+        (window.innerHeight - 2 * HERO_V_MARGIN) / HERO_DESIGN_H,
+      );
+      setHeroScale(Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, s)));
+    };
+    compute();
+    window.addEventListener('resize', compute);
+    mqDesktop.addEventListener('change', compute);
+    return () => {
+      window.removeEventListener('resize', compute);
+      mqDesktop.removeEventListener('change', compute);
     };
   }, []);
 
@@ -552,8 +590,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, [mountPlans]);
 
-  // 預載各計畫的裝飾星形照片：星形（PaperFlipStar）在掛載後才以 new Image() 載貼圖、
-  // 載完才顯示。延到計畫區掛載後才預載，避免和 hero 入場搶主執行緒。
+  // 預載各計畫的裝飾星形照片：以 new Image() 先載入，避免 hover 浮出時才載造成閃跳。
+  // 延到計畫區掛載後才預載，避免和 hero 入場搶主執行緒。
   useEffect(() => {
     if (typeof window === 'undefined' || !mountPlans) return;
     plans.forEach((plan) => {
@@ -683,11 +721,20 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             overflowX: 'clip',
           }}
         >
-          <DecorativeTextCloud
-            shapeContents={heroShapeContents}
-            defaultIndex={activeIndex}
-            language={language}
-          />
+          {/* 桌機：固定設計寬 + zoom 等比縮放（色塊與文字一起）填滿一屏；手機回原生寬。 */}
+          <Box
+            sx={{
+              width: '100%',
+              zoom: heroScale !== 1 ? heroScale : undefined,
+              [portalTokens.mq.tabletUp]: { width: HERO_DESIGN_W },
+            }}
+          >
+            <DecorativeTextCloud
+              shapeContents={heroShapeContents}
+              defaultIndex={activeIndex}
+              language={language}
+            />
+          </Box>
         </Box>
 
         {/* 計畫介紹大卡 */}
