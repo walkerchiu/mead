@@ -1124,7 +1124,29 @@
         "assignSuccess": "Role assigned successfully",
         "revokeSuccess": "Role revoked successfully",
         "confirmRevoke": "Are you sure you want to revoke this role?",
-        "manageRolesFor": "Manage roles for:"
+        "manageRolesFor": "Manage roles for:",
+        "tabs": {
+          "accounts": "Accounts",
+          "featureMatrix": "Feature Access"
+        },
+        "featureMatrix": {
+          "title": "Feature Access Matrix",
+          "description": "Configure which features each role can access (view / manage). OWNER is always fully enabled and locked; you can only configure roles below your own tier.",
+          "ariaLabel": "Role feature access matrix",
+          "roleColumn": "Role",
+          "featureColumn": "Feature",
+          "view": "View",
+          "manage": "Manage",
+          "lockedHint": "OWNER always has full access and cannot be changed.",
+          "updateSuccess": "Role feature access updated",
+          "noPermission": "You don't have permission to edit feature access (requires roles:manage).",
+          "features": {
+            "user-management": "User Management",
+            "audit-logs": "Audit Logs",
+            "sessions": "Sessions",
+            "cron-jobs": "Cron Jobs"
+          }
+        }
       }
     }
   },

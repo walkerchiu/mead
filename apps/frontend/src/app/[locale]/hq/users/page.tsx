@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Container, Alert, Skeleton } from '@mui/material';
+import {
+  Container,
+  Alert,
+  Skeleton,
+  Tabs,
+  Tab,
+  Box,
+  Typography,
+} from '@mui/material';
 import { Button } from '@/components/atoms';
 import {
   PersonAdd as PersonAddIcon,
@@ -25,6 +33,12 @@ import {
   UserFilterInput,
 } from '@/graphql/users';
 import { usePermissions } from '@/hooks/usePermissions';
+import {
+  GET_FEATURE_MATRIX,
+  SET_ROLE_FEATURE_ACCESS,
+  RoleFeatureRow,
+} from '@/graphql/rbac';
+import { callerRankInScope } from '@/lib/rbac';
 
 // Lazy load components
 const UserTable = dynamic(
@@ -75,6 +89,14 @@ const ManageRolesDialog = dynamic(
   { ssr: false },
 );
 
+const FeatureMatrix = dynamic(
+  () =>
+    import('@/components/organisms/hq/FeatureMatrix/FeatureMatrix').then(
+      (mod) => mod.FeatureMatrix,
+    ),
+  { loading: () => <Skeleton variant="rectangular" height={320} /> },
+);
+
 function UsersContent() {
   const t = useTranslations('pages.hq.users');
   const tc = useTranslations('common');
@@ -92,6 +114,17 @@ function UsersContent() {
   const [filters, setFilters] = useState<UserFilterInput>({});
   const { hasPermission } = usePermissions();
   const canWriteUsers = hasPermission('users:create');
+  const canManageRoles = hasPermission('roles:manage');
+
+  const tFeature = useTranslations('pages.hq.users.featureMatrix');
+  const [tab, setTab] = useState(0);
+  const callerRank = callerRankInScope('HQ_SCOPE');
+  const hqFeatureColumns = [
+    { key: 'user-management', label: tFeature('features.user-management') },
+    { key: 'audit-logs', label: tFeature('features.audit-logs') },
+    { key: 'sessions', label: tFeature('features.sessions') },
+    { key: 'cron-jobs', label: tFeature('features.cron-jobs') },
+  ];
 
   // 查詢用戶列表
   const { data, loading, error, refetch } = useQuery<{
@@ -144,6 +177,38 @@ function UsersContent() {
       });
     },
   });
+
+  // 功能權限矩陣（HQ scope）；切到該分頁才查詢。
+  const {
+    data: matrixData,
+    loading: matrixLoading,
+    refetch: refetchMatrix,
+  } = useQuery<{ featureMatrix: RoleFeatureRow[] }>(GET_FEATURE_MATRIX, {
+    variables: { scope: 'HQ_SCOPE' },
+    skip: !authReady || tab !== 1,
+    fetchPolicy: 'cache-and-network',
+  });
+
+  const [setFeatureAccess] = useMutation(SET_ROLE_FEATURE_ACCESS, {
+    onCompleted: () => {
+      enqueueSnackbar(tFeature('updateSuccess'), { variant: 'success' });
+      refetchMatrix();
+    },
+    onError: (err) => {
+      enqueueSnackbar(`${tc('error')}: ${err.message}`, { variant: 'error' });
+    },
+  });
+
+  const handleFeatureToggle = (
+    roleId: string,
+    featureKey: string,
+    canRead: boolean,
+    canWrite: boolean,
+  ) => {
+    setFeatureAccess({
+      variables: { input: { roleId, featureKey, canRead, canWrite } },
+    });
+  };
 
   // 直接使用後端篩選後的結果
   const users = data?.usersPaginated?.data || [];
@@ -231,38 +296,69 @@ function UsersContent() {
           }
         />
 
-        {/* 錯誤提示 */}
-        {error && (
-          <Alert severity="error" sx={{ mb: 3 }}>
-            {tc('error.loadFailed')}: {error.message}
-          </Alert>
+        {/* 分頁：帳號 / 功能權限 */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+          <Tabs value={tab} onChange={(_, v) => setTab(v as number)}>
+            <Tab label={t('tabs.accounts')} />
+            <Tab label={t('tabs.featureMatrix')} />
+          </Tabs>
+        </Box>
+
+        {tab === 0 && (
+          <>
+            {/* 錯誤提示 */}
+            {error && (
+              <Alert severity="error" sx={{ mb: 3 }}>
+                {tc('error.loadFailed')}: {error.message}
+              </Alert>
+            )}
+
+            {/* 篩選器 */}
+            <UserFilters
+              filters={filters}
+              onChange={setFilters}
+              resultCount={pageInfo?.totalCount}
+            />
+
+            {/* 用戶列表 */}
+            <UserTable
+              users={users}
+              loading={loading}
+              pageInfo={pageInfo}
+              page={page}
+              onPageChange={handlePageChange}
+              onEdit={handleEdit}
+              onResetPassword={handleResetPassword}
+              onManageRoles={canManageRoles ? handleManageRoles : undefined}
+              onDelete={handleDelete}
+              onRestore={handleRestore}
+              onLock={handleLock}
+              onUnlock={handleUnlock}
+              readOnly={!canWriteUsers}
+            />
+          </>
         )}
 
-        {/* 篩選器 */}
-        <UserFilters
-          filters={filters}
-          onChange={setFilters}
-          resultCount={pageInfo?.totalCount}
-        />
-
-        {/* 用戶列表 */}
-        <UserTable
-          users={users}
-          loading={loading}
-          pageInfo={pageInfo}
-          page={page}
-          onPageChange={handlePageChange}
-          onEdit={handleEdit}
-          onResetPassword={handleResetPassword}
-          onManageRoles={
-            hasPermission('roles:manage') ? handleManageRoles : undefined
-          }
-          onDelete={handleDelete}
-          onRestore={handleRestore}
-          onLock={handleLock}
-          onUnlock={handleUnlock}
-          readOnly={!canWriteUsers}
-        />
+        {tab === 1 && (
+          <Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {tFeature('description')}
+            </Typography>
+            {!canManageRoles && (
+              <Alert severity="info" sx={{ mb: 2 }}>
+                {tFeature('noPermission')}
+              </Alert>
+            )}
+            <FeatureMatrix
+              rows={matrixData?.featureMatrix ?? []}
+              features={hqFeatureColumns}
+              loading={matrixLoading}
+              callerRank={callerRank}
+              editable={canManageRoles}
+              onToggle={handleFeatureToggle}
+            />
+          </Box>
+        )}
       </Container>
 
       {/* 創建用戶對話框 */}

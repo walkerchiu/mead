@@ -1124,7 +1124,29 @@
         "assignSuccess": "角色分配成功",
         "revokeSuccess": "角色已撤銷",
         "confirmRevoke": "確定要撤銷此角色嗎？",
-        "manageRolesFor": "管理角色："
+        "manageRolesFor": "管理角色：",
+        "tabs": {
+          "accounts": "帳號",
+          "featureMatrix": "功能權限"
+        },
+        "featureMatrix": {
+          "title": "功能權限矩陣",
+          "description": "設定各角色可存取哪些功能（檢視／管理）。OWNER 永遠全開且鎖定；您只能設定階層低於自己的角色。",
+          "ariaLabel": "角色功能權限矩陣",
+          "roleColumn": "角色",
+          "featureColumn": "功能",
+          "view": "檢視",
+          "manage": "管理",
+          "lockedHint": "OWNER 永遠擁有完整權限，無法調整。",
+          "updateSuccess": "已更新角色功能權限",
+          "noPermission": "您沒有編輯功能權限的權限（需要 roles:manage）。",
+          "features": {
+            "user-management": "用戶管理",
+            "audit-logs": "稽核日誌",
+            "sessions": "會話管理",
+            "cron-jobs": "排程任務"
+          }
+        }
       }
     }
   },
