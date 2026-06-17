@@ -7,7 +7,7 @@ import { PortalNarrativeSection } from './PortalNarrativeSection';
 
 /**
  * 計畫敘事區塊：右側直書標題 + 左欄前導段落與主文各段。
- * 收束標記呈現目前 active 計畫的形狀，hover 變形為下一個計畫並可點擊切換。
+ * 收束標記呈現目前 active 計畫的形狀，hover 變形為下一個計畫的形狀並放大（純視覺）。
  */
 const meta = {
   title: 'Public Scope/Organisms/PortalNarrativeSection',
@@ -31,8 +31,6 @@ export const Default: Story = {
     planMarker: {
       currentShapeClip: PLAN_SHAPE_CLIPS[0],
       nextShapeClip: PLAN_SHAPE_CLIPS[1],
-      nextLabel: '設計戰國策',
-      onSelectNext: () => {},
     },
   },
 };

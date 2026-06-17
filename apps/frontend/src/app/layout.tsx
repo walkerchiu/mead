@@ -6,7 +6,9 @@ import { headers } from 'next/headers';
 // 自帶字體（@fontsource，從 npm 取得、隨映像打包）：Docker build 不向 fonts.gstatic.com
 // 抓取字體子集，避免在受限網路 / 模擬建置下因 gstatic 連線失敗導致 build 中斷。
 // 字族名（Inter / Roboto / Roboto Mono / Noto Sans TC）對應 globals.css 與 theme
-// typography 的 --font-* 變數。權重 400 / 500 / 700 與原設定一致。
+// typography 的 --font-* 變數。權重 300 / 400 / 500 / 700。300（Light）供 SPOSAD
+// 入口網第一屏的裝飾性文字使用（較細一級）。
+import '@fontsource/inter/300.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/700.css';
@@ -16,6 +18,7 @@ import '@fontsource/roboto/700.css';
 import '@fontsource/roboto-mono/400.css';
 import '@fontsource/roboto-mono/500.css';
 import '@fontsource/roboto-mono/700.css';
+import '@fontsource/noto-sans-tc/300.css';
 import '@fontsource/noto-sans-tc/400.css';
 import '@fontsource/noto-sans-tc/500.css';
 import '@fontsource/noto-sans-tc/700.css';

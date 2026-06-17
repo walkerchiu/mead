@@ -15,6 +15,8 @@ export interface PlanPeekNavButtonProps {
   planName: string;
   /** 目標計畫的 logo 標誌圖路徑（純標誌、透明底）。 */
   markSrc: string;
+  /** 垂直位置（CSS top 值），預設 `'6%'`；手機卡片較高時可指定對齊卡片一 logo 列。 */
+  top?: string;
   onClick: () => void;
 }
 
@@ -36,6 +38,7 @@ export function PlanPeekNavButton({
   direction,
   planName,
   markSrc,
+  top = '6%',
   onClick,
 }: PlanPeekNavButtonProps) {
   const isPrev = direction === 'prev';
@@ -86,7 +89,7 @@ export function PlanPeekNavButton({
       }
       sx={{
         position: 'absolute',
-        top: '6%',
+        top,
         [isPrev ? 'left' : 'right']: 0,
         transform: `translateX(${isPrev ? -EDGE_OUT : EDGE_OUT}px)`,
         zIndex: 6,

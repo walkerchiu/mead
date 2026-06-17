@@ -16,18 +16,14 @@ export interface PortalNarrativeSectionProps {
   paragraphs?: readonly ReactNode[];
   /**
    * 收束標記的互動設定。提供時，標記呈現「目前 active 計畫」的標記多邊形
-   * （與卡片下方 active 導覽點同形狀）；hover/focus 變形為「下一個計畫」的多邊形
-   * 並放大，點擊切換到下一個計畫卡片。
+   * （與卡片下方 active 導覽點同形狀）；hover 變形為「下一個計畫」的多邊形並放大
+   * （純視覺、不可點）。
    */
   planMarker?: {
     /** 目前 active 計畫的形狀 clip-path（標記預設形狀）。 */
     currentShapeClip: string;
-    /** 下一個計畫的形狀 clip-path（hover/focus 預覽）。 */
+    /** 下一個計畫的形狀 clip-path（hover 預覽）。 */
     nextShapeClip: string;
-    /** 下一個計畫可讀名稱，供 aria-label。 */
-    nextLabel: string;
-    /** 點擊切換到下一個計畫卡片。 */
-    onSelectNext: () => void;
   };
 }
 
@@ -153,28 +149,20 @@ export function PortalNarrativeSection({
             {heading}
           </Typography>
           {/* 收束標記 — 預設呈現目前 active 計畫的標記多邊形（與卡片下方 active
-              導覽點同形狀）；hover/focus 變形為下一個計畫的多邊形並放大，點擊切換。 */}
+              導覽點同形狀）；hover 變形為下一個計畫的多邊形並放大（純視覺、不可點）。 */}
           {planMarker ? (
             <Box
-              component="button"
-              type="button"
-              onClick={planMarker.onSelectNext}
-              aria-label={`切換到下一個計畫：${planMarker.nextLabel}`}
+              aria-hidden
               sx={{
+                // 收束橘點僅桌機顯示（手機版不呈現此色塊）。
+                display: 'none',
                 flexShrink: 0,
-                p: 0,
-                border: 0,
-                background: 'none',
-                cursor: 'pointer',
                 lineHeight: 0,
-                borderRadius: '50%',
-                [portalTokens.mq.tabletUp]: { mt: 'auto' },
-                '&:hover .portal-narrative-dot, &:focus-visible .portal-narrative-dot':
-                  {
-                    clipPath: planMarker.nextShapeClip,
-                    transform: 'scale(1.2)',
-                  },
-                '&:focus-visible': portalTokens.focusRing,
+                [portalTokens.mq.tabletUp]: { display: 'block', mt: 'auto' },
+                '&:hover .portal-narrative-dot': {
+                  clipPath: planMarker.nextShapeClip,
+                  transform: 'scale(1.2)',
+                },
               }}
             >
               <Box
@@ -199,12 +187,15 @@ export function PortalNarrativeSection({
             <Box
               aria-hidden
               sx={{
+                // 收束橘點僅桌機顯示（手機版不呈現此色塊）。
+                display: 'none',
                 flexShrink: 0,
                 width: 16,
                 height: 16,
                 borderRadius: '50%',
                 bgcolor: portalTokens.color.brandOrange,
                 [portalTokens.mq.tabletUp]: {
+                  display: 'block',
                   width: 28,
                   height: 28,
                   mt: 'auto',

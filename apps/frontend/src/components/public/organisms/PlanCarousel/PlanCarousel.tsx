@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
 
@@ -131,6 +131,8 @@ export function PlanCardWithStars({
   showStars = true,
   starsVisible = true,
   staticStars = false,
+  dimmed = false,
+  snap = false,
 }: {
   plan: Plan;
   /**
@@ -144,10 +146,18 @@ export function PlanCardWithStars({
    */
   showStars?: boolean;
   /**
-   * 星形是否可見。中份的非作用卡片仍掛載星形但以 opacity 0 隱藏；切換時改用
-   * opacity 淡入淡出，消除「照片消失再冒出」的閃跳。
+   * 是否為作用中卡片：傳給 PlanCard 控制 slogan 重播。
    */
   starsVisible?: boolean;
+  /**
+   * 鄰卡：僅「卡片本體」淡化＋去飽和（裝飾照片不受影響，恆維持固定霧化、只在
+   * hover 時才有樣式變化）。dim 套在卡片層而非外層，避免波及底下照片。
+   */
+  dimmed?: boolean;
+  /**
+   * wrap snap 回中份那一幀：關閉卡片淡化／去飽和 transition，避免閃動。
+   */
+  snap?: boolean;
 }) {
   const photos = localPhotos(plan);
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
@@ -155,15 +165,9 @@ export function PlanCardWithStars({
     <>
       {/* 裝飾星形照片 — 各計畫位置不同，僅 ≥834px 顯示。平常以星形小尺寸、微傾、
           略縮藏在卡片後方；hover 時從後方「浮出」——上抬、前移、放大並輕回彈到卡片
-          前方（不帶陰影）。以 opacity 控制可見性，切換計畫時保持掛載、僅淡入淡出。 */}
-      <Box
-        aria-hidden
-        sx={{
-          opacity: starsVisible ? 1 : 0,
-          transition: 'opacity 0.5s ease',
-          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
-        }}
-      >
+          前方（不帶陰影）。一就位即全不透明＋固定霧化（不淡入、切換途中不變樣），
+          只有 hover 才有樣式變化。 */}
+      <Box aria-hidden>
         {stars.map((s, i) => {
           if (!photos[i]) return null;
           // 手機版：靜態霧化星形照片（沿用邊緣位置與星形輪廓，不互動、不載 WebGL）。
@@ -200,13 +204,12 @@ export function PlanCardWithStars({
           const restTilt = REST_TILT[i % REST_TILT.length];
           // 星形落在卡片左半 → 往左外傾；右半 → 往右外傾（強化「往外抽出」方向感）。
           const leanOut = s.x + STAR_SIZE / 2 < CARD_CENTER_X ? -3 : 3;
+          // 上層用「預先模糊好」的圖檔（blur／brightness／saturate 已烘進檔案）。
+          const hazeSrc = photos[i].replace(/\.jpg$/i, '.blur.jpg');
           return (
             <Box
               key={i}
               aria-hidden
-              component="img"
-              src={photos[i]}
-              alt=""
               sx={{
                 display: 'none',
                 [portalTokens.mq.tabletUp]: { display: 'block' },
@@ -215,40 +218,95 @@ export function PlanCardWithStars({
                 top: `${s.y}px`,
                 width: STAR_SIZE,
                 height: STAR_SIZE,
-                objectFit: 'cover',
                 clipPath: STAR_CLIP,
                 zIndex: 0,
                 transformOrigin: 'center bottom',
-                willChange: 'transform, filter',
+                willChange: 'transform',
+                // 靜止時微傾、略縮、藏在卡片後方；hover 從後方浮出——上抬、前移、放大
+                // 並輕回彈到卡片前方（不帶陰影）。
                 transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
-                // 靜止時恆為「霧化」：自帶模糊（不依賴卡片 backdrop），切換滑動期間也維持
-                // 霧化、不會在卡片就位前短暫露出清晰（依業主回饋）。hover 浮出時才清晰。
-                filter: 'blur(7px) brightness(0.92) saturate(0.95)',
-                transition:
-                  'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
+                transition: 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 '&:hover': {
                   transform: `perspective(900px) rotateX(-12deg) rotateZ(${leanOut}deg) translateY(-24px) translateZ(52px) scale(1.16)`,
                   zIndex: 3,
+                },
+                // hover 時上層預模糊圖淡出、底層清晰圖顯示並微微提亮。
+                '&:hover .plan-star-haze': { opacity: 0 },
+                '&:hover .plan-star-sharp': {
+                  visibility: 'visible',
                   filter: 'brightness(1.03) saturate(1.05)',
                 },
                 '@media (prefers-reduced-motion: reduce)': {
                   transform: 'none',
                   transition: 'none',
-                  filter: 'blur(7px) brightness(0.92) saturate(0.95)',
-                  '&:hover': {
-                    transform: 'none',
-                    zIndex: 3,
-                    filter: 'brightness(1.03) saturate(1.05)',
-                  },
+                  '&:hover': { transform: 'none', zIndex: 3 },
+                  '& .plan-star-haze': { transition: 'none' },
                 },
               }}
-            />
+            >
+              {/* 底層：清晰原圖，供 hover 浮出時顯示。靜止時隱藏，避免它在「上層模糊圖
+                  尚未載入」的競態中搶先露出清晰畫面（那正是「先清晰、再變更霧」的來源）。
+                  低載入優先序，讓上層模糊圖先就緒。 */}
+              <Box
+                component="img"
+                className="plan-star-sharp"
+                src={photos[i]}
+                alt=""
+                loading="lazy"
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  visibility: 'hidden',
+                }}
+              />
+              {/* 上層：預先模糊好的圖（霧化已烘進檔案）。圖檔本身即模糊，繪製第一幀就是
+                  最終霧化樣貌，不會有 CSS filter 首幀光柵化造成的「先清晰、再變更霧」。
+                  eager／高優先載入確保它最先就緒；hover 時淡出露出底層清晰圖。 */}
+              <Box
+                component="img"
+                className="plan-star-haze"
+                src={hazeSrc}
+                alt=""
+                loading="eager"
+                fetchPriority="high"
+                sx={{
+                  position: 'absolute',
+                  inset: 0,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                  opacity: 1,
+                  transition: 'opacity 0.4s ease',
+                }}
+              />
+            </Box>
           );
         })}
       </Box>
-      {/* 作用中的計畫卡片 */}
-      <Box sx={{ position: 'relative', zIndex: 1 }}>
-        <PlanCard plan={plan} active={starsVisible} />
+      {/* 作用中的計畫卡片 — 鄰卡的淡化／去飽和只套在這層卡片本體，不波及上方裝飾照片。
+          「讓卡片毛玻璃罩在均勻底色上、只讓照片淡淡透出」的半透明底改墊在 PlanCard 內
+          「每張卡各自後方」（見 PlanCard 的 frostBacking），這層外層不再上底色——否則會
+          連中間的卡間間隙也填滿、把上下兩張卡連成一塊（出現多餘連接線）。 */}
+      <Box
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          opacity: dimmed ? 0.42 : 1,
+          filter: dimmed ? 'saturate(0.55)' : 'none',
+          transition: snap
+            ? 'none'
+            : 'filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+        }}
+      >
+        {/* 有裝飾照片在卡片後方時，墊半透明底讓毛玻璃罩在均勻色上（照片淡淡透出、
+            濃淡一致）。墊在每張卡各自後方，不填卡間間隙。 */}
+        <PlanCard plan={plan} active={starsVisible} frostBacking={showStars} />
       </Box>
     </>
   );
@@ -652,6 +710,21 @@ export function PlanCarousel({
     },
     [],
   );
+  // 觸發一次方向性 wrap 滑動：先以 wrapOffset 順向滑到相鄰份，820ms（略長於 0.8s
+  // transition）後無動畫 snap 回中份。桌機 navigateTo 與手機 next 鈕共用。
+  const triggerWrap = useCallback((off: number) => {
+    if (off === 0) return;
+    if (wrapTimerRef.current) window.clearTimeout(wrapTimerRef.current);
+    setWrapSnap(false);
+    setWrapOffset(off);
+    wrapTimerRef.current = window.setTimeout(() => {
+      setWrapSnap(true);
+      setWrapOffset(0);
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => setWrapSnap(false)),
+      );
+    }, 820);
+  }, []);
 
   // 視窗寬與是否桌機（≥834px）：展開環狀軌道用視窗寬自適應卡距（peek 露出量恆定），
   // 並在桌機才啟用環狀軌道；手機維持單張滿版卡片。
@@ -677,6 +750,17 @@ export function PlanCarousel({
       mq.removeEventListener('change', onMq);
     };
   }, []);
+
+  // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）只在 engage
+  // 時才掛載，其首次合成會讓毛玻璃由淺變濃「後疊上來」。為此 engage 後先以同色遮罩
+  // 蓋住、讓卡片在底下實際合成完毛玻璃，再移除遮罩一次揭示——避免使用者看到「先霧化、
+  // 卡片再疊上來」的組裝過程。一次性，之後的切換不重掛、不再 gate。
+  const [ringRevealed, setRingRevealed] = useState(false);
+  useEffect(() => {
+    if (expandedIndex === null || ringRevealed) return;
+    const t = window.setTimeout(() => setRingRevealed(true), 240);
+    return () => window.clearTimeout(t);
+  }, [expandedIndex, ringRevealed]);
 
   // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
   const miniContainerRef = useRef<HTMLDivElement | null>(null);
@@ -960,14 +1044,80 @@ export function PlanCarousel({
     );
   }
 
-  // ── 手機（<834px）：單張滿版卡片（維持原行為，自動輪播 / 圓點切換） ──
+  // ── 手機（<834px）：橫向 peek 輪播 —— 當前卡置中、左右各露出鄰卡薄邊，右側一顆
+  //     next 探頭鈕循環切換（依設計稿 node 388:247，比照桌機 peek 體驗）。 ──
   if (!isTablet) {
-    const mobilePlan = plans[expandedIndex] ?? plans[0];
+    const W = viewportW || 390;
+    const MCARD_W = Math.max(280, W - 48); // 左右各 ~24px 留白
+    const MGAP = 12; // 卡距：鄰卡露出 ~12px 薄邊
+    const MSTEP = MCARD_W + MGAP;
+    const mid = Math.floor(count / 2);
+    const trackX = -(expandedIndex - mid + wrapOffset) * MSTEP;
+    const centerCopy = wrapOffset / count;
+    const mNext = (expandedIndex + 1) % count;
+    const mTransition = wrapSnap
+      ? 'none'
+      : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)';
+    const mobileNext = () => {
+      // 最後一張往後 → 順向 wrap；其餘直接前進。
+      triggerWrap(expandedIndex === count - 1 ? count : 0);
+      onExpandedIndexChange(mNext);
+    };
     return (
-      <Box sx={{ ...outerSx, overflow: 'visible' }}>
-        <Box sx={{ position: 'relative', mx: 'auto', maxWidth: 960 }}>
-          {/* 手機版：背後裝飾照片改為靜態霧化星形（無 WebGL 翻折互動） */}
-          <PlanCardWithStars plan={mobilePlan} staticStars />
+      <Box sx={{ width: '100%', overflowX: 'clip' }}>
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              gap: `${MGAP}px`,
+              transform: `translateX(${trackX}px)`,
+              transition: mTransition,
+              willChange: 'transform',
+              '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+            }}
+          >
+            {[-1, 0, 1].map((copy) =>
+              plans.map((plan, i) => {
+                const isCenter = copy === centerCopy && i === expandedIndex;
+                return (
+                  <Box
+                    key={`${copy}-${plan.id}`}
+                    aria-hidden={!isCenter}
+                    sx={{
+                      flex: '0 0 auto',
+                      width: MCARD_W,
+                      opacity: isCenter ? 1 : 0.5,
+                      transition: wrapSnap
+                        ? 'none'
+                        : 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      '@media (prefers-reduced-motion: reduce)': {
+                        transition: 'none',
+                      },
+                    }}
+                  >
+                    <PlanCard plan={plan} active={isCenter} />
+                  </Box>
+                );
+              }),
+            )}
+          </Box>
+          {/* 右側探頭導覽鈕 — 貼卡片右緣、對齊卡片一 logo 列、循環切到下一個計畫
+              （依設計稿 node 388:247：手機版僅右側一顆 next 鈕）。 */}
+          {count > 1 && (
+            <PlanPeekNavButton
+              direction="next"
+              top="40px"
+              planName={plans[mNext]?.name.zh ?? ''}
+              markSrc={`/images/plans/${plans[mNext]?.folderName}/logo/mark.png`}
+              onClick={mobileNext}
+            />
+          )}
         </Box>
       </Box>
     );
@@ -1010,25 +1160,38 @@ export function PlanCarousel({
       dir = 'prev';
       off = -count;
     }
-    if (off !== 0) {
-      if (wrapTimerRef.current) window.clearTimeout(wrapTimerRef.current);
-      setWrapSnap(false);
-      setWrapOffset(off);
-      wrapTimerRef.current = window.setTimeout(() => {
-        setWrapSnap(true);
-        setWrapOffset(0);
-        // 兩個 rAF 後恢復 transition（snap 該幀已套用、不會被動畫到）。
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => setWrapSnap(false)),
-        );
-      }, 820);
-    }
+    triggerWrap(off);
     if (onPeekNavigate) onPeekNavigate(target, dir);
     else onExpandedIndexChange(target);
   };
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', overflow: 'visible' }}>
+    <Box
+      sx={{
+        position: 'relative',
+        width: '100%',
+        overflow: 'visible',
+      }}
+    >
+      {/* 合成完才揭示：卡片含毛玻璃 backdrop-filter，首次合成會讓毛玻璃由淺變濃
+          「後疊上來」。warmup 期間卡片以正常 opacity 實際繪製（毛玻璃才會真的完成
+          合成），用一層與背景同色的不透明遮罩蓋住整個輪播區；毛玻璃熱好後移除遮罩，
+          一次顯示已合成好的整張卡。透明度 gate 無法觸發 backdrop 合成，故改用遮罩。 */}
+      {!ringRevealed && (
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            top: -360,
+            bottom: -80,
+            left: '-5%',
+            right: '-5%',
+            bgcolor: portalTokens.color.pageBg,
+            zIndex: 20,
+            pointerEvents: 'none',
+          }}
+        />
+      )}
       <Box
         sx={{
           // 自適應第二屏縮放：用 zoom（非 transform:scale）讓 SVG／文字重排後維持銳利。
@@ -1048,7 +1211,7 @@ export function PlanCarousel({
             gap: `${RING_GAP}px`,
             transform: `translateX(${trackX}px)`,
             // 切換以「快速起步、長距柔和減速滑停」的 expo ease-out 收束，營造有質感的
-            // 緩衝settle感（依業主回饋：切換到停下要有緩衝感）。wrap snap 回中份時關閉動畫。
+            // 緩衝 settle 感（切換到停下保有緩衝）。wrap snap 回中份時關閉動畫。
             transition: wrapSnap
               ? 'none'
               : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -1077,19 +1240,17 @@ export function PlanCarousel({
                     flex: '0 0 auto',
                     width: RING_CARD_W,
                     transformOrigin: 'top center',
-                    // active：保留段內捲動 reveal 位移；鄰卡：淡化、略縮、降彩度。
+                    // 此外層只負責隨軌道滑動的位移（active 保留段內捲動 reveal 位移、
+                    // 鄰卡略縮）。淡化／去飽和移到 PlanCardWithStars 內的卡片層，只套在
+                    // 卡片本體、不波及底下裝飾照片——照片維持固定霧化，僅 hover 時才變樣。
                     transform: isCenter
                       ? 'translateY(calc(var(--reveal-y, 0px) * -1))'
                       : 'scale(0.965)',
-                    opacity: isCenter ? 1 : 0.42,
-                    filter: isCenter ? 'none' : 'saturate(0.55)',
                     cursor: isCenter ? 'default' : 'pointer',
-                    // 與軌道滑動同步的緩衝收束（expo ease-out），讓鄰卡淡化／縮放
-                    // 與切換滑動一致地柔和停下。wrap snap 回中份那一幀關閉動畫，避免
-                    // 新置中份的卡片（連同底下裝飾照片）從鄰卡狀態「長大變亮」而閃動。
+                    // wrap snap 回中份那一幀關閉動畫，避免卡片從鄰卡狀態閃動。
                     transition: wrapSnap
                       ? 'none'
-                      : 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                      : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                     '@media (prefers-reduced-motion: reduce)': {
                       transition: 'none',
                     },
@@ -1099,6 +1260,8 @@ export function PlanCarousel({
                     plan={plan}
                     showStars={isCenter}
                     starsVisible={isCenter}
+                    dimmed={!isCenter}
+                    snap={wrapSnap}
                   />
                 </Box>
               );

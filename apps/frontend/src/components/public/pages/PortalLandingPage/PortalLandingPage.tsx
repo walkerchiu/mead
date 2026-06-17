@@ -615,19 +615,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     [scrollDriven, engageAt],
   );
 
-  // 切到指定計畫卡並捲回計畫介紹區（敘事連結 / 收束圓點共用）。
-  // （onClick 閉包本就每次 render 重建，故不需 useCallback。）
-  const goToPlanIndex = (i: number) => {
-    if (i < 0 || i >= planCount) return;
-    if (scrollDriven) engageAt(i);
-    else setActiveIndex(i);
-    if (typeof document !== 'undefined') {
-      document
-        .getElementById('portal-plans')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-
   // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端），
   // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
   const handlePeekNavigate = useCallback(
@@ -898,9 +885,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                 PLAN_SHAPE_CLIPS[
                   ((activeIndex + 1) % planCount) % PLAN_SHAPE_CLIPS.length
                 ],
-              nextLabel:
-                orderedPlans[(activeIndex + 1) % planCount]?.name.zh ?? '',
-              onSelectNext: () => goToPlanIndex((activeIndex + 1) % planCount),
             }}
           />
         </Box>

@@ -763,7 +763,8 @@ export function DecorativeTextCloud({
               // 僅以 visibility 隱藏；不動 animationName，故不會重觸發入場動畫。
               visibility: pos.hidden ? 'hidden' : 'visible',
               fontSize: 12.5,
-              fontWeight: 400,
+              // 裝飾性文字採 300（Light）— 較內文細一級，視覺更輕。
+              fontWeight: 300,
               letterSpacing: '0.02em',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
