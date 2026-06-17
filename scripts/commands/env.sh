@@ -346,7 +346,8 @@ env_switch() {
   log_step "清除 Cache 和 Queue 資料"
 
   local compose_project
-  compose_project=$(basename "$PROJECT_ROOT" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]//g')
+  # 以 docker-compose 的 name: 作為 project 前綴，與實際 volume 命名一致（含底線等字元）。
+  compose_project=$(grep -m1 '^name:' "$PROJECT_ROOT/docker-compose.yml" | awk '{print $2}')
 
   # 清除 Dragonfly volume
   if docker volume rm "${compose_project}_dragonfly-data" 2>/dev/null; then

@@ -409,10 +409,14 @@ storage_reset() {
   log_step "刪除 SeaweedFS 資料卷..."
   cd "$PROJECT_ROOT"
 
+  # 以 docker-compose 的 name: 作為 project 前綴，避免寫死字串誤刪其他 repo 的 volume。
+  local compose_project
+  compose_project=$(grep -m1 '^name:' "$PROJECT_ROOT/docker-compose.yml" | awk '{print $2}')
+
   docker volume rm -f \
-    mead_seaweedfs-master-data \
-    mead_seaweedfs-volume-data \
-    mead_seaweedfs-filer-data \
+    "${compose_project}_seaweedfs-master-data" \
+    "${compose_project}_seaweedfs-volume-data" \
+    "${compose_project}_seaweedfs-filer-data" \
     2>/dev/null || true
 
   log_success "SeaweedFS 資料已清除"
