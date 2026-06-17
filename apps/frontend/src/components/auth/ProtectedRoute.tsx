@@ -54,18 +54,7 @@ function hasAnyPermission(requiredPermissions: string[]): boolean {
   // Use permissions array from JWT payload
   const userPermissions = (payload.permissions as string[]) || [];
 
-  // Only SUPER_HQ role bypasses all permission checks
-  const accessScopes = (payload.accessScopes as string[]) || [];
-  const roles =
-    (payload.roles as Array<{ scope: string; roleNames: string[] }>) || [];
-  const isSuperHQ =
-    accessScopes.includes('HQ_SCOPE') &&
-    roles.some((r) => r.roleNames?.includes('SUPER_HQ'));
-  if (isSuperHQ) {
-    return true;
-  }
-
-  // Check if user has any of the required permissions
+  // 統一五階模型無角色繞過：直接以 JWT permissions 判斷（OWNER/ADMIN 已含全部權限）。
   return requiredPermissions.some((permission) =>
     userPermissions.includes(permission),
   );

@@ -43,30 +43,22 @@ export function useSidebarItems(): SidebarMenuItem[] {
     const payload = parseJwt(token);
     const scopes = (payload?.accessScopes as string[]) || [];
     const perms = (payload?.permissions as string[]) || [];
-    const roles =
-      (payload?.roles as Array<{ scope: string; roleNames: string[] }>) || [];
 
     const hasHQScope = scopes.includes(AccessScope.HQ_SCOPE);
-    const isSuperHQ =
-      hasHQScope && roles.some((r) => r.roleNames?.includes('SUPER_HQ'));
 
     setPermissions({
       isHQ: hasHQScope,
       // 「系統管理」整組對齊 backend：所有子頁 query 都是 RequireHqScope，且子頁 path 全部
       // /hq/*。customer scope 的 OWNER 因為 "*" glob 也會拿到 users:* / sessions:read /
       // sessions:revoke 等 permission claim，但 backend 不開放給 customer scope。為了避免
-      // menu 引導使用者到 401 死路，整組以 hasHQScope 為前提。
+      // menu 引導使用者到 401 死路，整組以 hasHQScope 為前提。統一五階模型無角色繞過，
+      // OWNER/ADMIN 透過種子權限自然取得對應 permission claim。
       canManageUsers:
         hasHQScope &&
-        (isSuperHQ ||
-          perms.includes('users:create') ||
-          perms.includes('users:read')),
-      canViewAuditLogs:
-        hasHQScope && (isSuperHQ || perms.includes('audit-logs:read')),
-      canManageSessions:
-        hasHQScope && (isSuperHQ || perms.includes('sessions:read')),
-      canViewCronJobs:
-        hasHQScope && (isSuperHQ || perms.includes('cron_jobs:read')),
+        (perms.includes('users:create') || perms.includes('users:read')),
+      canViewAuditLogs: hasHQScope && perms.includes('audit-logs:read'),
+      canManageSessions: hasHQScope && perms.includes('sessions:read'),
+      canViewCronJobs: hasHQScope && perms.includes('cron_jobs:read'),
     });
   }, [authReady]);
 

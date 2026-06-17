@@ -431,11 +431,9 @@ export class AuthService {
     // 使用高效查詢獲取 permissions
     const roleIds = user.userRoles.map((ur) => ur.role.id);
     const permissions = await this.getPermissionsByRoleIds(roleIds);
-    const isSuperHQ =
-      (user.accessScopes?.includes('HQ_SCOPE') &&
-        user.userRoles?.some((ur: any) => ur.role?.name === 'SUPER_HQ')) ||
-      false;
 
+    // 統一五階模型無「SUPER_HQ 全繞過」：授權一律以 accessScopes + 角色衍生的
+    // flat permissions 判斷（OWNER/ADMIN 已含該 scope 全部權限）。
     return {
       sub: user.id, // JWT 標準使用 sub 表示 subject (user ID)
       userId: user.id, // 保留 userId 以保持向後兼容
@@ -443,7 +441,6 @@ export class AuthService {
       accessScopes: user.accessScopes,
       roles: rolesByScope,
       permissions,
-      isSuperHQ, // 只有 SUPER_HQ 角色才有完整繞過權限
     };
   }
 

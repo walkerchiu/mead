@@ -51,7 +51,7 @@ export class PermissionService {
       }
     }
 
-    // 跨 scope 權限檢查：HQ_SCOPE 角色（CONTENT_EDITOR/VIEWER）可能擁有 CUSTOMER_SCOPE 的權限
+    // 跨 scope 權限檢查：HQ_SCOPE 角色可能擁有 CUSTOMER_SCOPE 的權限（統一五階下 HQ 各階皆可跨界）
     if (scope !== AccessScope.HQ_SCOPE) {
       const hqPermissions = await this.getUserPermissions(
         userId,

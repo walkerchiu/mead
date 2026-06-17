@@ -85,7 +85,6 @@ export class PatAuthGuard implements CanActivate {
       email: user.email,
       accessScopes: user.accessScopes as AccessScope[],
       permissions: result.scopes,
-      isSuperHQ: false, // PAT 不授予 SuperHQ 權限
       isPatAuth: true, // 標記為 PAT 認證
       roles: user.userRoles.map((ur) => ({
         scope: ur.role.scope as AccessScope,

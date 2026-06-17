@@ -36,6 +36,7 @@ import { UserFilterInput, UserStatus } from './user.input';
 import { AssignRoleInput, RevokeRoleInput } from './user.input';
 import { PermissionService } from '../../rbac/permission.service';
 import { RoleService } from '../../rbac/role.service';
+import { roleRank, maxRank } from '../../rbac/role-hierarchy';
 import { NotificationService } from '../../notification/notification.service';
 import * as bcrypt from 'bcrypt';
 
@@ -731,40 +732,38 @@ export class UserService {
   }
 
   /**
-   * 驗證用戶管理權限（目標用戶限制檢查）
-   *
-   * 規則：
-   * - SUPER_HQ: 可管理任何人
-   * - CONTENT_EDITOR (HQ non-SUPER_HQ): 不可管理 SUPER_HQ 用戶
-   * - OWNER (CUSTOMER_SCOPE): 僅可管理 CUSTOMER_SCOPE 用戶
-   * - MANAGER (CUSTOMER_SCOPE): 僅可管理 CUSTOMER_SCOPE 用戶，且不可管理 OWNER
+   * 取得某用戶在指定 scope 內的最高角色 rank（無角色為 0）。統一五階階層見 role-hierarchy。
+   */
+  private async rankInScope(
+    userId: string,
+    scope: AccessScope,
+  ): Promise<number> {
+    const userRoles = await this.prisma.userRole.findMany({
+      where: { userId, role: { scope: scope as any } },
+      select: { role: { select: { name: true } } },
+    });
+    return maxRank(userRoles.map((ur) => ur.role.name));
+  }
+
+  /**
+   * 驗證用戶管理權限（目標用戶限制檢查），對齊 nptc UserAdminAuthorizer：
+   * - 同 scope 內只能管理 rank 嚴格低於自身者（ADMIN 因此不可管理 OWNER／其他 ADMIN）。
+   * - HQ scope 在 customer/public 之上：HQ 呼叫者可管理 customer/public 使用者；
+   *   customer 呼叫者不可跨界管理 HQ 使用者。
    */
   private async validateUserManagementPermission(
     callerContext: UserQueryContext & { permissions?: string[] },
     targetUserId: string,
     lang?: string,
   ): Promise<void> {
-    const callerIsHQ = callerContext.accessScopes?.includes(
+    const callerHasHQ = !!callerContext.accessScopes?.includes(
       AccessScope.HQ_SCOPE,
     );
+    const callerId = callerContext.userId;
 
-    // 檢查呼叫者是否為 SUPER_HQ
-    const callerIsSuperHQ =
-      callerIsHQ && callerContext.userId
-        ? await this.permissionService.hasRole(
-            callerContext.userId,
-            AccessScope.HQ_SCOPE,
-            'SUPER_HQ',
-          )
-        : false;
-
-    // SUPER_HQ 可管理任何人
-    if (callerIsSuperHQ) return;
-
-    // 取得目標用戶資訊
     const targetUser = await this.prisma.user.findUnique({
       where: { id: targetUserId },
-      include: { userRoles: { include: { role: true } } },
+      select: { accessScopes: true },
     });
 
     if (!targetUser) {
@@ -773,45 +772,46 @@ export class UserService {
       );
     }
 
-    const targetRoleNames = targetUser.userRoles.map((ur) => ur.role.name);
-    const targetIsHQ = targetUser.accessScopes?.includes(AccessScope.HQ_SCOPE);
-    const targetIsSuperHQ = targetRoleNames.includes('SUPER_HQ');
-    const targetIsOwner = targetRoleNames.includes('OWNER');
+    const targetHasHQ = targetUser.accessScopes?.includes(AccessScope.HQ_SCOPE);
 
-    // CONTENT_EDITOR (HQ non-SUPER_HQ): 不可管理 SUPER_HQ 用戶
-    if (callerIsHQ) {
-      if (targetIsSuperHQ) {
+    // 目標具 HQ scope：僅 HQ 呼叫者、且 HQ rank 嚴格高於目標的 HQ rank 才可管理。
+    if (targetHasHQ) {
+      if (!callerHasHQ) {
         throw new ForbiddenException(
-          this.i18n.translate('auth.forbidden.manageSuperHQ', { lang }) ||
-            'Cannot manage SUPER_HQ users',
+          this.i18n.translate('auth.forbidden.manageHQUser', { lang }) ||
+            'Customer-scope users cannot manage HQ users',
         );
       }
-      return; // 可管理其他所有人
-    }
-
-    // OWNER/MANAGER (non-HQ): 只能管理 CUSTOMER_SCOPE 用戶
-    if (targetIsHQ) {
+      const callerHqRank = callerId
+        ? await this.rankInScope(callerId, AccessScope.HQ_SCOPE)
+        : 0;
+      const targetHqRank = await this.rankInScope(
+        targetUserId,
+        AccessScope.HQ_SCOPE,
+      );
+      if (callerHqRank > targetHqRank) return;
       throw new ForbiddenException(
-        this.i18n.translate('auth.forbidden.manageHQUser', { lang }) ||
-          'Cannot manage HQ users',
+        this.i18n.translate('auth.forbidden.manageHigherOrEqual', { lang }) ||
+          'You can only manage users ranked strictly below you',
       );
     }
 
-    // MANAGER 不可管理 OWNER
-    if (callerContext.userId) {
-      const callerIsOwner = await this.permissionService.hasRole(
-        callerContext.userId,
-        AccessScope.CUSTOMER_SCOPE,
-        'OWNER',
-      );
+    // 目標為 customer / public 使用者：HQ 呼叫者一律放行。
+    if (callerHasHQ) return;
 
-      if (!callerIsOwner && targetIsOwner) {
-        throw new ForbiddenException(
-          this.i18n.translate('auth.forbidden.manageOwner', { lang }) ||
-            'Cannot manage OWNER users',
-        );
-      }
-    }
+    // customer 呼叫者：customer rank 須嚴格高於目標的 customer rank。
+    const callerRank = callerId
+      ? await this.rankInScope(callerId, AccessScope.CUSTOMER_SCOPE)
+      : 0;
+    const targetRank = await this.rankInScope(
+      targetUserId,
+      AccessScope.CUSTOMER_SCOPE,
+    );
+    if (callerRank > targetRank) return;
+    throw new ForbiddenException(
+      this.i18n.translate('auth.forbidden.manageHigherOrEqual', { lang }) ||
+        'You can only manage users ranked strictly below you',
+    );
   }
 
   /**
@@ -1281,7 +1281,10 @@ export class UserService {
   }
 
   /**
-   * 驗證角色分配/撤銷的權限
+   * 驗證角色分配/撤銷的權限（對齊 nptc UserAdminAuthorizer.EnsureCanAssignRole）：
+   * 依角色 scope 與 rank 階層判斷，只能指派 rank 嚴格低於自身者（杜絕越權提權）。
+   * - 指派 HQ 角色：需 HQ 呼叫者，且 HQ rank 嚴格高於該角色 rank。
+   * - 指派 customer/public 角色：HQ 呼叫者放行；customer 呼叫者需 rank 嚴格高於該角色。
    */
   private async validateRoleAssignmentPermission(
     roleId: string,
@@ -1289,13 +1292,6 @@ export class UserService {
     context: UserQueryContext & { permissions?: string[] },
     lang?: string,
   ) {
-    const isHQ = context.accessScopes?.includes(AccessScope.HQ_SCOPE);
-
-    // HQ: no restrictions
-    if (isHQ) {
-      return;
-    }
-
     // Get the target role
     const targetRole = await this.roleService.getRole(roleId);
     if (!targetRole) {
@@ -1304,12 +1300,29 @@ export class UserService {
       );
     }
 
-    // Non-HQ: verify target role is CUSTOMER_SCOPE
-    if (targetRole.scope !== AccessScope.CUSTOMER_SCOPE) {
-      throw new BadRequestException('只能分配 CUSTOMER_SCOPE 角色');
+    const rank = roleRank(targetRole.name);
+    const callerHasHQ = !!context.accessScopes?.includes(AccessScope.HQ_SCOPE);
+    const callerId = context.userId;
+
+    // 指派 HQ 角色：需 HQ 呼叫者且 HQ rank 嚴格高於該角色 rank。
+    if (targetRole.scope === AccessScope.HQ_SCOPE) {
+      if (!callerHasHQ) {
+        throw new ForbiddenException(
+          this.i18n.translate('auth.forbidden.assignHQRole', { lang }) ||
+            'Only HQ users can assign HQ-scope roles',
+        );
+      }
+      const callerHqRank = callerId
+        ? await this.rankInScope(callerId, AccessScope.HQ_SCOPE)
+        : 0;
+      if (callerHqRank > rank) return;
+      throw new ForbiddenException(
+        this.i18n.translate('auth.forbidden.assignHigherOrEqual', { lang }) ||
+          'You can only assign roles strictly below your own',
+      );
     }
 
-    // Non-HQ: verify target user is CUSTOMER_SCOPE
+    // 指派 customer / public 角色：須為可管理目標（CUSTOMER_SCOPE 用戶）。
     const targetUser = await this.prisma.user.findUnique({
       where: { id: targetUserId },
       select: { accessScopes: true },
@@ -1326,21 +1339,16 @@ export class UserService {
       throw new BadRequestException('只能管理 CUSTOMER_SCOPE 用戶的角色');
     }
 
-    // Check if caller is OWNER
-    const isOwner = context.userId
-      ? await this.permissionService.hasRole(
-          context.userId,
-          AccessScope.CUSTOMER_SCOPE,
-          'OWNER',
-        )
-      : false;
-
-    // If not OWNER (i.e. MANAGER), additionally verify role is not OWNER or MANAGER
-    if (!isOwner) {
-      if (targetRole.name === 'OWNER' || targetRole.name === 'MANAGER') {
-        throw new BadRequestException('無法分配或撤銷 OWNER 或 MANAGER 角色');
-      }
-    }
+    // HQ 呼叫者一律放行；customer 呼叫者需 customer rank 嚴格高於該角色 rank。
+    if (callerHasHQ) return;
+    const callerRank = callerId
+      ? await this.rankInScope(callerId, AccessScope.CUSTOMER_SCOPE)
+      : 0;
+    if (callerRank > rank) return;
+    throw new ForbiddenException(
+      this.i18n.translate('auth.forbidden.assignHigherOrEqual', { lang }) ||
+        'You can only assign roles strictly below your own',
+    );
   }
 
   /**

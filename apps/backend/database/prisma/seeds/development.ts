@@ -1,166 +1,142 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, AccessScope } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
+/**
+ * 開發 / UAT / 本機測試帳號（對齊 .NET 模板 nptc DataSeeder 的 12 個角色帳號，跟隨 npt）。
+ *
+ * 每個系統角色一個帳號，命名規則：
+ *   - accountName：<scope>_<role>（小寫），如 hq_owner / cust_admin / pub_guest
+ *   - email：<scope>-<role>@example.com
+ *   - 單一角色、accessScopes = 該角色 scope、首登強制改密（mustChangePassword=true）
+ *   - 密碼一律 Password123!
+ */
+
+interface AccountSpec {
+  accountName: string;
+  email: string;
+  name: string;
+  scope: AccessScope;
+  roleName: string;
+}
+
+const SCOPE_KEY: Record<AccessScope, string> = {
+  HQ_SCOPE: 'hq',
+  CUSTOMER_SCOPE: 'cust',
+  PUBLIC_SCOPE: 'pub',
+};
+
+const SCOPE_LABEL: Record<AccessScope, string> = {
+  HQ_SCOPE: '總部',
+  CUSTOMER_SCOPE: '客戶',
+  PUBLIC_SCOPE: '終端',
+};
+
+const ROLE_LABEL: Record<string, string> = {
+  OWNER: '擁有者',
+  ADMIN: '系統管理員',
+  MANAGER: '管理者',
+  OPERATOR: '操作者',
+  VIEWER: '檢視者',
+  MEMBER: '成員',
+  GUEST: '訪客',
+};
+
+// VIEWER 在 HQ 與 customer/public 用字不同（對齊角色 displayName）：
+// HQ scope = 檢視員、其餘 = 檢視者。帳號名稱須與角色 displayName 一致。
+function roleLabel(scope: AccessScope, roleName: string): string {
+  if (roleName === 'VIEWER' && scope === AccessScope.HQ_SCOPE) return '檢視員';
+  return ROLE_LABEL[roleName];
+}
+
+function buildAccounts(): AccountSpec[] {
+  const fiveTier = ['OWNER', 'ADMIN', 'MANAGER', 'OPERATOR', 'VIEWER'];
+  const matrix: Array<{ scope: AccessScope; roles: string[] }> = [
+    { scope: AccessScope.HQ_SCOPE, roles: fiveTier },
+    { scope: AccessScope.CUSTOMER_SCOPE, roles: fiveTier },
+    { scope: AccessScope.PUBLIC_SCOPE, roles: ['MEMBER', 'GUEST'] },
+  ];
+  const accounts: AccountSpec[] = [];
+  for (const { scope, roles } of matrix) {
+    const sk = SCOPE_KEY[scope];
+    for (const roleName of roles) {
+      const rk = roleName.toLowerCase();
+      accounts.push({
+        accountName: `${sk}_${rk}`,
+        email: `${sk}-${rk}@example.com`,
+        name: `${SCOPE_LABEL[scope]}${roleLabel(scope, roleName)}`,
+        scope,
+        roleName,
+      });
+    }
+  }
+  return accounts;
+}
+
 export async function seedDevelopment(prisma: PrismaClient) {
-  // ==================== 創建測試用戶 ====================
-  console.log('\n👥 創建測試用戶...');
+  console.log('\n👥 創建測試用戶（12 個角色帳號）...');
 
   const hashedPassword = await bcrypt.hash('Password123!', 10);
+  const accounts = buildAccounts();
 
-  // 取得角色
-  const superHQRole = await prisma.role.findFirstOrThrow({
-    where: { name: 'SUPER_HQ', scope: 'HQ_SCOPE' },
-  });
-  const managerRole = await prisma.role.findFirstOrThrow({
-    where: { name: 'MANAGER', scope: 'CUSTOMER_SCOPE' },
-  });
-  const ownerRole = await prisma.role.findFirstOrThrow({
-    where: { name: 'OWNER', scope: 'CUSTOMER_SCOPE' },
-  });
+  for (const spec of accounts) {
+    const role = await prisma.role.findFirstOrThrow({
+      where: { name: spec.roleName, scope: spec.scope },
+    });
 
-  // Super HQ 用戶（同時擁有 HQ_SCOPE 和 CUSTOMER_SCOPE）
-  const hqUser = await prisma.user.upsert({
-    where: { accountName: 'hq_admin' },
-    update: {
-      accessScopes: ['HQ_SCOPE', 'CUSTOMER_SCOPE'],
-      mustChangePassword: true,
-    },
-    create: {
-      accountName: 'hq_admin',
-      email: 'hq@example.com',
-      password: hashedPassword,
-      name: 'Super HQ',
-      accessScopes: ['HQ_SCOPE', 'CUSTOMER_SCOPE'],
-      mustChangePassword: true,
-    },
-  });
-
-  // 賦予 HQ_SCOPE 的 SUPER_HQ 角色
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: hqUser.id,
-        roleId: superHQRole.id,
+    const user = await prisma.user.upsert({
+      where: { accountName: spec.accountName },
+      update: {
+        email: spec.email,
+        name: spec.name,
+        accessScopes: [spec.scope],
+        mustChangePassword: true,
+        deletedAt: null,
       },
-    },
-    update: {},
-    create: {
-      userId: hqUser.id,
-      roleId: superHQRole.id,
-    },
-  });
-
-  // 賦予 CUSTOMER_SCOPE 的 MANAGER 角色
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: hqUser.id,
-        roleId: managerRole.id,
+      create: {
+        accountName: spec.accountName,
+        email: spec.email,
+        name: spec.name,
+        password: hashedPassword,
+        accessScopes: [spec.scope],
+        mustChangePassword: true,
       },
-    },
-    update: {},
-    create: {
-      userId: hqUser.id,
-      roleId: managerRole.id,
-    },
-  });
+    });
 
-  // Customer Admin 用戶（純 CUSTOMER_SCOPE，OWNER 角色）
-  const adminUser = await prisma.user.upsert({
-    where: { accountName: 'customer_admin' },
-    update: {
-      accessScopes: ['CUSTOMER_SCOPE'],
-      mustChangePassword: true,
-    },
-    create: {
-      accountName: 'customer_admin',
-      email: 'admin@example.com',
-      password: hashedPassword,
-      name: 'Customer Admin',
-      accessScopes: ['CUSTOMER_SCOPE'],
-      mustChangePassword: true,
-    },
-  });
+    // 重設角色：清空後指派唯一的 canonical 角色（確保與 5 階模型一致）。
+    await prisma.userRole.deleteMany({ where: { userId: user.id } });
+    await prisma.userRole.create({
+      data: { userId: user.id, roleId: role.id },
+    });
 
-  await prisma.userRole.upsert({
-    where: {
-      userId_roleId: {
-        userId: adminUser.id,
-        roleId: ownerRole.id,
+    await prisma.profile.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        bio: `${spec.name}（示範帳號）`,
+        language: 'zh-TW',
       },
-    },
-    update: {},
-    create: {
-      userId: adminUser.id,
-      roleId: ownerRole.id,
-    },
-  });
+    });
+  }
 
-  // Public 用戶
-  const publicUser = await prisma.user.upsert({
-    where: { accountName: 'public_user' },
-    update: {
-      mustChangePassword: true,
-    },
-    create: {
-      accountName: 'public_user',
-      email: 'public@example.com',
-      password: hashedPassword,
-      name: 'Public User',
-      accessScopes: ['PUBLIC_SCOPE'],
-      mustChangePassword: true,
-    },
+  // 清除舊版示範帳號（已被 12 個角色帳號取代）。
+  // 注意：不可含 hq_admin——新模型亦使用該 accountName（HQ ADMIN），upsert 已就地轉換，
+  // 列入清除會把剛建好的帳號刪掉。僅清除名稱不在新集合中的舊帳號。
+  const obsoleteAccountNames = ['customer_admin', 'public_user'];
+  const removed = await prisma.user.deleteMany({
+    where: { accountName: { in: obsoleteAccountNames } },
   });
+  if (removed.count > 0) {
+    console.log(`🗑️  清理 ${removed.count} 個舊版示範帳號`);
+  }
 
   console.log('✅ 測試用戶創建完成');
-
-  // ==================== 創建測試 Profile ====================
-  console.log('\n📝 創建測試 Profile...');
-
-  await prisma.profile.upsert({
-    where: { userId: hqUser.id },
-    update: {},
-    create: {
-      userId: hqUser.id,
-      bio: 'Super HQ of the system',
-      phone: '+886-912-345-678',
-      address: 'Taipei, Taiwan',
-      website: 'https://hq.example.com',
-      language: 'zh-TW',
-    },
-  });
-
-  await prisma.profile.upsert({
-    where: { userId: adminUser.id },
-    update: {},
-    create: {
-      userId: adminUser.id,
-      bio: 'Customer scope OWNER (demo admin)',
-      language: 'zh-TW',
-    },
-  });
-
-  await prisma.profile.upsert({
-    where: { userId: publicUser.id },
-    update: {},
-    create: {
-      userId: publicUser.id,
-      bio: 'Public user account',
-      language: 'en',
-    },
-  });
-
-  console.log('✅ 測試 Profile 創建完成');
-
-  console.log('\n測試帳號（登入身分為「帳號」，非 email）：');
   console.log(
-    '  - hq_admin       (hq@example.com，SUPER_HQ in HQ_SCOPE + MANAGER in CUSTOMER_SCOPE)',
+    '\n測試帳號（登入身分為「帳號」，非 email；密碼 Password123!）：',
   );
-  console.log(
-    '  - customer_admin (admin@example.com，OWNER in CUSTOMER_SCOPE)',
-  );
-  console.log(
-    '  - public_user    (public@example.com，PUBLIC_SCOPE only, no roles)',
-  );
-  console.log('  密碼: Password123!');
+  for (const spec of accounts) {
+    console.log(
+      `  - ${spec.accountName.padEnd(13)} (${spec.email}, ${spec.scope} / ${spec.roleName})`,
+    );
+  }
 }

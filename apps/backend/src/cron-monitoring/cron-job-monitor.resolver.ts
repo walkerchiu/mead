@@ -255,13 +255,13 @@ export class CronJobMonitorResolver {
 
   /**
    * 更新 Cron Job 配置
-   * 需要權限：cron_jobs:write
+   * 需要權限：cron_jobs:manage
    */
   @Mutation(() => CronJobConfigType, {
     name: 'updateCronJobConfig',
     description: '更新 Cron Job 配置',
   })
-  @RequiresPermission('cron_jobs:write')
+  @RequiresPermission('cron_jobs:manage')
   async updateCronJobConfig(
     @Args('jobName', { type: () => String, description: 'Job 名稱' })
     jobName: string,
@@ -411,13 +411,13 @@ export class CronJobMonitorResolver {
 
   /**
    * 手動觸發 Cron Job 執行
-   * 需要權限：cron_jobs:write
+   * 需要權限：cron_jobs:manage
    */
   @Mutation(() => TriggerCronJobResult, {
     name: 'triggerCronJob',
     description: '手動觸發指定的 Cron Job 執行',
   })
-  @RequiresPermission('cron_jobs:write')
+  @RequiresPermission('cron_jobs:manage')
   async triggerCronJob(
     @Args('input') input: TriggerCronJobInput,
     @Context() context: any,
@@ -551,10 +551,10 @@ export class CronJobMonitorResolver {
           return false;
         }
 
-        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:write 亦通過）。
+        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:manage 亦通過）。
         const hasPermission =
           user.permissions.includes('cron_jobs:read') ||
-          user.permissions.includes('cron_jobs:write');
+          user.permissions.includes('cron_jobs:manage');
 
         if (!hasPermission) {
           logger.debug(
@@ -617,10 +617,10 @@ export class CronJobMonitorResolver {
           return false;
         }
 
-        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:write 亦通過）。
+        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:manage 亦通過）。
         const hasPermission =
           user.permissions.includes('cron_jobs:read') ||
-          user.permissions.includes('cron_jobs:write');
+          user.permissions.includes('cron_jobs:manage');
 
         if (!hasPermission) {
           logger.debug(

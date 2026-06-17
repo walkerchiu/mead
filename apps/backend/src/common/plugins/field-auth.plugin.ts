@@ -165,13 +165,10 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
       return permissions;
     }
 
-    // 根據用戶的 scope 和 role 推斷權限
-    // 這裡簡化處理：假設 SUPER_HQ 有所有權限
+    // 根據用戶的 scope 和 role 推斷權限（統一五階模型已無角色式全域繞過；
+    // OWNER/ADMIN 的全權來自 seed 階段展開的 glob，正常情況下會出現在 user.permissions，
+    // 此處僅為缺 permissions claim 時的最小向後兼容）
     for (const roleInfo of user.roles) {
-      if (roleInfo.roleNames?.includes('SUPER_HQ')) {
-        // SUPER_HQ 有所有權限
-        permissions.add('*');
-      }
       if (roleInfo.roleNames?.includes('OWNER')) {
         // OWNER 有該 scope 的所有權限
         permissions.add(`${roleInfo.scope}:*`);

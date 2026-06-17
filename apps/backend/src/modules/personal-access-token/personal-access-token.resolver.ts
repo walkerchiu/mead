@@ -14,7 +14,6 @@ import { CurrentUser } from '../../auth/current-user.decorator';
 interface UserPayload {
   userId: string;
   permissions: string[];
-  isSuperHQ: boolean;
 }
 
 @Resolver(() => PersonalAccessTokenType)

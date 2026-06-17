@@ -27,12 +27,12 @@ export class HQSessionGuard implements CanActivate {
     const targetUserId = args.userId || args.input?.userId;
     const sessionId = args.sessionId || args.input?.sessionId;
 
-    // Super HQ: 完全訪問
-    if (this.isSuperHQ(user)) {
+    // HQ OWNER/ADMIN：完全訪問（統一五階頂層，已具 sessions:* 權限）。
+    if (this.isHqFullAccess(user)) {
       return true;
     }
 
-    // HQ: 有條件訪問
+    // HQ（其餘）: 有條件訪問
     if (this.isHQ(user)) {
       // 如果提供了 sessionId 但沒有 userId，需要查詢會話以獲取 userId
       if (sessionId && !targetUserId) {
@@ -153,20 +153,25 @@ export class HQSessionGuard implements CanActivate {
   }
 
   /**
-   * 檢查用戶是否為 Super HQ
+   * 檢查用戶是否為 HQ 頂層角色（OWNER / ADMIN）——統一五階模型下具完整會話存取。
+   * JWT 的 roles 形如 [{ scope, roleNames[] }]。
    */
-  private isSuperHQ(user: any): boolean {
+  private isHqFullAccess(user: any): boolean {
     return (
       user.roles?.some(
-        (role: any) => role.name === 'SUPER_HQ' && role.scope === 'HQ_SCOPE',
+        (r: any) =>
+          r.scope === 'HQ_SCOPE' &&
+          (r.roleNames?.includes('OWNER') || r.roleNames?.includes('ADMIN')),
       ) || false
     );
   }
 
   /**
-   * 檢查用戶是否為 HQ（非 Super HQ）
+   * 檢查用戶是否為 HQ（非頂層 OWNER/ADMIN）
    */
   private isHQ(user: any): boolean {
-    return user.accessScopes?.includes('HQ_SCOPE') && !this.isSuperHQ(user);
+    return (
+      user.accessScopes?.includes('HQ_SCOPE') && !this.isHqFullAccess(user)
+    );
   }
 }

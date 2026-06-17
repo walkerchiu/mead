@@ -8,7 +8,6 @@ import { Reflector, ModuleRef } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { I18nService } from 'nestjs-i18n';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
-import { PermissionService } from '../../rbac/permission.service';
 import { AccessScope } from '../enums/access-scope.enum';
 import {
   REQUIRES_SCOPE_KEY,
@@ -32,7 +31,6 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
 
   constructor(
     private reflector: Reflector,
-    private permissionService: PermissionService,
     private i18n: I18nService,
     private moduleRef: ModuleRef,
   ) {
@@ -83,6 +81,15 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context);
     const operationName = ctx.getInfo()?.fieldName;
+
+    // Subscriptions（WebSocket）的認證在各自的 @Subscription filter 中處理
+    //（解析 connectionParams 的 JWT 後檢查 scope/permission），與 JwtAuthGuard 一致。
+    // 此處直接放行——否則對沒有 req 的 WS context 取 req.user 會誤拋 noUserInfo，
+    // 導致掛在「有 class-level guard 的 resolver」上的訂閱（如 cron 監控）整個失效。
+    const gqlContext = ctx.getContext();
+    if (gqlContext?.connectionParams) {
+      return true;
+    }
 
     console.log(
       `🔒 [PermissionGuard] canActivate called for operation: ${operationName}`,
@@ -202,10 +209,7 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredScope) {
-      if (
-        !user.isSuperHQ &&
-        (!user.accessScopes || !user.accessScopes.includes(requiredScope))
-      ) {
+      if (!user.accessScopes || !user.accessScopes.includes(requiredScope)) {
         throw new ForbiddenException(
           this.i18n.translate('common.forbidden.requireScope', {
             lang,
@@ -262,9 +266,9 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredPermission) {
-      const hasPermission = await this.permissionService.checkPermission(
-        user.userId,
-        scope,
+      // 無狀態：讀 JWT permissions claim（發 token 時由啟用角色衍生），不每請求查 DB。
+      const hasPermission = this.permissionSatisfied(
+        user.permissions || [],
         requiredPermission,
       );
 
@@ -285,15 +289,10 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredAnyPermissions && requiredAnyPermissions.length > 0) {
-      // 只有 SUPER_HQ 角色才自動繞過所有權限檢查
-      if (user.isSuperHQ) {
-        return true;
-      }
-
-      // 優先使用 JWT 中的 permissions（避免資料庫查詢）
+      // 統一模型無角色繞過，一律以 JWT permissions 判斷（OWNER/ADMIN 已含全部權限）。
       const userPermissions: string[] = user.permissions || [];
       const hasAnyPermission = requiredAnyPermissions.some((permission) =>
-        userPermissions.includes(permission),
+        this.permissionSatisfied(userPermissions, permission),
       );
 
       if (!hasAnyPermission) {
@@ -313,12 +312,10 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     );
 
     if (requiredAllPermissions && requiredAllPermissions.length > 0) {
-      const hasAllPermissions =
-        await this.permissionService.checkAllPermissions(
-          user.userId,
-          scope,
-          requiredAllPermissions,
-        );
+      const userPermissions: string[] = user.permissions || [];
+      const hasAllPermissions = requiredAllPermissions.every((permission) =>
+        this.permissionSatisfied(userPermissions, permission),
+      );
 
       if (!hasAllPermissions) {
         throw new ForbiddenException(
@@ -331,6 +328,25 @@ export class PermissionGuard extends JwtAuthGuard implements CanActivate {
     }
 
     return true;
+  }
+
+  /**
+   * 純記憶體權限判定（不查 DB）：直接命中，或持有 `resource:manage` 隱含同 resource 的子動作。
+   * 對齊 DB checkPermission 的「direct + manage 隱含」；claim 為跨「啟用角色」的 flat 權限集，
+   * 等同其跨 scope fallback 行為（操作的 scope 另由 checkAccessScope 守門）。
+   */
+  private permissionSatisfied(
+    userPermissions: string[],
+    required: string,
+  ): boolean {
+    if (userPermissions.includes(required)) {
+      return true;
+    }
+    const parts = required.split(':');
+    if (parts.length === 2) {
+      return userPermissions.includes(`${parts[0]}:manage`);
+    }
+    return false;
   }
 
   /**
