@@ -584,15 +584,11 @@ export function DecorativeTextCloud({
             height={view.viewH}
             colorInterpolationFilters="sRGB"
           >
-            <feGaussianBlur
-              in="SourceGraphic"
-              stdDeviation="11"
-              result="blur"
-            />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="9" result="blur" />
             <feColorMatrix
               in="blur"
               type="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 16 -6"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -10"
             />
           </filter>
           {shapes.map((s, i) => (
