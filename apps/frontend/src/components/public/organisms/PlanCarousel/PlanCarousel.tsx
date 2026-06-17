@@ -221,7 +221,9 @@ export function PlanCardWithStars({
                 transformOrigin: 'center bottom',
                 willChange: 'transform, filter',
                 transform: `perspective(900px) rotateZ(${restTilt}deg) scale(0.96)`,
-                filter: 'brightness(0.94) saturate(0.95)',
+                // 靜止時恆為「霧化」：自帶模糊（不依賴卡片 backdrop），切換滑動期間也維持
+                // 霧化、不會在卡片就位前短暫露出清晰（依業主回饋）。hover 浮出時才清晰。
+                filter: 'blur(7px) brightness(0.92) saturate(0.95)',
                 transition:
                   'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.4s ease',
                 '&:hover': {
@@ -232,8 +234,12 @@ export function PlanCardWithStars({
                 '@media (prefers-reduced-motion: reduce)': {
                   transform: 'none',
                   transition: 'none',
-                  filter: 'none',
-                  '&:hover': { transform: 'none', zIndex: 3 },
+                  filter: 'blur(7px) brightness(0.92) saturate(0.95)',
+                  '&:hover': {
+                    transform: 'none',
+                    zIndex: 3,
+                    filter: 'brightness(1.03) saturate(1.05)',
+                  },
                 },
               }}
             />
@@ -632,6 +638,21 @@ export function PlanCarousel({
   const [exitingTo, setExitingTo] = useState<number | null>(null);
   const exitTimerRef = useRef<number | null>(null);
 
+  // 環狀軌道 wrap 的順向滑動：最後一張按「下一個」回到第一張（或反向）時，預設
+  // 由 expandedIndex 直推 trackX 會「往回跳」（反方向）。改以方向性 wrapOffset 先把
+  // 軌道順向滑到相鄰份複本的同卡片，落定後再「無動畫 snap」回中份複本，使 wrap 也順向。
+  // wrapOffset 單位為「份」×count 步（+count=往後滑一份、-count=往前滑一份）。
+  const [wrapOffset, setWrapOffset] = useState(0);
+  // snap 回中份時暫時關閉 transition（避免回跳被看見）。
+  const [wrapSnap, setWrapSnap] = useState(false);
+  const wrapTimerRef = useRef<number | null>(null);
+  useEffect(
+    () => () => {
+      if (wrapTimerRef.current) window.clearTimeout(wrapTimerRef.current);
+    },
+    [],
+  );
+
   // 視窗寬與是否桌機（≥834px）：展開環狀軌道用視窗寬自適應卡距（peek 露出量恆定），
   // 並在桌機才啟用環狀軌道；手機維持單張滿版卡片。
   const [viewportW, setViewportW] = useState(() =>
@@ -968,8 +989,10 @@ export function PlanCarousel({
   const RING_GAP = gapScreen / (cardScale || 1);
   const RING_STEP = RING_CARD_W + RING_GAP;
   const mid = Math.floor(count / 2);
-  // 置中 active：以「中份的中央計畫」為 translateX=0 基準，平移 (active - mid) 步。
-  const trackX = -(expandedIndex - mid) * RING_STEP;
+  // 置中 active：以「中份的中央計畫」為 translateX=0 基準，平移 (active - mid + wrapOffset) 步。
+  const trackX = -(expandedIndex - mid + wrapOffset) * RING_STEP;
+  // 目前視覺上置中的「份」（0=中份、+1=右份、-1=左份）；wrap 滑動期間用來標記 active 卡。
+  const centerCopy = wrapOffset / count;
   const prevIndex = (expandedIndex - 1 + count) % count;
   const nextIndex = (expandedIndex + 1) % count;
 
@@ -977,8 +1000,29 @@ export function PlanCarousel({
   const navigateTo = (target: number) => {
     if (target === expandedIndex) return;
     let dir: 'prev' | 'next' = target > expandedIndex ? 'next' : 'prev';
-    if (expandedIndex === count - 1 && target === 0) dir = 'next';
-    if (expandedIndex === 0 && target === count - 1) dir = 'prev';
+    // wrap：最後一張→第一張（往後）或第一張→最後一張（往前）。以 wrapOffset 讓軌道
+    // 順向滑到相鄰份的同卡片，820ms（略長於 0.8s transition）後無動畫 snap 回中份。
+    let off = 0;
+    if (expandedIndex === count - 1 && target === 0) {
+      dir = 'next';
+      off = count;
+    } else if (expandedIndex === 0 && target === count - 1) {
+      dir = 'prev';
+      off = -count;
+    }
+    if (off !== 0) {
+      if (wrapTimerRef.current) window.clearTimeout(wrapTimerRef.current);
+      setWrapSnap(false);
+      setWrapOffset(off);
+      wrapTimerRef.current = window.setTimeout(() => {
+        setWrapSnap(true);
+        setWrapOffset(0);
+        // 兩個 rAF 後恢復 transition（snap 該幀已套用、不會被動畫到）。
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => setWrapSnap(false)),
+        );
+      }, 820);
+    }
     if (onPeekNavigate) onPeekNavigate(target, dir);
     else onExpandedIndexChange(target);
   };
@@ -1004,15 +1048,18 @@ export function PlanCarousel({
             gap: `${RING_GAP}px`,
             transform: `translateX(${trackX}px)`,
             // 切換以「快速起步、長距柔和減速滑停」的 expo ease-out 收束，營造有質感的
-            // 緩衝settle感（依業主回饋：切換到停下要有緩衝感）。
-            transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+            // 緩衝settle感（依業主回饋：切換到停下要有緩衝感）。wrap snap 回中份時關閉動畫。
+            transition: wrapSnap
+              ? 'none'
+              : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
             willChange: 'transform',
             '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
           }}
         >
           {[-1, 0, 1].map((copy) =>
             plans.map((plan, i) => {
-              const isCenter = copy === 0 && i === expandedIndex;
+              // wrap 滑動期間視覺置中的份為 centerCopy（±1）；其餘時間為中份（0）。
+              const isCenter = copy === centerCopy && i === expandedIndex;
               return (
                 <Box
                   key={`${copy}-${plan.id}`}
@@ -1038,9 +1085,11 @@ export function PlanCarousel({
                     filter: isCenter ? 'none' : 'saturate(0.55)',
                     cursor: isCenter ? 'default' : 'pointer',
                     // 與軌道滑動同步的緩衝收束（expo ease-out），讓鄰卡淡化／縮放
-                    // 與切換滑動一致地柔和停下。
-                    transition:
-                      'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                    // 與切換滑動一致地柔和停下。wrap snap 回中份那一幀關閉動畫，避免
+                    // 新置中份的卡片（連同底下裝飾照片）從鄰卡狀態「長大變亮」而閃動。
+                    transition: wrapSnap
+                      ? 'none'
+                      : 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
                     '@media (prefers-reduced-motion: reduce)': {
                       transition: 'none',
                     },
