@@ -68,28 +68,43 @@ const SHAPE_META = [
 ] as const;
 
 /**
- * 兩種佈局：
- * - 橫向（≥834px）：三圖左中右並排（依 Figma 1:2 原座標）。
+ * 三種佈局（對應三斷點）：
+ * - h 橫向（≥1200px 桌機）：三圖左中右並排（依 Figma 1:2 原座標）。
  *   viewBox 1440x620 對齊 Figma frame 寬 1440 + hero section 約 620 高（y=130~750）。
  *   centers cy=275 對齊 Figma blob 中心 y=405、相對 hero 頂部 130 偏移 275。
  *   三 blob 中心間距 216（重疊 152px），形成設計稿的緊密 metaball 連體。
- * - 直向（<834px）：三圖上中下堆疊（依手機／平板稿 node 43:396 / 43:1142）。
+ * - t 直向（834–1199px 平板）：三圖上中下堆疊（依平板稿 node 43:1142）。
+ *   viewBox 834×1278 對齊 frame 寬 834；Union x=167 寬 493（置中、約 59% 寬），
+ *   三星中心 cy≈277 / 642 / 1031、半徑 246.7。色塊比手機版更窄、更拉長、頂端留白。
+ * - v 直向（<834px 手機）：三圖上中下堆疊（依手機稿 node 43:396）。
+ *   frame 寬 402、Union x=19 寬 365.5（幾乎填滿寬），三星中心 cy≈92 / 363 / 651
+ *   （頂塊上緣超出、上方切齊），半徑 ~183（沿用 SHAPE_R）。
  */
 const LAYOUT = {
   h: {
     viewW: 1440,
     viewH: 620,
+    r: SHAPE_R,
     centers: [
       { cx: 513, cy: 275 },
       { cx: 729, cy: 275 },
       { cx: 947, cy: 275 },
     ],
   },
+  t: {
+    viewW: 834,
+    viewH: 1278,
+    r: 246.7,
+    centers: [
+      { cx: 414, cy: 277 },
+      { cx: 414, cy: 642 },
+      { cx: 414, cy: 1031 },
+    ],
+  },
   v: {
-    // 依手機稿 node 43:396：frame 寬 402、Union x=19 寬 365.5（填滿寬），三星
-    // 中心 cy≈92 / 363 / 651（頂塊上緣超出、上方切齊），半徑 ~183（沿用 SHAPE_R）。
     viewW: 402,
     viewH: 836,
+    r: SHAPE_R,
     centers: [
       { cx: 201, cy: 92 },
       { cx: 201, cy: 363 },
@@ -97,6 +112,9 @@ const LAYOUT = {
     ],
   },
 } as const;
+
+/** 佈局模式：h=桌機橫向、t=平板直向、v=手機直向 */
+type LayoutMode = keyof typeof LAYOUT;
 
 interface ShapeDef {
   cx: number;
@@ -125,10 +143,10 @@ function shapePoints(s: ShapeDef): string {
 }
 
 /** 依佈局組出三圖形（含 polygon points） */
-function buildShapes(vertical: boolean) {
-  const L = vertical ? LAYOUT.v : LAYOUT.h;
+function buildShapes(mode: LayoutMode) {
+  const L = LAYOUT[mode];
   return SHAPE_META.map((m, i) => {
-    const s: ShapeDef = { ...m, ...L.centers[i], r: SHAPE_R };
+    const s: ShapeDef = { ...m, ...L.centers[i], r: L.r };
     return { ...s, points: shapePoints(s) };
   });
 }
@@ -306,19 +324,27 @@ export function DecorativeTextCloud({
     setRandomGroup(candidates[Math.floor(Math.random() * candidates.length)]);
   }, [shapeContents]);
 
-  // 直向佈局判斷 — SSR 與首次 client render 皆為橫向，掛載後再依視窗校正，
-  // 避免 hydration 不一致。
-  const [vertical, setVertical] = useState(false);
+  // 佈局模式判斷 — SSR 與首次 client render 皆為桌機橫向（h），掛載後再依視窗校正，
+  // 避免 hydration 不一致。<834=手機(v)、834–1199=平板(t)、≥1200=桌機(h)。
+  const [mode, setMode] = useState<LayoutMode>('h');
   useEffect(() => {
-    const mq = window.matchMedia('(max-width:833.95px)');
-    const update = () => setVertical(mq.matches);
+    const mqMobile = window.matchMedia('(max-width:833.95px)');
+    const mqDesktop = window.matchMedia('(min-width:1200px)');
+    const update = () =>
+      setMode(mqMobile.matches ? 'v' : mqDesktop.matches ? 'h' : 't');
     update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
+    mqMobile.addEventListener('change', update);
+    mqDesktop.addEventListener('change', update);
+    return () => {
+      mqMobile.removeEventListener('change', update);
+      mqDesktop.removeEventListener('change', update);
+    };
   }, []);
+  // 平板與手機共用直向版型（標語兩欄堆疊、文字左右兩側）；桌機才橫向。
+  const vertical = mode !== 'h';
 
-  const shapes = useMemo(() => buildShapes(vertical), [vertical]);
-  const view = vertical ? LAYOUT.v : LAYOUT.h;
+  const shapes = useMemo(() => buildShapes(mode), [mode]);
+  const view = LAYOUT[mode];
 
   /** 各圖形外框遮罩多邊形的 DOM 參照與目前旋轉動畫 */
   const spinRefs = useRef<(SVGPolygonElement | null)[]>([null, null, null]);
@@ -431,13 +457,15 @@ export function DecorativeTextCloud({
       sx={{
         position: 'relative',
         width: '100%',
-        // 與 Figma frame 寬度一致（1440），所有 leftPct/topPct 對齊設計稿原座標
-        maxWidth: 1440,
+        // 桌機與 Figma frame 寬度一致（1440）；平板鎖 834（依設計稿 43:1142 的 frame 寬，
+        // 置中後兩側留白），所有 leftPct/topPct 才對齊各自設計稿原座標。
+        maxWidth: mode === 't' ? 834 : 1440,
         mx: 'auto',
-        // 直向佈局：高度對齊手機稿 hero 區（viewBox 402×836，色塊填滿寬、靠頂）；
-        // 橫向 ≥834px 為 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
-        height: vertical ? 836 : 440,
-        [portalTokens.mq.tabletUp]: { height: 620 },
+        // 直向佈局高度對齊各自設計稿 hero 區：手機 836（viewBox 402×836，色塊填滿寬、
+        // 靠頂）、平板 1278（viewBox 834×1278，色塊置中約 59% 寬、頂端留白）；
+        // 桌機橫向 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
+        height: mode === 'v' ? 836 : mode === 't' ? 1278 : 440,
+        [portalTokens.mq.desktopUp]: { height: 620 },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
         '@keyframes portalTwinkle': {
           '0%, 100%': { opacity: 0 },

@@ -721,21 +721,22 @@ export function PlanCarousel({
     }, 820);
   }, []);
 
-  // 視窗寬與是否桌機（≥834px）：展開環狀軌道用視窗寬自適應卡距（peek 露出量恆定），
-  // 並在桌機才啟用環狀軌道；手機維持單張滿版卡片。
+  // 視窗寬與是否桌機（≥1200px）：桌機才啟用 960 寬環狀軌道（用視窗寬自適應卡距、
+  // peek 露出量恆定）；平板（834–1199）與手機共用單張滿版 peek 輪播（窄卡置中、
+  // 鄰卡薄邊探出），避免 960 寬卡在平板被左右裁切。
   const [viewportW, setViewportW] = useState(() =>
     typeof window !== 'undefined' ? window.innerWidth : 0,
   );
-  const [isTablet, setIsTablet] = useState(() =>
+  const [isDesktop, setIsDesktop] = useState(() =>
     typeof window !== 'undefined'
-      ? window.matchMedia('(min-width:834px)').matches
+      ? window.matchMedia('(min-width:1200px)').matches
       : false,
   );
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(min-width:834px)');
+    const mq = window.matchMedia('(min-width:1200px)');
     const onResize = () => setViewportW(window.innerWidth);
-    const onMq = () => setIsTablet(mq.matches);
+    const onMq = () => setIsDesktop(mq.matches);
     onResize();
     onMq();
     window.addEventListener('resize', onResize);
@@ -1067,11 +1068,12 @@ export function PlanCarousel({
     );
   }
 
-  // ── 手機（<834px）：橫向 peek 輪播 —— 當前卡置中、左右各露出鄰卡薄邊，右側一顆
-  //     next 探頭鈕循環切換（依設計稿 node 388:247，比照桌機 peek 體驗）。 ──
-  if (!isTablet) {
+  // ── 手機 / 平板（<1200px）：橫向 peek 輪播 —— 當前卡置中、左右各露出鄰卡薄邊，
+  //     右側一顆 next 探頭鈕循環切換（依設計稿 node 388:247 / 43:1142，窄卡單欄堆疊）。
+  //     卡寬上限 720：平板（834–1199）不致拉得過寬，保留設計稿的窄卡比例與兩側留白。 ──
+  if (!isDesktop) {
     const W = viewportW || 390;
-    const MCARD_W = Math.max(280, W - 48); // 左右各 ~24px 留白
+    const MCARD_W = Math.min(720, Math.max(280, W - 48)); // 左右各 ~24px 留白、上限 720
     const MGAP = 12; // 卡距：鄰卡露出 ~12px 薄邊
     const MSTEP = MCARD_W + MGAP;
     const mid = Math.floor(count / 2);

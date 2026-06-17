@@ -59,17 +59,23 @@ export const portalTokens = {
     /** 斷點 — 對齊設計稿的 <420 / <834 / >834 */
     breakpointMobile: 420,
     breakpointTablet: 834,
+    breakpointDesktop: 1200,
   },
   /**
-   * 媒體查詢 — 對齊設計稿的三斷點（手機 <420 / 平板 <834 / 桌機 >834）。
+   * 媒體查詢 — 對齊設計稿的斷點。
+   * 手機 <420 / 平板 834–1199（垂直單欄、原生捲動，依設計稿 43:1142）/
+   * 桌機 ≥1200（水平 hero ＋滾輪釘住輪播）。tabletUp（≥834）切換成平板以上的
+   * 直書／間距等通用樣式；desktopUp（≥1200）才啟用水平 hero 與釘住輪播這套桌機體驗。
    * mead theme 的 MUI 斷點為 xs360/sm768/md1024，與設計稿不符，
    * 故 Public Scope 一律以這組原生 media query 控制響應式。
    */
   mq: {
     /** ≥ 420px：平板（含）以上 */
     mobileUp: '@media (min-width:420px)',
-    /** ≥ 834px：桌機版型 */
+    /** ≥ 834px：平板（含）以上 */
     tabletUp: '@media (min-width:834px)',
+    /** ≥ 1200px：桌機（水平 hero ＋滾輪釘住輪播） */
+    desktopUp: '@media (min-width:1200px)',
   },
 } as const;
 

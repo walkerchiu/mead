@@ -488,8 +488,9 @@ function PlanCardDesktop({
 }
 
 /**
- * PlanCard — 依視窗寬度切換版面：<834px 手機版（原始版面）、≥834px 桌機版（新版）。
- * 以 CSS display 斷點切換（非 useMediaQuery）以避免 SSR / hydration 不一致。
+ * PlanCard — 依視窗寬度切換版面：<1200px 手機／平板版（單欄堆疊、窄卡，依設計稿
+ * 43:1142）、≥1200px 桌機版（左右拉伸三欄）。以 CSS display 斷點切換（非
+ * useMediaQuery）以避免 SSR / hydration 不一致。
  */
 export function PlanCard({
   plan,
@@ -501,7 +502,7 @@ export function PlanCard({
       <Box
         sx={{
           width: '100%',
-          [portalTokens.mq.tabletUp]: { display: 'none' },
+          [portalTokens.mq.desktopUp]: { display: 'none' },
         }}
       >
         <PlanCardMobile plan={plan} active={active} />
@@ -510,7 +511,7 @@ export function PlanCard({
         sx={{
           width: '100%',
           display: 'none',
-          [portalTokens.mq.tabletUp]: { display: 'block' },
+          [portalTokens.mq.desktopUp]: { display: 'block' },
         }}
       >
         <PlanCardDesktop

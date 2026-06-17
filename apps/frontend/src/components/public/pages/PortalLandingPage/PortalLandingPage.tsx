@@ -166,10 +166,11 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 確保一次手勢只觸發一次跳轉（依業主需求：第一屏滾一下直接到計畫卡片區）。
   const heroSnappingRef = useRef(false);
 
-  // 桌機 + 非減少動態 → 啟用捲動驅動；視窗變動時即時校正。
+  // 桌機（≥1200）+ 非減少動態 → 啟用捲動驅動釘住輪播；平板（834–1199）與手機走原生捲動。
+  // 視窗變動時即時校正。
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mqDesktop = window.matchMedia('(min-width:834px)');
+    const mqDesktop = window.matchMedia('(min-width:1200px)');
     const mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () =>
       setScrollDriven(mqDesktop.matches && !mqMotion.matches);
@@ -182,21 +183,26 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     };
   }, []);
 
-  // 自適應第一屏：以 hero 設計畫布（1440×620）對視窗做 contain-fit 縮放（取寬高較小者），
-  // 比照第二屏卡片「填滿一屏」；桌機（≥834px）才縮放，手機回 1（vertical 佈局自撐寬）。
+  // 自適應第一屏：以 hero 設計畫布（1440×732）對視窗做 contain-fit 縮放（取寬高較小者），
+  // 比照第二屏卡片「填滿一屏」；僅桌機（≥1200px）橫向 hero 才縮放，平板／手機回 1
+  // （直向佈局自撐寬、原生捲動）。
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mqDesktop = window.matchMedia('(min-width:834px)');
+    const mqDesktop = window.matchMedia('(min-width:1200px)');
     const compute = () => {
       if (!mqDesktop.matches) {
         setHeroScale(1);
         return;
       }
-      const s = Math.min(
-        (window.innerWidth - 2 * HERO_SIDE_MARGIN) / HERO_DESIGN_W,
-        (window.innerHeight - 2 * HERO_V_MARGIN) / HERO_DESIGN_H,
-      );
-      setHeroScale(Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, s)));
+      const widthScale =
+        (window.innerWidth - 2 * HERO_SIDE_MARGIN) / HERO_DESIGN_W;
+      const heightScale =
+        (window.innerHeight - 2 * HERO_V_MARGIN) / HERO_DESIGN_H;
+      const fit = Math.min(widthScale, heightScale);
+      const clamped = Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, fit));
+      // 夾下限（HERO_MIN_SCALE）後仍不得超過「寬度可容納」的比例，否則窄桌機
+      // （1200px 附近、widthScale < 下限）會被夾大而水平裁切 hero。
+      setHeroScale(Math.min(clamped, widthScale));
     };
     compute();
     window.addEventListener('resize', compute);
@@ -708,7 +714,8 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             overflowX: 'clip',
           }}
         >
-          {/* 文字雲區：佔滿剩餘高度並置中（手機靠頂、桌機垂直置中）。 */}
+          {/* 文字雲區：佔滿剩餘高度並置中（手機／平板靠頂、桌機垂直置中）。
+              平板直向 hero 較高，靠頂對齊才不會把色塊往下推、貼到下一段。 */}
           <Box
             sx={{
               flex: 1,
@@ -716,15 +723,16 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               display: 'flex',
               alignItems: 'flex-start',
               justifyContent: 'center',
-              [portalTokens.mq.tabletUp]: { alignItems: 'center' },
+              [portalTokens.mq.desktopUp]: { alignItems: 'center' },
             }}
           >
-            {/* 桌機：固定設計寬 + zoom 等比縮放（色塊與文字一起）填滿一屏；手機回原生寬。 */}
+            {/* 桌機：固定設計寬 + zoom 等比縮放（色塊與文字一起）填滿一屏；
+                平板／手機回原生寬（DecorativeTextCloud 內部自行依模式鎖寬置中）。 */}
             <Box
               sx={{
                 width: '100%',
                 zoom: heroScale !== 1 ? heroScale : undefined,
-                [portalTokens.mq.tabletUp]: { width: HERO_DESIGN_W },
+                [portalTokens.mq.desktopUp]: { width: HERO_DESIGN_W },
               }}
             >
               <DecorativeTextCloud
