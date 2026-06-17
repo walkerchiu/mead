@@ -62,17 +62,17 @@ const FROSTED = {
 } as const;
 
 /**
- * frostBacking 用：墊在每張卡「正後方」、與頁面同色（pageBg #E3E3E3）約 82% 不透明的底。
- * 毛玻璃 backdrop-filter 因此大半罩在均勻色上，只讓底下裝飾照片淡淡透出；切換時各處霧化
- * 趨於一致。墊在每張卡後方（非整張 PlanCard 外層）才不會填到卡間間隙、把上下卡連成一塊。
- * 圓角與 FROSTED 一致，避免露出方角。
+ * frostBacking 用：墊在每張卡「正後方」、與頁面同色（pageBg #E3E3E3）的半透明底。毛玻璃
+ * backdrop-filter 因此罩在均勻色上，只讓底下裝飾照片依 alpha 透出。墊在每張卡後方（非整張
+ * PlanCard 外層）才不會填到卡間間隙、把上下卡連成一塊。圓角與 FROSTED 一致。上下兩張卡
+ * 皆套用，保留透出質感。alpha 越低、透出越明顯。
  */
 const FROST_BACKING = {
   position: 'absolute',
   inset: 0,
   borderRadius: '17.35px',
-  // pageBg (#E3E3E3) @ 72% 不透明 → 照片透出 ~28%（比先前 82% 略明顯）。
-  bgcolor: 'rgba(227, 227, 227, 0.72)',
+  // pageBg (#E3E3E3) @ 60% → 照片透出 ~40%（比先前更明顯）。
+  bgcolor: 'rgba(227, 227, 227, 0.6)',
   pointerEvents: 'none',
 } as const;
 
