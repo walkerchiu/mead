@@ -270,7 +270,6 @@ export interface UpdateProfileInput {
 export interface ChangePasswordInput {
   currentPassword: string;
   newPassword: string;
-  revokeOtherSessions?: boolean;
 }
 
 export interface LockUserInput {

@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useSnackbar } from 'notistack';
 import { useTranslations } from 'next-intl';
-import { Box, FormControlLabel, Checkbox, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { Lock } from '@mui/icons-material';
 import { CHANGE_PASSWORD_MUTATION } from '@/lib/graphql';
 import { getErrorMessage } from '@/lib/error-utils';
@@ -15,13 +15,10 @@ import { Button } from '@/components/atoms';
 
 interface ChangePasswordFormProps {
   onSuccess?: () => void;
-  /** 是否顯示「登出其他設備」勾選框；首次登入強制改密頁不需要（預設顯示）。 */
-  showRevokeOtherSessions?: boolean;
 }
 
 export default function ChangePasswordForm({
   onSuccess,
-  showRevokeOtherSessions = true,
 }: ChangePasswordFormProps) {
   const { enqueueSnackbar } = useSnackbar();
   const t = useTranslations('pages.settings.security');
@@ -33,7 +30,6 @@ export default function ChangePasswordForm({
     currentPassword: string;
     newPassword: string;
     confirmPassword: string;
-    revokeOtherSessions: boolean;
   };
 
   const changePasswordSchema = z
@@ -50,7 +46,6 @@ export default function ChangePasswordForm({
           tv('password.specialChar'),
         ),
       confirmPassword: z.string(),
-      revokeOtherSessions: z.boolean(),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
       message: tv('password.mismatch'),
@@ -68,7 +63,6 @@ export default function ChangePasswordForm({
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
-      revokeOtherSessions: false,
     },
   });
 
@@ -83,7 +77,6 @@ export default function ChangePasswordForm({
           input: {
             currentPassword: data.currentPassword,
             newPassword: data.newPassword,
-            revokeOtherSessions: data.revokeOtherSessions,
           },
         },
       });
@@ -148,23 +141,6 @@ export default function ChangePasswordForm({
         }
         disabled={loading}
       />
-
-      {showRevokeOtherSessions && (
-        <FormControlLabel
-          control={
-            <Checkbox {...register('revokeOtherSessions')} disabled={loading} />
-          }
-          label={
-            <Box>
-              <Typography variant="body2">{t('revokeOtherDevices')}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {t('revokeOtherDevicesHelper')}
-              </Typography>
-            </Box>
-          }
-          sx={{ mt: 2, mb: 2 }}
-        />
-      )}
 
       <Button
         type="submit"

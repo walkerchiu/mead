@@ -366,8 +366,6 @@
         "newPasswordHelper": "At least 8 characters with uppercase, lowercase, number, and special character",
         "confirmPassword": "Confirm New Password",
         "confirmPasswordHelper": "Re-enter your new password",
-        "revokeOtherDevices": "Sign out other devices",
-        "revokeOtherDevicesHelper": "Log out from all other devices after changing password",
         "passwordChanged": "Password changed successfully",
         "updateError": "Failed to change password. Please try again."
       },

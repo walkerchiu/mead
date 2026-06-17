@@ -74,11 +74,6 @@ export class ChangePasswordInput {
   @IsNotEmpty({ message: '新密碼不可為空' })
   @IsString({ message: '新密碼必須是字串' })
   newPassword: string;
-
-  @Field({ defaultValue: false })
-  @IsOptional()
-  @IsBoolean({ message: '撤銷其他 sessions 必須是布林值' })
-  revokeOtherSessions?: boolean;
 }
 
 /**

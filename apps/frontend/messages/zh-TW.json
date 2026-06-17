@@ -366,8 +366,6 @@
         "newPasswordHelper": "至少 8 個字元，包含大小寫字母、數字和特殊字元",
         "confirmPassword": "確認新密碼",
         "confirmPasswordHelper": "再次輸入您的新密碼",
-        "revokeOtherDevices": "登出其他設備",
-        "revokeOtherDevicesHelper": "修改密碼後將其他所有設備登出",
         "passwordChanged": "密碼修改成功",
         "updateError": "變更密碼失敗，請再試一次。"
       },

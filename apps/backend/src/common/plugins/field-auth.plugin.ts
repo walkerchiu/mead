@@ -53,10 +53,6 @@ export class FieldAuthPlugin implements ApolloServerPlugin {
           'Login',
           'refreshToken',
           'RefreshToken',
-          'registerCustomer',
-          'RegisterCustomer',
-          'registerHQ',
-          'RegisterHQ',
           'verifyTwoFactorLogin',
           'VerifyTwoFactorLogin',
         ];

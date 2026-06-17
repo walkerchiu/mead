@@ -191,7 +191,6 @@ type CacheStats {
 input ChangePasswordInput {
   currentPassword: String!
   newPassword: String!
-  revokeOtherSessions: Boolean! = false
 }
 
 """
@@ -1070,46 +1069,6 @@ type Mutation {
   使用 HttpOnly Cookie 中的 Refresh Token 取得新的 Access Token（當 Access Token 過期時使用）
   """
   refreshToken: AuthResponse!
-
-  """
-  註冊新的管理員用戶（僅限 HQ_SCOPE 權限，用於建立管理團隊）
-  """
-  registerHQ(
-    """
-    電子郵件地址（必須唯一）
-    """
-    email: String!
-
-    """
-    用戶顯示名稱（選填）
-    """
-    name: String
-
-    """
-    密碼（至少 8 字符，包含大小寫字母和數字）
-    """
-    password: String!
-  ): AuthResponse!
-
-  """
-  註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 HQ_SCOPE 權限，用於邀請制註冊）
-  """
-  registerCustomer(
-    """
-    電子郵件地址（必須唯一）
-    """
-    email: String!
-
-    """
-    用戶顯示名稱（選填）
-    """
-    name: String
-
-    """
-    密碼（至少 8 字符，包含大小寫字母和數字）
-    """
-    password: String!
-  ): AuthResponse!
 
   """
   移除用戶從部門（僅 MANAGER 可執行）

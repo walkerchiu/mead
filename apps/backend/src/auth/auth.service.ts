@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { I18nService } from 'nestjs-i18n';
@@ -19,12 +15,7 @@ import {
   TwoFactorLoginResponse,
 } from './auth.types';
 import { RevokedMethod } from './hq-session.types';
-import { assertPasswordStrength } from '../common/utils/password-validator';
-import {
-  assertValidEmail,
-  assertValidName,
-  assertValidAccountName,
-} from '../common/utils/input-validator';
+import { assertValidAccountName } from '../common/utils/input-validator';
 import { logger } from '../common/services/logger.service';
 
 @Injectable()
@@ -54,140 +45,6 @@ export class AuthService {
       accessToken: this.ACCESS_TOKEN_EXPIRES_IN,
       refreshToken: this.REFRESH_TOKEN_EXPIRES_IN,
     });
-  }
-
-  /**
-   * 註冊客戶用戶
-   * 只有 CUSTOMER_SCOPE 或 HQ_SCOPE 的用戶可以調用
-   */
-  async registerCustomer(
-    accountName: string,
-    email: string,
-    password: string,
-    name?: string,
-    userAgent?: string,
-    ipAddress?: string,
-    lang?: string,
-  ): Promise<AuthTokenResult> {
-    const accountLower = accountName.trim().toLowerCase();
-    assertValidAccountName(accountLower, lang, this.i18n);
-    assertValidEmail(email, lang, this.i18n);
-    assertValidName(name, lang, this.i18n);
-
-    // 唯一性檢查改以帳號為準（email 已非唯一）
-    const existingUser = await this.prisma.user.findUnique({
-      where: { accountName: accountLower },
-    });
-
-    if (existingUser) {
-      throw new ConflictException(
-        this.i18n.translate('auth.accountAlreadyRegistered', { lang }),
-      );
-    }
-
-    // 驗證密碼強度（包含相似度檢查；username 帶帳號避免密碼含帳號片段）
-    assertPasswordStrength(password, lang, this.i18n, {
-      email,
-      name,
-      username: accountLower,
-    });
-
-    const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
-
-    const user = await this.prisma.user.create({
-      data: {
-        accountName: accountLower,
-        email,
-        password: hashedPassword,
-        name,
-        accessScopes: [AccessScope.CUSTOMER_SCOPE],
-      },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // 註冊時創建新會話
-    return this.generateTokens(user, userAgent, ipAddress, true);
-  }
-
-  /**
-   * 註冊管理員用戶
-   * 只有 HQ_SCOPE 的用戶可以調用
-   */
-  async registerHQ(
-    accountName: string,
-    email: string,
-    password: string,
-    name?: string,
-    userAgent?: string,
-    ipAddress?: string,
-    lang?: string,
-  ): Promise<AuthTokenResult> {
-    const accountLower = accountName.trim().toLowerCase();
-    assertValidAccountName(accountLower, lang, this.i18n);
-    assertValidEmail(email, lang, this.i18n);
-    assertValidName(name, lang, this.i18n);
-
-    // 唯一性檢查改以帳號為準（email 已非唯一）
-    const existingUser = await this.prisma.user.findUnique({
-      where: { accountName: accountLower },
-    });
-
-    if (existingUser) {
-      throw new ConflictException(
-        this.i18n.translate('auth.accountAlreadyRegistered', { lang }),
-      );
-    }
-
-    // 驗證密碼強度（包含相似度檢查；username 帶帳號避免密碼含帳號片段）
-    assertPasswordStrength(password, lang, this.i18n, {
-      email,
-      name,
-      username: accountLower,
-    });
-
-    const hashedPassword = await bcrypt.hash(password, this.SALT_ROUNDS);
-
-    const user = await this.prisma.user.create({
-      data: {
-        accountName: accountLower,
-        email,
-        password: hashedPassword,
-        name,
-        accessScopes: [AccessScope.HQ_SCOPE],
-      },
-      include: {
-        userRoles: {
-          include: {
-            role: {
-              include: {
-                rolePermissions: {
-                  include: {
-                    permission: true,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    // 註冊時創建新會話
-    return this.generateTokens(user, userAgent, ipAddress, true);
   }
 
   async login(

@@ -36,9 +36,6 @@ import {
 } from './password-reset.types';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { logger } from '../common/services/logger.service';
-import { PermissionGuard } from '../common/guards/permission.guard';
-import { RequiresAnyScope } from '../common/decorators/requires-scope.decorator';
-import { AccessScope } from '../common/enums/access-scope.enum';
 import { GraphQLContextWithExpress } from '../common/types/graphql-context.type';
 
 // 創建 Union type 給 login mutation
@@ -62,116 +59,6 @@ export class AuthResolver {
     private passwordResetService: PasswordResetService,
     private i18n: I18nService,
   ) {}
-
-  /**
-   * 註冊客戶用戶
-   * 需要 CUSTOMER_SCOPE 或 HQ_SCOPE
-   */
-  @Mutation(() => AuthResponse, {
-    description:
-      '註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 HQ_SCOPE 權限，用於邀請制註冊）',
-  })
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @RequiresAnyScope([AccessScope.CUSTOMER_SCOPE, AccessScope.HQ_SCOPE])
-  async registerCustomer(
-    @Args('accountName', { description: '登入帳號（3-20 英數底線，唯一）' })
-    accountName: string,
-    @Args('email', { description: '電子郵件地址（通知用）' })
-    email: string,
-    @Args('password', {
-      description: '密碼（至少 8 字符，包含大小寫字母和數字）',
-    })
-    password: string,
-    @Args('name', { nullable: true, description: '用戶顯示名稱（選填）' })
-    name: string | undefined,
-    @I18nLang() lang: string,
-    @Context() context: GraphQLContextWithExpress,
-  ): Promise<AuthResponse> {
-    const { refreshToken, ...authResponse } =
-      await this.authService.registerCustomer(
-        accountName,
-        email,
-        password,
-        name,
-        context.req.headers['user-agent'],
-        context.req.ip,
-        lang,
-      );
-
-    // 驗證 accessToken 是否存在
-    if (!authResponse.accessToken) {
-      logger.error(
-        '[AuthResolver] Register customer failed: accessToken is missing',
-        {
-          email,
-          hasUser: !!authResponse.user,
-        },
-      );
-      throw new InternalServerErrorException(
-        this.i18n.translate('auth.loginFailed', { lang }),
-      );
-    }
-
-    // 設置 access token 和 refresh token cookies（註冊一律持久化）
-    setAccessTokenCookie(context.res, authResponse.accessToken);
-    setRememberMeCookie(context.res, true);
-    setRefreshTokenCookie(context.res, refreshToken, true);
-    return authResponse;
-  }
-
-  /**
-   * 註冊管理員用戶
-   * 只有 HQ_SCOPE 可以調用
-   */
-  @Mutation(() => AuthResponse, {
-    description: '註冊新的管理員用戶（僅限 HQ_SCOPE 權限，用於建立管理團隊）',
-  })
-  @UseGuards(JwtAuthGuard, PermissionGuard)
-  @RequiresAnyScope([AccessScope.HQ_SCOPE])
-  async registerHQ(
-    @Args('accountName', { description: '登入帳號（3-20 英數底線，唯一）' })
-    accountName: string,
-    @Args('email', { description: '電子郵件地址（通知用）' })
-    email: string,
-    @Args('password', {
-      description: '密碼（至少 8 字符，包含大小寫字母和數字）',
-    })
-    password: string,
-    @Args('name', { nullable: true, description: '用戶顯示名稱（選填）' })
-    name: string | undefined,
-    @I18nLang() lang: string,
-    @Context() context: GraphQLContextWithExpress,
-  ): Promise<AuthResponse> {
-    const { refreshToken, ...authResponse } = await this.authService.registerHQ(
-      accountName,
-      email,
-      password,
-      name,
-      context.req.headers['user-agent'],
-      context.req.ip,
-      lang,
-    );
-
-    // 驗證 accessToken 是否存在
-    if (!authResponse.accessToken) {
-      logger.error(
-        '[AuthResolver] Register hq failed: accessToken is missing',
-        {
-          email,
-          hasUser: !!authResponse.user,
-        },
-      );
-      throw new InternalServerErrorException(
-        this.i18n.translate('auth.loginFailed', { lang }),
-      );
-    }
-
-    // 設置 access token 和 refresh token cookies（註冊一律持久化）
-    setAccessTokenCookie(context.res, authResponse.accessToken);
-    setRememberMeCookie(context.res, true);
-    setRefreshTokenCookie(context.res, refreshToken, true);
-    return authResponse;
-  }
 
   /**
    * 用戶登入（可能需要 2FA）

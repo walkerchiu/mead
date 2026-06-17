@@ -540,7 +540,7 @@ export class UserService {
     lang?: string,
     currentRefreshToken?: string,
   ): Promise<boolean> {
-    const { currentPassword, newPassword, revokeOtherSessions } = input;
+    const { currentPassword, newPassword } = input;
 
     // 獲取用戶資料
     const user = await this.prisma.user.findUnique({
@@ -642,19 +642,15 @@ export class UserService {
       }
     });
 
-    // 撤銷其他設備的 sessions（可選）
-    if (revokeOtherSessions) {
-      // 只撤銷「其他」session，保留當前 session（reload 不會被登出）。
-      // 需要當前 session 的 refresh token 才能辨識並保留之；
-      // 若取不到（理論上不應發生）則退回全撤以確保安全。
-      if (currentRefreshToken) {
-        await this.sessionManagementService.revokeOtherSessions(
-          currentRefreshToken,
-          userId,
-        );
-      } else {
-        await this.sessionManagementService.revokeAllSessions(userId);
-      }
+    // 改密為安全事件：一律撤銷其他裝置的 sessions（與 reference repo npt 一致，不設開關）。
+    // 帶得到當前 refresh token 時只撤其他、保留本機；辨識不出當前 session 時退而全撤。
+    if (currentRefreshToken) {
+      await this.sessionManagementService.revokeOtherSessions(
+        currentRefreshToken,
+        userId,
+      );
+    } else {
+      await this.sessionManagementService.revokeAllSessions(userId);
     }
 
     // 發送密碼變更通知（email + 系統通知）

@@ -81,10 +81,7 @@ export default function ForcedChangePassword({
         <Alert severity="info" sx={{ mb: 3 }}>
           {t('notice')}
         </Alert>
-        <ChangePasswordForm
-          onSuccess={handleSuccess}
-          showRevokeOtherSessions={false}
-        />
+        <ChangePasswordForm onSuccess={handleSuccess} />
       </Box>
     </AuthLayout>
   );

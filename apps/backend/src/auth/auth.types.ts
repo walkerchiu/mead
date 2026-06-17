@@ -77,35 +77,6 @@ export interface AuthTokenResult {
 }
 
 /**
- * Register Input（已棄用，請使用 registerCustomer 或 registerHQ）
- */
-@InputType({ description: '註冊輸入（已棄用）' })
-export class RegisterInput {
-  @Field(() => String, { description: '電子郵件地址' })
-  @IsEmail({}, { message: '無效的電子郵件格式' })
-  email: string;
-
-  @Field(() => String, {
-    description: '密碼（至少 8 字符，包含大小寫字母和數字）',
-  })
-  @IsString()
-  @Length(8, 100, { message: '密碼長度必須在 8-100 字符之間' })
-  @Matches(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()_+\-=[\]{};:,.<>])/,
-    {
-      message: '密碼必須包含大小寫字母、數字和特殊符號',
-    },
-  )
-  password: string;
-
-  @Field(() => String, { nullable: true, description: '顯示名稱（選填）' })
-  @IsOptional()
-  @IsString()
-  @Length(2, 50, { message: '名稱長度必須在 2-50 字符之間' })
-  name?: string;
-}
-
-/**
  * Login Input
  */
 @InputType({ description: '登入輸入' })

@@ -351,8 +351,6 @@ export interface Messages {
         newPasswordHelper: string;
         confirmPassword: string;
         confirmPasswordHelper: string;
-        revokeOtherDevices: string;
-        revokeOtherDevicesHelper: string;
         passwordChanged: string;
       };
       tokens: {

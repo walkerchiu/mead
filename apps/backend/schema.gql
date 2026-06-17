@@ -119,7 +119,6 @@ type CacheStats {
 input ChangePasswordInput {
   currentPassword: String!
   newPassword: String!
-  revokeOtherSessions: Boolean! = false
 }
 
 """建立個人存取權杖輸入"""
@@ -530,36 +529,6 @@ type Mutation {
   使用 HttpOnly Cookie 中的 Refresh Token 取得新的 Access Token（當 Access Token 過期時使用）
   """
   refreshToken: AuthResponse!
-
-  """註冊新的客戶用戶（需要 CUSTOMER_SCOPE 或 HQ_SCOPE 權限，用於邀請制註冊）"""
-  registerCustomer(
-    """登入帳號（3-20 英數底線，唯一）"""
-    accountName: String!
-
-    """電子郵件地址（通知用）"""
-    email: String!
-
-    """用戶顯示名稱（選填）"""
-    name: String
-
-    """密碼（至少 8 字符，包含大小寫字母和數字）"""
-    password: String!
-  ): AuthResponse!
-
-  """註冊新的管理員用戶（僅限 HQ_SCOPE 權限，用於建立管理團隊）"""
-  registerHQ(
-    """登入帳號（3-20 英數底線，唯一）"""
-    accountName: String!
-
-    """電子郵件地址（通知用）"""
-    email: String!
-
-    """用戶顯示名稱（選填）"""
-    name: String
-
-    """密碼（至少 8 字符，包含大小寫字母和數字）"""
-    password: String!
-  ): AuthResponse!
 
   """請求停用雙因素認證（會發送驗證碼到您的 Email）"""
   requestDisable2FA: BasicResponse!
