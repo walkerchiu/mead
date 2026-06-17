@@ -68,6 +68,8 @@ const MAX_CARD_SCALE = 2;
 const CARD_BASE_W = 960;
 /** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
 const FIT_SIDE_MARGIN = 72;
+/** 輪播指示點本身的渲染高度（px，固定尺寸不隨 cardScale 縮放）；供上方平衡 spacer 用。 */
+const DOTS_BLOCK_H = 16;
 
 /** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。 */
 const HERO_DESIGN_W = 1440;
@@ -811,6 +813,16 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               justifyContent: 'center',
             }}
           >
+            {/* 上方平衡 spacer — 與下方「指示點區」（gap 72×scale + 指示點高 ~16px）等高，
+                使「卡片本身」垂直置中（而非卡片＋指示點整組）；否則指示點會把卡片往上推、
+                吃掉預留給上方裝飾星形的淨空，導致最上方裝飾照片被第二屏頂端裁切。 */}
+            <Box
+              aria-hidden
+              sx={{
+                flexShrink: 0,
+                height: `${72 * cardScale + DOTS_BLOCK_H}px`,
+              }}
+            />
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>
               {mountPlans && planCarousel}
             </Box>
