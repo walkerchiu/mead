@@ -71,7 +71,8 @@ const FROST_BACKING = {
   position: 'absolute',
   inset: 0,
   borderRadius: '17.35px',
-  bgcolor: 'rgba(227, 227, 227, 0.82)',
+  // pageBg (#E3E3E3) @ 72% 不透明 → 照片透出 ~28%（比先前 82% 略明顯）。
+  bgcolor: 'rgba(227, 227, 227, 0.72)',
   pointerEvents: 'none',
 } as const;
 

@@ -132,7 +132,6 @@ export function PlanCardWithStars({
   starsVisible = true,
   staticStars = false,
   dimmed = false,
-  snap = false,
 }: {
   plan: Plan;
   /**
@@ -154,10 +153,6 @@ export function PlanCardWithStars({
    * hover 時才有樣式變化）。dim 套在卡片層而非外層，避免波及底下照片。
    */
   dimmed?: boolean;
-  /**
-   * wrap snap 回中份那一幀：關閉卡片淡化／去飽和 transition，避免閃動。
-   */
-  snap?: boolean;
 }) {
   const photos = localPhotos(plan);
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
@@ -296,12 +291,12 @@ export function PlanCardWithStars({
         sx={{
           position: 'relative',
           zIndex: 1,
+          // 淡化／去飽和「瞬間定樣」、不進 transition：切到中央的卡若以 0.8s 漸變
+          // 由 saturate(0.55) 回到 none，會讓「透出的照片」緩慢變色＝使用者看到的樣式變化。
+          // 瞬間定樣後，置中卡一就位即為最終樣貌，切換不再有漸變。
           opacity: dimmed ? 0.42 : 1,
           filter: dimmed ? 'saturate(0.55)' : 'none',
-          transition: snap
-            ? 'none'
-            : 'filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-          '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
+          transition: 'none',
         }}
       >
         {/* 有裝飾照片在卡片後方時，墊半透明底讓毛玻璃罩在均勻色上（照片淡淡透出、
@@ -751,15 +746,43 @@ export function PlanCarousel({
     };
   }, []);
 
-  // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）只在 engage
-  // 時才掛載，其首次合成會讓毛玻璃由淺變濃「後疊上來」。為此 engage 後先以同色遮罩
-  // 蓋住、讓卡片在底下實際合成完毛玻璃，再移除遮罩一次揭示——避免使用者看到「先霧化、
-  // 卡片再疊上來」的組裝過程。一次性，之後的切換不重掛、不再 gate。
+  // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）一掛載即渲染，其
+  // 首次合成會讓毛玻璃由淺變濃、底下裝飾照片（尤其冷快取時才載入）淡入——使用者會看到
+  // 「輕微變化」。為此掛載後先以同色遮罩蓋住整個輪播區，等到①卡片後方的霧化照片全部載入
+  // 解碼、②再過兩個 rAF 讓毛玻璃確實合成完，才移除遮罩一次揭示。用「等照片就緒」而非固定
+  // 時間，冷快取也不會在揭示後才淡入。1.5s fallback 兜底。一次性，之後切換不重掛、不再 gate。
   const [ringRevealed, setRingRevealed] = useState(false);
   useEffect(() => {
     if (expandedIndex === null || ringRevealed) return;
-    const t = window.setTimeout(() => setRingRevealed(true), 240);
-    return () => window.clearTimeout(t);
+    let cancelled = false;
+    let raf = 0;
+    const reveal = () => {
+      if (!cancelled) setRingRevealed(true);
+    };
+    const tick = () => {
+      if (cancelled) return;
+      const hazes = Array.from(
+        document.querySelectorAll<HTMLImageElement>('.plan-star-haze'),
+      );
+      const ready =
+        hazes.length > 0 &&
+        hazes.every((h) => h.complete && h.naturalWidth > 0);
+      if (ready) {
+        // 照片已就緒；再等兩個 rAF 讓毛玻璃合成完，才揭示。
+        raf = requestAnimationFrame(() => {
+          raf = requestAnimationFrame(reveal);
+        });
+      } else {
+        raf = requestAnimationFrame(tick);
+      }
+    };
+    const fallback = window.setTimeout(reveal, 1500);
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+      window.clearTimeout(fallback);
+    };
   }, [expandedIndex, ringRevealed]);
 
   // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
@@ -1261,7 +1284,6 @@ export function PlanCarousel({
                     showStars={isCenter}
                     starsVisible={isCenter}
                     dimmed={!isCenter}
-                    snap={wrapSnap}
                   />
                 </Box>
               );
