@@ -814,16 +814,18 @@ export function DecorativeTextCloud({
           Vertical 直向佈局仍是兩欄堆疊（左頂 + 右底），手機版邏輯不變。 */}
       {vertical ? (
         <>
-          {/* 左：ART x DESIGN / GATEWAY（regular）＋ Taiwan（粗體）— 依手機稿 node 388:247 */}
+          {/* 左欄：ART x DESIGN / GATEWAY（細）＋ Taiwan（粗）＋ 識別橫書一列。
+              依手機稿 388:247（左 6%、y≈707）與平板稿 43:1142（左 3.5%、y≈1080）：
+              識別「教育部 藝術與設計｜三大計畫入口網」改為橫書、置於 Taiwan 下方
+              （不再直書於右側）；上緣與右欄「臺灣的創造力」對齊。 */}
           <Box
             aria-hidden
             sx={{
               position: 'absolute',
-              left: '6%',
-              bottom: 16,
+              left: mode === 't' ? '3.5%' : '6%',
+              top: mode === 't' ? '1080px' : '707px',
               display: 'flex',
               flexDirection: 'column',
-              gap: 0.5,
               pointerEvents: 'none',
             }}
           >
@@ -849,14 +851,43 @@ export function DecorativeTextCloud({
                 </Box>
               ),
             )}
+            {/* 識別橫書列：教育部 藝術與設計 ｜ 三大計畫入口網（黑字、不混色）。
+                兩段間距依稿（手機 17px、平板 23px）。 */}
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                gap: mode === 't' ? '23px' : '17px',
+                mt: '20px',
+              }}
+            >
+              {['教育部 藝術與設計', '三大計畫入口網'].map((line) => (
+                <Box
+                  key={line}
+                  component="span"
+                  sx={{
+                    fontSize: 12.23,
+                    fontWeight: 500,
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    color: '#000000',
+                  }}
+                >
+                  {line}
+                </Box>
+              ))}
+            </Box>
           </Box>
-          {/* 中：臺灣的創造力，／走向世界 */}
+          {/* 右欄：臺灣的創造力，／走向世界 —— 依新稿往右移（手機 75% / 平板 77.8%），
+              上緣與左欄 ART x DESIGN 對齊。平板鎖定欄寬 160px（依稿 47:1925 文字框寬），
+              讓「走向世界」靠右縮排貼近右緣（x649→809、距框右 25px）；手機維持隨內容收合。 */}
           <Box
             aria-hidden
             sx={{
               position: 'absolute',
-              left: '42%',
-              bottom: 16,
+              left: mode === 't' ? '77.8%' : '75%',
+              top: mode === 't' ? '1080px' : '707px',
+              width: mode === 't' ? '160px' : undefined,
               display: 'flex',
               flexDirection: 'column',
               gap: 0.5,
@@ -871,8 +902,6 @@ export function DecorativeTextCloud({
                   fontSize: 12.89,
                   fontWeight: 600,
                   lineHeight: 1.25,
-                  // 走向世界 與上方臺灣的創造力之間留較大間隙、靠右縮排，使「臺灣的創造力」
-                  // 上緣對齊 ART x DESIGN、「走向世界」底緣對齊 Taiwan（依手機稿 388:247）。
                   mt: line.align === 'end' ? '48px' : 0,
                   whiteSpace: 'nowrap',
                   color: '#ffffff',
@@ -881,36 +910,6 @@ export function DecorativeTextCloud({
                 }}
               >
                 {line.text}
-              </Box>
-            ))}
-          </Box>
-          {/* 右：直書識別（三大計畫入口網／教育部 藝術與設計）— 兩行靠上對齊、黑字 */}
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              right: '5%',
-              bottom: 16,
-              display: 'flex',
-              alignItems: 'flex-start',
-              gap: '4px',
-              pointerEvents: 'none',
-            }}
-          >
-            {['三大計畫入口網', '教育部 藝術與設計'].map((line) => (
-              <Box
-                key={line}
-                component="span"
-                sx={{
-                  writingMode: 'vertical-rl',
-                  fontSize: 12.23,
-                  fontWeight: 500,
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                  color: '#000000',
-                }}
-              >
-                {line}
               </Box>
             ))}
           </Box>
@@ -1021,33 +1020,15 @@ export function DecorativeTextCloud({
             </Box>
           </Box>
 
-          {/* 左側直書識別（依設計稿 node 388:81：三大計畫入口網 left 324px、教育部 藝術與
-              設計 left 341px，皆在 ART x DESIGN 左側；HERO_DESIGN_W=1440 故直接用設計 px）。
-              取代原 hero 底部的教育部圓徽＋站名；黑字、不混色。bottom 對齊標語列基線、往上
-              排，避免直書文字往下溢出到第二屏。 */}
+          {/* 識別橫書（依設計稿 node 388:81：教育部 藝術與設計 x=414/1440=28.75%、
+              三大計畫入口網 x=539/1440=37.43%，皆置於 ART x DESIGN／GATEWAY 下方
+              y=770，較標語列頂端低約 47px）。取代原直書識別；黑字、不混色。 */}
           <Box
             component="span"
             sx={{
               position: 'absolute',
-              left: '324px',
-              top: '-38px',
-              writingMode: 'vertical-rl',
-              fontSize: 12.23,
-              fontWeight: 500,
-              color: '#000000',
-              whiteSpace: 'nowrap',
-              lineHeight: 1.2,
-            }}
-          >
-            三大計畫入口網
-          </Box>
-          <Box
-            component="span"
-            sx={{
-              position: 'absolute',
-              left: '341px',
-              top: '-38px',
-              writingMode: 'vertical-rl',
+              left: '28.75%',
+              top: '47px',
               fontSize: 12.23,
               fontWeight: 500,
               color: '#000000',
@@ -1056,6 +1037,21 @@ export function DecorativeTextCloud({
             }}
           >
             教育部 藝術與設計
+          </Box>
+          <Box
+            component="span"
+            sx={{
+              position: 'absolute',
+              left: '37.43%',
+              top: '47px',
+              fontSize: 12.23,
+              fontWeight: 500,
+              color: '#000000',
+              whiteSpace: 'nowrap',
+              lineHeight: 1.2,
+            }}
+          >
+            三大計畫入口網
           </Box>
         </Box>
       )}
