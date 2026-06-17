@@ -385,6 +385,18 @@ type EntityStatType {
   entity: String!
 }
 
+"""角色對單一功能的檢視／管理存取狀態"""
+type FeatureAccessType {
+  """是否可檢視該功能"""
+  canRead: Boolean!
+
+  """是否可管理該功能"""
+  canWrite: Boolean!
+
+  """功能 key（前端依此 i18n）"""
+  featureKey: String!
+}
+
 input HQResetPasswordInput {
   newPassword: String!
 
@@ -506,13 +518,15 @@ type Mutation {
     input: LockUserInput!
   ): User!
 
-  """用戶登入（使用 email 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼"""
+  """用戶登入（使用帳號 accountName 和密碼）。如果啟用 2FA，將返回臨時 Token 並發送驗證碼"""
   login(
-    """註冊的電子郵件地址"""
-    email: String!
+    """登入帳號（accountName，3-20 英數底線）"""
+    accountName: String!
 
     """用戶密碼"""
     password: String!
+
+    """記住我：true 時 refresh token cookie 持久化，false 為 session cookie"""
     rememberMe: Boolean = false
   ): LoginResult!
 
@@ -580,6 +594,9 @@ type Mutation {
 
   """撤銷用戶所有會話"""
   revokeUserSessions(input: RevokeUserSessionsInput!): RevokeResultType!
+
+  """設定角色對單一功能的檢視／管理存取（OWNER 鎖定、需 roles:manage 且 rank 嚴格高於該角色）"""
+  setRoleFeatureAccess(input: SetRoleFeatureAccessInput!): Boolean!
 
   """軟刪除用戶（僅限 HQ_SCOPE，需要 users:delete 權限）"""
   softDeleteUser(id: String!): User!
@@ -952,6 +969,9 @@ type Query {
     startDate: String
   ): CronJobStatisticsType!
 
+  """指定 scope 的功能權限矩陣（角色 × 功能 read/write）"""
+  featureMatrix(scope: AccessScope!): [RoleFeatureRowType!]!
+
   """查詢當前登入用戶的完整資料"""
   me: User!
 
@@ -1147,6 +1167,27 @@ enum RevokedMethod {
   HQ_FORCE
   SECURITY_MEASURE
   USER_LOGOUT
+}
+
+"""功能權限矩陣中的一列（一個角色 × 各功能存取）"""
+type RoleFeatureRowType {
+  """角色顯示名稱"""
+  displayName: String!
+
+  """各功能的存取狀態"""
+  features: [FeatureAccessType!]!
+
+  """是否鎖定（OWNER 永遠全開且不可調整）"""
+  locked: Boolean!
+
+  """角色名稱（OWNER/ADMIN/...）"""
+  name: String!
+
+  """角色 rank（5..1）"""
+  rank: Int!
+
+  """角色 ID"""
+  roleId: String!
 }
 
 """角色資訊"""
@@ -1360,6 +1401,21 @@ type SessionType {
 
   """用戶名稱"""
   userName: String
+}
+
+"""設定角色對單一功能的檢視／管理存取"""
+input SetRoleFeatureAccessInput {
+  """是否可檢視"""
+  canRead: Boolean!
+
+  """是否可管理（隱含檢視）"""
+  canWrite: Boolean!
+
+  """功能 key"""
+  featureKey: String!
+
+  """角色 ID"""
+  roleId: String!
 }
 
 type Subscription {
