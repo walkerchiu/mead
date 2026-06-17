@@ -815,14 +815,15 @@ export function DecorativeTextCloud({
       {vertical ? (
         <>
           {/* 左欄：ART x DESIGN / GATEWAY（細）＋ Taiwan（粗）＋ 識別橫書一列。
-              依手機稿 388:247（左 6%、y≈707）與平板稿 43:1142（左 3.5%、y≈1080）：
-              識別「教育部 藝術與設計｜三大計畫入口網」改為橫書、置於 Taiwan 下方
-              （不再直書於右側）；上緣與右欄「臺灣的創造力」對齊。 */}
+              依手機稿 388:247（左 x25）與平板稿 43:1142（左 x29）：識別「教育部 藝術與設計｜
+              三大計畫入口網」改為橫書、置於 Taiwan 下方（不再直書於右側）；上緣與右欄
+              「臺灣的創造力」對齊。手機鎖固定左距 24px（貼左緣、不隨視窗寬放大留白）；
+              平板容器固定 834，沿用 3.5% 即穩定。 */}
           <Box
             aria-hidden
             sx={{
               position: 'absolute',
-              left: mode === 't' ? '3.5%' : '6%',
+              left: mode === 't' ? '3.5%' : '24px',
               top: mode === 't' ? '1080px' : '707px',
               display: 'flex',
               flexDirection: 'column',
@@ -878,14 +879,16 @@ export function DecorativeTextCloud({
               ))}
             </Box>
           </Box>
-          {/* 右欄：臺灣的創造力，／走向世界 —— 依新稿往右移（手機 75% / 平板 77.8%），
-              上緣與左欄 ART x DESIGN 對齊。平板鎖定欄寬 160px（依稿 47:1925 文字框寬），
-              讓「走向世界」靠右縮排貼近右緣（x649→809、距框右 25px）；手機維持隨內容收合。 */}
+          {/* 右欄：臺灣的創造力，／走向世界 —— 上緣與左欄 ART x DESIGN 對齊、走向世界
+              靠右縮排下沉。手機改以 right 錨定（固定右距 24px、貼右緣，不隨視窗寬把整組
+              往中央拉）；平板容器固定 834，沿用 left 77.8% + 欄寬 160px（依稿 47:1925 文字框寬，
+              讓走向世界縮排貼近右緣 x809、距框右 25px）。 */}
           <Box
             aria-hidden
             sx={{
               position: 'absolute',
-              left: mode === 't' ? '77.8%' : '75%',
+              left: mode === 't' ? '77.8%' : undefined,
+              right: mode === 't' ? undefined : '24px',
               top: mode === 't' ? '1080px' : '707px',
               width: mode === 't' ? '160px' : undefined,
               display: 'flex',
