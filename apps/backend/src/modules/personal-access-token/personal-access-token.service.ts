@@ -19,7 +19,7 @@ const ALLOWED_SCOPES: readonly string[] = [] as const;
 const ALLOWED_EXPIRE_DAYS = [30, 90, 180] as const;
 
 /** 每位用戶最多有效 Token 數量 */
-const MAX_ACTIVE_TOKENS_PER_USER = 3;
+const MAX_ACTIVE_TOKENS_PER_USER = 5;
 
 /** Token 前綴 */
 const TOKEN_PREFIX = 'mead_';

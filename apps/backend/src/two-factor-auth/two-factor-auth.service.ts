@@ -427,11 +427,20 @@ export class TwoFactorAuthService {
 
   /**
    * 生成備用驗證碼
+   *
+   * 與 reference repo npt 一致：每碼 10 位、取自排除易混字元（無 0/1/I/O）的英數字母表，
+   * 熵（約 50 bit）高於原本 8 碼 hex（32 bit）且更可讀。
    */
   private generateBackupCodes(count: number = 10): string[] {
+    const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const codeLength = 10;
     const codes: string[] = [];
     for (let i = 0; i < count; i++) {
-      const code = crypto.randomBytes(4).toString('hex').toUpperCase();
+      const buf = crypto.randomBytes(codeLength);
+      let code = '';
+      for (let j = 0; j < codeLength; j++) {
+        code += alphabet[buf[j] % alphabet.length];
+      }
       codes.push(code);
     }
     return codes;

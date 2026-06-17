@@ -551,12 +551,12 @@ export class CronJobMonitorResolver {
           return false;
         }
 
-        // 檢查是否有 cron_jobs:read 權限
-        const hasPermission = user.permissions.some(
-          (p: any) => p.name === 'cron_jobs:read' || p.resource === 'cron_jobs',
-        );
+        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:write 亦通過）。
+        const hasPermission =
+          user.permissions.includes('cron_jobs:read') ||
+          user.permissions.includes('cron_jobs:write');
 
-        if (!hasPermission && user.permissions.length > 0) {
+        if (!hasPermission) {
           logger.debug(
             '[Subscription Filter] User lacks cron_jobs:read permission',
           );
@@ -617,12 +617,12 @@ export class CronJobMonitorResolver {
           return false;
         }
 
-        // 檢查是否有 cron_jobs:read 權限
-        const hasPermission = user.permissions.some(
-          (p: any) => p.name === 'cron_jobs:read' || p.resource === 'cron_jobs',
-        );
+        // 檢查 cron_jobs:read 權限（permissions 是 flat string[]；持 cron_jobs:write 亦通過）。
+        const hasPermission =
+          user.permissions.includes('cron_jobs:read') ||
+          user.permissions.includes('cron_jobs:write');
 
-        if (!hasPermission && user.permissions.length > 0) {
+        if (!hasPermission) {
           logger.debug(
             '[Subscription Filter] User lacks cron_jobs:read permission',
           );
