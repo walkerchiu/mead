@@ -150,11 +150,14 @@ export class UserService {
       ];
     }
 
-    // 2. 存取範圍篩選
+    // 2. 存取範圍篩選：與 RLS（buildAccessScopeFilter）以 AND 結合，
+    //    避免使用者指定的 accessScope 蓋過 RLS 而越權（例如 customer 呼叫者指定 HQ_SCOPE）。
+    const accessScopeAnd: any[] = [];
+    if (accessScopeFilter && Object.keys(accessScopeFilter).length > 0) {
+      accessScopeAnd.push(accessScopeFilter);
+    }
     if (filter?.accessScope) {
-      filterWhere.accessScopes = {
-        has: filter.accessScope,
-      };
+      accessScopeAnd.push({ accessScopes: { has: filter.accessScope } });
     }
 
     // 3. 角色篩選
@@ -191,11 +194,13 @@ export class UserService {
       }
     }
 
-    const where = {
+    const where: any = {
       ...baseWhere,
-      ...accessScopeFilter,
       ...filterWhere,
     };
+    if (accessScopeAnd.length > 0) {
+      where.AND = accessScopeAnd;
+    }
 
     const skip = calculateSkip(page, limit);
 
