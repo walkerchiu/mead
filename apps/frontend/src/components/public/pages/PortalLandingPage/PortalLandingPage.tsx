@@ -71,9 +71,11 @@ const FIT_SIDE_MARGIN = 72;
 /** 輪播指示點本身的渲染高度（px，固定尺寸不隨 cardScale 縮放）；供上方平衡 spacer 用。 */
 const DOTS_BLOCK_H = 16;
 
-/** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。 */
+/** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。
+ *  高度含左下直書識別「三大計畫入口網／教育部 藝術與設計」往標語列下方的延伸，
+ *  讓 contain-fit 一併把識別與下方留白算進去（否則寬螢幕時識別會貼底、無下方間距）。 */
 const HERO_DESIGN_W = 1440;
-const HERO_DESIGN_H = 620;
+const HERO_DESIGN_H = 732;
 /** hero 縮放與視窗邊緣的左右／上下淨空（px）。 */
 const HERO_SIDE_MARGIN = 48;
 const HERO_V_MARGIN = 40;
@@ -730,53 +732,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
                 defaultIndex={activeIndex}
                 language={language}
               />
-            </Box>
-          </Box>
-          {/* hero 底部站名識別（依設計稿 node 1:2 / 43:1142）：教育部圓徽 + 入口網站名。
-              手機：站名靠左、圓徽靠右（兩端分置）；桌機：圓徽 + 站名相鄰、靠左下。 */}
-          <Box
-            aria-hidden
-            sx={{
-              flexShrink: 0,
-              px: '24px',
-              pb: 'clamp(20px, 4vh, 40px)',
-              display: 'flex',
-              alignItems: 'center',
-              // 手機：DOM[圓徽,站名] 以 row-reverse + space-between → 站名左、圓徽右。
-              flexDirection: 'row-reverse',
-              justifyContent: 'space-between',
-              [portalTokens.mq.tabletUp]: {
-                // 桌機：圓徽 + 站名相鄰、靠左下；左側內縮約對齊 hero 內容。
-                flexDirection: 'row',
-                justifyContent: 'flex-start',
-                gap: '11px',
-                pl: 'clamp(24px, 22vw, 320px)',
-                pr: 0,
-                pb: 'clamp(24px, 6vh, 56px)',
-              },
-            }}
-          >
-            <Box
-              component="img"
-              src="/images/moe-emblem.png"
-              alt=""
-              sx={{
-                width: 22,
-                height: 22,
-                flexShrink: 0,
-                [portalTokens.mq.tabletUp]: { width: 29, height: 29 },
-              }}
-            />
-            <Box
-              component="span"
-              sx={{
-                fontSize: 12.23,
-                fontWeight: 500,
-                color: '#000000',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {t('heroSiteName')}
             </Box>
           </Box>
         </Box>
