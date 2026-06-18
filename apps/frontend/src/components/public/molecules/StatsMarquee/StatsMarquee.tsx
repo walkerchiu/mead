@@ -140,14 +140,17 @@ export function StatsMarquee({
     flexShrink: 0,
   } as const;
 
-  // 滑鼠拖曳捲動：按下記錄起點，移動時依位移更新捲動位置（沿軸、無縫環繞），
-  // 拖曳期間暫停自動捲。與 hover 滾輪瀏覽並存。
+  // 拖曳瀏覽：按下記錄起點，移動時依位移更新捲動位置（沿軸、無縫環繞），期間暫停自動捲。
+  // 拖曳僅供滑鼠；觸控一律交還瀏覽器原生捲動 —— 對觸控做 setPointerCapture 會攔截
+  // pointer、卡住 iOS 原生捲動（連帶垂直頁面捲動也滑不過去），故觸控只暫停自動捲、不接管。
   const axisProp = horizontal ? 'scrollLeft' : 'scrollTop';
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
+    // 任何指標按下都先暫停自動捲，避免與使用者捲動相互較勁。
+    pausedRef.current = true;
+    if (e.pointerType !== 'mouse') return; // 觸控／觸控筆：交給原生捲動
     const el = scrollerRef.current;
     if (!el) return;
     draggingRef.current = true;
-    pausedRef.current = true;
     dragStartRef.current = {
       pos: horizontal ? e.clientX : e.clientY,
       scroll: el[axisProp],
@@ -166,6 +169,11 @@ export function StatsMarquee({
     el[axisProp] = next;
   };
   const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== 'mouse') {
+      pausedRef.current = false; // 觸控結束：恢復自動捲（觸控無 mouseleave）
+      return;
+    }
+    // 滑鼠：維持暫停直到游標離開（onMouseLeave 恢復），此處僅結束拖曳。
     if (!draggingRef.current) return;
     draggingRef.current = false;
     scrollerRef.current?.releasePointerCapture?.(e.pointerId);
@@ -206,7 +214,9 @@ export function StatsMarquee({
         // 可拖曳瀏覽：grab 游標、拖曳中 grabbing；拖曳期間不選取文字。
         cursor: 'grab',
         userSelect: 'none',
-        touchAction: horizontal ? 'pan-y' : 'pan-x',
+        // 水平跑馬燈：允許原生雙軸捲動 —— 橫向滑動捲跑馬燈、縱向滑動讓頁面捲過去
+        // （瀏覽器依手勢方向與可捲動軸自動路由）。垂直跑馬燈：原生縱向捲動。
+        touchAction: horizontal ? 'pan-x pan-y' : 'pan-y',
         '&:active': { cursor: 'grabbing' },
       }}
     >
