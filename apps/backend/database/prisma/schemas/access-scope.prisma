@@ -1,7 +1,0 @@
-// AccessScope - 訪問範圍枚舉
-// 決定用戶可以訪問哪個介面
-enum AccessScope {
-  PUBLIC_SCOPE    // 公開頁面訪問
-  CUSTOMER_SCOPE  // 客戶儀表板訪問
-  HQ_SCOPE     // 管理後台訪問
-}

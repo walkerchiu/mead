@@ -16,15 +16,6 @@
     "type-check": {
       "dependsOn": ["^type-check"]
     },
-    "db:generate": {
-      "cache": false
-    },
-    "db:push": {
-      "cache": false
-    },
-    "db:migrate": {
-      "cache": false
-    },
     "clean": {
       "cache": false
     },
