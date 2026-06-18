@@ -20,20 +20,6 @@ storybook-static/
 .env.*
 !.env.example
 !.env.*.example
-# Docker environment (contains sensitive data)
-.env.docker
-!.env.docker.example
-
-# Per-host docker compose override（每環境 override，對齊 .env.docker.<env>.example）
-# 從 docker-compose.<env>.override.yml.example 衍生；每台機器值不同，不入庫。
-docker-compose.dev.override.yml
-docker-compose.sit.override.yml
-docker-compose.uat.override.yml
-docker-compose.staging.override.yml
-docker-compose.prod.override.yml
-
-# SeaweedFS generated config (generated from infra/seaweedfs/s3.json.template)
-infra/seaweedfs/s3.json
 
 # IDE / 開發者個人設定
 .idea/
@@ -61,7 +47,6 @@ Thumbs.db
 
 # Logs
 logs/
-!**/hq/logs/
 *.log
 npm-debug.log*
 pnpm-debug.log*
@@ -75,18 +60,6 @@ coverage/
 # Temporary
 tmp/
 temp/
-
-# Database backups
-backups/
-
-# Uploaded files (應使用外部儲存如 S3/SeaweedFS)
-apps/backend/uploads/*
-!apps/backend/uploads/README.md
-
-# Python（scripts/check-drift.py 執行產物）
-__pycache__/
-*.pyc
-*.pyo
 
 # AWS bootstrap 一次性產物（DEPLOYMENT_NOTES.txt 的 heredoc 生成；非長期 source of truth）
 *-policy.json

@@ -89,15 +89,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  async redirects() {
-    return [
-      {
-        source: '/:locale(en|zh-TW)/admin/:path*',
-        destination: '/:locale/hq/:path*',
-        permanent: true, // 308 永久重定向
-      },
-    ];
-  },
 };
 
 export default withBundleAnalyzer(withNextIntl(nextConfig));
