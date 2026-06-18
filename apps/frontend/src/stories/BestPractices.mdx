@@ -45,33 +45,30 @@ export function Button({ children, loading, ...props }) {
 ### 1. 保持元件純粹
 
 ```tsx
-// ❌ Bad: Side effects inside component
-function LoginForm() {
-  const [login] = useMutation(LOGIN_MUTATION); // API call
-  const router = useRouter(); // Routing logic
+// ❌ Bad: Data loading inside a presentational component
+function PlanList() {
+  const { plans } = usePlans(); // data loading
+  const router = useNavRouter(); // routing logic
 
-  return <form>...</form>;
+  return <div>...</div>;
 }
 
-// ✅ Good: Component only handles UI
-function LoginForm({ onSubmit, loading, error }) {
-  const { handleSubmit } = useForm();
-
+// ✅ Good: Component only handles UI, data comes via props
+function PlanList({ plans, onSelect }) {
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      {error && <ErrorMessage />}
-      <Button loading={loading}>Login</Button>
-    </form>
+    <div>
+      {plans.map((plan) => (
+        <PlanCard key={plan.id} plan={plan} onSelect={onSelect} />
+      ))}
+    </div>
   );
 }
 
-// Handle logic at page level
-function LoginPage() {
-  const [login, { loading }] = useMutation(LOGIN_MUTATION);
-  const handleSubmit = async (data) => {
-    await login({ variables: data });
-  };
-  return <LoginForm onSubmit={handleSubmit} loading={loading} />;
+// Load data at the page level
+function PortalLandingPage() {
+  const { plans, loading } = usePlans();
+  if (loading) return <CircularProgress />;
+  return <PlanList plans={plans} onSelect={openPlan} />;
 }
 ```
 
@@ -129,27 +126,21 @@ export function Button({
 
 ```tsx
 // ✅ Good: Explicit types
-export interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => void | Promise<void>;
-  loading?: boolean;
-  error?: string;
-  defaultEmail?: string;
+export interface PlanCardProps {
+  plan: Plan;
+  active?: boolean;
+  onSelect?: (plan: Plan) => void;
 }
-
-export type LoginFormData = {
-  email: string;
-  password: string;
-};
 ```
 
 #### 避免使用 any
 
 ```tsx
 // ❌ Bad
-function handleSubmit(data: any) {}
+function selectPlan(plan: any) {}
 
 // ✅ Good
-function handleSubmit(data: LoginFormData) {}
+function selectPlan(plan: Plan) {}
 ```
 
 ---
@@ -312,8 +303,8 @@ export { ComponentName } from './ComponentName';
 export type { ComponentNameProps } from './ComponentName';
 
 // atoms/index.ts
-export * from './Button';
-export * from './TextField';
+export * from './Buttons';
+export * from './Icon';
 ```
 
 ---

@@ -150,7 +150,7 @@ H1 / H2 之間用 `---`（前後各一空行）。
 
 ````markdown
 ```bash
-./scripts/cli.sh dev
+pnpm dev
 ```
 
 ```ts
@@ -172,7 +172,7 @@ const x = 1;
 
 ## 連結與參考
 
-- 內部連結用相對路徑：`[見 CLI 指南](./CLI_GUIDE.md)`
+- 內部連結用相對路徑：`[組件庫指南](../frontend/COMPONENT_LIBRARY.md)`
 - 外部連結用完整 URL：`[Next.js Docs](https://nextjs.org/docs)`
 - 同檔內錨點用 `#章節名`：`[跳到目錄](#目錄)`
 

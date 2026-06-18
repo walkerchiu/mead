@@ -21,8 +21,8 @@
       - [1. `default-src 'self'`](#1-default-src-self)
       - [2. `script-src 'self' 'nonce-{nonce}' 'strict-dynamic'`](#2-script-src-self-nonce-nonce-strict-dynamic)
       - [3. `style-src 'self' 'nonce-{nonce}'`](#3-style-src-self-nonce-nonce)
-      - [4. `connect-src 'self' {graphqlHttp} {graphqlWs}'`](#4-connect-src-self-graphqlhttp-graphqlws)
-      - [5. `img-src 'self' data: https:`](#5-img-src-self-data-https)
+      - [4. `connect-src 'self'`](#4-connect-src-self)
+      - [5. `img-src 'self' data: blob: https:`](#5-img-src-self-data-blob-https)
       - [6. `frame-ancestors 'none'`](#6-frame-ancestors-none)
       - [7. `object-src 'none'`](#7-object-src-none)
   - [整合流程](#整合流程)
@@ -37,7 +37,7 @@
     - [4. 功能測試清單](#4-功能測試清單)
   - [疑難排解](#疑難排解)
     - [問題 1: 頁面白屏，樣式無法載入](#問題-1-頁面白屏樣式無法載入)
-    - [問題 2: GraphQL 請求被阻止](#問題-2-graphql-請求被阻止)
+    - [問題 2: 外部連線被阻止 (connect-src)](#問題-2-外部連線被阻止-connect-src)
     - [問題 3: 外部 CDN 資源無法載入](#問題-3-外部-cdn-資源無法載入)
     - [問題 4: 開發環境 DevTools 問題](#問題-4-開發環境-devtools-問題)
   - [安全考量](#安全考量)
@@ -68,7 +68,6 @@
 
 - 每個請求生成唯一的隨機 nonce
 - 支援 Material-UI (Emotion) 動態樣式
-- 支援 GraphQL WebSocket 訂閱
 - 阻止所有未授權的腳本和樣式
 
 ---
@@ -165,10 +164,13 @@ const cspDirectives = [
   "default-src 'self'",
   "script-src 'self' 'nonce-{nonce}' 'strict-dynamic'",
   "style-src 'self' 'nonce-{nonce}'",
-  "img-src 'self' data: https:",
+  "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' {graphqlHttp} {graphqlWs}",
+  // 純展示入口網讀同源靜態資料，無外部 API；connect-src 僅需 'self'。
+  "connect-src 'self'",
   "media-src 'self'",
+  "frame-src 'self' blob:",
+  "worker-src 'self' blob:",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -237,28 +239,25 @@ const cspDirectives = [
 </style>
 ```
 
-#### 4. `connect-src 'self' {graphqlHttp} {graphqlWs}'`
+#### 4. `connect-src 'self'`
 
 **作用**: 控制 XHR、WebSocket、EventSource 等連線
 
-- `'self'`: 同源連線
-- GraphQL HTTP 端點 (例如 `http://localhost:4000`)
-- GraphQL WebSocket 端點 (例如 `ws://localhost:4000`)
+- `'self'`: 同源連線。入口網讀同源靜態 `plans.json`，無外部 API，故僅需 `'self'`。
 
 **範例**:
 
 ```javascript
-// ✅ 允許：GraphQL 查詢
-fetch('http://localhost:4000/graphql', { ... });
+// ✅ 允許：同源靜態資料
+fetch('/data/plans.json');
 
-// ✅ 允許：GraphQL 訂閱
-new WebSocket('ws://localhost:4000/graphql');
-
-// ❌ 阻止：未授權的端點
+// ❌ 阻止：未授權的外部端點
 fetch('https://evil.com/steal-data', { ... });
 ```
 
-#### 5. `img-src 'self' data: https:`
+> 若未來需連外部 API，於 `connect-src` 加入該來源即可。
+
+#### 5. `img-src 'self' data: blob: https:`
 
 **作用**: 控制圖片來源
 
@@ -345,9 +344,8 @@ export default async function LocaleLayout({ children, params }) {
 export function Providers({ children, nonce }: { children: ReactNode; nonce?: string }) {
   return (
     <ThemeRegistry nonce={nonce}>
-      <ApolloProvider>
-        {/* ... */}
-      </ApolloProvider>
+      {/* ProgressProvider / SnackbarProvider ... */}
+      {children}
     </ThemeRegistry>
   );
 }
@@ -426,9 +424,8 @@ Refused to connect to 'https://api.example.com' because it violates CSP directiv
 
 - [ ] 頁面正常渲染（無白屏）
 - [ ] Material-UI 樣式正確載入
-- [ ] 按鈕、表單等互動正常
-- [ ] GraphQL 查詢和變更正常
-- [ ] GraphQL 訂閱 (WebSocket) 正常
+- [ ] 按鈕等互動正常
+- [ ] 同源靜態資料（`plans.json`）正常載入
 - [ ] 圖片正常顯示
 - [ ] 字體正常載入
 - [ ] Console 無 CSP 違規錯誤
@@ -457,31 +454,17 @@ const nonce = headersList.get('x-nonce') || undefined;
 console.log('[Layout] Nonce:', nonce); // 應該顯示一個 base64 字串
 ```
 
-### 問題 2: GraphQL 請求被阻止
+### 問題 2: 外部連線被阻止 (connect-src)
 
 **症狀**: Console 顯示 `connect-src` 違規
 
 ```text
-Refused to connect to 'http://localhost:4000/graphql' because it violates CSP directive
+Refused to connect to 'https://api.example.com' because it violates CSP directive: "connect-src 'self'".
 ```
 
-**原因**: CSP 的 `connect-src` 沒有允許 GraphQL 端點
+**原因**: 入口網 `connect-src` 僅允許 `'self'`（同源）。入口網讀同源靜態 `plans.json`，正常情況不會觸發此違規。
 
-**解決方案**:
-
-確認 `.env` 文件中的環境變數正確：
-
-```bash
-NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:4000/graphql
-NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT=ws://localhost:4000/graphql
-```
-
-確認 `middleware.ts` 正確讀取環境變數：
-
-```typescript
-const graphqlHttpUrl = process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT || '...';
-const graphqlWsUrl = process.env.NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT || '...';
-```
+**解決方案**: 若刻意要連某個外部來源，於 `apps/frontend/src/proxy.ts` 的 `connect-src` 指令加入該來源；否則改回同源資源。
 
 ### 問題 3: 外部 CDN 資源無法載入
 
@@ -626,8 +609,7 @@ export default function handler(req, res) {
 - [ ] TypeScript 編譯通過
 - [ ] 頁面正常渲染
 - [ ] MUI 樣式正確載入
-- [ ] GraphQL 查詢正常
-- [ ] GraphQL 訂閱正常
+- [ ] 同源靜態資料正常載入
 - [ ] Console 無 CSP 錯誤
 
 ### 安全確認

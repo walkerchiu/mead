@@ -213,12 +213,8 @@ ssh -i <金鑰>.pem ubuntu@<主機IP> '
 2. **Security Group / 防火牆**：開 inbound 80、443。
 3. **HSTS preload**：`next.config.ts` 目前為 `Strict-Transport-Security: max-age=63072000; includeSubDomains`（**不含 `preload`**）。
    `preload` 幾乎不可逆，故初期刻意不帶；待 HTTPS 穩定一段時間後再視需要加上。
-4. **CSP connect-src**：目前 CSP 含 `http://localhost:4000`（範本後端，入口網用不到，瀏覽器
-   主控台會有無害的 auth 連線錯誤）。若生產純前端，可移除該來源讓主控台乾淨；若有接後端則改成正式 endpoint。
-5. **若生產要連後端**：本入口網為純展示不需後端；如需後端，請改用全棧方案
-   （見 [SELF_HOSTED_TLS_DEPLOYMENT.md](./SELF_HOSTED_TLS_DEPLOYMENT.md)），並評估主機規格
-   （後端 + TimescaleDB/RabbitMQ/Dragonfly/SeaweedFS 需數 GB RAM）。
-6. **映像來源**：生產建議改用私有 registry（ECR）而非 scp（見附錄 A），便於版本管理與多機部署。
+4. **CSP**：入口網讀同源靜態資料，`connect-src` 已收斂為 `'self'`（見 `apps/frontend/src/proxy.ts`），無對外 API 來源，生產不需額外調整。
+5. **映像來源**：生產建議改用私有 registry（ECR）而非 scp（見附錄 A），便於版本管理與多機部署。
 
 ---
 
