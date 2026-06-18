@@ -5,8 +5,8 @@
 // 首幀光柵化造成的「先清晰再變霧」。此腳本即該圖檔的唯一產生來源——調整霧化外觀
 // 改這裡並重跑，勿手改二進位檔。
 //
-// 外觀參數：以原圖縮到 600 寬、Gaussian blur sigma 16 鋪底，再降彩度、提亮，讓
-// 霧化更輕透、不濃深（彩度約 0.6、亮度約 1.15）。
+// 外觀參數：以原圖縮到 600 寬、Gaussian blur sigma 10 鋪底，再降彩度、提亮，讓
+// 霧化輕透、不濃深、保留可辨識的輪廓（彩度約 0.6、亮度約 1.15）。
 //
 // 執行：pnpm --filter @mead/frontend assets:plan-blur
 
@@ -24,7 +24,7 @@ const PHOTO_NAMES = ['photo_01', 'photo_02', 'photo_03'];
 
 /** 霧化外觀：縮圖寬度、模糊強度、彩度 / 亮度倍率。 */
 const WIDTH = 600;
-const BLUR_SIGMA = 16;
+const BLUR_SIGMA = 10;
 const SATURATION = 0.6;
 const BRIGHTNESS = 1.15;
 
