@@ -62,7 +62,7 @@ docker buildx build --platform linux/amd64 \
   -t mead-frontend:latest --load .
 ```
 
-完成後確認：`docker images mead-frontend`（本次約 85MB）。
+完成後確認：`docker images mead-frontend`（本次約 100MB）。
 
 ---
 
@@ -246,6 +246,6 @@ docker buildx build --platform linux/amd64 -t <acct>.dkr.ecr.<region>.amazonaws.
 - 主機：EC2 Ubuntu 24.04，2 vCPU / ~1GB RAM / 6.8GB disk
 - 網域：`mead.webhop.me` → 43.212.90.250
 - 憑證：Let's Encrypt 正式（E8），效期至 2026-08-21，TLS-ALPN-01 驗證通過
-- 映像：`mead-frontend:latest`（linux/amd64，~85MB）
+- 映像：`mead-frontend:latest`（linux/amd64，~100MB）
 - 部署目錄：主機 `~/mead-deploy/`（Caddyfile、docker-compose.yml、.env）
 - 結果：`https://mead.webhop.me` 正常（HTTPS、HTTP 轉址、i18n、無障礙、計畫詳細頁皆 OK）
