@@ -132,6 +132,7 @@ export function PlanCardWithStars({
   starsVisible = true,
   staticStars = false,
   dimmed = false,
+  suppressSloganReplay = false,
 }: {
   plan: Plan;
   /**
@@ -153,6 +154,11 @@ export function PlanCardWithStars({
    * hover 時才有樣式變化）。dim 套在卡片層而非外層，避免波及底下照片。
    */
   dimmed?: boolean;
+  /**
+   * 抑制本次 active 轉換的 slogan 重播。wrap 後 snap 回中份把 active 換到另一份
+   * 複本 instance 時設為 true，避免同一計畫切換 slogan 播兩次。透傳給 PlanCard。
+   */
+  suppressSloganReplay?: boolean;
 }) {
   const photos = localPhotos(plan);
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
@@ -301,7 +307,12 @@ export function PlanCardWithStars({
       >
         {/* 有裝飾照片在卡片後方時，墊半透明底讓毛玻璃罩在均勻色上（照片淡淡透出、
             濃淡一致）。墊在每張卡各自後方，不填卡間間隙。 */}
-        <PlanCard plan={plan} active={starsVisible} frostBacking={showStars} />
+        <PlanCard
+          plan={plan}
+          active={starsVisible}
+          frostBacking={showStars}
+          suppressSloganReplay={suppressSloganReplay}
+        />
       </Box>
     </>
   );
@@ -1126,7 +1137,12 @@ export function PlanCarousel({
                       },
                     }}
                   >
-                    <PlanCard plan={plan} active={isCenter} />
+                    <PlanCard
+                      plan={plan}
+                      active={isCenter}
+                      // wrap snap 回中份的無感重定位：不重播 slogan（見桌機環狀同款處理）。
+                      suppressSloganReplay={wrapSnap}
+                    />
                   </Box>
                 );
               }),
@@ -1286,6 +1302,9 @@ export function PlanCarousel({
                     showStars={isCenter}
                     starsVisible={isCenter}
                     dimmed={!isCenter}
+                    // wrap 後 snap 回中份那一拍，active 換到中份複本 instance；此重定位
+                    // 無感，不應再播 slogan（避免同一計畫切換時 slogan 跑兩次）。
+                    suppressSloganReplay={wrapSnap}
                   />
                 </Box>
               );

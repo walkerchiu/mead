@@ -30,21 +30,41 @@ export interface PlanCardProps {
    * 切換時各處霧化趨於一致。墊在每張卡後方（非整體外層）才不會填到卡間間隙、連成一塊。
    */
   frostBacking?: boolean;
+  /**
+   * 抑制本次 active 轉換所觸發的 slogan 重播。環狀輪播以三份卡片複本實作無限循環，
+   * wrap（首↔末）後會「無動畫 snap 回中份」把 active 卡換到另一份複本的 instance 上；
+   * 該重定位本應無感，故此時設為 true，避免新 instance 因 active 轉真而再播一次 slogan。
+   */
+  suppressSloganReplay?: boolean;
 }
 
 /**
  * slogan 重播控制：掛載時播一次（由 AnimatedSlogan 的初始 key 觸發），之後每次
  * 「切換到此卡」（active 轉 true 或計畫改變）再播一次；不隨滑鼠互動、不輪播。
+ *
+ * suppress 為 true 時跳過該次 active 轉換的重播：用於環狀輪播 wrap 後「snap 回中份」
+ * 把 active 換到另一份複本 instance 的無感重定位，避免同一計畫切換時 slogan 播兩次。
+ * 以 ref 讀取，使「抑制與否」取當下這一拍的值，又不把它列入 effect deps。
  */
-function useSloganReplay(active: boolean, planId: string): number {
+function useSloganReplay(
+  active: boolean,
+  planId: string,
+  suppress = false,
+): number {
   const [nonce, setNonce] = useState(0);
   const first = useRef(true);
+  const suppressRef = useRef(suppress);
+  // 先把當下的 suppress 同步進 ref（無 deps、每次 commit 都跑），且宣告在下方 active
+  // effect 之前 → 同一拍 active 轉換時，下方 effect 讀到的已是這一拍的 suppress 值。
+  useEffect(() => {
+    suppressRef.current = suppress;
+  });
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
-    if (active) setNonce((n) => n + 1);
+    if (active && !suppressRef.current) setNonce((n) => n + 1);
   }, [active, planId]);
   return nonce;
 }
@@ -127,10 +147,14 @@ function getCardImage(plan: Plan): string | null {
  * 卡片二為橫向滾動數據跑馬燈、內縮 banner、社群連結列。時程與數據改為橫向呈現，
  * 讓窄版閱讀更從容、版面更輕（與桌機卡片的跑馬燈處理一致）。
  */
-function PlanCardMobile({ plan, active = true }: PlanCardProps) {
+function PlanCardMobile({
+  plan,
+  active = true,
+  suppressSloganReplay = false,
+}: PlanCardProps) {
   const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
-  const sloganNonce = useSloganReplay(active, plan.id);
+  const sloganNonce = useSloganReplay(active, plan.id, suppressSloganReplay);
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
@@ -303,10 +327,11 @@ function PlanCardDesktop({
   plan,
   active = true,
   frostBacking = false,
+  suppressSloganReplay = false,
 }: PlanCardProps) {
   const headline = getSloganText(plan);
   const cardImage = getCardImage(plan);
-  const sloganNonce = useSloganReplay(active, plan.id);
+  const sloganNonce = useSloganReplay(active, plan.id, suppressSloganReplay);
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
@@ -496,6 +521,7 @@ export function PlanCard({
   plan,
   active = true,
   frostBacking = false,
+  suppressSloganReplay = false,
 }: PlanCardProps) {
   return (
     <>
@@ -505,7 +531,11 @@ export function PlanCard({
           [portalTokens.mq.desktopUp]: { display: 'none' },
         }}
       >
-        <PlanCardMobile plan={plan} active={active} />
+        <PlanCardMobile
+          plan={plan}
+          active={active}
+          suppressSloganReplay={suppressSloganReplay}
+        />
       </Box>
       <Box
         sx={{
@@ -518,6 +548,7 @@ export function PlanCard({
           plan={plan}
           active={active}
           frostBacking={frostBacking}
+          suppressSloganReplay={suppressSloganReplay}
         />
       </Box>
     </>
