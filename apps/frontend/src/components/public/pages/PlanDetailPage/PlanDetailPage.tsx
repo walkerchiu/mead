@@ -89,6 +89,7 @@ export function PlanDetailPage({ plan, onBack }: PlanDetailPageProps) {
     <Box
       sx={{
         minHeight: '100vh',
+        '@supports (min-height: 100dvh)': { minHeight: '100dvh' },
         bgcolor: portalTokens.color.pageBg,
         display: 'flex',
         flexDirection: 'column',

@@ -194,10 +194,12 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         setHeroScale(1);
         return;
       }
+      // 用 visualViewport.height（實際可視高，跨引擎一致）量測，與 dvh 容器對齊；
+      // 各行動瀏覽器工具列高度不同造成的 innerHeight 落差不致讓 hero 縮放跑掉。
+      const vvh = window.visualViewport?.height ?? window.innerHeight;
       const widthScale =
         (window.innerWidth - 2 * HERO_SIDE_MARGIN) / HERO_DESIGN_W;
-      const heightScale =
-        (window.innerHeight - 2 * HERO_V_MARGIN) / HERO_DESIGN_H;
+      const heightScale = (vvh - 2 * HERO_V_MARGIN) / HERO_DESIGN_H;
       const fit = Math.min(widthScale, heightScale);
       const clamped = Math.max(HERO_MIN_SCALE, Math.min(HERO_MAX_SCALE, fit));
       // 夾下限（HERO_MIN_SCALE）後仍不得超過「寬度可容納」的比例，否則窄桌機
@@ -281,7 +283,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     const measure = () => {
       const wrap = cardWrapRef.current;
       if (!wrap) return;
-      const vh = window.innerHeight;
+      const vh = window.visualViewport?.height ?? window.innerHeight;
       // 還原自然高度：zoom 會讓 scrollHeight 變成縮放後高度，除以目前已套用倍率還原。
       const natural = wrap.scrollHeight / (appliedScaleRef.current || 1);
       // 依高度比例放大／縮小填滿第二屏：scale = 視窗高 /（卡片自然高 + 2×留白基準），
@@ -705,9 +707,12 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
           {t('viewingPlan', { name: activePlan.name.zh })}
         </Box>
         {/* 第一屏 — 文字雲佔滿整個視窗高度；底部置一列站名識別。 */}
+        {/* 用 dvh（動態視窗高＝實際可視區）讓各行動裝置一致填滿可視畫面；Android Chrome
+            的 100vh 含底部工具列區，會在下方留多餘空白。舊瀏覽器回退 100vh。 */}
         <Box
           sx={{
             minHeight: '100vh',
+            '@supports (min-height: 100dvh)': { minHeight: '100dvh' },
             display: 'flex',
             flexDirection: 'column',
             // 文字雲側邊圖片略微溢出時裁掉水平方向，避免出現橫向捲軸
@@ -753,6 +758,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             id="portal-plans"
             sx={{
               height: '100vh',
+              '@supports (height: 100dvh)': { height: '100dvh' },
               overflow: 'hidden',
               boxSizing: 'border-box',
               // 卡片在第二屏內垂直置中：各視窗高度都不靠頂留大片空白。卡片依高度比例

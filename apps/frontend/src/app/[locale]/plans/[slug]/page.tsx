@@ -29,6 +29,7 @@ export default function PlanDetailRoute({
 
   const centered = {
     minHeight: '100vh',
+    '@supports (min-height: 100dvh)': { minHeight: '100dvh' },
     display: 'flex',
     flexDirection: 'column' as const,
     alignItems: 'center',
