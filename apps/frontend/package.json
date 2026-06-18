@@ -21,6 +21,7 @@
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
     "generate-i18n-types": "tsx generate-i18n-types.ts",
+    "assets:plan-blur": "node scripts/generate-plan-blur.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "analyze": "ANALYZE=true next build"
@@ -91,6 +92,7 @@
     "msw": "^2.14.3",
     "msw-storybook-addon": "^2.0.7",
     "playwright": "^1.59.1",
+    "sharp": "0.34.5",
     "storybook": "^10.3.6",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",

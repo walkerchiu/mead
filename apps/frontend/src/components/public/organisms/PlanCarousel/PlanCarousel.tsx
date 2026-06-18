@@ -191,8 +191,9 @@ export function PlanCardWithStars({
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   clipPath: STAR_CLIP,
-                  // 霧化透出：模糊 + 半透明，融入卡片底下。
-                  filter: 'blur(8px)',
+                  // 霧化透出：模糊 + 降彩度提亮 + 半透明，輕透融入卡片底下（與桌機
+                  // 預模糊圖的淡彩外觀一致，不濃深）。
+                  filter: 'blur(8px) saturate(0.6) brightness(1.15)',
                   opacity: 0.55,
                   pointerEvents: 'none',
                   zIndex: 0,
