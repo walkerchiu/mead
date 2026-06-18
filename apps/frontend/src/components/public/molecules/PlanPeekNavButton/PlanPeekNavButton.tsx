@@ -106,7 +106,9 @@ export function PlanPeekNavButton({
         boxShadow:
           '0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06)',
         cursor: 'pointer',
-        transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+        // top 納入過場：手機版 peek 鈕會在使用者捲到卡片底部時由上方「跳下來」就位。
+        transition:
+          'box-shadow 0.2s ease, transform 0.2s ease, top 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
         '&:hover': {
           transform: `translateX(${isPrev ? -EDGE_OUT + 4 : EDGE_OUT - 4}px)`,
           boxShadow:

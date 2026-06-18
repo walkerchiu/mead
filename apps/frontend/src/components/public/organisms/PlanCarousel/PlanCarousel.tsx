@@ -759,6 +759,37 @@ export function PlanCarousel({
     };
   }, []);
 
+  // 手機展開卡比視窗高、需頁面捲動瀏覽。下一頁 peek 鈕原本固定在卡片頂部，捲到卡片
+  // 底部時會被捲出視野、必須回捲才能切換。改為偵測「卡片底部已進入視窗下緣」時，讓
+  // peek 鈕由上方「跳下來」貼到卡片底部就位，使用者在原處即可切到下一個計畫。
+  const mobileCardWrapRef = useRef<HTMLDivElement | null>(null);
+  const [peekAtBottom, setPeekAtBottom] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || isDesktop || expandedIndex === null) {
+      return;
+    }
+    const wrap = mobileCardWrapRef.current;
+    if (!wrap) return;
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
+      const vh = window.visualViewport?.height ?? window.innerHeight;
+      // 卡片底部捲到視窗下緣附近即視為「到底」，peek 鈕下移就位。
+      setPeekAtBottom(wrap.getBoundingClientRect().bottom <= vh + 24);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [isDesktop, expandedIndex]);
+
   // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）一掛載即渲染，其
   // 首次合成會讓毛玻璃由淺變濃、底下裝飾照片（尤其冷快取時才載入）淡入——使用者會看到
   // 「輕微變化」。為此掛載後先以同色遮罩蓋住整個輪播區，等到①卡片後方的霧化照片全部載入
@@ -1103,6 +1134,7 @@ export function PlanCarousel({
     return (
       <Box sx={{ width: '100%', overflowX: 'clip' }}>
         <Box
+          ref={mobileCardWrapRef}
           sx={{
             position: 'relative',
             display: 'flex',
@@ -1154,7 +1186,8 @@ export function PlanCarousel({
           {count > 1 && (
             <PlanPeekNavButton
               direction="next"
-              top="40px"
+              // 捲到卡片底部時由頂部（40px）跳到卡片底部（容器底上方約 110px）就位。
+              top={peekAtBottom ? 'calc(100% - 110px)' : '40px'}
               planName={plans[mNext]?.name.zh ?? ''}
               markSrc={`/images/plans/${plans[mNext]?.folderName}/logo/mark.png`}
               onClick={mobileNext}
