@@ -1,1 +1,0 @@
-export { GlobalLoadingProgress } from './GlobalLoadingProgress';

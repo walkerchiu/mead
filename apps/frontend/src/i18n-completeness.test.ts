@@ -131,7 +131,7 @@ describe('i18n Translation Completeness', () => {
   });
 
   describe('Namespace structure', () => {
-    const expectedNamespaces = ['common', 'nav', 'auth', 'validation', 'pages'];
+    const expectedNamespaces = ['a11y', 'portal'];
 
     languages.forEach((language) => {
       it(`should have all expected namespaces in ${language}`, () => {
@@ -145,21 +145,22 @@ describe('i18n Translation Completeness', () => {
     });
   });
 
-  describe('Auth namespace completeness', () => {
-    const expectedAuthSections = [
-      'login',
-      'forgotPassword',
-      'resetPassword',
-      'twoFactor',
+  describe('Portal namespace completeness', () => {
+    const expectedPortalSections = [
+      'eyebrow',
+      'heading',
+      'footer',
+      'detail',
+      'narrative',
     ];
 
     languages.forEach((language) => {
-      it(`should have all auth sections in ${language}`, () => {
+      it(`should have all portal sections in ${language}`, () => {
         const translation = translations[language as keyof typeof translations];
-        const authKeys = Object.keys(translation.auth || {}).sort();
+        const portalKeys = Object.keys(translation.portal || {}).sort();
 
-        expectedAuthSections.forEach((section) => {
-          expect(authKeys).toContain(section);
+        expectedPortalSections.forEach((section) => {
+          expect(portalKeys).toContain(section);
         });
       });
     });

@@ -1,1 +1,0 @@
-export { AuditLogDetailsModal } from './AuditLogDetailsModal';

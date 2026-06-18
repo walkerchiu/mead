@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { GlobalLoadingProgress } from '@/components/atoms/GlobalLoadingProgress';
 import { ClientErrorBoundary } from '@/components/errors';
 import { headers } from 'next/headers';
 // 自帶字體（@fontsource，從 npm 取得、隨映像打包）：Docker build 不向 fonts.gstatic.com
@@ -93,13 +92,8 @@ export default async function RootLayout({
         {/*
           全站路由 progress bar 由 @bprogress/next 的 ProgressProvider 處理
           （掛在 [locale]/providers.tsx）— bprogress 在 anchor click 的 capture
-          階段就觸發 bar，比 nextjs-toploader 的 router event 觸發早 50~250ms。
-
-          這裡只保留 Apollo in-flight progress：訂閱 GraphQL operation 計數
-          而不是 router events，覆蓋路由切完之後資料還在抓的時間。
-          兩者視覺一致（4px navy + glow），任一在跑都看到同款 bar。
+          階段就觸發 bar，使用者按下後幾乎是立即看到。
         */}
-        <GlobalLoadingProgress />
         <ClientErrorBoundary>{children}</ClientErrorBoundary>
       </body>
     </html>

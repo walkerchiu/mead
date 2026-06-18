@@ -278,24 +278,15 @@ export const Primary: Story = {
 - ✅ Default story（預設狀態）
 - ✅ Loading story（載入中狀態）
 - ✅ Error story（錯誤狀態）
-- ✅ Disabled story（停用狀態）
 - ✅ Interactive story（互動範例）
 
-### 2. 使用 MSW 模擬 API
+### 2. 以 args 驅動情境
+
+入口網元件為純展示、props 驅動，直接用 `args` 切換情境即可，不需模擬後端。
 
 ```tsx
-export const WithAPICall: Story = {
-  parameters: {
-    msw: {
-      handlers: [
-        graphql.mutation('Login', () => {
-          return HttpResponse.json({
-            data: { login: { accessToken: 'token' } },
-          });
-        }),
-      ],
-    },
-  },
+export const Loading: Story = {
+  args: { loading: true },
 };
 ```
 

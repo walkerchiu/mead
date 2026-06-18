@@ -1,1 +1,0 @@
-export { CronJobConfigDetailsModal } from './CronJobConfigDetailsModal';

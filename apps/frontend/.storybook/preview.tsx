@@ -3,16 +3,9 @@ import React from 'react';
 import { NextIntlClientProvider } from 'next-intl';
 import { ProgressProvider } from '@bprogress/next/app';
 import { StorybookThemeRegistry } from '../src/theme/StorybookThemeRegistry';
-import { StorybookApolloProvider } from '../src/lib/apollo-provider-storybook';
 import { SnackbarProvider } from 'notistack';
-import { initialize, mswLoader } from 'msw-storybook-addon';
 import enMessages from '../messages/en.json';
 import zhTWMessages from '../messages/zh-TW.json';
-
-// Initialize MSW
-initialize({
-  onUnhandledRequest: 'bypass',
-});
 
 // Language support
 const messages = {
@@ -65,20 +58,6 @@ const preview: Preview = {
             'Atoms',
             'Molecules',
             'Organisms',
-            'Layout',
-            'Templates',
-            'Pages',
-          ],
-          'HQ Scope',
-          [
-            'Overview',
-            'Design System',
-            ['Colors', 'Typography'],
-            'Atoms',
-            'Molecules',
-            'Organisms',
-            'Layout',
-            'Templates',
             'Pages',
           ],
           'Shared',
@@ -88,10 +67,6 @@ const preview: Preview = {
             ['Colors', 'Typography'],
             'Atoms',
             'Molecules',
-            'Organisms',
-            'Layout',
-            'Templates',
-            'Pages',
           ],
         ],
         locales: 'en-US',
@@ -112,32 +87,28 @@ const preview: Preview = {
         >
           {/*
             ProgressProvider — required by `useNavRouter` (which calls
-            `useProgress`). Any story that touches MainAppBar / Sidebar /
-            DashboardLayout / etc. transitively needs this; without it the
+            `useProgress`). Any story that navigates needs this; without it the
             story errors with "useProgress must be used within a
             ProgressProvider".
           */}
           <ProgressProvider color="#F59E0B" height="4px">
             <StorybookThemeRegistry>
-              <StorybookApolloProvider>
-                <SnackbarProvider
-                  maxSnack={3}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  autoHideDuration={5000}
-                >
-                  <Story />
-                </SnackbarProvider>
-              </StorybookApolloProvider>
+              <SnackbarProvider
+                maxSnack={3}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                autoHideDuration={5000}
+              >
+                <Story />
+              </SnackbarProvider>
             </StorybookThemeRegistry>
           </ProgressProvider>
         </NextIntlClientProvider>
       );
     },
   ],
-  loaders: [mswLoader],
 };
 
 export default preview;

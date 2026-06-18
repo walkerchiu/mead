@@ -1,1 +1,0 @@
-export { DeleteUserModal } from './DeleteUserModal';

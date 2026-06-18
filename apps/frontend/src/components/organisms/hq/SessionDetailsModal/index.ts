@@ -1,1 +1,0 @@
-export { SessionDetailsModal } from './SessionDetailsModal';

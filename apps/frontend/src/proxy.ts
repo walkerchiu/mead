@@ -48,12 +48,6 @@ export default function middleware(request: NextRequest) {
 
   const isDevelopment = process.env.NODE_ENV === 'development';
 
-  // 後端基礎 URL（統一配置，避免重複）
-  const backendBaseUrl =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-  const graphqlEndpoint = `${backendBaseUrl}/graphql`;
-  const wsEndpoint = backendBaseUrl.replace('http', 'ws') + '/graphql';
-
   // 構建 CSP policy
   const cspHeader = [
     "default-src 'self'",
@@ -67,7 +61,8 @@ export default function middleware(request: NextRequest) {
       : `style-src 'self' 'nonce-${nonce}'`,
     "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
-    `connect-src 'self' ${backendBaseUrl} ${graphqlEndpoint} ${wsEndpoint}`,
+    // 純展示入口網讀同源靜態資料，無外部 API；connect-src 僅需 'self'。
+    "connect-src 'self'",
     "media-src 'self'",
     "frame-src 'self' blob:",
     "worker-src 'self' blob:",

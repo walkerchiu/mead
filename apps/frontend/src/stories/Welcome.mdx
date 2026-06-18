@@ -4,14 +4,14 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # 歡迎使用 MEAD Storybook
 
-這是 MEAD 專案的 Storybook 元件庫，以 **Atomic Design** 原則為基礎建構。
+這是 MEAD 公開入口網的 Storybook 元件庫，以 **Atomic Design** 原則為基礎建構。
 
 ## 🎯 什麼是 Atomic Design？
 
-Atomic Design 是一套設計系統方法論，將 UI 元件組織為五個層級：
+Atomic Design 是一套設計系統方法論，將 UI 元件組織為以下層級：
 
 ```
-Atoms → Molecules → Organisms → Templates → Pages
+Atoms → Molecules → Organisms → Pages
 ```
 
 ### 📦 元件層級
@@ -23,8 +23,8 @@ Atoms → Molecules → Organisms → Templates → Pages
 範例：
 
 - `Button` - 按鈕元件
-- `TextField` - 輸入欄位
-- `CodeInput` - 驗證碼輸入
+- `Icon` - 圖示元件
+- `AnimatedSlogan` - 入口網逐字進場標語
 
 **何時使用**：當你需要最基本的 UI 元素時。
 
@@ -34,9 +34,9 @@ Atoms → Molecules → Organisms → Templates → Pages
 
 範例：
 
-- `FormField` - 表單欄位（TextField + Label + Error）
-- `PasswordField` - 密碼輸入（TextField + 顯示／隱藏按鈕 + 強度指示器）
 - `AlertMessage` - 警示訊息
+- `SnackbarWithProgress` - 帶進度條的提示
+- `PlanTimeline` - 計畫時程
 
 **何時使用**：當你需要組合多個基本元素以達成特定功能時。
 
@@ -46,30 +46,20 @@ Atoms → Molecules → Organisms → Templates → Pages
 
 範例：
 
-- `LoginForm` - 登入表單
-- `TwoFactorForm` - 雙因素驗證表單
-- `ForgotPasswordForm` - 忘記密碼表單
+- `PlanCard` - 計畫卡片
+- `PlanCarousel` - 三計畫展開／收合輪播
+- `PortalFooter` - 入口網頁尾
 
-**何時使用**：當你需要完整的功能模組（表單、卡片等）時。
+**何時使用**：當你需要完整的功能模組時。
 
-#### 4. **Templates**
+#### 4. **Pages**
 
-定義頁面結構與版面配置。
-
-範例：
-
-- `AuthLayout` - 認證頁面版面配置
-
-**何時使用**：當你需要統一的頁面版面配置時。
-
-#### 5. **Pages**
-
-完整的頁面呈現（僅供 Storybook 使用）。
+完整的頁面呈現。
 
 範例：
 
-- `LoginPage` - 完整登入頁面流程
-- `ForgotPasswordPage` - 忘記密碼頁面
+- `PortalLandingPage` - 入口網首頁
+- `PlanDetailPage` - 計畫詳細頁
 
 **何時使用**：用於展示完整的使用者流程與互動。
 
@@ -79,27 +69,20 @@ Atoms → Molecules → Organisms → Templates → Pages
 
 ### 瀏覽元件
 
-側邊欄分為三個頂層 **scope**，各自擁有專屬的 `Overview` 頁面：
+側邊欄分為兩個頂層 **scope**，各自擁有專屬的 `Overview` 頁面：
 
-1. **Public Scope** - 公開、免登入的內容網站（近期主力焦點）
-2. **HQ Scope** - 後台管理；運維工具（稽核日誌、Cron Jobs、Session）與 HQ 專屬外殼
-3. **Shared** - 跨 scope 的通用 UI 元件與認證流程
+1. **Public Scope** - 公開、免登入的入口網內容元件
+2. **Shared** - 不綁定入口網的通用 UI 基礎元件
 
-在每個 scope 內，元件皆遵循相同的 Atomic Design 分層：
-**Design System → Atoms → Molecules → Organisms → Layout → Templates → Pages**。
-
-Scope 由原始碼資料夾決定：scope 專屬元件位於
-`components/public/<level>/`（Public）或 `components/<level>/hq/`（HQ）；通用的
-共用元件則直接放在 `components/<level>/` 之下。當不確定元件歸屬時，預設放入
-**Shared**。
+Scope 由原始碼資料夾決定：入口網專屬元件位於 `components/public/<level>/`，
+通用的共用元件則直接放在 `components/<level>/` 之下。當不確定元件歸屬時，
+預設放入 **Shared**。
 
 ### 測試元件
 
 每個元件都有多個 **Story**（情境展示）：
 
 - **Default** - 預設狀態
-- **Loading** - 載入中狀態
-- **Error** - 錯誤狀態
 - **Interactive** - 互動範例
 
 ### 使用 Controls
@@ -107,7 +90,7 @@ Scope 由原始碼資料夾決定：scope 專屬元件位於
 點選 **Controls** 分頁即可即時調整元件 props：
 
 - 修改文字內容
-- 切換狀態（停用、載入中）
+- 切換狀態
 - 調整樣式（variant、color、size）
 
 ---
@@ -134,10 +117,6 @@ Scope 由原始碼資料夾決定：scope 專屬元件位於
    export const Default: Story = {
      args: { children: 'Click me' },
    };
-
-   export const Loading: Story = {
-     args: { children: 'Loading', loading: true },
-   };
    ```
 
 3. **測試所有狀態**
@@ -148,39 +127,35 @@ Scope 由原始碼資料夾決定：scope 專屬元件位於
 4. **整合至 Next.js 頁面**
 
    ```tsx
-   // app/login/page.tsx
-   import { LoginForm } from '@/components/organisms';
+   // app/[locale]/page.tsx
+   import { PortalLandingPage } from '@/components/public';
 
-   export default function LoginPage() {
-     return <LoginForm onSubmit={handleLogin} />;
+   export default function Home() {
+     return <PortalLandingPage />;
    }
    ```
 
 ### 命名慣例
 
-- **元件**：PascalCase（例如 `LoginForm`）
-- **檔案**：與元件名稱相同（例如 `LoginForm.tsx`）
-- **Story**：ComponentName.stories.tsx（例如 `LoginForm.stories.tsx`）
+- **元件**：PascalCase（例如 `PlanCard`）
+- **檔案**：與元件名稱相同（例如 `PlanCard.tsx`）
+- **Story**：ComponentName.stories.tsx（例如 `PlanCard.stories.tsx`）
 
 ### 目錄結構
 
 ```text
 src/components/
 ├── atoms/
-│   ├── Button/
-│   │   ├── Button.tsx
-│   │   └── Button.stories.tsx
+│   ├── Buttons/
 │   └── index.ts
 ├── molecules/
-│   ├── FormField/
-│   │   ├── FormField.tsx
-│   │   └── FormField.stories.tsx
+│   ├── AlertMessage/
 │   └── index.ts
-└── organisms/
-    ├── LoginForm/
-    │   ├── LoginForm.tsx
-    │   └── LoginForm.stories.tsx
-    └── index.ts
+└── public/
+    ├── atoms/
+    ├── molecules/
+    ├── organisms/
+    └── pages/
 ```
 
 ---
@@ -207,14 +182,12 @@ src/components/
 
 ## 🔧 技術堆疊
 
-- **Storybook 10.2.1** - 元件展示與文件
+- **Storybook** - 元件展示與文件
 - **Next.js 16** - 應用框架
 - **React 19** - UI 函式庫
-- **MUI 6** - Material-UI 元件庫
+- **MUI 7** - Material-UI 元件庫
 - **TypeScript** - 型別安全
-- **MSW** - API 模擬
-- **React Hook Form** - 表單處理
-- **Zod** - Schema 驗證
+- **next-intl** - 國際化（i18n）
 
 ---
 
@@ -231,4 +204,4 @@ src/components/
 
 從左側邊欄選擇任一元件即可開始探索！
 
-我們建議從 **Atoms/Button** 開始，逐步了解整個設計系統。
+我們建議從 **Public Scope/Pages/PortalLandingPage** 開始。
