@@ -10,8 +10,10 @@ services:
       dockerfile: apps/frontend/Dockerfile
       args:
         # NEXT_PUBLIC_* 於 build 時烘進 client bundle；值由環境插值（未設則為空）。
-        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-}
-        NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-}
+        NEXT_PUBLIC_APP_VERSION: ${NEXT_PUBLIC_APP_VERSION:-}
+        NEXT_PUBLIC_BUILD_ID: ${NEXT_PUBLIC_BUILD_ID:-}
+        NEXT_PUBLIC_COMMIT_SHA: ${NEXT_PUBLIC_COMMIT_SHA:-}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
     container_name: mead-frontend
     restart: unless-stopped
     ports:

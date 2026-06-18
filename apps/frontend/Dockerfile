@@ -13,14 +13,11 @@ FROM base AS builder
 COPY . .
 RUN pnpm install --frozen-lockfile --filter @mead/frontend...
 # NEXT_PUBLIC_* 在 build 時烘進 client bundle —— 以 build args 傳入（見 docker-compose.yml 的
-# frontend.build.args，值由 .env.docker 插值），不依賴 Next.js 自動載入 .env 檔，故 runtime
-# 設定檔可命名為 .env.prod（與 backend 一致）。
-ARG NEXT_PUBLIC_GRAPHQL_ENDPOINT
-ARG NEXT_PUBLIC_GRAPHQL_WS_ENDPOINT
-ARG NEXT_PUBLIC_APP_URL
-ARG NEXT_PUBLIC_APP_NAME
-ARG NEXT_PUBLIC_ENABLE_2FA
-ARG NEXT_PUBLIC_ENABLE_ANALYTICS
+# frontend.build.args，值由環境插值）。入口網僅用到版本資訊與選用的 Sentry DSN
+# （見 src/lib/error-context.ts、src/lib/sentry-service.ts）。
+ARG NEXT_PUBLIC_APP_VERSION
+ARG NEXT_PUBLIC_BUILD_ID
+ARG NEXT_PUBLIC_COMMIT_SHA
 ARG NEXT_PUBLIC_SENTRY_DSN
 ENV NEXT_TELEMETRY_DISABLED=1
 # 快取 Next 建置快取（含 next/font/google 抓取的字體子集）：gstatic 對上百個
