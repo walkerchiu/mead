@@ -158,7 +158,7 @@ echo | openssl s_client -servername <網域> -connect <網域>:443 2>/dev/null \
   | openssl x509 -noout -issuer -enddate                # issuer 應為 Let's Encrypt
 
 # 內容
-curl -s https://<網域>/zh-TW | grep "為台灣藝術設計開啟更多可能"
+curl -s https://<網域>/zh-TW | grep "為臺灣藝術設計開啟更多可能"
 curl -sI https://<網域>/data/plans.json | head -1       # 200
 curl -sI http://<網域>/ | grep -i "HTTP/\|location"     # HTTP→HTTPS 轉址
 ```
@@ -190,8 +190,14 @@ scp -i <金鑰>.pem /tmp/mead-frontend.tar.gz ubuntu@<主機IP>:/tmp/
 # 主機載入新映像 + 重啟前端（憑證不受影響）
 ssh -i <金鑰>.pem ubuntu@<主機IP> '
   gunzip -f /tmp/mead-frontend.tar.gz && sudo docker load -i /tmp/mead-frontend.tar && rm -f /tmp/mead-frontend.tar
-  cd ~/mead-deploy && sudo docker compose up -d --force-recreate frontend'
+  cd ~/mead-deploy && sudo docker compose up -d --force-recreate frontend
+  # 清理被新版取代的舊映像（每次更新會留下一份 untagged 舊建置，~350MB；
+  # 小主機磁碟易塞滿。只刪 dangling，不動使用中的映像）
+  sudo docker rmi $(sudo docker images -f dangling=true -q) 2>/dev/null || true'
 ```
+
+> ⚠️ 小主機磁碟（本測試機僅 6.8GB）：若略過上面的 dangling 清理，累積數次更新後
+> `docker load` 會因 `no space left on device` 中途失敗、映像不完整。務必保留此清理行。
 
 ---
 
