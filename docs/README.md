@@ -11,20 +11,20 @@
 
 ## 前端
 
-| 文檔                                                                         | 說明                             |
-| ---------------------------------------------------------------------------- | -------------------------------- |
-| [SPOSAD 入口網](frontend/SPOSAD_PORTAL.md)                                   | 入口網架構與元件總覽             |
-| [設計指南](frontend/DESIGN_GUIDE.md)                                         | 設計規範與視覺標準（含暗色模式） |
-| [組件庫指南](frontend/COMPONENT_LIBRARY.md)                                  | Atomic Design 架構與 Storybook   |
-| [組件 — Atoms](frontend/component-library/ATOMS.md)                          | 原子組件清單                     |
-| [組件 — Molecules](frontend/component-library/MOLECULES.md)                  | 分子組件清單                     |
-| [組件 — Organisms](frontend/component-library/ORGANISMS.md)                  | 有機體組件清單                   |
-| [組件 — Layout / Templates / Pages](frontend/component-library/TEMPLATES.md) | 佈局、模板與頁面                 |
-| [主題系統](frontend/THEME_SYSTEM.md)                                         | Light/Dark/System 主題系統       |
-| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md)              | ScrollControl 設計與 API         |
-| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)                | Error Boundaries 與錯誤追蹤      |
-| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                               | Content Security Policy          |
-| [i18n 設置指南](frontend/I18N_SETUP.md)                                      | next-intl 多語系配置             |
+| 文檔                                                            | 說明                                             |
+| --------------------------------------------------------------- | ------------------------------------------------ |
+| [SPOSAD 入口網](frontend/SPOSAD_PORTAL.md)                      | 入口網架構與元件總覽                             |
+| [設計指南](frontend/DESIGN_GUIDE.md)                            | 設計規範與視覺標準（含暗色模式）                 |
+| [組件庫指南](frontend/COMPONENT_LIBRARY.md)                     | Atomic Design 架構與 Storybook                   |
+| [組件 — Atoms](frontend/component-library/ATOMS.md)             | 原子組件清單                                     |
+| [組件 — Molecules](frontend/component-library/MOLECULES.md)     | 分子組件清單                                     |
+| [組件 — Organisms](frontend/component-library/ORGANISMS.md)     | 有機體組件清單                                   |
+| [組件 — Pages](frontend/component-library/TEMPLATES.md)         | 入口網頁面（PortalLandingPage / PlanDetailPage） |
+| [主題系統](frontend/THEME_SYSTEM.md)                            | Light/Dark/System 主題系統                       |
+| [捲動控制組件設計](frontend/SCROLL_CONTROL_COMPONENT_DESIGN.md) | ScrollControl 設計與 API                         |
+| [前端錯誤處理指南](frontend/FRONTEND_ERROR_HANDLING_GUIDE.md)   | Error Boundaries 與錯誤追蹤                      |
+| [CSP 實作指南](frontend/CSP_IMPLEMENTATION.md)                  | Content Security Policy                          |
+| [i18n 設置指南](frontend/I18N_SETUP.md)                         | next-intl 多語系配置                             |
 
 ## 部署
 
