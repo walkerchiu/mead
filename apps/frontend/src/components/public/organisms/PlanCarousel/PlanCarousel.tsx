@@ -782,23 +782,27 @@ export function PlanCarousel({
     };
   }, []);
 
-  // 手機展開卡比視窗高、需頁面捲動瀏覽。偵測「卡片底部已進入視窗下緣」時（peekAtBottom），
-  // 下一頁 peek 鈕由卡片頂部下移到社群列下方的保留空白帶就位，使用者在卡片尾端原處即可
-  // 切到下一個計畫，且不覆蓋代表圖與連結。
+  // 手機展開卡比視窗高、需頁面捲動瀏覽。偵測「作用中卡片底部已進入視窗下緣」時
+  // （peekAtBottom），下一頁 peek 鈕由卡片頂部下移到社群列下方就位，使用者在卡片尾端原處
+  // 即可切到下一個計畫，且不覆蓋代表圖與連結。peek 以「作用中卡片的實際高度」定位（而非
+  // 整條軌道高 = 最高卡），讓各計畫卡（含較矮者）與 peek 的距離一致。
   const mobileCardWrapRef = useRef<HTMLDivElement | null>(null);
+  const activeCardRef = useRef<HTMLDivElement | null>(null);
   const [peekAtBottom, setPeekAtBottom] = useState(false);
+  const [activeCardH, setActiveCardH] = useState(0);
   useEffect(() => {
     if (typeof window === 'undefined' || isDesktop || expandedIndex === null) {
       return;
     }
-    const wrap = mobileCardWrapRef.current;
-    if (!wrap) return;
+    const card = activeCardRef.current;
+    if (!card) return;
     let raf = 0;
     const measure = () => {
       raf = 0;
       const vh = window.visualViewport?.height ?? window.innerHeight;
-      // 卡片底部捲到視窗下緣附近即視為「到底」，peek 鈕下移就位。
-      setPeekAtBottom(wrap.getBoundingClientRect().bottom <= vh + 24);
+      setActiveCardH(card.offsetHeight);
+      // 作用中卡片底部捲到視窗下緣附近即視為「到底」，peek 鈕下移就位。
+      setPeekAtBottom(card.getBoundingClientRect().bottom <= vh + 24);
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(measure);
@@ -806,12 +810,15 @@ export function PlanCarousel({
     measure();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+    const ro = new ResizeObserver(() => measure());
+    ro.observe(card);
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
+      ro.disconnect();
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [isDesktop, expandedIndex]);
+  }, [isDesktop, expandedIndex, viewportW]);
 
   // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）一掛載即渲染，其
   // 首次合成會讓毛玻璃由淺變濃、底下裝飾照片（尤其冷快取時才載入）淡入——使用者會看到
@@ -1179,6 +1186,8 @@ export function PlanCarousel({
           <Box
             sx={{
               display: 'flex',
+              // 不撐高鄰卡：各卡維持自然高度（量到的中央卡高度才是該卡實高，供 peek 定位）。
+              alignItems: 'flex-start',
               gap: `${MGAP}px`,
               transform: `translateX(${trackX}px)`,
               transition: mTransition,
@@ -1192,6 +1201,7 @@ export function PlanCarousel({
                 return (
                   <Box
                     key={`${copy}-${plan.id}`}
+                    ref={isCenter ? activeCardRef : undefined}
                     aria-hidden={!isCenter}
                     sx={{
                       flex: '0 0 auto',
@@ -1221,9 +1231,16 @@ export function PlanCarousel({
           {count > 1 && (
             <PlanPeekNavButton
               direction="next"
-              // 捲到卡片底部時由頂部（40px）下移到社群列正下方就位（容器底再下 48px），
+              // 捲到卡片底部時由頂部（40px）下移到作用中卡片底部下 48px（社群列正下方）就位，
               // 緊貼社群列、不覆蓋代表圖與「前往官網」等連結；下方資訊區的留白即其落點。
-              top={peekAtBottom ? 'calc(100% + 48px)' : '40px'}
+              // 以作用中卡片實高定位，各計畫卡（含較矮者）與 peek 距離一致。
+              top={
+                peekAtBottom
+                  ? activeCardH
+                    ? `${Math.round(activeCardH) + 48}px`
+                    : 'calc(100% + 48px)'
+                  : '40px'
+              }
               planName={plans[mNext]?.name.zh ?? ''}
               markSrc={`/images/plans/${plans[mNext]?.folderName}/logo/mark.png`}
               onClick={mobileNext}
