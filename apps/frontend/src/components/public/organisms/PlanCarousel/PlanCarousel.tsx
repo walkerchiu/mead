@@ -36,6 +36,14 @@ const DECOR_STARS: Record<string, { x: number; y: number }[]> = {
     { x: 805, y: 248 }, // 右側溢出
   ],
 };
+// 個別裝飾照片在星形框內的取像微調。未列出者置中滿框（cover）。鍵為 photos 索引。
+// 橫向照片在正方星框是「高度填滿、左右裁切」、垂直無餘量，故以底部為錨垂直放大
+// （zoomUp）裁掉上緣 → 畫面在框內視覺上移、上緣暗部（如舞台黑底）露出更少。
+const STAR_FOCAL: Record<string, Record<number, { zoomUp: number }>> = {
+  // 菁培右上照片上緣為舞台暗部，放大約 1.3 倍裁掉上緣約 23%、減少黑色區塊。
+  sposad: { 0: { zoomUp: 1.3 } },
+};
+
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
 /** 手機版裝飾星形縮放 */
@@ -171,6 +179,8 @@ export function PlanCardWithStars({
       <Box aria-hidden>
         {stars.map((s, i) => {
           if (!photos[i]) return null;
+          // 該照片在星形框內的取像微調（未指定者置中滿框）。以底部為錨垂直放大裁上緣。
+          const focal = STAR_FOCAL[plan.id]?.[i];
           // 手機版：靜態霧化星形照片（沿用邊緣位置與星形輪廓，不互動、不載 WebGL）。
           if (staticStars) {
             const m = MOBILE_STAR_LAYOUT[i];
@@ -188,8 +198,11 @@ export function PlanCardWithStars({
                   transform: `scale(${MOBILE_STAR_SCALE})`,
                   transformOrigin: 'center',
                   backgroundImage: `url("${photos[i]}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
+                  // 同桌機：以底部為錨垂直放大裁上緣（auto 高度 zoom），其餘維持 cover。
+                  backgroundSize: focal
+                    ? `auto ${focal.zoomUp * 100}%`
+                    : 'cover',
+                  backgroundPosition: focal ? 'center bottom' : 'center',
                   clipPath: STAR_CLIP,
                   // 霧化透出：模糊 + 降彩度提亮 + 半透明，輕透融入卡片底下（與桌機
                   // 預模糊圖的淡彩外觀一致，不濃深）。
@@ -261,6 +274,11 @@ export function PlanCardWithStars({
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  // 以底部為錨垂直放大，裁掉上緣暗部（畫面在框內視覺上移）。
+                  ...(focal && {
+                    transform: `scale(${focal.zoomUp})`,
+                    transformOrigin: 'center bottom',
+                  }),
                   display: 'block',
                   visibility: 'hidden',
                 }}
@@ -281,6 +299,11 @@ export function PlanCardWithStars({
                   width: '100%',
                   height: '100%',
                   objectFit: 'cover',
+                  // 以底部為錨垂直放大，裁掉上緣暗部（畫面在框內視覺上移）。
+                  ...(focal && {
+                    transform: `scale(${focal.zoomUp})`,
+                    transformOrigin: 'center bottom',
+                  }),
                   display: 'block',
                   opacity: 1,
                   transition: 'opacity 0.4s ease',
