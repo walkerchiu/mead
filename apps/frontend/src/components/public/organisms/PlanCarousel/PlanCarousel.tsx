@@ -1181,6 +1181,9 @@ export function PlanCarousel({
             position: 'relative',
             display: 'flex',
             justifyContent: 'center',
+            // 容器高度跟隨作用中卡片實高（而非最高卡），讓下方資訊區與各計畫卡的距離一致；
+            // 較高的鄰卡多出的部分向下溢出，落在卡片與資訊區間的留白帶、不影響版面高度。
+            ...(activeCardH ? { height: `${activeCardH}px` } : {}),
           }}
         >
           <Box
@@ -1207,6 +1210,11 @@ export function PlanCarousel({
                       flex: '0 0 auto',
                       width: MCARD_W,
                       opacity: isCenter ? 1 : 0.5,
+                      // 較高的鄰卡裁切到作用卡高度，避免其底部從邊緣溢出到卡片與資訊區的留白帶；
+                      // 中央卡不裁切，其社群列與 peek 仍正常向下探出。
+                      ...(!isCenter && activeCardH
+                        ? { maxHeight: `${activeCardH}px`, overflow: 'hidden' }
+                        : {}),
                       transition: wrapSnap
                         ? 'none'
                         : 'opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
