@@ -818,12 +818,15 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
         )}
 
         {/* 敘事段落（第三屏 / 資訊區）— 上下留適當留白，使捲動／PageDown 切到此屏時
-            敘事內容不貼齊視窗上緣、下方亦留呼吸空間（隨視窗高度等比、夾在上下限）。*/}
+            敘事內容不貼齊視窗上緣、下方亦留呼吸空間（隨視窗高度等比、夾在上下限）。
+            手機／平板：上距收斂並設上限，使計畫卡與資訊區的間距精簡、不隨高螢幕膨脹
+            （下限仍足以容納卡片底部就位的 peek 鈕）；桌機（釘住第三屏）維持原本較大留白。*/}
         <Box
           ref={infoSectionRef}
           sx={{
-            pt: 'clamp(56px, 12vh, 180px)',
+            pt: 'clamp(88px, 9vh, 116px)',
             pb: 'clamp(48px, 9vh, 140px)',
+            [portalTokens.mq.desktopUp]: { pt: 'clamp(56px, 12vh, 180px)' },
           }}
         >
           <PortalNarrativeSection

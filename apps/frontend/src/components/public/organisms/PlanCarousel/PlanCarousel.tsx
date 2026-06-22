@@ -1221,17 +1221,15 @@ export function PlanCarousel({
           {count > 1 && (
             <PlanPeekNavButton
               direction="next"
-              // 捲到卡片底部時由頂部（40px）下移到社群列下方的保留區（容器底再下 56px），
-              // 落在下方 spacer 留出的空白帶，不覆蓋代表圖與「前往官網」等連結。
-              top={peekAtBottom ? 'calc(100% + 56px)' : '40px'}
+              // 捲到卡片底部時由頂部（40px）下移到社群列正下方就位（容器底再下 48px），
+              // 緊貼社群列、不覆蓋代表圖與「前往官網」等連結；下方資訊區的留白即其落點。
+              top={peekAtBottom ? 'calc(100% + 48px)' : '40px'}
               planName={plans[mNext]?.name.zh ?? ''}
               markSrc={`/images/plans/${plans[mNext]?.folderName}/logo/mark.png`}
               onClick={mobileNext}
             />
           )}
         </Box>
-        {/* 卡片底部就位時，於社群列下方保留 peek 鈕的空白落點，避免疊到下一段或被裁切。 */}
-        {count > 1 && peekAtBottom && <Box aria-hidden sx={{ height: 128 }} />}
       </Box>
     );
   }
