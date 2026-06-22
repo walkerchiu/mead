@@ -782,9 +782,9 @@ export function PlanCarousel({
     };
   }, []);
 
-  // 手機展開卡比視窗高、需頁面捲動瀏覽。下一頁 peek 鈕原本固定在卡片頂部，捲到卡片
-  // 底部時會被捲出視野、必須回捲才能切換。改為偵測「卡片底部已進入視窗下緣」時，讓
-  // peek 鈕由上方「跳下來」貼到卡片底部就位，使用者在原處即可切到下一個計畫。
+  // 手機展開卡比視窗高、需頁面捲動瀏覽。偵測「卡片底部已進入視窗下緣」時（peekAtBottom），
+  // 下一頁 peek 鈕由卡片頂部下移到社群列下方的保留空白帶就位，使用者在卡片尾端原處即可
+  // 切到下一個計畫，且不覆蓋代表圖與連結。
   const mobileCardWrapRef = useRef<HTMLDivElement | null>(null);
   const [peekAtBottom, setPeekAtBottom] = useState(false);
   useEffect(() => {
@@ -1153,6 +1153,18 @@ export function PlanCarousel({
       // 最後一張往後 → 順向 wrap；其餘直接前進。
       triggerWrap(expandedIndex === count - 1 ? count : 0);
       onExpandedIndexChange(mNext);
+      // 使用者常捲到卡片尾端才切換：切到下一張時把頁面捲回卡片頂端，讓新計畫從頭閱讀。
+      const wrap = mobileCardWrapRef.current;
+      if (wrap && typeof window !== 'undefined') {
+        const reduce = window.matchMedia(
+          '(prefers-reduced-motion: reduce)',
+        ).matches;
+        const y = wrap.getBoundingClientRect().top + window.scrollY - 24;
+        window.scrollTo({
+          top: Math.max(0, y),
+          behavior: reduce ? 'auto' : 'smooth',
+        });
+      }
     };
     return (
       <Box sx={{ width: '100%', overflowX: 'clip' }}>
@@ -1209,14 +1221,17 @@ export function PlanCarousel({
           {count > 1 && (
             <PlanPeekNavButton
               direction="next"
-              // 捲到卡片底部時由頂部（40px）跳到卡片底部（容器底上方約 110px）就位。
-              top={peekAtBottom ? 'calc(100% - 110px)' : '40px'}
+              // 捲到卡片底部時由頂部（40px）下移到社群列下方的保留區（容器底再下 56px），
+              // 落在下方 spacer 留出的空白帶，不覆蓋代表圖與「前往官網」等連結。
+              top={peekAtBottom ? 'calc(100% + 56px)' : '40px'}
               planName={plans[mNext]?.name.zh ?? ''}
               markSrc={`/images/plans/${plans[mNext]?.folderName}/logo/mark.png`}
               onClick={mobileNext}
             />
           )}
         </Box>
+        {/* 卡片底部就位時，於社群列下方保留 peek 鈕的空白落點，避免疊到下一段或被裁切。 */}
+        {count > 1 && peekAtBottom && <Box aria-hidden sx={{ height: 128 }} />}
       </Box>
     );
   }
