@@ -4,6 +4,7 @@ import {
   type PointerEvent as ReactPointerEvent,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 
 import Box from '@mui/material/Box';
@@ -49,6 +50,28 @@ export function StatsMarquee({
 
   // 滾動速度：每筆約 2.6s 捲過一份，整體隨筆數成長，維持穩定觀感。
   const durationSec = Math.max(12, stats.length * 2.6);
+
+  // 相接份數：無縫循環需「可捲距離 ≥ 一份長度」（捲過一份才能無感回捲）。資料少時
+  // 一份可能比捲動視窗短，僅兩份相接會卡在 maxScroll 捲不滿一份（跑馬燈靜止不動）。
+  // 故依視窗／一份長度量算所需份數（多備一份保險），讓內容無論多寡都能完整循環。
+  const [copies, setCopies] = useState(2);
+  useEffect(() => {
+    const el = scrollerRef.current;
+    const copy = copyRef.current;
+    if (!el || !copy) return;
+    const measure = () => {
+      const viewport = horizontal ? el.clientWidth : el.clientHeight;
+      const one = horizontal ? copy.offsetWidth : copy.offsetHeight;
+      if (one <= 0 || viewport <= 0) return;
+      const needed = Math.max(2, Math.ceil(viewport / one) + 1);
+      setCopies((prev) => (prev === needed ? prev : needed));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    ro.observe(copy);
+    return () => ro.disconnect();
+  }, [horizontal, stats.length]);
 
   useEffect(() => {
     const el = scrollerRef.current;
@@ -227,13 +250,17 @@ export function StatsMarquee({
           width: horizontal ? 'max-content' : undefined,
         }}
       >
-        {/* 兩份相接以無縫循環；第二份對讀屏隱藏避免重複朗讀 */}
-        <Box ref={copyRef} sx={copySx}>
-          {stats.map((s, i) => renderItem(s, `a-${i}`))}
-        </Box>
-        <Box aria-hidden sx={copySx}>
-          {stats.map((s, i) => renderItem(s, `b-${i}`))}
-        </Box>
+        {/* 多份相接以無縫循環；僅第一份供讀屏朗讀，其餘隱藏避免重複。份數依量測自動補足。 */}
+        {Array.from({ length: copies }).map((_, c) => (
+          <Box
+            key={c}
+            ref={c === 0 ? copyRef : undefined}
+            aria-hidden={c !== 0 || undefined}
+            sx={copySx}
+          >
+            {stats.map((s, i) => renderItem(s, `${c}-${i}`))}
+          </Box>
+        ))}
       </Box>
     </Box>
   );
