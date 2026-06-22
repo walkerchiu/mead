@@ -86,18 +86,27 @@ export function StatsMarquee({
     const axis = horizontal ? 'scrollLeft' : 'scrollTop';
     let raf = 0;
     let last = 0;
+    // 以 JS 全精度累加捲動位置再寫入 DOM，不回讀 el[axis]。iOS Safari 的 scrollLeft／
+    // scrollTop 只保留整數像素，若每幀回讀再累加，<1px 的增量會被丟失 —— 資料少、捲速
+    // 慢（每幀位移不足 1px）的跑馬燈因此在 iOS 完全不動。累加器讓次像素增量正確累積，
+    // DOM 顯示由瀏覽器取整。
+    let pos = el[axis];
     const tick = (now: number) => {
       raf = requestAnimationFrame(tick);
       if (!last) last = now;
       const dt = (now - last) / 1000;
       last = now;
-      if (pausedRef.current || draggingRef.current) return;
+      if (pausedRef.current || draggingRef.current) {
+        // 暫停期間跟隨使用者捲動／拖曳的位置，恢復後由此接續。
+        pos = el[axis];
+        return;
+      }
       // 一份內容長度（含尾端 margin）= 兩份相接時的一輪位移。
       const loop = horizontal ? copy.offsetWidth : copy.offsetHeight;
       if (loop <= 0) return;
-      let next = el[axis] + (loop / durationSec) * dt;
-      if (next >= loop) next -= loop;
-      el[axis] = next;
+      pos += (loop / durationSec) * dt;
+      if (pos >= loop) pos -= loop;
+      el[axis] = pos;
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
