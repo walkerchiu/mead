@@ -45,6 +45,8 @@ export function PlanPeekNavButton({
 
   const marker = (
     <Box
+      // key 綁 markSrc：切換計畫換成目標計畫的標誌時，img 重掛、由透明漸入（無到有）。
+      key={markSrc}
       component="img"
       src={markSrc}
       alt=""
@@ -54,6 +56,13 @@ export function PlanPeekNavButton({
         height: MARKER,
         flexShrink: 0,
         objectFit: 'contain',
+        '@keyframes planPeekMarkFadeIn': {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        },
+        // 標誌由透明度 0 漸入到 100，約 1.2s 柔和淡入。
+        animation: 'planPeekMarkFadeIn 1.2s ease-out both',
+        '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     />
   );
