@@ -259,15 +259,18 @@ export function PlanCardWithStars({
                 },
               }}
             >
-              {/* 底層：清晰原圖，供 hover 浮出時顯示。靜止時隱藏，避免它在「上層模糊圖
-                  尚未載入」的競態中搶先露出清晰畫面（那正是「先清晰、再變更霧」的來源）。
-                  低載入優先序，讓上層模糊圖先就緒。 */}
+              {/* 底層：清晰原圖（原始 2000px 檔，未壓縮、未縮放），供 hover 浮出時以
+                  原檔畫質顯示。eager + 低 fetchPriority 預先載入：上層模糊圖以高優先
+                  先就緒、維持靜止霧化外觀，原圖隨後低優先載入，確保 hover 時已備妥、
+                  立即呈現原檔清晰度，不必等 lazy 才下載。靜止時以 visibility 隱藏，
+                  不會在模糊圖之前搶先露出（杜絕「先清晰、再變霧」）。 */}
               <Box
                 component="img"
                 className="plan-star-sharp"
                 src={photos[i]}
                 alt=""
-                loading="lazy"
+                loading="eager"
+                fetchPriority="low"
                 sx={{
                   position: 'absolute',
                   inset: 0,
