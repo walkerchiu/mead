@@ -13,8 +13,8 @@
     "error": "計畫資料載入失敗，請稍後再試。",
     "retry": "重新載入",
     "footer": {
-      "siteName": "教育部藝術設計計畫資訊網",
-      "tagline": "教育部藝術與設計人才培育計畫入口網\n致力於推動臺灣藝術設計教育發展",
+      "siteName": "教育部藝術與設計三大計畫入口網",
+      "tagline": "教育部致力於推動臺灣藝術設計教育發展",
       "copyright": "Copyright {year} . All Rights Reserved."
     },
     "detail": {

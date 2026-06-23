@@ -30,9 +30,6 @@ export interface PortalFooterProps {
   copyright?: string;
 }
 
-/** 品牌副標 — 三大計畫名（依 Figma node 1:53） */
-const BRAND_SUBLINE = '菁培計畫｜設計戰國策｜臺灣國際學生創意設計大賽';
-
 /** 連結欄位（依 Figma node 1:47）：計畫連結三個計畫官網 + 關於我們教育部官網。 */
 const DEFAULT_COLUMNS: FooterColumn[] = [
   {
@@ -56,7 +53,6 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
 const C = {
   title: '#000000', // node 1:51 / 1:62
   link: '#888888', // node 1:54 簡述 / 1:63-65 連結
-  subline: '#BBBBBB', // node 1:53 菁培｜設計戰國策｜…
   badgeBorder: '#444444', // node 1:56 徽章邊框
   badgeText: '#AAAAAA', // node 1:60 徽章文字
   badgeIcon: '#B8860B', // node 1:57 shield-check 圖示（金色）
@@ -74,8 +70,8 @@ const copyrightSx = { fontSize: 11, color: C.copyright } as const;
  *   版權文字併入品牌區塊末行；頁尾內容約 460px 寬置中。
  */
 export function PortalFooter({
-  siteName = '教育部藝術設計計畫資訊網',
-  tagline = '教育部藝術與設計人才培育計畫入口網，致力於推動臺灣藝術設計教育發展。',
+  siteName = '教育部藝術與設計三大計畫入口網',
+  tagline = '教育部致力於推動臺灣藝術設計教育發展',
   columns = DEFAULT_COLUMNS,
   copyright = `Copyright ${new Date().getFullYear()} . All Rights Reserved.`,
 }: PortalFooterProps) {
@@ -141,7 +137,7 @@ export function PortalFooter({
               [portalTokens.mq.tabletUp]: { flex: '1 1 auto', width: 'auto' },
             }}
           >
-            {/* 教育部識別 + 名稱 + 副標 */}
+            {/* 教育部識別 + 名稱 */}
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
                 <Box
@@ -158,20 +154,6 @@ export function PortalFooter({
                   {siteName}
                 </Typography>
               </Box>
-              {/* 依 Figma node 1:53 — 字級照設計稿 8.6px；色彩維持 AA（#4A4A4A
-                  on #E3E3E3 ≈ 8.4:1）並允許換行（不 nowrap），兼顧 1.4.4 / 1.4.10。 */}
-              <Typography
-                component="p"
-                sx={{
-                  mt: 0.5,
-                  ml: '50px',
-                  fontSize: 8.6,
-                  lineHeight: 1.6,
-                  color: C.subline,
-                }}
-              >
-                {BRAND_SUBLINE}
-              </Typography>
             </Box>
 
             {/* 簡述 — 依 Figma node 1:54（Inter Regular 13px / 1.8） */}
