@@ -55,7 +55,7 @@ const BASE_LABEL_GROUPS: BaseLabelGroup[] = [
 ];
 
 /** hover 時照片隨機變換的間隔（ms） */
-const PHOTO_INTERVAL = 850;
+const PHOTO_INTERVAL = 1700;
 /** hover 旋轉一圈的時間（ms）— 順時針 */
 const SPIN_PERIOD = 3500;
 /** 游標移開後的逆時針減速時間（ms） */
