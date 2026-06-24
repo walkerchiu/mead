@@ -1,12 +1,24 @@
 'use client';
 
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import Box from '@mui/material/Box';
 
 import type { LocalizedText } from '@/types/plan';
 
 import { portalTokens } from '../../tokens';
+
+/** SSR 安全的 layout effect（伺服器端退回 useEffect，避免 useLayoutEffect 警告） */
+const useIsoLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 /**
  * hero 底部的固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40（各計畫共用）。
@@ -50,6 +62,17 @@ const SPIN_PERIOD = 3500;
 const RELEASE_DURATION = 1300;
 /** 游標移開後逆時針再轉的角度（度）— 夠明顯但不過度甩轉 */
 const RELEASE_DEG = 330;
+
+/**
+ * 計畫切換的「緩衝過場」：新計畫的字逐字淡入（數量漸增）、舊計畫的字留在原位逐字
+ * 淡出（數量漸減），兩者各自依序錯開，形成有緩衝感的接力切換。
+ */
+/** 一組字依序淡入／淡出的錯開跨度（s） */
+const WORD_STAGGER_S = 0.55;
+/** 舊計畫單字淡出時長（s） */
+const WORD_FADE_OUT_S = 0.5;
+/** 過場總長（ms）：錯開跨度 + 單字淡出後，移除淡出層 */
+const WORD_TRANSITION_MS = (WORD_STAGGER_S + WORD_FADE_OUT_S) * 1000 + 50;
 
 /**
  * 圖形半徑 — 依 Figma 1:2 / 23:21 / 31:215 量測：每個 blob 369.44×369.44px、半徑 184.72。
@@ -359,29 +382,81 @@ export function DecorativeTextCloud({
     [shapeContents],
   );
 
-  // 整片雲顯示「進場隨機選定那組」的裝飾文字位置（textIndex 改變 → 重算）。每個字
-  // 只出現一組、不重複、不隨機換詞。詞數少於 maxWords 時，以隱藏佔位補齊到固定
-  // 長度（沿用最後一個位置、visibility 控制顯隱）。
-  const positions = useMemo(() => {
-    const texts = (shapeContents[textIndex]?.words ?? [])
-      .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
-      .filter((t): t is string => Boolean(t));
-    const placed = placeWords(texts, vertical);
-    if (placed.length >= maxWords) return placed;
-    const anchor = placed[placed.length - 1] ?? {
-      leftPct: 50,
-      topPct: 50,
-      side: 'left' as const,
-    };
-    const padded = Array.from({ length: maxWords - placed.length }, () => ({
-      text: '',
-      leftPct: anchor.leftPct,
-      topPct: anchor.topPct,
-      side: anchor.side,
-      hidden: true,
-    }));
-    return [...placed, ...padded];
-  }, [shapeContents, textIndex, language, vertical, maxWords]);
+  // 某計畫的裝飾文字散布位置。每個字只出現一組、不重複；詞數少於 maxWords 時以隱藏
+  // 佔位補齊到固定長度（沿用最後一個位置、visibility 控制顯隱）。供「進場層」與
+  // 「淡出層」共用（各帶不同的計畫 index）。
+  const buildPositions = useCallback(
+    (idx: number): PlacedWord[] => {
+      const texts = (shapeContents[idx]?.words ?? [])
+        .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
+        .filter((t): t is string => Boolean(t));
+      const placed = placeWords(texts, vertical);
+      if (placed.length >= maxWords) return placed;
+      const anchor = placed[placed.length - 1] ?? {
+        leftPct: 50,
+        topPct: 50,
+        side: 'left' as const,
+      };
+      const padded = Array.from({ length: maxWords - placed.length }, () => ({
+        text: '',
+        leftPct: anchor.leftPct,
+        topPct: anchor.topPct,
+        side: anchor.side,
+        hidden: true,
+      }));
+      return [...placed, ...padded];
+    },
+    [shapeContents, language, vertical, maxWords],
+  );
+
+  // 計畫切換的緩衝過場：transFrom = 正在淡出的（前一個）計畫；transId 每次切換遞增，
+  // 用於 key 讓新計畫的字 span 重新掛載、重跑「逐字淡入」。只在 hover 改變時觸發
+  // （略過進場隨機那組的初次落定 — 那由入場壓縮動畫負責，不走淡入淡出）。
+  const [transFrom, setTransFrom] = useState<number | null>(null);
+  const [transId, setTransId] = useState(0);
+  const prevHoveredRef = useRef(hovered);
+  const prevTextRef = useRef(textIndex);
+  const transTimerRef = useRef<number | null>(null);
+  useIsoLayoutEffect(() => {
+    const fromText = prevTextRef.current;
+    const hoveredChanged = prevHoveredRef.current !== hovered;
+    prevHoveredRef.current = hovered;
+    prevTextRef.current = textIndex;
+    if (!hoveredChanged || fromText === textIndex || prefersReducedMotion()) {
+      return;
+    }
+    setTransFrom(fromText);
+    setTransId((n) => n + 1);
+    if (transTimerRef.current) window.clearTimeout(transTimerRef.current);
+    transTimerRef.current = window.setTimeout(
+      () => setTransFrom(null),
+      WORD_TRANSITION_MS,
+    );
+  }, [hovered, textIndex]);
+  useEffect(
+    () => () => {
+      if (transTimerRef.current) window.clearTimeout(transTimerRef.current);
+    },
+    [],
+  );
+
+  // 進場層（目前計畫）與淡出層（前一個計畫，過場期間才有）的字位置與可見字數。
+  const positions = useMemo(
+    () => buildPositions(textIndex),
+    [buildPositions, textIndex],
+  );
+  const outgoingPositions = useMemo(
+    () => (transFrom === null ? null : buildPositions(transFrom)),
+    [buildPositions, transFrom],
+  );
+  const visibleCount = useMemo(
+    () => positions.filter((p) => !p.hidden).length,
+    [positions],
+  );
+  const outgoingVisibleCount = useMemo(
+    () => outgoingPositions?.filter((p) => !p.hidden).length ?? 0,
+    [outgoingPositions],
+  );
 
   // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
   // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
@@ -452,6 +527,132 @@ export function DecorativeTextCloud({
 
   const driftState = hovered !== null ? 'paused' : 'running';
 
+  /**
+   * 渲染單一裝飾字。phase：
+   *  - 'steady'：首載狀態 — twinkle 閃爍（一開始即可見）+ 橫向的入場 left 壓縮。
+   *  - 'in'    ：切換後新計畫的字 — 依序錯開、由 opacity 0 淡入後續轉入 twinkle。
+   *  - 'out'   ：切換後舊計畫的字 — 留在原位、依序錯開淡出後移除。
+   * visibleCount = 該層可見字數，用來把錯開延遲平均分配（造成數量漸增／漸減）。
+   * 動畫名／節奏放在 sx（讓 prefers-reduced-motion 能覆寫 animationName:none），
+   * duration／delay／CSS 變數放 inline style。
+   */
+  const renderWord = (
+    pos: PlacedWord,
+    i: number,
+    phase: 'steady' | 'in' | 'out',
+    keyStr: string,
+    visibleCount: number,
+  ) => {
+    const dur = 4.6 + ((i * 1.73) % 3.6);
+    // steady：負延遲把 twinkle 相位固定在 opacity=1 區間，第一影格即可見。
+    const steadyDelay = -(0.2 + ((i * 0.151) % 0.4)) * dur;
+    // in／out：依序錯開（前面的先、後面的後），形成數量漸增／漸減。
+    const frac =
+      visibleCount > 1 ? Math.min(i, visibleCount - 1) / (visibleCount - 1) : 0;
+    const stagger = frac * WORD_STAGGER_S;
+    const initLeftPct = vertical ? pos.leftPct : 50 + (pos.leftPct - 50) * 1.5;
+    const word = pos.text;
+    // 含中日韓字元 → 直書；否則為英文 → 旋轉 −90°（僅橫向佈局）
+    const isCJK = /[\u3000-\u9fff\uff00-\uffef]/.test(word);
+
+    let animSx: Record<string, string | number>;
+    let animStyle: React.CSSProperties;
+    if (phase === 'out') {
+      animSx = {
+        animationName: 'portalWordFadeOut',
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 1,
+        // fillMode both：延遲前維持可見（opacity 1）、結束後停在 opacity 0。
+        animationFillMode: 'both',
+      };
+      animStyle = {
+        animationDuration: `${WORD_FADE_OUT_S}s`,
+        animationDelay: `${stagger.toFixed(2)}s`,
+      };
+    } else if (phase === 'in') {
+      animSx = {
+        animationName: 'portalTwinkle',
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 'infinite',
+        // fillMode backwards：延遲前停在 0%（opacity 0），延遲到才由 0 淡入後續閃爍。
+        animationFillMode: 'backwards',
+      };
+      animStyle = {
+        animationDuration: `${dur.toFixed(2)}s`,
+        animationDelay: `${stagger.toFixed(2)}s`,
+      };
+    } else if (vertical) {
+      animSx = {
+        animationName: 'portalTwinkle',
+        animationTimingFunction: 'ease-in-out',
+        animationIterationCount: 'infinite',
+      };
+      animStyle = {
+        animationDuration: `${dur.toFixed(2)}s`,
+        animationDelay: `${steadyDelay.toFixed(2)}s`,
+      };
+    } else {
+      animSx = {
+        animationName: 'portalTwinkle, portalLabelEntrance',
+        animationTimingFunction: 'ease-in-out, cubic-bezier(0.22, 1, 0.36, 1)',
+        animationIterationCount: 'infinite, 1',
+        animationFillMode: 'none, both',
+      };
+      animStyle = {
+        animationDuration: `${dur.toFixed(2)}s, 2.4s`,
+        animationDelay: `${steadyDelay.toFixed(2)}s, 0s`,
+        ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
+        ['--final-left' as string]: `${pos.leftPct.toFixed(2)}%`,
+      } as React.CSSProperties;
+    }
+
+    return (
+      <Box
+        key={keyStr}
+        component="span"
+        className="portal-twinkle"
+        aria-hidden
+        style={animStyle}
+        sx={{
+          position: 'absolute',
+          top: `${pos.topPct}%`,
+          ...(vertical
+            ? {
+                ...(pos.side === 'left'
+                  ? { left: `${pos.leftPct}%` }
+                  : { right: `${100 - pos.leftPct}%`, textAlign: 'right' }),
+                transform: 'translateY(-50%)',
+              }
+            : {
+                left: `${pos.leftPct}%`,
+                ...(isCJK
+                  ? {
+                      writingMode: 'vertical-rl',
+                      transform: 'translateX(-50%)',
+                    }
+                  : {
+                      transform: 'translateX(-50%) rotate(-90deg)',
+                      transformOrigin: 'center top',
+                    }),
+              }),
+          ...animSx,
+          '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+          visibility: pos.hidden ? 'hidden' : 'visible',
+          fontSize: 12.5,
+          // 裝飾性文字採 300（Light）— 較內文細一級，視覺更輕。
+          fontWeight: 300,
+          letterSpacing: '0.02em',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          color: '#ffffff',
+          mixBlendMode: 'difference',
+        }}
+      >
+        {word}
+      </Box>
+    );
+  };
+
   return (
     <Box
       sx={{
@@ -471,6 +672,11 @@ export function DecorativeTextCloud({
           '0%, 100%': { opacity: 0 },
           '16%, 62%': { opacity: 1 },
           '86%': { opacity: 0 },
+        },
+        // 計畫切換時，舊計畫的字逐一淡出（一次性、停在 opacity 0）。
+        '@keyframes portalWordFadeOut': {
+          from: { opacity: 1 },
+          to: { opacity: 0 },
         },
         // 只在父層提供 base opacity；animation shorthand 留給 span 自己設，
         // 否則此 selector specificity (0,2,0) 會壓過 span sx 的 (0,1,0)，把
@@ -706,104 +912,22 @@ export function DecorativeTextCloud({
         })}
       </Box>
 
-      {/* 色塊周圍的裝飾文字 — 白字 + difference，每詞只出現一次、繞色塊自然散布。
+      {/* 色塊周圍的裝飾文字 — 切換計畫帶緩衝感：舊計畫淡出層逐字淡出、新計畫進場層逐字淡入。
           橫向：散布於色塊上、下、左右周圍（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
-          一開始即全部可見（twinkle 負延遲鎖在 opacity=1 相位），之後緩慢閃爍；
-          入場 left 從外側 (50 + (leftPct-50)*1.5) 收回到 leftPct，與三個色塊同步往內擠。 */}
-      {positions.map((pos, i) => {
-        const dur = 4.6 + ((i * 1.73) % 3.6);
-        // 一開始就全部出現：負延遲把 twinkle 相位固定在 opacity=1 區間（16~62%），
-        // 第一影格即可見，之後緩慢閃爍（不做漸次淡入）。
-        const delay = -(0.2 + ((i * 0.151) % 0.4)) * dur;
-        // 入場：文字從更外側（距中心 1.5×）隨色塊壓縮往內擠回最終散布位置。
-        // 擠前（外側 1.5×）與擠後（最終散布）相鄰間距都足夠、不會太近。
-        const initLeftPct = vertical
-          ? pos.leftPct
-          : 50 + (pos.leftPct - 50) * 1.5;
-        const word = pos.text;
-        // 含中日韓字元 → 直書；否則為英文 → 旋轉 −90°（僅橫向佈局）
-        const isCJK = /[\u3000-\u9fff\uff00-\uffef]/.test(word);
-        return (
-          <Box
-            key={i}
-            component="span"
-            className="portal-twinkle"
-            aria-hidden
-            style={
-              vertical
-                ? {
-                    animationDuration: `${dur.toFixed(2)}s`,
-                    animationDelay: `${delay.toFixed(2)}s`,
-                  }
-                : ({
-                    // 兩支動畫：twinkle(opacity) + entrance(left 壓縮)，
-                    // entrance 2.4s 與三個色塊入場同步，文字隨色塊往內擠。
-                    animationDuration: `${dur.toFixed(2)}s, 2.4s`,
-                    animationDelay: `${delay.toFixed(2)}s, 0s`,
-                    ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
-                    ['--final-left' as string]: `${pos.leftPct.toFixed(2)}%`,
-                  } as React.CSSProperties)
-            }
-            sx={{
-              position: 'absolute',
-              top: `${pos.topPct}%`,
-              ...(vertical
-                ? {
-                    // 直向：靠左／右欄，正立橫書（垂直置中對齊）
-                    ...(pos.side === 'left'
-                      ? { left: `${pos.leftPct}%` }
-                      : {
-                          right: `${100 - pos.leftPct}%`,
-                          textAlign: 'right',
-                        }),
-                    transform: 'translateY(-50%)',
-                    // 直向只跑 twinkle（opacity），不做水平壓縮入場。
-                    animationName: 'portalTwinkle',
-                    animationTimingFunction: 'ease-in-out',
-                    animationIterationCount: 'infinite',
-                    '@media (prefers-reduced-motion: reduce)': {
-                      animationName: 'none',
-                    },
-                  }
-                : {
-                    // 橫向：水平置中於 leftPct、頂端錨定（中文直書、英文 −90°）
-                    left: `${pos.leftPct}%`,
-                    ...(isCJK
-                      ? {
-                          writingMode: 'vertical-rl',
-                          transform: 'translateX(-50%)',
-                        }
-                      : {
-                          transform: 'translateX(-50%) rotate(-90deg)',
-                          transformOrigin: 'center top',
-                        }),
-                    // twinkle 控 opacity（一開始即可見）、entrance 控 left（隨色塊往內擠）
-                    animationName: 'portalTwinkle, portalLabelEntrance',
-                    animationTimingFunction:
-                      'ease-in-out, cubic-bezier(0.22, 1, 0.36, 1)',
-                    animationIterationCount: 'infinite, 1',
-                    animationFillMode: 'none, both',
-                    '@media (prefers-reduced-motion: reduce)': {
-                      animationName: 'none',
-                    },
-                  }),
-              // 隱藏佔位：常駐掛載（避免 hover 切換時重掛載而重跑入場），
-              // 僅以 visibility 隱藏；不動 animationName，故不會重觸發入場動畫。
-              visibility: pos.hidden ? 'hidden' : 'visible',
-              fontSize: 12.5,
-              // 裝飾性文字採 300（Light）— 較內文細一級，視覺更輕。
-              fontWeight: 300,
-              letterSpacing: '0.02em',
-              whiteSpace: 'nowrap',
-              pointerEvents: 'none',
-              color: '#ffffff',
-              mixBlendMode: 'difference',
-            }}
-          >
-            {word}
-          </Box>
-        );
-      })}
+          首載（transId 0）走 steady：一開始即全部可見（twinkle 負延遲鎖在 opacity=1 相位）、
+          入場 left 從外側收回；hover 切換時，前一計畫的字淡出、新計畫的字錯開淡入。 */}
+      {outgoingPositions?.map((pos, i) =>
+        renderWord(pos, i, 'out', `out-${transId}-${i}`, outgoingVisibleCount),
+      )}
+      {positions.map((pos, i) =>
+        renderWord(
+          pos,
+          i,
+          transId === 0 ? 'steady' : 'in',
+          `in-${transId}-${i}`,
+          visibleCount,
+        ),
+      )}
 
       {/* 底部固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40：
           - 左塊（regular）：ART x DESIGN / Gateway（兩行）
