@@ -43,9 +43,9 @@ const BASE_LABEL_GROUPS: BaseLabelGroup[] = [
 ];
 
 /** hover 時照片隨機變換的間隔（ms） */
-const PHOTO_INTERVAL = 420;
+const PHOTO_INTERVAL = 850;
 /** hover 旋轉一圈的時間（ms）— 順時針 */
-const SPIN_PERIOD = 2000;
+const SPIN_PERIOD = 3500;
 /** 游標移開後的逆時針減速時間（ms） */
 const RELEASE_DURATION = 1300;
 /** 游標移開後逆時針再轉的角度（度）— 夠明顯但不過度甩轉 */
