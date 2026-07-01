@@ -39,7 +39,10 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
         label: '藝術與設計菁英海外培訓計畫',
         href: 'https://www.animlab.yuntech.edu.tw/sposad/',
       },
-      { label: '設計戰國策', href: 'https://www.moe-idc.org/' },
+      {
+        label: '鼓勵學生參加藝術與設計類國際競賽計畫',
+        href: 'https://www.moe-idc.org/',
+      },
       { label: '臺灣國際學生創意設計大賽', href: 'https://www.tisdc.org/' },
     ],
   },

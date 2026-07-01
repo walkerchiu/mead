@@ -107,7 +107,7 @@ export interface PlanCarouselProps {
  */
 const CARD_TITLE_LINES: Record<string, string[]> = {
   sposad: ['教育部藝術與設計菁英海外', '培訓計畫'],
-  idc: ['設計戰國策—鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+  idc: ['教育部鼓勵學生參加', '藝術與設計類國際競賽計畫'],
   tisdc: ['臺灣國際學生創意設計大賽'],
 };
 

@@ -628,6 +628,9 @@ export function DecorativeTextCloud({
                 ...(isCJK
                   ? {
                       writingMode: 'vertical-rl',
+                      // 直書時讓夾在中文裡的拉丁字（如「X」連接號）維持正立，
+                      // 而非預設 mixed 的側躺。
+                      textOrientation: 'upright',
                       transform: 'translateX(-50%)',
                     }
                   : {
@@ -641,6 +644,14 @@ export function DecorativeTextCloud({
           fontSize: 12.5,
           // 裝飾性文字採 300（Light）— 較內文細一級，視覺更輕。
           fontWeight: 300,
+          // 中文詞句夾雜的拉丁字（如「X」連接號）與中文同用 Noto Sans TC，
+          // 避免依字族順序落到 Inter 而顯得比周圍中文更粗、更大。
+          ...(isCJK
+            ? {
+                fontFamily:
+                  'var(--font-noto-sans-tc, "Noto Sans TC"), sans-serif',
+              }
+            : {}),
           letterSpacing: '0.02em',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',

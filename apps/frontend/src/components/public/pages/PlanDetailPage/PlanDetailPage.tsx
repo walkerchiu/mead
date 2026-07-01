@@ -149,6 +149,7 @@ export function PlanDetailPage({ plan, onBack }: PlanDetailPageProps) {
             name={plan.name}
             planId={plan.id}
             logoSrc={plan.logoUrl}
+            nameplate={plan.logoNameplate}
             size={64}
           />
         </Box>
