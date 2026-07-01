@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Box from '@mui/material/Box';
@@ -11,6 +11,10 @@ import type {
   TimelineDate,
   TimelineEvent,
 } from '@/types/plan';
+
+/** SSR 安全的 layout effect（伺服器端退回 useEffect，避免警告）。 */
+const useIsoLayoutEffect =
+  typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 
@@ -27,11 +31,17 @@ const YEAR_DAYS = 365;
 const MIN_RANGE_PCT = 0.02;
 
 /** 軌道內視覺尺寸（px）。 */
-const DOT = 11;
-const BAR_H = 12;
-const LANE_H = 20;
-const POINT_ROW_H = 18;
-const RAIL_PAD_Y = 7;
+const DOT = 10;
+const BAR_H = 8;
+const LANE_H = 16;
+const POINT_ROW_H = 16;
+const RAIL_PAD_Y = 8;
+
+/**
+ * 事件列表日期欄固定寬（px）——三計畫共用，讓各列 title 對齊、且與最長日期標籤
+ * （如「12/1(二)-12/7(一)」約 96px）保持間距。
+ */
+const LIST_DATE_W = 108;
 
 /** Figma 色票（沿用 node 1:86 Timeline）：月份字、軌道底邊框、閒置段、作用段、白。 */
 const C = {
@@ -40,6 +50,8 @@ const C = {
   segIdle: '#ECECEC',
   segActive: '#E3AE5D',
   ink: '#4A4A4A',
+  grid: '#EFEFEF',
+  axis: '#E7E7E7',
   white: '#ffffff',
 };
 
@@ -95,7 +107,8 @@ function assignLanes(ranges: TimelineEvent[]): {
     laneEnds[lane] = m.left + m.width;
     laneOf[m.e.id] = lane;
   }
-  return { laneOf, laneCount: Math.max(1, laneEnds.length) };
+  // 無期間事件時回 0（不預留空白列）；有幾個重疊層就佔幾列。
+  return { laneOf, laneCount: laneEnds.length };
 }
 
 export interface PlanTimelineProps {
@@ -129,6 +142,14 @@ export function PlanTimeline({
   const years = timelines ?? [];
   const [yearIndex, setYearIndex] = useState(0);
   const [activeId, setActiveId] = useState<string | null>(null);
+  // 作用中 mark 相對於元件根的位置與根寬（tooltip 定位用）。
+  const [tip, setTip] = useState<{ x: number; y: number; w: number } | null>(
+    null,
+  );
+  // tooltip 實際寬度（量測後才知），用來把箭頭對準 mark、框體夾在根寬內。
+  const [tipW, setTipW] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const current = years[Math.min(yearIndex, Math.max(0, years.length - 1))];
   const events = useMemo(() => current?.events ?? [], [current]);
@@ -146,25 +167,87 @@ export function PlanTimeline({
     () => [...events].sort((a, b) => startPct(a) - startPct(b)),
     [events],
   );
+  // tooltip 顯示後量測其實際寬度（供夾邊與箭頭對位）。
+  useIsoLayoutEffect(() => {
+    if (tooltipRef.current) setTipW(tooltipRef.current.offsetWidth);
+  }, [activeId, tip]);
 
   if (years.length === 0 || !current) return null;
 
   const scroll = variant === 'scroll';
   const hasPoints = points.length > 0;
-  const railHeight =
-    RAIL_PAD_Y * 2 + (hasPoints ? POINT_ROW_H : 0) + laneCount * LANE_H;
+  const railHeight = Math.max(
+    34,
+    RAIL_PAD_Y * 2 + (hasPoints ? POINT_ROW_H : 0) + laneCount * LANE_H,
+  );
+  // 圓點所在列的垂直中心：軌道加上月份刻度、時間點連成一條時間線。
+  const axisY =
+    RAIL_PAD_Y + (hasPoints ? POINT_ROW_H : railHeight - RAIL_PAD_Y * 2) / 2;
   const activeEvent = events.find((e) => e.id === activeId) ?? null;
 
   const clearIfActive = (id: string) =>
     setActiveId((prev) => (prev === id ? null : prev));
 
-  /** 事件互動處理（hover／focus／點擊皆設為作用事件；點擊可切換關閉）。 */
-  const eventHandlers = (id: string) => ({
+  /**
+   * tooltip 定位：量測作用中 mark 相對於元件根的位置存入 tip，tooltip 於根層（不被
+   * 手機橫向捲動容器裁切）浮出。桌機 hover／focus、手機點擊皆會量測並顯示。
+   */
+  const showTipFor = (el: HTMLElement) => {
+    const root = rootRef.current;
+    if (!root) return;
+    const r = el.getBoundingClientRect();
+    const rr = root.getBoundingClientRect();
+    // 卡片可能套 CSS zoom（ring 輪播的 cardScale）：getBoundingClientRect 為縮放後的
+    // 螢幕座標，而 tooltip 的 left 為本地 CSS px（會再被 zoom 縮放），需除以縮放比還原。
+    const scale = root.offsetWidth > 0 ? rr.width / root.offsetWidth : 1;
+    setTip({
+      x: (r.left + r.width / 2 - rr.left) / scale,
+      y: (r.top - rr.top) / scale,
+      w: root.offsetWidth,
+    });
+  };
+
+  /** 軌道上事件 mark（長條／圓點）的互動：設為作用事件並定位 tooltip。 */
+  const markHandlers = (id: string) => ({
     tabIndex: 0,
     role: 'button' as const,
-    onMouseEnter: () => setActiveId(id),
+    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+      setActiveId(id);
+      showTipFor(e.currentTarget);
+    },
+    onMouseLeave: () => {
+      clearIfActive(id);
+      setTip(null);
+    },
+    onFocus: (e: React.FocusEvent<HTMLElement>) => {
+      setActiveId(id);
+      showTipFor(e.currentTarget);
+    },
+    onBlur: () => {
+      clearIfActive(id);
+      setTip(null);
+    },
+    onClick: (e: React.MouseEvent<HTMLElement>) => {
+      const activate = activeId !== id;
+      setActiveId(activate ? id : null);
+      if (activate) showTipFor(e.currentTarget);
+      else setTip(null);
+    },
+  });
+
+  /** 事件列表列的互動：與軌道連動 highlight（不出 tooltip，資訊已在該列）。 */
+  const rowHandlers = (id: string) => ({
+    tabIndex: 0,
+    role: 'button' as const,
+    onMouseEnter: () => {
+      setActiveId(id);
+      setTip(null);
+    },
     onMouseLeave: () => clearIfActive(id),
-    onFocus: () => setActiveId(id),
+    onFocus: () => {
+      setActiveId(id);
+      setTip(null);
+    },
     onBlur: () => clearIfActive(id),
     onClick: () => setActiveId((prev) => (prev === id ? null : id)),
   });
@@ -196,8 +279,15 @@ export function PlanTimeline({
         ))}
       </Box>
 
-      {/* 白色描邊軌道 + 事件（期間長條／時間點圓點） */}
-      <Box sx={{ position: 'relative', mt: 1, pb: scroll ? '64px' : '56px' }}>
+      {/* 白色描邊軌道 + 事件（期間長條／時間點圓點）。tooltip 浮於 mark 上方，
+          軌道下方不需為其預留空間。 */}
+      <Box
+        sx={{
+          position: 'relative',
+          mt: 1,
+          pb: '12px',
+        }}
+      >
         <Box
           sx={{
             position: 'relative',
@@ -205,8 +295,38 @@ export function PlanTimeline({
             borderRadius: '11px',
             border: `1px solid ${C.border}`,
             bgcolor: C.white,
+            overflow: 'hidden',
           }}
         >
+          {/* 月份刻度：11 條淡分隔線，讓事件讀作落在月曆刻度上而非漂浮。 */}
+          {MONTHS.slice(1).map((m) => (
+            <Box
+              key={`grid-${m}`}
+              aria-hidden
+              sx={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: `${((m - 1) / 12) * 100}%`,
+                width: '1px',
+                bgcolor: C.grid,
+              }}
+            />
+          ))}
+
+          {/* 時間線：貫穿圓點列的水平軸線，讓時間點串成一線。 */}
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              left: 0,
+              right: 0,
+              top: axisY,
+              height: '1px',
+              bgcolor: C.axis,
+            }}
+          />
+
           {/* 期間長條（依 lane 分列） */}
           {ranges.map((e) => {
             const { left, width } = rangeMetrics(e);
@@ -215,7 +335,7 @@ export function PlanTimeline({
             return (
               <Box
                 key={e.id}
-                {...eventHandlers(e.id)}
+                {...markHandlers(e.id)}
                 aria-label={`${e.dateLabel} ${e.title}`}
                 sx={{
                   position: 'absolute',
@@ -249,11 +369,11 @@ export function PlanTimeline({
             return (
               <Box
                 key={e.id}
-                {...eventHandlers(e.id)}
+                {...markHandlers(e.id)}
                 aria-label={`${e.dateLabel} ${e.title}`}
                 sx={{
                   position: 'absolute',
-                  top: RAIL_PAD_Y + (POINT_ROW_H - DOT) / 2,
+                  top: axisY - DOT / 2,
                   left: `${left * 100}%`,
                   width: DOT,
                   height: DOT,
@@ -261,7 +381,9 @@ export function PlanTimeline({
                   borderRadius: '50%',
                   bgcolor: C.segActive,
                   border: `2px solid ${C.white}`,
-                  boxShadow: on ? `0 0 0 2px ${C.segActive}` : 'none',
+                  boxShadow: on
+                    ? `0 0 0 2px ${C.segActive}`
+                    : `0 0 0 3px ${C.white}`,
                   cursor: 'pointer',
                   outline: 'none',
                   transition: 'box-shadow 0.15s ease',
@@ -270,81 +392,98 @@ export function PlanTimeline({
             );
           })}
         </Box>
-
-        {/* tooltip：作用事件顯示於軌道下方，箭頭指向軌道。 */}
-        {activeEvent && (
-          <Box
-            role="tooltip"
-            sx={{
-              position: 'absolute',
-              top: railHeight + 10,
-              left: `${startPct(activeEvent) * 100}%`,
-              transform: 'translateX(-50%)',
-              maxWidth: scroll ? 220 : 280,
-              px: 1.5,
-              py: 0.75,
-              bgcolor: C.white,
-              border: `1px solid ${C.border}`,
-              borderRadius: '10px',
-              boxShadow: '0 6px 16px -10px rgba(0,0,0,0.3)',
-              pointerEvents: 'none',
-              zIndex: 2,
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: -5,
-                left: '50%',
-                transform: 'translateX(-50%) rotate(45deg)',
-                width: 8,
-                height: 8,
-                bgcolor: C.white,
-                borderTop: `1px solid ${C.border}`,
-                borderLeft: `1px solid ${C.border}`,
-              },
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: 11,
-                fontWeight: 600,
-                lineHeight: 1.4,
-                letterSpacing: '0.04em',
-                color: C.segActive,
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {activeEvent.dateLabel}
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 12.5,
-                fontWeight: 500,
-                lineHeight: 1.4,
-                color: C.ink,
-              }}
-            >
-              {activeEvent.title}
-            </Typography>
-            {activeEvent.note && (
-              <Typography
-                sx={{
-                  mt: 0.25,
-                  fontSize: 11.5,
-                  lineHeight: 1.5,
-                  color: C.text,
-                }}
-              >
-                {activeEvent.note}
-              </Typography>
-            )}
-          </Box>
-        )}
       </Box>
     </>
   );
 
+  /**
+   * tooltip 定位（桌機／手機共用）：以量測到的 mark 位置浮於元件根層——不被手機橫向
+   * 捲動容器裁切。框體以 mark 為中心、夾在根寬內不出界；箭頭再依 mark 實際位置相對
+   * 框中心位移，使箭頭「始終對準」該事件 mark（即使框體因靠邊而位移）。
+   */
+  const TIP_PAD = 8;
+  const tipHalf = tipW / 2;
+  const tipLeft = tip
+    ? Math.min(
+        Math.max(tip.x, tipHalf + TIP_PAD),
+        Math.max(tipHalf + TIP_PAD, tip.w - tipHalf - TIP_PAD),
+      )
+    : 0;
+  const arrowMax = Math.max(0, tipHalf - 8);
+  const arrowDx = tip
+    ? Math.max(-arrowMax, Math.min(arrowMax, tip.x - tipLeft))
+    : 0;
+
+  const tooltipNode =
+    activeEvent && tip ? (
+      <Box
+        ref={tooltipRef}
+        role="tooltip"
+        sx={{
+          position: 'absolute',
+          left: `${tipLeft}px`,
+          top: tip.y,
+          // max-content：避免絕對定位框靠邊時被「left 到容器右緣的可用寬」壓窄而折行。
+          width: 'max-content',
+          maxWidth: 260,
+          transform: 'translate(-50%, calc(-100% - 8px))',
+          px: 1.5,
+          py: 0.75,
+          bgcolor: C.white,
+          border: `1px solid ${C.border}`,
+          borderRadius: '10px',
+          boxShadow: '0 8px 20px -10px rgba(0,0,0,0.35)',
+          pointerEvents: 'none',
+          zIndex: 4,
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            left: `calc(50% + ${arrowDx}px)`,
+            bottom: -5,
+            transform: 'translateX(-50%) rotate(45deg)',
+            width: 8,
+            height: 8,
+            bgcolor: C.white,
+            borderBottom: `1px solid ${C.border}`,
+            borderRight: `1px solid ${C.border}`,
+          },
+        }}
+      >
+        <Typography
+          sx={{
+            fontSize: 11,
+            fontWeight: 600,
+            lineHeight: 1.4,
+            letterSpacing: '0.04em',
+            color: C.segActive,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {activeEvent.dateLabel}
+        </Typography>
+        <Typography
+          sx={{
+            fontSize: 12.5,
+            fontWeight: 500,
+            lineHeight: 1.4,
+            color: C.ink,
+          }}
+        >
+          {activeEvent.title}
+        </Typography>
+        {activeEvent.note && (
+          <Typography
+            sx={{ mt: 0.25, fontSize: 11.5, lineHeight: 1.5, color: C.text }}
+          >
+            {activeEvent.note}
+          </Typography>
+        )}
+      </Box>
+    ) : null;
+
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box ref={rootRef} sx={{ position: 'relative', width: '100%' }}>
+      {tooltipNode}
       {/* 年度選擇：多年度以切換鈕呈現，單一年度顯示標籤。 */}
       <Box
         sx={{
@@ -404,6 +543,13 @@ export function PlanTimeline({
 
       {scroll ? (
         <Box
+          // 橫向捲動會使已量測的 tooltip 位置失準，捲動時關閉 tooltip。
+          onScroll={() => {
+            if (tip) {
+              setTip(null);
+              setActiveId(null);
+            }
+          }}
           sx={{
             overflowX: 'auto',
             // 行動裝置以滑動操作，隱藏捲軸避免細軸破壞版面。
@@ -419,54 +565,68 @@ export function PlanTimeline({
         monthsAndTrack
       )}
 
-      {/* 事件列表：詳細頁呈現，行動裝置無 hover 亦可取得完整資訊（依 spec）。 */}
+      {/* 事件列表：常駐呈現（行動裝置無 hover 亦可取得完整資訊，依 spec）。
+          與軌道連動：hover／focus 某列會 highlight 對應的軌道 mark，反之亦然。 */}
       {showList && listEvents.length > 0 && (
-        <Box component="ul" sx={{ listStyle: 'none', m: 0, mt: 1, p: 0 }}>
-          {listEvents.map((e) => (
-            <Box
-              key={e.id}
-              component="li"
-              sx={{
-                display: 'flex',
-                gap: 1.5,
-                py: 0.75,
-                borderTop: `1px solid ${C.segIdle}`,
-                alignItems: 'baseline',
-              }}
-            >
-              <Typography
+        <Box component="ul" sx={{ listStyle: 'none', m: 0, mt: '14px', p: 0 }}>
+          {listEvents.map((e) => {
+            const on = activeId === e.id;
+            return (
+              <Box
+                key={e.id}
+                component="li"
+                {...rowHandlers(e.id)}
                 sx={{
-                  flex: '0 0 auto',
-                  minWidth: 96,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  lineHeight: 1.5,
-                  color: C.segActive,
+                  display: 'flex',
+                  gap: '18px',
+                  py: '7px',
+                  pl: '10px',
+                  ml: '-10px',
+                  borderRadius: '8px',
+                  alignItems: 'baseline',
+                  cursor: 'default',
+                  outline: 'none',
+                  bgcolor: on ? 'rgba(227, 174, 93, 0.12)' : 'transparent',
+                  boxShadow: on ? `inset 3px 0 0 ${C.segActive}` : 'none',
+                  transition:
+                    'background-color 0.15s ease, box-shadow 0.15s ease',
                 }}
               >
-                {e.dateLabel}
-              </Typography>
-              <Box sx={{ minWidth: 0 }}>
                 <Typography
-                  sx={{ fontSize: 13, lineHeight: 1.5, color: C.ink }}
+                  sx={{
+                    flex: `0 0 ${LIST_DATE_W}px`,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    lineHeight: 1.5,
+                    color: C.segActive,
+                    fontVariantNumeric: 'tabular-nums',
+                    whiteSpace: 'nowrap',
+                  }}
                 >
-                  {e.title}
+                  {e.dateLabel}
                 </Typography>
-                {e.note && (
+                <Box sx={{ minWidth: 0 }}>
                   <Typography
-                    sx={{
-                      mt: 0.25,
-                      fontSize: 12,
-                      lineHeight: 1.5,
-                      color: C.text,
-                    }}
+                    sx={{ fontSize: 13, lineHeight: 1.5, color: C.ink }}
                   >
-                    {e.note}
+                    {e.title}
                   </Typography>
-                )}
+                  {e.note && (
+                    <Typography
+                      sx={{
+                        mt: 0.25,
+                        fontSize: 12,
+                        lineHeight: 1.5,
+                        color: C.text,
+                      }}
+                    >
+                      {e.note}
+                    </Typography>
+                  )}
+                </Box>
               </Box>
-            </Box>
-          ))}
+            );
+          })}
         </Box>
       )}
     </Box>
