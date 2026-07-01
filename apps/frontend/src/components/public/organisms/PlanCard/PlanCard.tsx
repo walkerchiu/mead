@@ -247,7 +247,7 @@ function PlanCardMobile({
 
         {/* 時程 — 窄版橫向可滑動 */}
         <Box sx={{ mt: 3 }}>
-          <PlanTimeline variant="scroll" />
+          <PlanTimeline timelines={plan.timelines} variant="scroll" />
         </Box>
       </Box>
 
@@ -427,7 +427,7 @@ function PlanCardDesktop({
 
           {/* 時程 */}
           <Box sx={{ mt: '28px' }}>
-            <PlanTimeline />
+            <PlanTimeline timelines={plan.timelines} />
           </Box>
 
           {/* 了解更多 — 依 Figma node 1:141：卡片一右欄、執行單位下方 */}

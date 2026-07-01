@@ -39,6 +39,43 @@ export interface PlanSocialLink {
   url: string;
 }
 
+/** 時程事件的日期端點：僅月份（`precision: 'month'`）或含日（`precision: 'day'`） */
+export interface TimelineDate {
+  /** 月份 1–12 */
+  month: number;
+  /** 日 1–31（`precision: 'day'` 才有） */
+  day?: number;
+}
+
+/**
+ * 時程事件。`kind: 'range'` 為期間（長條）、`kind: 'point'` 為單一時間點（圓點）。
+ * `precision: 'month'` 只有月份、`precision: 'day'` 含日期，位置比例依此換算。
+ */
+export interface TimelineEvent {
+  /** 穩定識別碼，例如 "sposad-2026-brief" */
+  id: string;
+  kind: 'point' | 'range';
+  precision: 'month' | 'day';
+  /** 起點（point 亦用此欄） */
+  start: TimelineDate;
+  /** 期間終點（`kind: 'range'` 才有） */
+  end?: TimelineDate;
+  /** 顯示用日期標籤，例如 "3月"、"4/27(一)-7/6(一)" */
+  dateLabel: string;
+  title: string;
+  /** 補充說明（tooltip／列表用）；未提供時不顯示 */
+  note?: string;
+}
+
+/** 單一年度的時程（固定 1–12 月軸） */
+export interface PlanTimelineYear {
+  /** 年度西元年，例如 2026 */
+  year: number;
+  /** 年度顯示標籤，例如 "隔年（2027）"；未提供時以 `${year}年` 呈現 */
+  label?: string;
+  events: TimelineEvent[];
+}
+
 /** 單一計畫 */
 export interface Plan {
   /** 程式用穩定識別碼：sposad / tisdc / idc */
@@ -77,6 +114,8 @@ export interface Plan {
   photos: PlanImage[];
   /** 裝飾性文字（用於 hero 文字雲） */
   decorativeText: LocalizedText[];
+  /** 計畫時程（依年度分組；可含多個年度，例如菁培的當年與隔年） */
+  timelines?: PlanTimelineYear[];
 }
 
 /** plans.json 的最上層結構 */

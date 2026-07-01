@@ -273,7 +273,7 @@ export function PlanDetailPage({ plan, onBack }: PlanDetailPageProps) {
 
         {/* 計畫時程 */}
         <Section title={t('detail.timeline')}>
-          <PlanTimeline />
+          <PlanTimeline timelines={plan.timelines} showList />
         </Section>
 
         {/* 精彩照片 */}
