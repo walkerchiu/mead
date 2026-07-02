@@ -32,12 +32,15 @@ const YEAR_DAYS = 365;
 /** 日期級期間的最小可視寬度（比例）——避免短天數期間細到看不見。 */
 const MIN_RANGE_PCT = 0.02;
 
-/** 軌道內視覺尺寸（px）。 */
-const DOT = 10;
-const BAR_H = 8;
-const LANE_H = 16;
-const POINT_ROW_H = 16;
-const RAIL_PAD_Y = 8;
+/**
+ * 軌道內視覺尺寸（px）。單行呈現：所有長條與圓點都置於中央那條時間線上，
+ * 重疊者直接同線排放（依設計稿，不分列）。
+ */
+const DOT = 12;
+const BAR_H = 14;
+const RAIL_H = 40;
+/** 長條左右內縮（px）——相鄰事件之間留出間隙，讀作分段而非連續一條。 */
+const BAR_GAP = 3;
 
 /** tooltip 與軌道底的間距、以及軌道下方為 tooltip 預留的高度（px）。 */
 const TIP_GAP = 8;
@@ -104,32 +107,6 @@ function coversMonth(e: TimelineEvent, month: number): boolean {
   return e.start.month === month;
 }
 
-/**
- * 期間事件的 lane 分配（貪婪區間排程）：重疊的期間分到不同列，避免互相覆蓋。
- * 回傳每筆事件 id 對應的 lane 索引與總列數。
- */
-function assignLanes(ranges: TimelineEvent[]): {
-  laneOf: Record<string, number>;
-  laneCount: number;
-} {
-  const metrics = ranges
-    .map((e) => ({ e, ...rangeMetrics(e) }))
-    .sort((a, b) => a.left - b.left);
-  const laneEnds: number[] = [];
-  const laneOf: Record<string, number> = {};
-  for (const m of metrics) {
-    let lane = laneEnds.findIndex((end) => m.left >= end);
-    if (lane === -1) {
-      lane = laneEnds.length;
-      laneEnds.push(0);
-    }
-    laneEnds[lane] = m.left + m.width;
-    laneOf[m.e.id] = lane;
-  }
-  // 無期間事件時回 0（不預留空白列）；有幾個重疊層就佔幾列。
-  return { laneOf, laneCount: laneEnds.length };
-}
-
 export interface PlanTimelineProps {
   /** 計畫時程（依年度分組）。未提供或為空時不渲染。 */
   timelines?: PlanTimelineYear[];
@@ -183,7 +160,6 @@ export function PlanTimeline({
     () => events.filter((e) => e.kind === 'range'),
     [events],
   );
-  const { laneOf, laneCount } = useMemo(() => assignLanes(ranges), [ranges]);
   const sorted = useMemo(
     () => [...events].sort((a, b) => startPct(a) - startPct(b)),
     [events],
@@ -225,14 +201,9 @@ export function PlanTimeline({
   if (years.length === 0 || !current) return null;
 
   const scroll = variant === 'scroll';
-  const hasPoints = points.length > 0;
-  const railHeight = Math.max(
-    34,
-    RAIL_PAD_Y * 2 + (hasPoints ? POINT_ROW_H : 0) + laneCount * LANE_H,
-  );
-  // 圓點所在列的垂直中心：軌道加上月份刻度、時間點連成一條時間線。
-  const axisY =
-    RAIL_PAD_Y + (hasPoints ? POINT_ROW_H : railHeight - RAIL_PAD_Y * 2) / 2;
+  // 單行軌道：所有長條與圓點都置於中央時間線上（不分列）。
+  const railHeight = RAIL_H;
+  const axisY = RAIL_H / 2;
 
   /**
    * 事件 mark（長條／圓點）的互動：hover 用 pointer 事件且僅回應滑鼠——觸控不走 hover
@@ -414,10 +385,9 @@ export function PlanTimeline({
             }}
           />
 
-          {/* 期間長條（依 lane 分列） */}
+          {/* 期間長條（單行，置於中央時間線上） */}
           {ranges.map((e) => {
             const { left, width } = rangeMetrics(e);
-            const lane = laneOf[e.id] ?? 0;
             const on = shownId === e.id;
             return (
               <Box
@@ -426,14 +396,10 @@ export function PlanTimeline({
                 aria-label={`${e.dateLabel} ${e.title}`}
                 sx={{
                   position: 'absolute',
-                  top:
-                    RAIL_PAD_Y +
-                    (hasPoints ? POINT_ROW_H : 0) +
-                    lane * LANE_H +
-                    (LANE_H - BAR_H) / 2,
-                  left: `${left * 100}%`,
-                  width: `${width * 100}%`,
-                  minWidth: 6,
+                  top: axisY - BAR_H / 2,
+                  left: `calc(${left * 100}% + ${BAR_GAP}px)`,
+                  width: `calc(${width * 100}% - ${BAR_GAP * 2}px)`,
+                  minWidth: BAR_H,
                   height: BAR_H,
                   borderRadius: '999px',
                   bgcolor: C.segActive,
