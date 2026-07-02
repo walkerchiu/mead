@@ -41,17 +41,21 @@ const BAR_H = 22;
 const RAIL_H = 44;
 /** 長條左右內縮（px）——相鄰事件之間留出間隙，讀作分段而非連續一條。 */
 const BAR_GAP = 3;
+/** 軌道內容（事件與對應月份）左右內縮（px）——讓事件不貼膠囊圓端，依設計稿留白。 */
+const TRACK_PAD = 12;
 
 /** tooltip 與軌道底的間距、以及軌道下方為 tooltip 預留的高度（px）。 */
 const TIP_GAP = 8;
 const TIP_RESERVE = 54;
 const TIP_PAD = 8;
 
-/** Figma 色票（沿用 node 1:86 Timeline）：月份字、下拉／tooltip 邊框、閒置段、作用段。 */
+/** Figma 色票（沿用 node 1:86 Timeline）：月份字、下拉／tooltip 邊框、年度分隔線、
+    閒置段（淡灰）、作用段（橘）。 */
 const C = {
   text: '#9A9A9A',
   border: '#D3D3D3',
-  segIdle: '#D6D6D6',
+  line: '#E7E7E7',
+  segIdle: '#E2E2E2',
   segActive: '#E3AE5D',
   ink: '#4A4A4A',
   white: '#ffffff',
@@ -225,9 +229,10 @@ export function PlanTimeline({
     onClick: () => setHoverId(id),
   });
 
-  // tooltip 水平定位：以事件在軸上的比例位置換算容器內 px，框體夾在容器寬內不出界；
-  // 箭頭再依 mark 實際位置相對框中心位移，使箭頭「始終對準」該事件 mark。
-  const markPx = activeEvent ? centerPct(activeEvent) * dims.container : 0;
+  // tooltip 水平定位：事件位於軌道內縮區（左右各 TRACK_PAD），故 mark 中心 =
+  // TRACK_PAD + 比例×內縮區寬；框體夾在容器寬內不出界，箭頭再依 mark 位置相對框中心位移。
+  const innerW = Math.max(0, dims.container - 2 * TRACK_PAD);
+  const markPx = activeEvent ? TRACK_PAD + centerPct(activeEvent) * innerW : 0;
   const tipHalf = dims.tip / 2;
   const tipLeft = Math.min(
     Math.max(markPx, tipHalf + TIP_PAD),
@@ -274,10 +279,10 @@ export function PlanTimeline({
       <Typography
         sx={{
           fontSize: 11,
-          fontWeight: 600,
+          fontWeight: 500,
           lineHeight: 1.4,
           letterSpacing: '0.04em',
-          color: C.segActive,
+          color: C.text,
           whiteSpace: 'nowrap',
         }}
       >
@@ -304,8 +309,8 @@ export function PlanTimeline({
       ref={trackRef}
       sx={{ position: 'relative', ...(scroll ? { width: MONTH_W * 12 } : {}) }}
     >
-      {/* 月份列（當前月份以底色標示） */}
-      <Box sx={{ display: 'flex', mt: 1 }}>
+      {/* 月份列（當前月份以底色標示）；左右內縮與軌道事件對齊。 */}
+      <Box sx={{ display: 'flex', mt: 1, px: `${TRACK_PAD}px` }}>
         {MONTHS.map((m) => {
           const isCur = m === curMonth;
           return (
@@ -355,62 +360,73 @@ export function PlanTimeline({
             overflow: 'hidden',
           }}
         >
-          {/* 期間長條（單行，置於中央時間線上） */}
-          {ranges.map((e) => {
-            const { left, width } = rangeMetrics(e);
-            const on = shownId === e.id;
-            return (
-              <Box
-                key={e.id}
-                {...markHandlers(e.id)}
-                aria-label={`${e.dateLabel} ${e.title}`}
-                sx={{
-                  position: 'absolute',
-                  top: axisY - BAR_H / 2,
-                  left: `calc(${left * 100}% + ${BAR_GAP}px)`,
-                  width: `calc(${width * 100}% - ${BAR_GAP * 2}px)`,
-                  minWidth: BAR_H,
-                  height: BAR_H,
-                  borderRadius: '999px',
-                  // 當下／hover 者橘色，其餘灰色（依設計稿，無白色描邊）。
-                  bgcolor: on ? C.segActive : C.segIdle,
-                  // 作用中者置頂：與相鄰事件重疊時不被灰段覆蓋而看似變短。
-                  zIndex: on ? 2 : 1,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'background-color 0.15s ease',
-                }}
-              />
-            );
-          })}
+          {/* 事件內容左右內縮，不貼膠囊圓端（與月份列同步內縮，位置仍對齊）。 */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: `${TRACK_PAD}px`,
+              right: `${TRACK_PAD}px`,
+            }}
+          >
+            {/* 期間長條（單行，置於中央時間線上） */}
+            {ranges.map((e) => {
+              const { left, width } = rangeMetrics(e);
+              const on = shownId === e.id;
+              return (
+                <Box
+                  key={e.id}
+                  {...markHandlers(e.id)}
+                  aria-label={`${e.dateLabel} ${e.title}`}
+                  sx={{
+                    position: 'absolute',
+                    top: axisY - BAR_H / 2,
+                    left: `calc(${left * 100}% + ${BAR_GAP}px)`,
+                    width: `calc(${width * 100}% - ${BAR_GAP * 2}px)`,
+                    minWidth: BAR_H,
+                    height: BAR_H,
+                    borderRadius: '999px',
+                    // 當下／hover 者橘色，其餘灰色（依設計稿，無白色描邊）。
+                    bgcolor: on ? C.segActive : C.segIdle,
+                    // 作用中者置頂：與相鄰事件重疊時不被灰段覆蓋而看似變短。
+                    zIndex: on ? 2 : 1,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'background-color 0.15s ease',
+                  }}
+                />
+              );
+            })}
 
-          {/* 時間點圓點 */}
-          {points.map((e) => {
-            const left = pointLeft(e);
-            const on = shownId === e.id;
-            return (
-              <Box
-                key={e.id}
-                {...markHandlers(e.id)}
-                aria-label={`${e.dateLabel} ${e.title}`}
-                sx={{
-                  position: 'absolute',
-                  top: axisY - DOT / 2,
-                  left: `${left * 100}%`,
-                  width: DOT,
-                  height: DOT,
-                  transform: 'translateX(-50%)',
-                  borderRadius: '50%',
-                  // 當下／hover 者橘色，其餘灰色（依設計稿，無白框）。
-                  bgcolor: on ? C.segActive : C.segIdle,
-                  zIndex: on ? 2 : 1,
-                  cursor: 'pointer',
-                  outline: 'none',
-                  transition: 'background-color 0.15s ease',
-                }}
-              />
-            );
-          })}
+            {/* 時間點圓點 */}
+            {points.map((e) => {
+              const left = pointLeft(e);
+              const on = shownId === e.id;
+              return (
+                <Box
+                  key={e.id}
+                  {...markHandlers(e.id)}
+                  aria-label={`${e.dateLabel} ${e.title}`}
+                  sx={{
+                    position: 'absolute',
+                    top: axisY - DOT / 2,
+                    left: `${left * 100}%`,
+                    width: DOT,
+                    height: DOT,
+                    transform: 'translateX(-50%)',
+                    borderRadius: '50%',
+                    // 當下／hover 者橘色，其餘灰色（依設計稿，無白框）。
+                    bgcolor: on ? C.segActive : C.segIdle,
+                    zIndex: on ? 2 : 1,
+                    cursor: 'pointer',
+                    outline: 'none',
+                    transition: 'background-color 0.15s ease',
+                  }}
+                />
+              );
+            })}
+          </Box>
         </Box>
 
         {tooltipNode}
@@ -428,7 +444,7 @@ export function PlanTimeline({
           display: 'flex',
           alignItems: 'center',
           pb: 0.5,
-          borderBottom: `1px solid ${C.border}`,
+          borderBottom: `1px solid ${C.line}`,
         }}
       >
         <Box
