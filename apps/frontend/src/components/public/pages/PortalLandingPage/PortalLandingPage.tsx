@@ -56,11 +56,13 @@ const PIN_TOP_PAD = 120;
  */
 const DWELL_PX = 100;
 /**
- * 自適應第二屏的對稱留白基準（px，未縮放）。縮放倍率以
- * scale = 視窗高 /（卡片自然高 + 2×此值）計算 → 卡片依高度比例放大／縮小填滿，
- * 上下留白 = 此值×scale（對稱），且足以容納卡片上緣溢出的裝飾星形（最高約 112px）。
+ * 自適應第二屏的上／下留白基準（px，未縮放）。縮放倍率以
+ * scale = 視窗高 /（卡片自然高 + 上留白 + 下留白）計算，留白 = 基準×scale。
+ * 上留白須容納卡片上緣溢出的裝飾星形（最高約 112px）；下留白只需容納指示點區，
+ * 故較窄 → 同樣視窗高下卡片可放得更大、字級更大。
  */
-const FIT_MARGIN_BASE = 130;
+const FIT_TOP_BASE = 118;
+const FIT_BOTTOM_BASE = 140;
 /** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
 const MAX_CARD_SCALE = 2;
@@ -68,8 +70,6 @@ const MAX_CARD_SCALE = 2;
 const CARD_BASE_W = 960;
 /** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
 const FIT_SIDE_MARGIN = 72;
-/** 輪播指示點本身的渲染高度（px，固定尺寸不隨 cardScale 縮放）；供上方平衡 spacer 用。 */
-const DOTS_BLOCK_H = 16;
 
 /** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。
  *  高度含左下直書識別「三大計畫入口網／教育部 藝術與設計」往標語列下方的延伸，
@@ -286,10 +286,9 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const vh = window.visualViewport?.height ?? window.innerHeight;
       // 還原自然高度：zoom 會讓 scrollHeight 變成縮放後高度，除以目前已套用倍率還原。
       const natural = wrap.scrollHeight / (appliedScaleRef.current || 1);
-      // 依高度比例放大／縮小填滿第二屏：scale = 視窗高 /（卡片自然高 + 2×留白基準），
-      // 卡片視覺高 = natural×scale，上下各留 FIT_MARGIN_BASE×scale 的對稱留白
-      // （含裝飾星形上緣淨空）；夾在縮放上下限內。
-      const raw = vh / (natural + 2 * FIT_MARGIN_BASE);
+      // 依高度比例放大／縮小填滿第二屏：scale = 視窗高 /（卡片自然高 + 上留白 + 下留白）。
+      // 上留白（含裝飾星形淨空）較寬、下留白（僅指示點）較窄；夾在縮放上下限內。
+      const raw = vh / (natural + FIT_TOP_BASE + FIT_BOTTOM_BASE);
       // 寬度上限：卡片放大後不得超出視窗（並讓兩側保留淨空、不壓到 peek）。
       // CARD_BASE_W 為展開卡設計寬（960）；視窗較窄時以寬度為準收斂縮放。
       const widthCap = (window.innerWidth - 2 * FIT_SIDE_MARGIN) / CARD_BASE_W;
@@ -761,23 +760,17 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
               '@supports (height: 100dvh)': { height: '100dvh' },
               overflow: 'hidden',
               boxSizing: 'border-box',
-              // 卡片在第二屏內垂直置中：各視窗高度都不靠頂留大片空白。卡片依高度比例
-              // 由 cardScale（zoom）放大／縮小填滿，置中後上下自然形成對稱留白
-              // （= FIT_MARGIN_BASE×scale，含裝飾星形上緣淨空）。
+              // 卡片自頂端起、上留白較寬（容納裝飾星形溢出）、下留白較窄（僅指示點）：
+              // 非對稱留白讓同樣視窗高下卡片放得更大、字級更大（不再上下對稱置中）。
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
             }}
           >
-            {/* 上方平衡 spacer — 與下方「指示點區」（gap 72×scale + 指示點高 ~16px）等高，
-                使「卡片本身」垂直置中（而非卡片＋指示點整組）；否則指示點會把卡片往上推、
-                吃掉預留給上方裝飾星形的淨空，導致最上方裝飾照片被第二屏頂端裁切。 */}
+            {/* 上方淨空 — 容納卡片上緣溢出的裝飾星形（最高約 112px），隨 cardScale 等比。 */}
             <Box
               aria-hidden
-              sx={{
-                flexShrink: 0,
-                height: `${72 * cardScale + DOTS_BLOCK_H}px`,
-              }}
+              sx={{ flexShrink: 0, height: `${FIT_TOP_BASE * cardScale}px` }}
             />
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>
               {mountPlans && planCarousel}
