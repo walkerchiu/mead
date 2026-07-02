@@ -122,6 +122,8 @@ export interface PlanTimelineProps {
   variant?: 'fit' | 'scroll';
   /** 是否於軌道下方顯示事件列表（詳細頁用；卡片版預設關閉以維持精簡高度）。 */
   showList?: boolean;
+  /** 事件列表欄數（預設 1）；桌機卡片用 2 欄壓低高度、讓整卡自適應屏高時字級更大。 */
+  listCols?: number;
 }
 
 /**
@@ -138,6 +140,7 @@ export function PlanTimeline({
   timelines,
   variant = 'fit',
   showList = false,
+  listCols = 1,
 }: PlanTimelineProps) {
   const years = timelines ?? [];
   const [yearIndex, setYearIndex] = useState(0);
@@ -568,7 +571,19 @@ export function PlanTimeline({
       {/* 事件列表：常駐呈現（行動裝置無 hover 亦可取得完整資訊，依 spec）。
           與軌道連動：hover／focus 某列會 highlight 對應的軌道 mark，反之亦然。 */}
       {showList && listEvents.length > 0 && (
-        <Box component="ul" sx={{ listStyle: 'none', m: 0, mt: '14px', p: 0 }}>
+        <Box
+          component="ul"
+          sx={{
+            listStyle: 'none',
+            m: 0,
+            mt: '12px',
+            p: 0,
+            // 桌機卡片以多欄壓低列表高度（scroll／窄容器仍單欄）。
+            display: 'grid',
+            gridTemplateColumns: `repeat(${scroll ? 1 : listCols}, minmax(0, 1fr))`,
+            columnGap: '28px',
+          }}
+        >
           {listEvents.map((e) => {
             const on = activeId === e.id;
             return (
@@ -578,10 +593,9 @@ export function PlanTimeline({
                 {...rowHandlers(e.id)}
                 sx={{
                   display: 'flex',
-                  gap: '18px',
-                  py: '7px',
-                  pl: '10px',
-                  ml: '-10px',
+                  gap: '16px',
+                  py: '5px',
+                  px: '8px',
                   borderRadius: '8px',
                   alignItems: 'baseline',
                   cursor: 'default',

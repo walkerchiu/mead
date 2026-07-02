@@ -424,9 +424,10 @@ function PlanCardDesktop({
             )}
           </Box>
 
-          {/* 時程 — 附事件列表（依 spec：事件也要以列表呈現，不可只靠 hover） */}
-          <Box sx={{ mt: '28px' }}>
-            <PlanTimeline timelines={plan.timelines} showList />
+          {/* 時程 — 附事件列表（依 spec：事件也要以列表呈現，不可只靠 hover）。
+              桌機卡片用 2 欄列表壓低高度，讓整卡自適應屏高時字級不致過小。 */}
+          <Box sx={{ mt: '22px' }}>
+            <PlanTimeline timelines={plan.timelines} showList listCols={2} />
           </Box>
 
           {/* 了解更多 — 依 Figma node 1:141：卡片一右欄、執行單位下方 */}
