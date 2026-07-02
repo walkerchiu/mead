@@ -36,9 +36,9 @@ const MIN_RANGE_PCT = 0.02;
  * 軌道內視覺尺寸（px）。單行呈現：所有長條與圓點都置於中央那條時間線上，
  * 重疊者直接同線排放（依設計稿，不分列）。
  */
-const DOT = 12;
-const BAR_H = 14;
-const RAIL_H = 40;
+const DOT = 16;
+const BAR_H = 22;
+const RAIL_H = 44;
 /** 長條左右內縮（px）——相鄰事件之間留出間隙，讀作分段而非連續一條。 */
 const BAR_GAP = 3;
 
@@ -47,15 +47,13 @@ const TIP_GAP = 8;
 const TIP_RESERVE = 54;
 const TIP_PAD = 8;
 
-/** Figma 色票（沿用 node 1:86 Timeline）：月份字、軌道底邊框、閒置段、作用段、白。 */
+/** Figma 色票（沿用 node 1:86 Timeline）：月份字、下拉／tooltip 邊框、閒置段、作用段。 */
 const C = {
   text: '#9A9A9A',
   border: '#D3D3D3',
-  segIdle: '#ECECEC',
+  segIdle: '#D6D6D6',
   segActive: '#E3AE5D',
   ink: '#4A4A4A',
-  grid: '#EFEFEF',
-  axis: '#E7E7E7',
   white: '#ffffff',
 };
 
@@ -344,47 +342,19 @@ export function PlanTimeline({
         })}
       </Box>
 
-      {/* 白色描邊軌道 + 事件；tooltip 浮於軌道下方（含預留空間）。 */}
+      {/* 白色膠囊軌道 + 事件；tooltip 浮於軌道下方（含預留空間）。依設計稿：白色膠囊、
+          無描邊、以淡陰影浮於卡片上，內無格線／軸線，事件（灰／橘長條與圓點）置中排放。 */}
       <Box sx={{ position: 'relative', mt: 1 }}>
         <Box
           sx={{
             position: 'relative',
             height: railHeight,
-            borderRadius: '11px',
-            border: `1px solid ${C.border}`,
+            borderRadius: `${RAIL_H / 2}px`,
             bgcolor: C.white,
+            boxShadow: '0 2px 10px -4px rgba(0,0,0,0.14)',
             overflow: 'hidden',
           }}
         >
-          {/* 月份刻度：11 條淡分隔線，讓事件讀作落在月曆刻度上而非漂浮。 */}
-          {MONTHS.slice(1).map((m) => (
-            <Box
-              key={`grid-${m}`}
-              aria-hidden
-              sx={{
-                position: 'absolute',
-                top: 0,
-                bottom: 0,
-                left: `${((m - 1) / 12) * 100}%`,
-                width: '1px',
-                bgcolor: C.grid,
-              }}
-            />
-          ))}
-
-          {/* 時間線：貫穿圓點列的水平軸線，讓時間點串成一線。 */}
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              left: 0,
-              right: 0,
-              top: axisY,
-              height: '1px',
-              bgcolor: C.axis,
-            }}
-          />
-
           {/* 期間長條（單行，置於中央時間線上） */}
           {ranges.map((e) => {
             const { left, width } = rangeMetrics(e);
@@ -402,14 +372,13 @@ export function PlanTimeline({
                   minWidth: BAR_H,
                   height: BAR_H,
                   borderRadius: '999px',
-                  bgcolor: C.segActive,
-                  opacity: on ? 1 : 0.92,
-                  boxShadow: on
-                    ? `0 0 0 2px ${C.white}, 0 0 0 3px ${C.segActive}`
-                    : 'none',
+                  // 當下／hover 者橘色，其餘灰色（依設計稿，無白色描邊）。
+                  bgcolor: on ? C.segActive : C.segIdle,
+                  // 作用中者置頂：與相鄰事件重疊時不被灰段覆蓋而看似變短。
+                  zIndex: on ? 2 : 1,
                   cursor: 'pointer',
                   outline: 'none',
-                  transition: 'opacity 0.15s ease, box-shadow 0.15s ease',
+                  transition: 'background-color 0.15s ease',
                 }}
               />
             );
@@ -432,14 +401,12 @@ export function PlanTimeline({
                   height: DOT,
                   transform: 'translateX(-50%)',
                   borderRadius: '50%',
-                  bgcolor: C.segActive,
-                  border: `2px solid ${C.white}`,
-                  boxShadow: on
-                    ? `0 0 0 2px ${C.segActive}`
-                    : `0 0 0 3px ${C.white}`,
+                  // 當下／hover 者橘色，其餘灰色（依設計稿，無白框）。
+                  bgcolor: on ? C.segActive : C.segIdle,
+                  zIndex: on ? 2 : 1,
                   cursor: 'pointer',
                   outline: 'none',
-                  transition: 'box-shadow 0.15s ease',
+                  transition: 'background-color 0.15s ease',
                 }}
               />
             );
