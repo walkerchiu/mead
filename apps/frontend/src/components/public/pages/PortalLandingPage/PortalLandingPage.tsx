@@ -61,8 +61,8 @@ const DWELL_PX = 100;
  * 上留白須容納卡片上緣溢出的裝飾星形（最高約 112px）；下留白只需容納指示點區，
  * 故較窄 → 同樣視窗高下卡片可放得更大、字級更大。
  */
-const FIT_TOP_BASE = 118;
-const FIT_BOTTOM_BASE = 140;
+const FIT_TOP_BASE = 116;
+const FIT_BOTTOM_BASE = 118;
 /** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
 const MAX_CARD_SCALE = 2;
