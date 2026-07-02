@@ -210,15 +210,22 @@ export function PlanTimeline({
     });
   };
 
-  /** 軌道上事件 mark（長條／圓點）的互動：設為作用事件並定位 tooltip。 */
+  /**
+   * 軌道上事件 mark（長條／圓點）的互動：設為作用事件並定位 tooltip。
+   * hover 用 pointer 事件且僅回應滑鼠——觸控不走 hover 路徑，避免 iOS 把有 hover 行為
+   * 的元素視為「首次點只觸發 hover、需再點一次才 click」而要點兩次；觸控由 onClick 於
+   * 首次點擊即觸發。
+   */
   const markHandlers = (id: string) => ({
     tabIndex: 0,
     role: 'button' as const,
-    onMouseEnter: (e: React.MouseEvent<HTMLElement>) => {
+    onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'mouse') return;
       setActiveId(id);
       showTipFor(e.currentTarget);
     },
-    onMouseLeave: () => {
+    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'mouse') return;
       clearIfActive(id);
       setTip(null);
     },
@@ -230,29 +237,34 @@ export function PlanTimeline({
       clearIfActive(id);
       setTip(null);
     },
+    // 點擊／點按一律「顯示」（不切換關閉），與 onFocus 一致、避免同一次點按先開後關；
+    // 關閉交由點到別處（blur／離開）或點另一個 mark 處理。
     onClick: (e: React.MouseEvent<HTMLElement>) => {
-      const activate = activeId !== id;
-      setActiveId(activate ? id : null);
-      if (activate) showTipFor(e.currentTarget);
-      else setTip(null);
+      setActiveId(id);
+      showTipFor(e.currentTarget);
     },
   });
 
-  /** 事件列表列的互動：與軌道連動 highlight（不出 tooltip，資訊已在該列）。 */
+  /** 事件列表列的互動：與軌道連動 highlight（不出 tooltip，資訊已在該列）。
+      hover 同樣僅回應滑鼠，觸控由 onClick 於首次點擊即觸發。 */
   const rowHandlers = (id: string) => ({
     tabIndex: 0,
     role: 'button' as const,
-    onMouseEnter: () => {
+    onPointerEnter: (e: React.PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'mouse') return;
       setActiveId(id);
       setTip(null);
     },
-    onMouseLeave: () => clearIfActive(id),
+    onPointerLeave: (e: React.PointerEvent<HTMLElement>) => {
+      if (e.pointerType !== 'mouse') return;
+      clearIfActive(id);
+    },
     onFocus: () => {
       setActiveId(id);
       setTip(null);
     },
     onBlur: () => clearIfActive(id),
-    onClick: () => setActiveId((prev) => (prev === id ? null : id)),
+    onClick: () => setActiveId(id),
   });
 
   // 月份列 + 軌道 + tooltip：兩種版型共用，僅月份寬度與外層容器不同。
