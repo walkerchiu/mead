@@ -54,7 +54,7 @@ const TIP_PAD = 8;
 const C = {
   text: '#9A9A9A',
   border: '#D3D3D3',
-  line: '#E7E7E7',
+  line: '#A8A8A8',
   segIdle: '#E2E2E2',
   segActive: '#E3AE5D',
   ink: '#4A4A4A',
