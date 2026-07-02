@@ -146,11 +146,6 @@ export const MultiYear: Story = {
   args: { timelines: MULTI_YEAR },
 };
 
-/** 詳細頁：軌道下方附事件列表。 */
-export const WithList: Story = {
-  args: { timelines: DAY_TIMELINE, showList: true },
-};
-
 /** 窄版（手機卡片）：月份固定寬、整排超出容器寬，可橫向滑動閱讀。 */
 export const Scroll: Story = {
   args: { timelines: MONTH_TIMELINE, variant: 'scroll' },

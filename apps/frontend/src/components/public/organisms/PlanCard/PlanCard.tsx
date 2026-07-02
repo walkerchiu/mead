@@ -245,9 +245,9 @@ function PlanCardMobile({
           </Box>
         </Box>
 
-        {/* 時程 — 窄版橫向可滑動；附事件列表（手機無 hover，依 spec 不可只靠 tooltip） */}
+        {/* 時程 — 窄版橫向可滑動；預設顯示當下期程，點按時間點顯示該事件 */}
         <Box sx={{ mt: 3 }}>
-          <PlanTimeline timelines={plan.timelines} variant="scroll" showList />
+          <PlanTimeline timelines={plan.timelines} variant="scroll" />
         </Box>
       </Box>
 
@@ -424,10 +424,9 @@ function PlanCardDesktop({
             )}
           </Box>
 
-          {/* 時程 — 附事件列表（依 spec：事件也要以列表呈現，不可只靠 hover）。
-              桌機卡片用 2 欄列表壓低高度，讓整卡自適應屏高時字級不致過小。 */}
+          {/* 時程 — 軌道只標位置，預設顯示當下期程；hover／focus／點按顯示個別事件 */}
           <Box sx={{ mt: '22px' }}>
-            <PlanTimeline timelines={plan.timelines} showList listCols={2} />
+            <PlanTimeline timelines={plan.timelines} />
           </Box>
 
           {/* 了解更多 — 依 Figma node 1:141：卡片一右欄、執行單位下方 */}
