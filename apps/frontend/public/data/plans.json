@@ -210,26 +210,29 @@
           "events": [
             {
               "id": "sposad-2026-brief",
-              "kind": "point",
+              "kind": "range",
               "precision": "month",
               "start": { "month": 3 },
-              "dateLabel": "3月",
-              "title": "簡章公告"
+              "end": { "month": 5 },
+              "dateLabel": "3-5月",
+              "title": "簡章公告及受理報名"
             },
             {
               "id": "sposad-2026-apply-review1",
-              "kind": "point",
+              "kind": "range",
               "precision": "month",
               "start": { "month": 6 },
-              "dateLabel": "6月",
-              "title": "報名截止及初審"
+              "end": { "month": 7 },
+              "dateLabel": "6-7月",
+              "title": "報名截止及國內初審"
             },
             {
               "id": "sposad-2026-camp",
-              "kind": "point",
+              "kind": "range",
               "precision": "month",
               "start": { "month": 7 },
-              "dateLabel": "7月",
+              "end": { "month": 8 },
+              "dateLabel": "7-8月",
               "title": "國內研習營"
             },
             {
