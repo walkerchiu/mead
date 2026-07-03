@@ -1,13 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import type { Plan } from '@/types/plan';
 
-import { AnimatedSlogan } from '../../atoms/AnimatedSlogan';
 import { LearnMoreButton } from '../../atoms/LearnMoreButton';
 import { PlanLogo } from '../../molecules/PlanLogo';
 import { PlanTimeline } from '../../molecules/PlanTimeline';
@@ -19,54 +16,12 @@ export interface PlanCardProps {
   /** 計畫資料 */
   plan: Plan;
   /**
-   * 是否為目前顯示（active）的卡片。切換到此卡時（active 轉為 true，或顯示的計畫改變）
-   * slogan 進場動畫播放一次；非 active 不播。預設 true。
-   */
-  active?: boolean;
-  /**
    * 桌機卡片是否在「每張卡各自後方」墊一塊與頁面同色的半透明底（僅桌機版生效）。
    * 用於 SPOSAD 入口網環狀輪播：卡片後方有裝飾照片時，毛玻璃 backdrop-filter 會把照片
    * 罩濃、且露出 vs 卡片後方濃淡不一；墊底後毛玻璃大半罩在均勻色上、照片只淡淡透出，
    * 切換時各處霧化趨於一致。墊在每張卡後方（非整體外層）才不會填到卡間間隙、連成一塊。
    */
   frostBacking?: boolean;
-  /**
-   * 抑制本次 active 轉換所觸發的 slogan 重播。環狀輪播以三份卡片複本實作無限循環，
-   * wrap（首↔末）後會「無動畫 snap 回中份」把 active 卡換到另一份複本的 instance 上；
-   * 該重定位本應無感，故此時設為 true，避免新 instance 因 active 轉真而再播一次 slogan。
-   */
-  suppressSloganReplay?: boolean;
-}
-
-/**
- * slogan 重播控制：掛載時播一次（由 AnimatedSlogan 的初始 key 觸發），之後每次
- * 「切換到此卡」（active 轉 true 或計畫改變）再播一次；不隨滑鼠互動、不輪播。
- *
- * suppress 為 true 時跳過該次 active 轉換的重播：用於環狀輪播 wrap 後「snap 回中份」
- * 把 active 換到另一份複本 instance 的無感重定位，避免同一計畫切換時 slogan 播兩次。
- * 以 ref 讀取，使「抑制與否」取當下這一拍的值，又不把它列入 effect deps。
- */
-function useSloganReplay(
-  active: boolean,
-  planId: string,
-  suppress = false,
-): number {
-  const [nonce, setNonce] = useState(0);
-  const first = useRef(true);
-  const suppressRef = useRef(suppress);
-  // 先把當下的 suppress 同步進 ref（無 deps、每次 commit 都跑），且宣告在下方 active
-  // effect 之前 → 同一拍 active 轉換時，下方 effect 讀到的已是這一拍的 suppress 值。
-  useEffect(() => {
-    suppressRef.current = suppress;
-  });
-  useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (active && !suppressRef.current) setNonce((n) => n + 1);
-  }, [active, planId]);
-  return nonce;
 }
 
 /**
@@ -96,43 +51,6 @@ const FROST_BACKING = {
   pointerEvents: 'none',
 } as const;
 
-/**
- * 各計畫主標的文字框寬度（手機版用，依 Figma 各卡標題節點）：控制主標斷行。
- */
-const HEADLINE_WIDTH: Record<string, number> = {
-  sposad: 195,
-  idc: 195,
-  tisdc: 249,
-};
-
-/** 計畫主標／標語：優先 slogan，其次以裝飾性文字首句替代 */
-function getHeadline(plan: Plan): string {
-  return (
-    plan.slogan.zh ??
-    plan.slogan.en ??
-    plan.decorativeText[0]?.zh ??
-    plan.decorativeText[0]?.en ??
-    plan.name.zh
-  );
-}
-
-/**
- * 各計畫 slogan 的指定斷行（'\n' 為明確換行點）：
- *  - 菁培：值得你期待的／設計公費留學品牌
- *  - 設計戰國策：躍上國際舞臺／培育具全球視野的藝術設計人才
- *  - 創意設計大賽：臺灣國際學生／創意設計大賽／（TISDC）
- */
-const SLOGAN_LINES: Record<string, string> = {
-  sposad: '值得你期待的\n設計公費留學品牌',
-  idc: '躍上國際舞臺\n培育具全球視野的藝術設計人才',
-  tisdc: '臺灣國際學生\n創意設計大賽\n（TISDC）',
-};
-
-/** slogan 文字（含指定斷行）；未指定者回退 getHeadline */
-function getSloganText(plan: Plan): string {
-  return SLOGAN_LINES[plan.id] ?? getHeadline(plan);
-}
-
 /** 卡片用代表圖：優先本機 banner，其次首張本機照片 */
 function getCardImage(plan: Plan): string | null {
   return (
@@ -147,14 +65,8 @@ function getCardImage(plan: Plan): string | null {
  * 卡片二為橫向滾動數據跑馬燈、內縮 banner、社群連結列。時程與數據改為橫向呈現，
  * 讓窄版閱讀更從容、版面更輕（與桌機卡片的跑馬燈處理一致）。
  */
-function PlanCardMobile({
-  plan,
-  active = true,
-  suppressSloganReplay = false,
-}: PlanCardProps) {
-  const headline = getSloganText(plan);
+function PlanCardMobile({ plan }: PlanCardProps) {
   const cardImage = getCardImage(plan);
-  const sloganNonce = useSloganReplay(active, plan.id, suppressSloganReplay);
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
@@ -169,7 +81,7 @@ function PlanCardMobile({
         }}
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '47px' }}>
-          {/* 識別 + 主標 */}
+          {/* 識別 */}
           <Box sx={{ minWidth: 0 }}>
             <PlanLogo
               name={plan.name}
@@ -177,22 +89,6 @@ function PlanCardMobile({
               logoSrc={plan.logoUrl}
               nameplate={plan.logoNameplate}
             />
-            <Typography
-              component="h2"
-              sx={{
-                mt: '47px',
-                // 依 Figma node 1:117 — Inter Medium 20px / line-height 1.8
-                fontSize: 20,
-                fontWeight: 500,
-                lineHeight: 1.8,
-                color: '#000000',
-                ...(HEADLINE_WIDTH[plan.id]
-                  ? { width: `${HEADLINE_WIDTH[plan.id]}px` }
-                  : {}),
-              }}
-            >
-              <AnimatedSlogan key={sloganNonce} text={headline} />
-            </Typography>
           </Box>
 
           {/* 簡介 + 執行單位 + 了解更多（與執行單位同列、靠右、底部對齊） */}
@@ -323,15 +219,8 @@ function PlanCardMobile({
  * - 卡片二（960×314）：左窄欄數據成果（垂直跑馬燈）＋右側大代表圖 banner；社群連結列
  *   疊於底緣。
  */
-function PlanCardDesktop({
-  plan,
-  active = true,
-  frostBacking = false,
-  suppressSloganReplay = false,
-}: PlanCardProps) {
-  const headline = getSloganText(plan);
+function PlanCardDesktop({ plan, frostBacking = false }: PlanCardProps) {
   const cardImage = getCardImage(plan);
-  const sloganNonce = useSloganReplay(active, plan.id, suppressSloganReplay);
 
   return (
     <Box sx={{ position: 'relative', width: '100%' }}>
@@ -356,28 +245,14 @@ function PlanCardDesktop({
               gap: '48px',
             }}
           >
-            {/* 欄一：識別 + 標語 */}
-            <Box sx={{ minWidth: 0, flex: '0 0 268px' }}>
+            {/* 欄一：識別（垂直置中於三欄列，佔用原標語騰出的空間） */}
+            <Box sx={{ minWidth: 0, flex: '0 0 268px', alignSelf: 'center' }}>
               <PlanLogo
                 name={plan.name}
                 planId={plan.id}
                 logoSrc={plan.logoUrl}
                 nameplate={plan.logoNameplate}
               />
-              <Typography
-                component="h2"
-                sx={{
-                  mt: '36px',
-                  // 依 Figma node 1:117 — Inter Medium 20px / line-height 1.8
-                  fontSize: 20,
-                  fontWeight: 500,
-                  lineHeight: 1.8,
-                  color: '#000000',
-                  width: '195px',
-                }}
-              >
-                <AnimatedSlogan key={sloganNonce} text={headline} />
-              </Typography>
             </Box>
 
             {/* 欄二：簡介描述 */}
@@ -516,12 +391,7 @@ function PlanCardDesktop({
  * 43:1142）、≥1200px 桌機版（左右拉伸三欄）。以 CSS display 斷點切換（非
  * useMediaQuery）以避免 SSR / hydration 不一致。
  */
-export function PlanCard({
-  plan,
-  active = true,
-  frostBacking = false,
-  suppressSloganReplay = false,
-}: PlanCardProps) {
+export function PlanCard({ plan, frostBacking = false }: PlanCardProps) {
   return (
     <>
       <Box
@@ -530,11 +400,7 @@ export function PlanCard({
           [portalTokens.mq.desktopUp]: { display: 'none' },
         }}
       >
-        <PlanCardMobile
-          plan={plan}
-          active={active}
-          suppressSloganReplay={suppressSloganReplay}
-        />
+        <PlanCardMobile plan={plan} />
       </Box>
       <Box
         sx={{
@@ -543,12 +409,7 @@ export function PlanCard({
           [portalTokens.mq.desktopUp]: { display: 'block' },
         }}
       >
-        <PlanCardDesktop
-          plan={plan}
-          active={active}
-          frostBacking={frostBacking}
-          suppressSloganReplay={suppressSloganReplay}
-        />
+        <PlanCardDesktop plan={plan} frostBacking={frostBacking} />
       </Box>
     </>
   );
