@@ -344,7 +344,7 @@ function PlanCardDesktop({
             position: 'relative',
             pt: '40px',
             pr: '40px',
-            pb: '36px',
+            pb: '18px',
             pl: '36px',
           }}
         >

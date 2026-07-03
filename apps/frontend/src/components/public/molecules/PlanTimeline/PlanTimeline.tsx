@@ -36,9 +36,9 @@ const MIN_RANGE_PCT = 0.02;
  * 軌道內視覺尺寸（px）。單行呈現：所有長條與圓點都置於中央那條時間線上，
  * 重疊者直接同線排放（依設計稿，不分列）。
  */
-const DOT = 16;
-const BAR_H = 22;
-const RAIL_H = 44;
+const DOT = 8;
+const BAR_H = 11;
+const RAIL_H = 22;
 /** 長條左右內縮（px）——相鄰事件之間留出間隙，讀作分段而非連續一條。 */
 const BAR_GAP = 3;
 /** 軌道內容（事件與對應月份）左右內縮（px）——讓事件不貼膠囊圓端，依設計稿留白。 */
