@@ -3,7 +3,6 @@
  *
  * 三大計畫入口網的基礎元件。
  */
-export { AnimatedSlogan, type AnimatedSloganProps } from './AnimatedSlogan';
 export { LearnMoreButton, type LearnMoreButtonProps } from './LearnMoreButton';
 export {
   SocialIconButton,
