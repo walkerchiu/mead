@@ -42,14 +42,6 @@ const MONTH_TIMELINE: PlanTimelineYear[] = [
         title: '校園巡迴展',
       },
       {
-        id: 'demo-keynote',
-        kind: 'point',
-        precision: 'month',
-        start: { month: 5 },
-        dateLabel: '5月',
-        title: '專題講座',
-      },
-      {
         id: 'demo-grant',
         kind: 'range',
         precision: 'month',

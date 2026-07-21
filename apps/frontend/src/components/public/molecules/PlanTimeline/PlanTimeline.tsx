@@ -475,6 +475,7 @@ export function PlanTimeline({
           anchorEl={yearAnchor}
           open={Boolean(yearAnchor)}
           onClose={() => setYearAnchor(null)}
+          disableScrollLock
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
         >

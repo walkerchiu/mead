@@ -44,6 +44,24 @@ const STAR_FOCAL: Record<string, Record<number, { zoomUp: number }>> = {
   sposad: { 0: { zoomUp: 1.3 } },
 };
 
+const DECOR_STAR_PHOTOS: Record<string, string[]> = {
+  sposad: [
+    '/images/portal/second-layer/sposad_01.jpg',
+    '/images/portal/second-layer/sposad_02.jpg',
+    '/images/portal/second-layer/sposad_03.jpg',
+  ],
+  idc: [
+    '/images/portal/second-layer/idc_01.jpg',
+    '/images/portal/second-layer/idc_02.jpg',
+    '/images/portal/second-layer/idc_03.jpg',
+  ],
+  tisdc: [
+    '/images/portal/second-layer/tisdc_01.jpg',
+    '/images/portal/second-layer/tisdc_02.jpg',
+    '/images/portal/second-layer/tisdc_03.jpg',
+  ],
+};
+
 /** 裝飾星形尺寸（Figma 為 297px） */
 const STAR_SIZE = 292;
 /** 手機版裝飾星形縮放 */
@@ -128,6 +146,10 @@ function localPhotos(plan: Plan): string[] {
     .map((p) => p.src as string);
 }
 
+export function getDecorStarPhotos(plan: Plan): string[] {
+  return DECOR_STAR_PHOTOS[plan.id] ?? localPhotos(plan);
+}
+
 /**
  * PlanCardWithStars — 展開大卡 + 周圍裝飾星形照片的組合單元。
  *
@@ -157,7 +179,7 @@ export function PlanCardWithStars({
    */
   dimmed?: boolean;
 }) {
-  const photos = localPhotos(plan);
+  const photos = getDecorStarPhotos(plan);
   const stars = showStars ? (DECOR_STARS[plan.id] ?? []) : [];
   return (
     <>
