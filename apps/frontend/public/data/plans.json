@@ -674,15 +674,7 @@
               "start": { "month": 3 },
               "end": { "month": 5 },
               "dateLabel": "3-5月",
-              "title": "設計深耕X生根設計 校園講座、校園巡迴展"
-            },
-            {
-              "id": "idc-2026-keynote",
-              "kind": "point",
-              "precision": "month",
-              "start": { "month": 5 },
-              "dateLabel": "5月",
-              "title": "設計深耕X生根設計 專題講座"
+              "title": "設計深耕X生根設計 校園講座、校園巡迴展、專題講座"
             },
             {
               "id": "idc-2026-grant-open",
