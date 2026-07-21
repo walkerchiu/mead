@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlanTimelineYear } from '@/types/plan';
 import { render, screen } from '@/test/test-utils';
@@ -38,6 +38,13 @@ const MULTI_YEAR_TIMELINE: PlanTimelineYear[] = [
 ];
 
 describe('PlanTimeline', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'scrollTo', {
+      configurable: true,
+      value: vi.fn(),
+    });
+  });
+
   it('does not lock body scroll when opening the year menu', async () => {
     const user = userEvent.setup();
 
@@ -48,5 +55,17 @@ describe('PlanTimeline', () => {
     expect(screen.getByRole('menu')).toBeInTheDocument();
     expect(document.body.style.overflow).not.toBe('hidden');
     expect(document.body.style.paddingRight).toBe('');
+  });
+
+  it('keeps focus on the year trigger when opening the year menu', async () => {
+    const user = userEvent.setup();
+
+    render(<PlanTimeline timelines={MULTI_YEAR_TIMELINE} />);
+
+    const trigger = screen.getByRole('button', { name: /2026年/ });
+    await user.click(trigger);
+
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+    expect(document.activeElement).toBe(trigger);
   });
 });

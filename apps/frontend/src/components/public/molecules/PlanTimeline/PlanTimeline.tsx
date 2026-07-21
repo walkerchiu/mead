@@ -144,6 +144,7 @@ export function PlanTimeline({
   const [now, setNow] = useState<Date | null>(null);
   // 軌道容器寬與 tooltip 寬（皆取 offsetWidth，為未縮放的本地 px，供夾邊與箭頭對位）。
   const [dims, setDims] = useState({ container: 0, tip: 0 });
+  const yearMenuScrollRef = useRef<{ x: number; y: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
 
@@ -153,6 +154,25 @@ export function PlanTimeline({
 
   const current = years[Math.min(yearIndex, Math.max(0, years.length - 1))];
   const events = useMemo(() => current?.events ?? [], [current]);
+
+  const openYearMenu = (anchor: HTMLElement) => {
+    if (typeof window !== 'undefined') {
+      yearMenuScrollRef.current = { x: window.scrollX, y: window.scrollY };
+    }
+    anchor.focus({ preventScroll: true });
+    setYearAnchor(anchor);
+  };
+
+  useIsoLayoutEffect(() => {
+    if (!yearAnchor || typeof window === 'undefined') return undefined;
+    const pos = yearMenuScrollRef.current;
+    if (!pos) return undefined;
+
+    const restore = () => window.scrollTo(pos.x, pos.y);
+    restore();
+    const raf = window.requestAnimationFrame(restore);
+    return () => window.cancelAnimationFrame(raf);
+  }, [yearAnchor]);
 
   const points = useMemo(
     () => events.filter((e) => e.kind === 'point'),
@@ -450,7 +470,8 @@ export function PlanTimeline({
         <Box
           component="button"
           type="button"
-          onClick={(e) => setYearAnchor(e.currentTarget)}
+          onMouseDown={(e) => e.preventDefault()}
+          onClick={(e) => openYearMenu(e.currentTarget)}
           aria-haspopup="listbox"
           aria-expanded={Boolean(yearAnchor)}
           sx={{
@@ -475,6 +496,10 @@ export function PlanTimeline({
           anchorEl={yearAnchor}
           open={Boolean(yearAnchor)}
           onClose={() => setYearAnchor(null)}
+          autoFocus={false}
+          disableAutoFocus
+          disableAutoFocusItem
+          disableRestoreFocus
           disableScrollLock
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
