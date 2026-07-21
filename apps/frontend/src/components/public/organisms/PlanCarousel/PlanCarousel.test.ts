@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { idcPlan, sposadPlan, tisdcPlan } from '@/mocks/fixtures/plans';
 
-import { getDecorStarPhotos } from './PlanCarousel';
+import { getDecorStarFocal, getDecorStarPhotos } from './PlanCarousel';
 
 describe('PlanCarousel decor star photos', () => {
   it('uses second-layer background photos without depending on plans.json photo order', () => {
@@ -21,5 +21,9 @@ describe('PlanCarousel decor star photos', () => {
       '/images/portal/second-layer/tisdc_02.jpg',
       '/images/portal/second-layer/tisdc_03.jpg',
     ]);
+  });
+
+  it('does not zoom the first SPOSAD second-layer photo', () => {
+    expect(getDecorStarFocal('sposad', 0)).toBeUndefined();
   });
 });
