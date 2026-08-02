@@ -15,7 +15,6 @@ import { useLocale, useTranslations } from 'next-intl';
 import { getLocalPhotos } from '@/lib/portal/plans';
 import type { Plan } from '@/types/plan';
 
-import { CarouselDots } from '../../atoms/CarouselDots';
 import { DecorativeTextCloud } from '../../organisms/DecorativeTextCloud';
 import { PlanCarousel } from '../../organisms/PlanCarousel';
 import { PortalFooter } from '../../organisms/PortalFooter';
@@ -63,15 +62,31 @@ const DWELL_PX = 100;
  * 上留白須容納卡片上緣溢出的裝飾星形（最高約 112px）；下留白只需容納指示點區，
  * 故較窄 → 同樣視窗高下卡片可放得更大、字級更大。
  */
-const FIT_TOP_BASE = 116;
-const FIT_BOTTOM_BASE = 118;
+const FIT_TOP_BASE = 120;
+const FIT_BOTTOM_BASE = 110;
 /** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
-const MAX_CARD_SCALE = 2;
-/** 展開卡設計寬度（px，與 PlanCarousel 的 maxWidth 一致）；供寬度上限計算。 */
-const CARD_BASE_W = 960;
+const MAX_CARD_SCALE = 1.35;
+/** 第二屏桌機舞台設計寬度（px，主卡 537 + gap 29 + 右欄 290）；供寬度上限計算。 */
+const CARD_BASE_W = 856;
+/** 第二屏桌機舞台設計高度（px，與 PlanCarousel desktop stage 一致）。 */
+const CARD_BASE_H = 561;
 /** 自適應寬度上限的左右側淨空（px）：卡片放大後與視窗邊緣的最小間距（含 peek 淨空）。 */
 const FIT_SIDE_MARGIN = 72;
+
+export function calculatePlanStageScale({
+  viewportWidth,
+  viewportHeight,
+}: {
+  viewportWidth: number;
+  viewportHeight: number;
+}): number {
+  const heightCap =
+    viewportHeight / (CARD_BASE_H + FIT_TOP_BASE + FIT_BOTTOM_BASE);
+  const widthCap = (viewportWidth - 2 * FIT_SIDE_MARGIN) / CARD_BASE_W;
+  const fit = Math.min(heightCap, widthCap);
+  return Math.min(MAX_CARD_SCALE, Math.max(MIN_CARD_SCALE, fit));
+}
 
 /** 第一屏 hero 設計畫布尺寸（px，桌機）；contain-fit 縮放的基準。
  *  高度含左下直書識別「三大計畫入口網／教育部 藝術與設計」往標語列下方的延伸，
@@ -297,16 +312,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       const vh = window.visualViewport?.height ?? window.innerHeight;
       // 還原自然高度：zoom 會讓 scrollHeight 變成縮放後高度，除以目前已套用倍率還原。
       const natural = wrap.scrollHeight / (appliedScaleRef.current || 1);
-      // 依高度比例放大／縮小填滿第二屏：scale = 視窗高 /（卡片自然高 + 上留白 + 下留白）。
-      // 上留白（含裝飾星形淨空）較寬、下留白（僅指示點）較窄；夾在縮放上下限內。
-      const raw = vh / (natural + FIT_TOP_BASE + FIT_BOTTOM_BASE);
-      // 寬度上限：卡片放大後不得超出視窗（並讓兩側保留淨空、不壓到 peek）。
-      // CARD_BASE_W 為展開卡設計寬（960）；視窗較窄時以寬度為準收斂縮放。
-      const widthCap = (window.innerWidth - 2 * FIT_SIDE_MARGIN) / CARD_BASE_W;
-      const scale = Math.min(
-        MAX_CARD_SCALE,
-        Math.max(MIN_CARD_SCALE, Math.min(raw, widthCap)),
-      );
+      const scale = calculatePlanStageScale({
+        viewportWidth: window.innerWidth,
+        viewportHeight: vh,
+      });
       appliedScaleRef.current = scale;
       setCardScale(scale);
       // 卡片填入一屏後段內無需 reveal，捲動僅作離散切換。
@@ -626,15 +635,6 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
     });
   }, [plans, mountPlans]);
 
-  // 指示點點選：捲動驅動時釘住並切到該卡；否則直接切 activeIndex。
-  const handleDotSelect = useCallback(
-    (i: number) => {
-      if (scrollDriven) engageAt(i);
-      else setActiveIndex(i);
-    },
-    [scrollDriven, engageAt],
-  );
-
   // 兩側 peek 點擊（捲動驅動）：明確導覽 — 直接切到目標卡（回頂端），
   // 隨時可用、可循環。因為是明確操作，不受滾輪離散門檻限制。
   const handlePeekNavigate = useCallback(
@@ -791,23 +791,13 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             <Box ref={cardWrapRef} sx={{ width: '100%' }}>
               {mountPlans && planCarousel}
             </Box>
-            {/* 輪播指示點 — 卡片正下方（第二屏）。與卡片的間距依設計稿 72px（社群列底→
-                指示點），並隨 cardScale 等比縮放，維持與卡片相同的視覺比例。 */}
             <Box
+              aria-hidden
               sx={{
-                mt: `${72 * cardScale}px`,
-                display: 'flex',
-                justifyContent: 'center',
+                flexShrink: 0,
+                height: `${FIT_BOTTOM_BASE * cardScale}px`,
               }}
-            >
-              <CarouselDots
-                count={planCount}
-                activeIndex={activeIndex}
-                onSelect={handleDotSelect}
-                labels={orderedPlans.map((p) => p.name.zh)}
-                ariaLabel="計畫切換"
-              />
-            </Box>
+            />
           </Box>
         ) : (
           // 手機 / 減少動態：不劫持捲動，原生流；計畫切換由 hero 色塊與敘事區標記觸發

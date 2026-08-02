@@ -2,11 +2,16 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import Box from '@mui/material/Box';
 
 import type { Plan } from '@/types/plan';
 
+import { PlanLogo } from '../../molecules/PlanLogo';
 import { PlanPeekNavButton } from '../../molecules/PlanPeekNavButton';
+import { PlanTimeline } from '../../molecules/PlanTimeline';
+import { SocialLinkBar } from '../../molecules/SocialLinkBar';
+import { StatsMarquee } from '../../molecules/StatsMarquee';
 import { portalTokens } from '../../tokens';
 import { PlanCard } from '../PlanCard';
 import { SLOGAN_EXIT_MS } from '../PortalIntroSection/PortalIntroSection';
@@ -87,6 +92,43 @@ const MOBILE_STAR_LAYOUT: { left: string; top: string }[] = [
   { left: '-72px', top: '42%' }, // 左側露出
   { left: 'calc(100% - 120px)', top: '74%' }, // 右下露出
 ];
+
+const DESKTOP_STAGE_W = 856;
+const DESKTOP_MAIN_W = 537;
+const DESKTOP_SIDE_W = 290;
+const DESKTOP_STAGE_GAP_X = 29;
+const DESKTOP_STAGE_GAP_Y = 16;
+const DESKTOP_MAIN_TOP_H = 384;
+const DESKTOP_MAIN_STATS_H = 167;
+const DESKTOP_ROTATE_MS = 6000;
+
+const DESKTOP_BACK_PHOTOS = [
+  {
+    left: -104,
+    top: 74,
+    size: 223,
+    clipId: 'flowerA',
+    opacity: 0.6,
+    hoverX: -18,
+    hoverY: -12,
+    hoverRotate: -3,
+  },
+  {
+    left: 64,
+    top: -79,
+    size: 180,
+    clipId: 'flowerB',
+    opacity: 0.58,
+    hoverX: 10,
+    hoverY: -18,
+    hoverRotate: 3,
+  },
+] as const;
+
+const FLOWER_A_PATH =
+  'M .88 .5 A .13 .13 0 0 1 .807 .723 A .13 .13 0 0 1 .617 .861 A .13 .13 0 0 1 .383 .861 A .13 .13 0 0 1 .193 .723 A .13 .13 0 0 1 .12 .5 A .13 .13 0 0 1 .193 .277 A .13 .13 0 0 1 .383 .139 A .13 .13 0 0 1 .617 .139 A .13 .13 0 0 1 .807 .277 A .13 .13 0 0 1 .88 .5 Z';
+const FLOWER_B_PATH =
+  'M .87 .5 A .18 .18 0 0 1 .731 .789 A .18 .18 0 0 1 .418 .861 A .18 .18 0 0 1 .167 .66 A .18 .18 0 0 1 .167 .34 A .18 .18 0 0 1 .418 .139 A .18 .18 0 0 1 .731 .211 A .18 .18 0 0 1 .87 .5 Z';
 
 export interface PlanCarouselProps {
   /** 三大計畫（已依設計稿順序排好） */
@@ -382,6 +424,488 @@ interface PlanMiniCardProps {
    * 查詢下把 --exit-tx 接上此值，keyframes 內的 translate 才會生效。
    */
   exitTranslateXRow?: number;
+}
+
+interface DesktopPlanSideCardProps {
+  plan: Plan;
+  onSelect: () => void;
+}
+
+function DesktopRotateRing({ paused }: { paused: boolean }) {
+  return (
+    <Box
+      data-testid="desktop-rotate-ring"
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        width: 16,
+        height: 16,
+        opacity: 0.85,
+        pointerEvents: 'none',
+        zIndex: 2,
+        '@keyframes desktopRotateRingFill': {
+          from: { strokeDashoffset: 100 },
+          to: { strokeDashoffset: 0 },
+        },
+      }}
+    >
+      <Box
+        component="svg"
+        viewBox="0 0 36 36"
+        sx={{
+          width: '100%',
+          height: '100%',
+          display: 'block',
+          transform: 'rotate(-90deg)',
+        }}
+      >
+        <Box
+          component="circle"
+          cx="18"
+          cy="18"
+          r="15.5"
+          pathLength="100"
+          sx={{
+            fill: 'none',
+            stroke: '#F1E5D5',
+            strokeWidth: 3.4,
+            strokeLinecap: 'round',
+          }}
+        />
+        <Box
+          component="circle"
+          cx="18"
+          cy="18"
+          r="15.5"
+          pathLength="100"
+          sx={{
+            fill: 'none',
+            stroke: '#E3AE5D',
+            strokeWidth: 3.4,
+            strokeLinecap: 'round',
+            strokeDasharray: 100,
+            strokeDashoffset: 100,
+            animation: `desktopRotateRingFill ${DESKTOP_ROTATE_MS}ms linear forwards`,
+            animationPlayState: paused ? 'paused' : 'running',
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+            },
+          }}
+        />
+      </Box>
+    </Box>
+  );
+}
+
+function DesktopPlanSideCard({ plan, onSelect }: DesktopPlanSideCardProps) {
+  const name = planName(plan);
+
+  return (
+    <Box
+      data-testid="desktop-plan-side"
+      data-plan-id={plan.id}
+      role="button"
+      tabIndex={0}
+      aria-label={`切換至${name}`}
+      onClick={onSelect}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      sx={{
+        position: 'relative',
+        minHeight: 0,
+        height: '100%',
+        borderRadius: '18px',
+        bgcolor: '#FFFFFF',
+        boxShadow: '0 12px 36px rgba(40, 36, 28, 0.07)',
+        p: '32px 30px 39px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '28px',
+        textAlign: 'left',
+        outline: 'none',
+        transition:
+          'transform 0.35s ease, box-shadow 0.35s ease, background-color 0.35s ease',
+        cursor: 'inherit',
+        '&:hover, &:focus-visible': {
+          transform: 'translateY(-4px)',
+          boxShadow:
+            '0 16px 40px rgba(40, 36, 28, 0.10), 0 0 0 1px rgba(227, 174, 93, 0.32), 0 0 28px rgba(227, 174, 93, 0.20)',
+        },
+        '&:focus-visible': portalTokens.focusRing,
+      }}
+    >
+      <CompactPlanNameplate plan={plan} side />
+      <Box
+        component="span"
+        sx={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '14px',
+          bgcolor: '#FFFFFF',
+          borderRadius: '9px',
+          px: '19px',
+          py: '7px',
+          boxShadow: '0 4px 14px rgba(40, 36, 28, 0.10)',
+          fontSize: 14.5,
+          fontWeight: 500,
+          lineHeight: 1.8,
+          color: '#000000',
+          whiteSpace: 'nowrap',
+          transition: 'transform 0.25s ease, box-shadow 0.25s ease',
+          '.MuiBox-root:hover &, .MuiBox-root:focus-visible &': {
+            transform: 'translateY(-2px)',
+            boxShadow: '0 8px 20px rgba(40, 36, 28, 0.16)',
+          },
+        }}
+      >
+        了解更多
+        <ArrowOutwardIcon sx={{ fontSize: 15 }} />
+      </Box>
+    </Box>
+  );
+}
+
+function getDesktopCardImage(plan: Plan): string | null {
+  return (
+    plan.banners.find((b) => b.type === 'local' && b.src)?.src ??
+    plan.photos.find((p) => p.type === 'local' && p.src)?.src ??
+    null
+  );
+}
+
+function CompactPlanNameplate({
+  plan,
+  side = false,
+}: {
+  plan: Plan;
+  side?: boolean;
+}) {
+  const nameplate = plan.logoNameplate;
+
+  if (!nameplate) {
+    return (
+      <PlanLogo
+        name={plan.name}
+        planId={plan.id}
+        logoSrc={plan.logoUrl}
+        nameplate={plan.logoNameplate}
+      />
+    );
+  }
+
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: side ? '18px' : '18px',
+      }}
+    >
+      <Box
+        component="img"
+        src={nameplate.mark}
+        alt=""
+        sx={{
+          width: side ? 58 : 45,
+          height: side ? 58 : 45,
+          objectFit: 'contain',
+          flexShrink: 0,
+          display: 'block',
+        }}
+      />
+      <Box sx={{ minWidth: 0, maxWidth: side ? 132 : 145 }}>
+        {nameplate.nameZh.map((line, i) => (
+          <Box
+            key={i}
+            component="p"
+            sx={{
+              m: 0,
+              fontSize: side ? 12 : 11.5,
+              fontWeight: 700,
+              lineHeight: 1.22,
+              color: '#000000',
+            }}
+          >
+            {line}
+          </Box>
+        ))}
+        <Box
+          component="p"
+          sx={{
+            m: 0,
+            mt: side ? '7px' : '8px',
+            fontSize: side ? 9 : 8.8,
+            fontWeight: 400,
+            lineHeight: 1.25,
+            color: '#000000',
+            maxWidth: side ? 130 : 142,
+          }}
+        >
+          {nameplate.nameEn}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
+function DesktopPlanBackPhotos({ plan }: { plan: Plan }) {
+  const photos = localPhotos(plan);
+  const flowerAId = `desktop-${plan.id}-flower-a`;
+  const flowerBId = `desktop-${plan.id}-flower-b`;
+
+  return (
+    <Box
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+      }}
+    >
+      <Box
+        component="svg"
+        sx={{ position: 'absolute', width: 0, height: 0, overflow: 'hidden' }}
+      >
+        <defs>
+          <clipPath id={flowerAId} clipPathUnits="objectBoundingBox">
+            <path d={FLOWER_A_PATH} />
+          </clipPath>
+          <clipPath id={flowerBId} clipPathUnits="objectBoundingBox">
+            <path d={FLOWER_B_PATH} />
+          </clipPath>
+        </defs>
+      </Box>
+      {DESKTOP_BACK_PHOTOS.map((photoLayout, index) => {
+        const src = photos[index];
+        if (!src) return null;
+        const clipPath =
+          photoLayout.clipId === 'flowerA'
+            ? `url(#${flowerAId})`
+            : `url(#${flowerBId})`;
+
+        return (
+          <Box
+            key={`${plan.id}-${index}`}
+            data-testid="desktop-plan-back-photo-layer"
+            data-hover-layer="self"
+            sx={{
+              position: 'absolute',
+              left: photoLayout.left,
+              top: photoLayout.top,
+              width: photoLayout.size,
+              height: photoLayout.size,
+              zIndex: 0,
+              pointerEvents: 'auto',
+              '&:has([data-hover-effect="true"]:hover)': {
+                zIndex: 3,
+              },
+              '@media (prefers-reduced-motion: reduce)': {
+                '&:has([data-hover-effect="true"]:hover)': { zIndex: 3 },
+              },
+            }}
+          >
+            <Box
+              data-testid="desktop-plan-back-photo"
+              data-hover-effect="true"
+              data-hover-trigger="self"
+              component="img"
+              src={src}
+              alt=""
+              sx={{
+                display: 'block',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                clipPath,
+                opacity: photoLayout.opacity,
+                cursor: 'inherit',
+                filter: 'saturate(0.82) brightness(1.02)',
+                transformOrigin: 'center',
+                willChange: 'transform, opacity, filter',
+                '--desktop-back-photo-hover-transform': `translate(${photoLayout.hoverX}px, ${photoLayout.hoverY}px) rotate(${photoLayout.hoverRotate}deg) scale(1.1)`,
+                transition:
+                  'opacity 0.45s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease',
+                animation:
+                  'desktopBackPhotoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards',
+                animationDelay: `${index * 0.08}s`,
+                '&:hover': {
+                  opacity: Math.min(0.86, photoLayout.opacity + 0.24),
+                  filter: 'saturate(1.08) brightness(1.08)',
+                  transform: 'var(--desktop-back-photo-hover-transform)',
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'opacity 0.2s ease, filter 0.2s ease',
+                  animation: 'none',
+                  '&:hover': {
+                    transform: 'none',
+                  },
+                },
+              }}
+            />
+          </Box>
+        );
+      })}
+    </Box>
+  );
+}
+
+function DesktopPlanMainCard({
+  plan,
+  ringPaused,
+}: {
+  plan: Plan;
+  ringPaused: boolean;
+}) {
+  const cardImage = getDesktopCardImage(plan);
+  const organizers = plan.organizers;
+
+  return (
+    <Box sx={{ position: 'relative', width: '100%' }}>
+      <Box
+        sx={{
+          height: DESKTOP_MAIN_TOP_H,
+          borderRadius: '18px',
+          bgcolor: '#FFFFFF',
+          boxShadow: '0 12px 36px rgba(40, 36, 28, 0.07)',
+          p: '32px 28px 24px',
+          position: 'relative',
+        }}
+      >
+        <DesktopRotateRing paused={ringPaused} />
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '186px 1fr',
+            columnGap: '50px',
+            height: '100%',
+          }}
+        >
+          <Box sx={{ pt: '4px', pr: '8px' }}>
+            <CompactPlanNameplate plan={plan} />
+            {organizers.length > 0 && (
+              <Box data-testid="desktop-plan-organizers" sx={{ mt: '22px' }}>
+                <Box
+                  component="p"
+                  sx={{
+                    m: 0,
+                    fontSize: 9,
+                    lineHeight: 1.65,
+                    color: '#666666',
+                  }}
+                >
+                  執行單位：
+                </Box>
+                {organizers.map((org) => (
+                  <Box
+                    key={org}
+                    component="p"
+                    sx={{
+                      m: 0,
+                      fontSize: 8.5,
+                      lineHeight: 1.65,
+                      color: '#666666',
+                    }}
+                  >
+                    {org}
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
+          <Box sx={{ minWidth: 0, pr: '8px' }}>
+            <Box
+              component="p"
+              sx={{
+                m: 0,
+                fontSize: 10.8,
+                lineHeight: 1.75,
+                color: '#000000',
+                textAlign: 'justify',
+              }}
+            >
+              {plan.intro}
+            </Box>
+          </Box>
+        </Box>
+        <Box
+          data-testid="desktop-plan-timeline"
+          sx={{ position: 'absolute', left: 28, right: 28, bottom: 27 }}
+        >
+          <PlanTimeline timelines={plan.timelines} />
+        </Box>
+      </Box>
+
+      <Box
+        sx={{
+          mt: '10px',
+          height: DESKTOP_MAIN_STATS_H,
+          borderRadius: '18px',
+          bgcolor: 'rgba(255, 255, 255, 0.54)',
+          border: '1px solid rgba(138, 138, 138, 0.30)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          boxShadow: '0 10px 28px rgba(40, 36, 28, 0.05)',
+          p: '10px',
+          position: 'relative',
+          display: 'grid',
+          gridTemplateColumns: '116px 1fr',
+          gap: '12px',
+        }}
+      >
+        <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+          <StatsMarquee stats={plan.stats} />
+        </Box>
+        {cardImage ? (
+          <Box
+            component="img"
+            src={cardImage}
+            alt={`${plan.name.zh} 代表圖`}
+            loading="lazy"
+            sx={{
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: '12px',
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '12px',
+              background: `linear-gradient(120deg, ${portalTokens.color.blobOrangeFrom}, ${portalTokens.color.blobOrangeTo})`,
+            }}
+          />
+        )}
+        <Box
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            bottom: '-21px',
+            transform: 'translateX(-50%) scale(0.78)',
+            transformOrigin: 'center',
+            zIndex: 2,
+          }}
+        >
+          <SocialLinkBar
+            socialLinks={plan.socialLinks}
+            learnMoreLabel="前往官網"
+            learnMoreHref={plan.officialUrl}
+          />
+        </Box>
+      </Box>
+    </Box>
+  );
 }
 
 /**
@@ -780,6 +1304,10 @@ export function PlanCarousel({
       ? window.matchMedia('(min-width:1200px)').matches
       : false,
   );
+  const [desktopRingHeld, setDesktopRingHeld] = useState(false);
+  const desktopRingTimerRef = useRef<number | null>(null);
+  const desktopRingStartedAtRef = useRef<number | null>(null);
+  const desktopRingRemainingRef = useRef(DESKTOP_ROTATE_MS);
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mq = window.matchMedia('(min-width:1200px)');
@@ -794,6 +1322,11 @@ export function PlanCarousel({
       mq.removeEventListener('change', onMq);
     };
   }, []);
+
+  useEffect(() => {
+    desktopRingRemainingRef.current = DESKTOP_ROTATE_MS;
+    desktopRingStartedAtRef.current = null;
+  }, [expandedIndex]);
 
   // 手機展開卡比視窗高、需頁面捲動瀏覽。偵測「作用中卡片底部已進入視窗下緣」時
   // （peekAtBottom），下一頁 peek 鈕由卡片頂部下移到社群列下方就位，使用者在卡片尾端原處
@@ -832,45 +1365,6 @@ export function PlanCarousel({
       if (raf) cancelAnimationFrame(raf);
     };
   }, [isDesktop, expandedIndex, viewportW]);
-
-  // 桌機環狀軌道「合成完才揭示」：環狀卡片（含毛玻璃 backdrop-filter）一掛載即渲染，其
-  // 首次合成會讓毛玻璃由淺變濃、底下裝飾照片（尤其冷快取時才載入）淡入——使用者會看到
-  // 「輕微變化」。為此掛載後先以同色遮罩蓋住整個輪播區，等到①卡片後方的霧化照片全部載入
-  // 解碼、②再過兩個 rAF 讓毛玻璃確實合成完，才移除遮罩一次揭示。用「等照片就緒」而非固定
-  // 時間，冷快取也不會在揭示後才淡入。1.5s fallback 兜底。一次性，之後切換不重掛、不再 gate。
-  const [ringRevealed, setRingRevealed] = useState(false);
-  useEffect(() => {
-    if (expandedIndex === null || ringRevealed) return;
-    let cancelled = false;
-    let raf = 0;
-    const reveal = () => {
-      if (!cancelled) setRingRevealed(true);
-    };
-    const tick = () => {
-      if (cancelled) return;
-      const hazes = Array.from(
-        document.querySelectorAll<HTMLImageElement>('.plan-star-haze'),
-      );
-      const ready =
-        hazes.length > 0 &&
-        hazes.every((h) => h.complete && h.naturalWidth > 0);
-      if (ready) {
-        // 照片已就緒；再等兩個 rAF 讓毛玻璃合成完，才揭示。
-        raf = requestAnimationFrame(() => {
-          raf = requestAnimationFrame(reveal);
-        });
-      } else {
-        raf = requestAnimationFrame(tick);
-      }
-    };
-    const fallback = window.setTimeout(reveal, 1500);
-    raf = requestAnimationFrame(tick);
-    return () => {
-      cancelled = true;
-      cancelAnimationFrame(raf);
-      window.clearTimeout(fallback);
-    };
-  }, [expandedIndex, ringRevealed]);
 
   // ── 橘字接力（mini cards hover 之間的橘字飛行覆蓋層）──
   const miniContainerRef = useRef<HTMLDivElement | null>(null);
@@ -971,6 +1465,56 @@ export function PlanCarousel({
   };
 
   const count = plans.length;
+  useEffect(() => {
+    if (desktopRingTimerRef.current) {
+      window.clearTimeout(desktopRingTimerRef.current);
+      desktopRingTimerRef.current = null;
+    }
+    if (
+      typeof window === 'undefined' ||
+      !isDesktop ||
+      expandedIndex === null ||
+      count <= 1 ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+
+    if (desktopRingHeld) {
+      if (desktopRingStartedAtRef.current !== null) {
+        desktopRingRemainingRef.current = Math.max(
+          0,
+          desktopRingRemainingRef.current -
+            (Date.now() - desktopRingStartedAtRef.current),
+        );
+        desktopRingStartedAtRef.current = null;
+      }
+      return;
+    }
+
+    desktopRingStartedAtRef.current = Date.now();
+    desktopRingTimerRef.current = window.setTimeout(() => {
+      desktopRingRemainingRef.current = DESKTOP_ROTATE_MS;
+      desktopRingStartedAtRef.current = null;
+      const next = (expandedIndex + 1) % count;
+      if (onPeekNavigate) onPeekNavigate(next, 'next');
+      else onExpandedIndexChange(next);
+    }, desktopRingRemainingRef.current);
+
+    return () => {
+      if (desktopRingTimerRef.current) {
+        window.clearTimeout(desktopRingTimerRef.current);
+        desktopRingTimerRef.current = null;
+      }
+    };
+  }, [
+    count,
+    desktopRingHeld,
+    expandedIndex,
+    isDesktop,
+    onExpandedIndexChange,
+    onPeekNavigate,
+  ]);
   if (count === 0) return null;
 
   const handleSelect = (i: number) => {
@@ -1267,168 +1811,133 @@ export function PlanCarousel({
     );
   }
 
-  // ── 桌機展開：持久環狀軌道 ──
-  // 三份卡片並列（左／中／右複本），讓左右兩側永遠是真實卡片內容；active 永遠落在
-  // 中份範圍內、被置中，兩側恆有完整鄰卡。切換時整條軌道以 translateX 平滑滑動 ——
-  // 卡片全程掛載、不 remount，故無 pop-in、無閃跳。星形只掛在 active 卡（與設計稿
-  // 一致，peek 無星形），且照片皆已預載，切換時僅以 opacity 淡入淡出、不重載。
-  const RING_CARD_W = 960;
-  // peek 露出量（螢幕 px）：兩側鄰卡露出的寬度。卡距以視窗寬反推，讓各螢幕寬下
-  // peek 露出量大致一致（zoom 內 px = 螢幕 px / cardScale）。
-  const PEEK_PX = 72;
-  const cwScreen = RING_CARD_W * cardScale;
-  const gapScreen = viewportW
-    ? Math.max(16, (viewportW - cwScreen) / 2 - PEEK_PX)
-    : 64 * cardScale;
-  const RING_GAP = gapScreen / (cardScale || 1);
-  const RING_STEP = RING_CARD_W + RING_GAP;
-  const mid = Math.floor(count / 2);
-  // 置中 active：以「中份的中央計畫」為 translateX=0 基準，平移 (active - mid + wrapOffset) 步。
-  const trackX = -(expandedIndex - mid + wrapOffset) * RING_STEP;
-  // 目前視覺上置中的「份」（0=中份、+1=右份、-1=左份）；wrap 滑動期間用來標記 active 卡。
-  const centerCopy = wrapOffset / count;
-  const prevIndex = (expandedIndex - 1 + count) % count;
-  const nextIndex = (expandedIndex + 1) % count;
+  // ── 桌機展開：左側詳細主卡 + 右側兩張收合卡 ──
+  // 參考 portal-home prototype：第二屏一次呈現三個計畫；active 計畫顯示完整資訊，
+  // 其餘兩個計畫以右側收合卡呈現。點擊收合卡只切換版面與互動狀態，文案來源維持 Plan。
+  const activePlan = plans[expandedIndex];
+  const sidePlans = plans
+    .map((plan, index) => ({ plan, index }))
+    .filter(({ index }) => index !== expandedIndex);
 
-  // 點某張鄰卡 → 切換到該計畫（捲動驅動交由上層 onPeekNavigate，否則直接改索引）。
   const navigateTo = (target: number) => {
     if (target === expandedIndex) return;
     let dir: 'prev' | 'next' = target > expandedIndex ? 'next' : 'prev';
-    // wrap：最後一張→第一張（往後）或第一張→最後一張（往前）。以 wrapOffset 讓軌道
-    // 順向滑到相鄰份的同卡片，820ms（略長於 0.8s transition）後無動畫 snap 回中份。
-    let off = 0;
     if (expandedIndex === count - 1 && target === 0) {
       dir = 'next';
-      off = count;
     } else if (expandedIndex === 0 && target === count - 1) {
       dir = 'prev';
-      off = -count;
     }
-    triggerWrap(off);
     if (onPeekNavigate) onPeekNavigate(target, dir);
     else onExpandedIndexChange(target);
   };
 
   return (
     <Box
+      data-testid="desktop-plan-stage"
       sx={{
         position: 'relative',
-        width: '100%',
+        width: DESKTOP_STAGE_W,
+        height: 561,
+        maxWidth: '100%',
         overflow: 'visible',
+        zoom: cardScale !== 1 ? cardScale : undefined,
+        mx: 'auto',
       }}
     >
-      {/* 合成完才揭示：卡片含毛玻璃 backdrop-filter，首次合成會讓毛玻璃由淺變濃
-          「後疊上來」。warmup 期間卡片以正常 opacity 實際繪製（毛玻璃才會真的完成
-          合成），用一層與背景同色的不透明遮罩蓋住整個輪播區；毛玻璃熱好後移除遮罩，
-          一次顯示已合成好的整張卡。透明度 gate 無法觸發 backdrop 合成，故改用遮罩。 */}
-      {!ringRevealed && (
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            top: -360,
-            bottom: -80,
-            left: '-5%',
-            right: '-5%',
-            bgcolor: portalTokens.color.pageBg,
-            zIndex: 20,
-            pointerEvents: 'none',
-          }}
-        />
-      )}
       <Box
         sx={{
-          // 自適應第二屏縮放：用 zoom（非 transform:scale）讓 SVG／文字重排後維持銳利。
-          zoom: cardScale !== 1 ? cardScale : undefined,
-          position: 'relative',
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-          overflow: 'visible',
+          display: 'grid',
+          gridTemplateColumns: `${DESKTOP_MAIN_W}px ${DESKTOP_SIDE_W}px`,
+          gridTemplateRows: '1fr 1fr',
+          gap: `${DESKTOP_STAGE_GAP_Y}px ${DESKTOP_STAGE_GAP_X}px`,
+          minHeight: 561,
+          alignItems: 'stretch',
+          '@keyframes desktopPlanMainIn': {
+            from: { opacity: 0, transform: 'translateY(26px)' },
+            to: { opacity: 1, transform: 'translateY(0)' },
+          },
+          '@keyframes desktopBackPhotoIn': {
+            from: { opacity: 0, transform: 'scale(0.92) rotate(-6deg)' },
+            to: { opacity: 1, transform: 'scale(1) rotate(0deg)' },
+          },
+          '@keyframes desktopPlanSideIn': {
+            from: { opacity: 0, transform: 'translateY(20px)' },
+            to: { opacity: 1, transform: 'translateY(0)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            '& [data-plan-motion]': { animation: 'none' },
+          },
         }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            gap: `${RING_GAP}px`,
-            transform: `translateX(${trackX}px)`,
-            // 切換以「快速起步、長距柔和減速滑停」的 expo ease-out 收束，營造有質感的
-            // 緩衝 settle 感（切換到停下保有緩衝）。wrap snap 回中份時關閉動畫。
-            transition: wrapSnap
-              ? 'none'
-              : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-            willChange: 'transform',
-            '@media (prefers-reduced-motion: reduce)': { transition: 'none' },
-          }}
-        >
-          {[-1, 0, 1].map((copy) =>
-            plans.map((plan, i) => {
-              // wrap 滑動期間視覺置中的份為 centerCopy（±1）；其餘時間為中份（0）。
-              const isCenter = copy === centerCopy && i === expandedIndex;
-              return (
-                <Box
-                  key={`${copy}-${plan.id}`}
-                  onClick={isCenter ? undefined : () => navigateTo(i)}
-                  onMouseEnter={
-                    isCenter
-                      ? () => onHoverPlanChange?.(expandedIndex)
-                      : undefined
-                  }
-                  onMouseLeave={
-                    isCenter ? () => onHoverPlanChange?.(null) : undefined
-                  }
-                  aria-hidden={!isCenter}
-                  sx={{
-                    flex: '0 0 auto',
-                    width: RING_CARD_W,
-                    transformOrigin: 'top center',
-                    // 此外層只負責隨軌道滑動的位移（active 保留段內捲動 reveal 位移、
-                    // 鄰卡略縮）。淡化／去飽和移到 PlanCardWithStars 內的卡片層，只套在
-                    // 卡片本體、不波及底下裝飾照片——照片維持固定霧化，僅 hover 時才變樣。
-                    transform: isCenter
-                      ? 'translateY(calc(var(--reveal-y, 0px) * -1))'
-                      : 'scale(0.965)',
-                    cursor: isCenter ? 'default' : 'pointer',
-                    // wrap snap 回中份那一幀關閉動畫，避免卡片從鄰卡狀態閃動。
-                    transition: wrapSnap
-                      ? 'none'
-                      : 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-                    '@media (prefers-reduced-motion: reduce)': {
-                      transition: 'none',
+        {activePlan && <DesktopPlanBackPhotos plan={activePlan} />}
+        {plans.map((plan, index) => {
+          const isActive = index === expandedIndex;
+          const sideRank = sidePlans.findIndex((item) => item.index === index);
+          const roleLayout = isActive
+            ? {
+                left: 0,
+                top: 0,
+                width: DESKTOP_MAIN_W,
+                height: 561,
+                zIndex: 2,
+              }
+            : {
+                left: DESKTOP_MAIN_W + DESKTOP_STAGE_GAP_X,
+                top: sideRank === 0 ? 0 : 272 + DESKTOP_STAGE_GAP_Y,
+                width: DESKTOP_SIDE_W,
+                height: 272,
+                zIndex: 1,
+              };
+
+          return (
+            <Box
+              key={plan.id}
+              data-plan-motion=""
+              {...(isActive
+                ? {
+                    'data-testid': 'desktop-plan-main',
+                    'data-plan-id': plan.id,
+                    onMouseEnter: () => {
+                      setDesktopRingHeld(true);
+                      onHoverPlanChange?.(expandedIndex);
                     },
-                  }}
-                >
-                  <PlanCardWithStars
-                    plan={plan}
-                    showStars={isCenter}
-                    dimmed={!isCenter}
-                  />
-                </Box>
-              );
-            }),
-          )}
-        </Box>
+                    onMouseLeave: () => {
+                      setDesktopRingHeld(false);
+                      onHoverPlanChange?.(null);
+                    },
+                    onFocus: () => setDesktopRingHeld(true),
+                    onBlur: (event: React.FocusEvent<HTMLDivElement>) => {
+                      if (!event.currentTarget.contains(event.relatedTarget)) {
+                        setDesktopRingHeld(false);
+                      }
+                    },
+                  }
+                : {})}
+              sx={{
+                position: 'absolute',
+                ...roleLayout,
+                transition:
+                  'left 0.85s cubic-bezier(0.16, 1, 0.3, 1), top 0.85s cubic-bezier(0.16, 1, 0.3, 1), width 0.85s cubic-bezier(0.16, 1, 0.3, 1), height 0.85s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.45s ease, transform 0.85s cubic-bezier(0.16, 1, 0.3, 1)',
+                transform: isActive
+                  ? 'translateY(calc(var(--reveal-y, 0px) * -1))'
+                  : 'translateY(0)',
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'none',
+                },
+              }}
+            >
+              {isActive ? (
+                <DesktopPlanMainCard plan={plan} ringPaused={desktopRingHeld} />
+              ) : (
+                <DesktopPlanSideCard
+                  plan={plan}
+                  onSelect={() => navigateTo(index)}
+                />
+              )}
+            </Box>
+          );
+        })}
       </Box>
-      {/* 左右探頭導覽鈕 — 貼第二屏左右緣、於兩側 peek 細條上半部探出，明確指向
-          上一個 / 下一個計畫並可點擊切換（與卡片下方指示點、敘事區標記同一形狀語彙）。 */}
-      {count > 1 && (
-        <>
-          <PlanPeekNavButton
-            direction="prev"
-            planName={plans[prevIndex]?.name.zh ?? ''}
-            markSrc={`/images/plans/${plans[prevIndex]?.folderName}/logo/mark.png`}
-            onClick={() => navigateTo(prevIndex)}
-          />
-          <PlanPeekNavButton
-            direction="next"
-            planName={plans[nextIndex]?.name.zh ?? ''}
-            markSrc={`/images/plans/${plans[nextIndex]?.folderName}/logo/mark.png`}
-            onClick={() => navigateTo(nextIndex)}
-          />
-        </>
-      )}
     </Box>
   );
 }
