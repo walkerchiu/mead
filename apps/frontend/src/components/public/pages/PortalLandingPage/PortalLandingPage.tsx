@@ -34,6 +34,8 @@ export interface PortalLandingPageProps {
 
 /** 計畫卡顯示順序（依設計稿：菁培 → 設計戰國策 → 創意設計大賽） */
 const PLAN_ORDER: string[] = ['sposad', 'idc', 'tisdc'];
+/** 首頁色塊順序（依新版第一屏：左菁培 → 中創意設計大賽 → 右戰國策） */
+const HERO_PLAN_ORDER: string[] = ['sposad', 'tisdc', 'idc'];
 
 /**
  * hero 各計畫色塊 hover 時輪換的照片（依設計稿選用，非全部）。
@@ -99,6 +101,15 @@ const GESTURE_LOCK_MS = 700;
 const NarrativePlanName = styled('span')({
   color: portalTokens.color.brandOrange,
 });
+
+function heroPlanLabel(planId: string): string[] {
+  if (planId === 'sposad') return ['藝術與設計', '菁英海外培訓計畫'];
+  if (planId === 'tisdc') return ['臺灣國際學生', '創意設計大賽'];
+  if (planId === 'idc') {
+    return ['鼓勵學生參加', '藝術與設計類國際競賽計畫'];
+  }
+  return [];
+}
 
 /**
  * PortalLandingPage — 教育部藝術設計三大計畫入口網首頁。
@@ -638,10 +649,14 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
 
   if (!activePlan) return null;
 
-  // hero 文字雲：整片雲一次顯示「目前作用中計畫」的裝飾文字（defaultIndex =
-  // activeIndex）；hover 某色塊即切換成該計畫的文字並於塊內顯示其照片。
-  // 順序依 orderedPlans（sposad → idc → tisdc）對應左/中/右（直向為上/中/下）。
-  const heroShapeContents = orderedPlans.slice(0, 3).map((plan) => {
+  // hero 文字雲：色塊順序依新版第一屏（sposad → tisdc → idc）對應左/中/右。
+  const heroPlans = [
+    ...HERO_PLAN_ORDER.map((id) =>
+      orderedPlans.find((p) => p.id === id),
+    ).filter((p): p is Plan => Boolean(p)),
+    ...orderedPlans.filter((p) => !HERO_PLAN_ORDER.includes(p.id)),
+  ].slice(0, 3);
+  const heroShapeContents = heroPlans.map((plan) => {
     const allPhotos = getLocalPhotos(plan)
       .map((p) => p.src)
       .filter((s): s is string => Boolean(s));
@@ -651,6 +666,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
       photos: indices
         .map((i) => allPhotos[i])
         .filter((s): s is string => Boolean(s)),
+      label: heroPlanLabel(plan.id),
     };
   });
 

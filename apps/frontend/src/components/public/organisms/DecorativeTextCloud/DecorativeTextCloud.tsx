@@ -136,6 +136,54 @@ const LAYOUT = {
   },
 } as const;
 
+const SHAPE_LABEL_COLOR = '#E3E3E3';
+
+const DESKTOP_SHAPE_LABELS = [
+  [
+    { x: 492, y: 228 },
+    { x: 460, y: 246 },
+  ],
+  [
+    { x: 764, y: 261 },
+    { x: 728.33, y: 248 },
+  ],
+  [
+    { x: 954, y: 218 },
+    { x: 926, y: 240 },
+  ],
+] as const;
+
+const STACKED_SHAPE_LABELS = {
+  t: [
+    [
+      { x: 336, y: 278 },
+      { x: 436, y: 278 },
+    ],
+    [
+      { x: 326, y: 642 },
+      { x: 436, y: 642 },
+    ],
+    [
+      { x: 264, y: 1031 },
+      { x: 435, y: 1031 },
+    ],
+  ],
+  v: [
+    [
+      { x: 92, y: 92 },
+      { x: 207, y: 92 },
+    ],
+    [
+      { x: 86, y: 363 },
+      { x: 207, y: 363 },
+    ],
+    [
+      { x: 54, y: 651 },
+      { x: 205, y: 651 },
+    ],
+  ],
+} as const;
+
 /** 佈局模式：h=桌機橫向、t=平板直向、v=手機直向 */
 type LayoutMode = keyof typeof LAYOUT;
 
@@ -285,6 +333,8 @@ export interface ShapeContent {
   words: LocalizedText[];
   /** 該計畫的本機照片路徑 — hover 此色塊時於塊內隨機循環顯示 */
   photos: string[];
+  /** 色塊未 hover 時顯示的計畫名稱（桌機直式雙欄，小畫面橫式雙行） */
+  label?: string[];
 }
 
 export interface DecorativeTextCloudProps {
@@ -677,7 +727,7 @@ export function DecorativeTextCloud({
         // 靠頂）、平板 1278（viewBox 834×1278，色塊置中約 59% 寬、頂端留白）；
         // 桌機橫向 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
         height: mode === 'v' ? 836 : mode === 't' ? 1278 : 440,
-        [portalTokens.mq.desktopUp]: { height: 620 },
+        [portalTokens.mq.desktopUp]: { height: 620, mt: '84px' },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
         '@keyframes portalTwinkle': {
           '0%, 100%': { opacity: 0 },
@@ -886,6 +936,17 @@ export function DecorativeTextCloud({
             ? currentPhotos[photoIdx % currentPhotos.length]
             : undefined;
           const isHovered = hovered === i;
+          const label = shapeContents[i]?.label?.slice(0, 2) ?? [];
+          const desktopLabelPoints =
+            DESKTOP_SHAPE_LABELS[i] ?? DESKTOP_SHAPE_LABELS[0];
+          const stackedLabelPoints =
+            mode === 'h'
+              ? null
+              : ((STACKED_SHAPE_LABELS[mode][i] ??
+                  STACKED_SHAPE_LABELS[mode][0]) as readonly {
+                  x: number;
+                  y: number;
+                }[]);
           return (
             <g
               key={i}
@@ -908,6 +969,48 @@ export function DecorativeTextCloud({
                       pointerEvents: 'none',
                     }}
                   />
+                )}
+                {label.length > 0 && (
+                  <g
+                    aria-hidden="true"
+                    style={{
+                      opacity: isHovered ? 0 : 1,
+                      transition: 'opacity 0.32s ease',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    {label.map((line, labelIndex) => {
+                      const point = vertical
+                        ? (stackedLabelPoints?.[labelIndex] ??
+                          stackedLabelPoints?.[0])
+                        : (desktopLabelPoints[labelIndex] ??
+                          desktopLabelPoints[0]);
+                      if (!point) return null;
+                      return (
+                        <text
+                          key={line}
+                          x={point.x}
+                          y={point.y}
+                          fill={SHAPE_LABEL_COLOR}
+                          fontFamily='Inter, var(--font-noto-sans-tc, "Noto Sans TC"), sans-serif'
+                          fontSize={vertical ? (mode === 't' ? 18 : 14) : 12.58}
+                          fontWeight={400}
+                          letterSpacing="0"
+                          textAnchor={vertical ? 'middle' : undefined}
+                          dominantBaseline={vertical ? 'middle' : undefined}
+                          style={{
+                            writingMode: vertical
+                              ? 'horizontal-tb'
+                              : 'vertical-rl',
+                            textOrientation: vertical ? undefined : 'upright',
+                            textShadow: '0 1px 12px rgba(0, 0, 0, 0.16)',
+                          }}
+                        >
+                          {line}
+                        </text>
+                      );
+                    })}
+                  </g>
                 )}
                 <polygon
                   points={s.points}
@@ -1059,7 +1162,7 @@ export function DecorativeTextCloud({
             position: 'absolute',
             left: 0,
             right: 0,
-            bottom: 8,
+            top: -82,
             // 容器自身只承載絕對定位的三塊；高度由內容決定。
             // 不掛入場動畫：opacity / transform / filter / will-change 等任何能
             // 觸發 stacking context 的屬性都會讓子節點的 mix-blend-mode
