@@ -732,6 +732,10 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
             flexDirection: 'column',
             // 文字雲側邊圖片略微溢出時裁掉水平方向，避免出現橫向捲軸
             overflowX: 'clip',
+            // 手機 hero 的第三個色塊延伸到畫布底部；保留底部緩衝，避免下一屏計畫卡片
+            // 一開始就貼住或覆蓋色塊。
+            pb: '96px',
+            [portalTokens.mq.tabletUp]: { pb: 0 },
           }}
         >
           {/* 文字雲區：佔滿剩餘高度並置中（手機／平板靠頂、桌機垂直置中）。

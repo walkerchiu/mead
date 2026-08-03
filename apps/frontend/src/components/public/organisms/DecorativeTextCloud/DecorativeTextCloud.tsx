@@ -50,7 +50,7 @@ const BASE_LABEL_GROUPS: BaseLabelGroup[] = [
   },
   {
     position: 'end',
-    lines: [{ text: '臺灣的創造力，' }, { text: '走向世界', align: 'end' }],
+    lines: [{ text: '臺灣的創造力' }, { text: '走向世界', align: 'end' }],
   },
 ];
 
@@ -100,8 +100,8 @@ const SHAPE_META = [
  *   viewBox 834×1278 對齊 frame 寬 834；Union x=167 寬 493（置中、約 59% 寬），
  *   三星中心 cy≈277 / 642 / 1031、半徑 246.7。色塊比手機版更窄、更拉長、頂端留白。
  * - v 直向（<834px 手機）：三圖上中下堆疊（依手機稿 node 43:396）。
- *   frame 寬 402、Union x=19 寬 365.5（幾乎填滿寬），三星中心 cy≈92 / 363 / 651
- *   （頂塊上緣超出、上方切齊），半徑 ~183（沿用 SHAPE_R）。
+ *   frame 寬 402、Union x=19 寬 365.5（幾乎填滿寬），三星中心 cy≈185 / 456 / 744
+ *   讓第一個色塊完整露出，第二個色塊開始承接裝飾字，半徑 ~183（沿用 SHAPE_R）。
  */
 const LAYOUT = {
   h: {
@@ -126,12 +126,12 @@ const LAYOUT = {
   },
   v: {
     viewW: 402,
-    viewH: 836,
+    viewH: 929,
     r: SHAPE_R,
     centers: [
-      { cx: 201, cy: 92 },
-      { cx: 201, cy: 363 },
-      { cx: 201, cy: 651 },
+      { cx: 201, cy: 185 },
+      { cx: 201, cy: 456 },
+      { cx: 201, cy: 744 },
     ],
   },
 } as const;
@@ -156,30 +156,30 @@ const DESKTOP_SHAPE_LABELS = [
 const STACKED_SHAPE_LABELS = {
   t: [
     [
-      { x: 336, y: 278 },
-      { x: 436, y: 278 },
+      { x: 364, y: 260 },
+      { x: 392, y: 296 },
     ],
     [
-      { x: 326, y: 642 },
-      { x: 436, y: 642 },
+      { x: 364, y: 624 },
+      { x: 392, y: 660 },
     ],
     [
-      { x: 264, y: 1031 },
-      { x: 435, y: 1031 },
+      { x: 324, y: 1013 },
+      { x: 354, y: 1049 },
     ],
   ],
   v: [
     [
-      { x: 92, y: 92 },
-      { x: 207, y: 92 },
+      { x: 150, y: 171 },
+      { x: 176, y: 199 },
     ],
     [
-      { x: 86, y: 363 },
-      { x: 207, y: 363 },
+      { x: 151, y: 442 },
+      { x: 177, y: 470 },
     ],
     [
-      { x: 54, y: 651 },
-      { x: 205, y: 651 },
+      { x: 127, y: 730 },
+      { x: 155, y: 758 },
     ],
   ],
 } as const;
@@ -280,8 +280,10 @@ const HORIZONTAL_TEXT_SLOTS: { leftPct: number; topPct: number }[] = [
  *   取均勻分布的 slot 子集，讓較少的字仍分散整個畫面、不擠在一側。
  * - 直向：左右兩欄、沿色塊兩側由上而下（正立橫書）。
  */
-function placeWords(words: string[], vertical: boolean): PlacedWord[] {
-  if (vertical) {
+function placeWords(words: string[], mode: LayoutMode): PlacedWord[] {
+  if (mode !== 'h') {
+    const startPct = mode === 'v' ? 66 : 48;
+    const spreadPct = mode === 'v' ? 30 : 42;
     const leftCount = Math.ceil(words.length / 2);
     return words.map((text, i) => {
       const onLeft = i < leftCount;
@@ -291,7 +293,7 @@ function placeWords(words: string[], vertical: boolean): PlacedWord[] {
       return {
         text,
         leftPct: onLeft ? 5 : 95,
-        topPct: 7 + t * 66,
+        topPct: startPct + t * spreadPct,
         side: onLeft ? 'left' : 'right',
       };
     });
@@ -440,7 +442,7 @@ export function DecorativeTextCloud({
       const texts = (shapeContents[idx]?.words ?? [])
         .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
         .filter((t): t is string => Boolean(t));
-      const placed = placeWords(texts, vertical);
+      const placed = placeWords(texts, mode);
       if (placed.length >= maxWords) return placed;
       const anchor = placed[placed.length - 1] ?? {
         leftPct: 50,
@@ -456,7 +458,7 @@ export function DecorativeTextCloud({
       }));
       return [...placed, ...padded];
     },
-    [shapeContents, language, vertical, maxWords],
+    [shapeContents, language, mode, maxWords],
   );
 
   // 計畫切換的緩衝過場：transFrom = 正在淡出的（前一個）計畫；transId 每次切換遞增，
@@ -723,10 +725,10 @@ export function DecorativeTextCloud({
         // 置中後兩側留白），所有 leftPct/topPct 才對齊各自設計稿原座標。
         maxWidth: mode === 't' ? 834 : 1440,
         mx: 'auto',
-        // 直向佈局高度對齊各自設計稿 hero 區：手機 836（viewBox 402×836，色塊填滿寬、
-        // 靠頂）、平板 1278（viewBox 834×1278，色塊置中約 59% 寬、頂端留白）；
+        // 直向佈局高度對齊各自設計稿 hero 區：手機跟隨 viewBox 高度（色塊填滿寬、
+        // 第一塊完整露出）、平板 1278（viewBox 834×1278，色塊置中約 59% 寬、頂端留白）；
         // 桌機橫向 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
-        height: mode === 'v' ? 836 : mode === 't' ? 1278 : 440,
+        height: mode === 'v' ? LAYOUT.v.viewH : mode === 't' ? 1278 : 440,
         [portalTokens.mq.desktopUp]: { height: 620, mt: '84px' },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
         '@keyframes portalTwinkle': {
@@ -772,8 +774,8 @@ export function DecorativeTextCloud({
           position: 'absolute',
           ...(vertical
             ? {
-                // 直向：SVG 填滿容器寬、靠頂對齊（依手機稿 — 色塊填滿寬、頂塊上緣
-                // 切齊視窗）。viewBox 402×836 對齊 node 43:396 的 hero 區座標。
+                // 直向：SVG 填滿容器寬、靠頂對齊。手機版 viewBox 讓第一個色塊完整露出，
+                // 裝飾文字從第二個色塊開始進場。
                 top: 0,
                 left: '50%',
                 transform: 'translateX(-50%)',
@@ -993,16 +995,16 @@ export function DecorativeTextCloud({
                           y={point.y}
                           fill={SHAPE_LABEL_COLOR}
                           fontFamily='Inter, var(--font-noto-sans-tc, "Noto Sans TC"), sans-serif'
-                          fontSize={vertical ? (mode === 't' ? 18 : 14) : 12.58}
+                          fontSize={vertical ? (mode === 't' ? 18 : 12) : 12.58}
                           fontWeight={400}
                           letterSpacing="0"
-                          textAnchor={vertical ? 'middle' : undefined}
+                          textAnchor={vertical ? 'start' : undefined}
                           dominantBaseline={vertical ? 'middle' : undefined}
                           style={{
-                            writingMode: vertical
-                              ? 'horizontal-tb'
-                              : 'vertical-rl',
-                            textOrientation: vertical ? undefined : 'upright',
+                            writingMode:
+                              mode === 'v' ? 'horizontal-tb' : 'vertical-rl',
+                            textOrientation:
+                              mode === 'v' ? undefined : 'upright',
                             textShadow: '0 1px 12px rgba(0, 0, 0, 0.16)',
                           }}
                         >
@@ -1046,114 +1048,226 @@ export function DecorativeTextCloud({
       {/* 底部固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40：
           - 左塊（regular）：ART x DESIGN / Gateway（兩行）
           - 中塊（bold）：Taiwan（一行，粗體強調）
-          - 右塊（regular）：臺灣的創造力，（左）/ 走向世界（右靠縮進）
+          - 右塊（regular）：臺灣的創造力（左）/ 走向世界（右靠縮進）
           三塊以絕對定位精準錨點，而非 space-between，避免被視口寬度均勻拉開；
           top-aligned 讓第二行自然下沉，產生高低錯落。
           Vertical 直向佈局仍是兩欄堆疊（左頂 + 右底），手機版邏輯不變。 */}
       {vertical ? (
         <>
-          {/* 左欄：ART x DESIGN / GATEWAY（細）＋ Taiwan（粗）＋ 識別橫書一列。
-              依手機稿 388:247（左 x25）與平板稿 43:1142（左 x29）：識別「教育部 藝術與設計｜
-              三大計畫入口網」改為橫書、置於 Taiwan 下方（不再直書於右側）；上緣與右欄
-              「臺灣的創造力」對齊。手機鎖固定左距 24px（貼左緣、不隨視窗寬放大留白）；
-              平板容器固定 834，沿用 3.5% 即穩定。 */}
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              left: mode === 't' ? '3.5%' : '24px',
-              top: mode === 't' ? '1080px' : '707px',
-              display: 'flex',
-              flexDirection: 'column',
-              pointerEvents: 'none',
-            }}
-          >
-            {[...BASE_LABEL_GROUPS[0].lines, ...BASE_LABEL_GROUPS[1].lines].map(
-              (line) => (
-                <Box
-                  key={line.text}
-                  component="span"
-                  sx={{
-                    fontSize: 17.89,
-                    // 已載入字重 400/500/700：用 500（ART x DESIGN／GATEWAY，較細）對比
-                    // 700（Taiwan，較粗）。原本 600／800 都會 fallback 到 700、看起來一樣粗。
-                    fontWeight: line.text === 'Taiwan' ? 700 : 500,
-                    lineHeight: 1.25,
-                    // Taiwan 與上方 ART x DESIGN／GATEWAY 之間留間隙（依手機稿 388:247）。
-                    mt: line.text === 'Taiwan' ? '12px' : 0,
-                    whiteSpace: 'nowrap',
-                    color: '#ffffff',
-                    mixBlendMode: 'difference',
-                  }}
-                >
-                  {line.text}
-                </Box>
-              ),
-            )}
-            {/* 識別橫書列：教育部 藝術與設計 ｜ 三大計畫入口網（黑字、不混色）。
-                兩段間距依稿（手機 17px、平板 23px）。 */}
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                gap: mode === 't' ? '23px' : '17px',
-                mt: '20px',
-              }}
-            >
-              {['教育部 藝術與設計', '三大計畫入口網'].map((line) => (
-                <Box
-                  key={line}
-                  component="span"
-                  sx={{
-                    fontSize: 12.23,
-                    fontWeight: 500,
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                    color: '#000000',
-                  }}
-                >
-                  {line}
-                </Box>
-              ))}
-            </Box>
-          </Box>
-          {/* 右欄：臺灣的創造力，／走向世界 —— 上緣與左欄 ART x DESIGN 對齊、走向世界
-              靠右縮排下沉。手機改以 right 錨定（固定右距 24px、貼右緣，不隨視窗寬把整組
-              往中央拉）；平板容器固定 834，沿用 left 77.8% + 欄寬 160px（依稿 47:1925 文字框寬，
-              讓走向世界縮排貼近右緣 x809、距框右 25px）。 */}
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              left: mode === 't' ? '77.8%' : undefined,
-              right: mode === 't' ? undefined : '24px',
-              top: mode === 't' ? '1080px' : '707px',
-              width: mode === 't' ? '160px' : undefined,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0.5,
-              pointerEvents: 'none',
-            }}
-          >
-            {BASE_LABEL_GROUPS[2].lines.map((line) => (
+          {mode === 'v' ? (
+            <>
+              {/* 手機稿：原本在色塊下方的站名識別移到第一個色塊左右，改為直排。 */}
               <Box
-                key={line.text}
-                component="span"
+                data-testid="mobile-hero-brand-left"
+                aria-hidden
                 sx={{
-                  fontSize: 12.89,
-                  fontWeight: 600,
-                  lineHeight: 1.25,
-                  mt: line.align === 'end' ? '48px' : 0,
-                  whiteSpace: 'nowrap',
-                  color: '#ffffff',
-                  mixBlendMode: 'difference',
-                  alignSelf: line.align === 'end' ? 'flex-end' : 'flex-start',
+                  position: 'absolute',
+                  left: '26px',
+                  top: '36px',
+                  writingMode: 'vertical-rl',
+                  pointerEvents: 'none',
+                  color: '#000000',
                 }}
               >
-                {line.text}
+                <Box
+                  data-testid="mobile-hero-title-lockup"
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    display: 'flex',
+                    flexDirection: 'row-reverse',
+                    gap: '8px',
+                    writingMode: 'horizontal-tb',
+                  }}
+                >
+                  {BASE_LABEL_GROUPS[0].lines.map((line) => (
+                    <Box
+                      key={line.text}
+                      component="span"
+                      sx={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        lineHeight: 1,
+                        writingMode: 'vertical-rl',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {line.text}
+                    </Box>
+                  ))}
+                </Box>
+                <Box
+                  data-testid="mobile-hero-taiwan"
+                  component="span"
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: '170px',
+                    fontSize: 16,
+                    fontWeight: 700,
+                    lineHeight: 1,
+                    writingMode: 'vertical-rl',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Taiwan
+                </Box>
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: '282px',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '10px',
+                  }}
+                >
+                  {['教育部 藝術與設計', '三大計畫入口網'].map((line) => (
+                    <Box
+                      key={line}
+                      component="span"
+                      sx={{
+                        fontSize: 16,
+                        fontWeight: 700,
+                        lineHeight: 1.1,
+                        writingMode: 'vertical-rl',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {line}
+                    </Box>
+                  ))}
+                </Box>
               </Box>
-            ))}
-          </Box>
+              <Box
+                data-testid="mobile-hero-brand-right"
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  right: '24px',
+                  top: '42px',
+                  writingMode: 'vertical-rl',
+                  pointerEvents: 'none',
+                  color: '#000000',
+                }}
+              >
+                {BASE_LABEL_GROUPS[2].lines.map((line, index) => (
+                  <Box
+                    key={line.text}
+                    component="span"
+                    sx={{
+                      position: 'absolute',
+                      top: index === 0 ? 0 : '160px',
+                      right: 0,
+                      fontSize: 16,
+                      fontWeight: 700,
+                      lineHeight: 1.1,
+                      writingMode: 'vertical-rl',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {line.text}
+                  </Box>
+                ))}
+              </Box>
+            </>
+          ) : (
+            <>
+              {/* 平板稿：站名識別先在第一色塊左右完整出現，裝飾文字從後段色塊開始。 */}
+              <Box
+                data-testid="tablet-hero-brand-left"
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  left: '5.5%',
+                  top: '170px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  pointerEvents: 'none',
+                  color: '#000000',
+                }}
+              >
+                {[
+                  ...BASE_LABEL_GROUPS[0].lines,
+                  ...BASE_LABEL_GROUPS[1].lines,
+                ].map((line) => (
+                  <Box
+                    key={line.text}
+                    component="span"
+                    sx={{
+                      fontSize: 17.89,
+                      // 已載入字重 400/500/700：用 500（ART x DESIGN／GATEWAY，較細）對比
+                      // 700（Taiwan，較粗）。原本 600／800 都會 fallback 到 700、看起來一樣粗。
+                      fontWeight: line.text === 'Taiwan' ? 700 : 500,
+                      lineHeight: 1.25,
+                      // Taiwan 與上方 ART x DESIGN／GATEWAY 之間留間隙（依手機稿 388:247）。
+                      mt: line.text === 'Taiwan' ? '12px' : 0,
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {line.text}
+                  </Box>
+                ))}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    gap: '23px',
+                    mt: '20px',
+                  }}
+                >
+                  {['教育部 藝術與設計', '三大計畫入口網'].map((line) => (
+                    <Box
+                      key={line}
+                      component="span"
+                      sx={{
+                        fontSize: 12.23,
+                        fontWeight: 500,
+                        lineHeight: 1.2,
+                        whiteSpace: 'nowrap',
+                        color: '#000000',
+                      }}
+                    >
+                      {line}
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+              <Box
+                data-testid="tablet-hero-brand-right"
+                aria-hidden
+                sx={{
+                  position: 'absolute',
+                  right: '6%',
+                  top: '178px',
+                  width: '160px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '52px',
+                  pointerEvents: 'none',
+                }}
+              >
+                {BASE_LABEL_GROUPS[2].lines.map((line) => (
+                  <Box
+                    key={line.text}
+                    component="span"
+                    sx={{
+                      fontSize: 12.89,
+                      fontWeight: 600,
+                      lineHeight: 1.25,
+                      whiteSpace: 'nowrap',
+                      color: '#000000',
+                      alignSelf:
+                        line.align === 'end' ? 'flex-end' : 'flex-start',
+                    }}
+                  >
+                    {line.text}
+                  </Box>
+                ))}
+              </Box>
+            </>
+          )}
         </>
       ) : (
         <Box
@@ -1219,7 +1333,7 @@ export function DecorativeTextCloud({
             Taiwan
           </Box>
 
-          {/* 右塊：臺灣的創造力，/ 走向世界 — 對齊 Figma 1:38
+          {/* 右塊：臺灣的創造力 / 走向世界 — 對齊 Figma 1:38
               x=805/1440 = 55.9% 至 x=1028/1440 = 71.4%（right edge）
               即 left=55.9%, right=28.6% from container right */}
           <Box
@@ -1244,7 +1358,7 @@ export function DecorativeTextCloud({
                 mixBlendMode: 'difference',
               }}
             >
-              臺灣的創造力，
+              臺灣的創造力
             </Box>
             <Box
               component="span"
