@@ -280,6 +280,9 @@ describe('DecorativeTextCloud mobile labels', () => {
       top: '178px',
       right: '6%',
     });
+    expect(screen.getByText('臺灣的創造力')).toHaveStyle({
+      alignSelf: 'flex-end',
+    });
     expect(screen.getByText('藝術與設計')).toHaveAttribute('font-size', '18');
     expect(screen.getByText('藝術與設計')).toHaveStyle({
       writingMode: 'vertical-rl',

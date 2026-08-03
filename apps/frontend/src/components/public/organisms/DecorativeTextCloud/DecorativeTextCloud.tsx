@@ -1259,7 +1259,9 @@ export function DecorativeTextCloud({
                       whiteSpace: 'nowrap',
                       color: '#000000',
                       alignSelf:
-                        line.align === 'end' ? 'flex-end' : 'flex-start',
+                        line.align === 'end' || line.text === '臺灣的創造力'
+                          ? 'flex-end'
+                          : 'flex-start',
                     }}
                   >
                     {line.text}
