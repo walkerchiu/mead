@@ -275,6 +275,11 @@
       "slug": "tisdc",
       "folderName": "02_tisdc",
       "logoUrl": "/images/plans/02_tisdc/logo/logo.png",
+      "logoNameplate": {
+        "mark": "/images/plans/02_tisdc/logo/mark.png",
+        "nameZh": ["臺灣國際學生", "創意設計大賽"],
+        "nameEn": "Taiwan International Student Design Competition"
+      },
       "name": {
         "zh": "臺灣國際學生創意設計大賽",
         "en": "Taiwan International Student Design Competition (TISDC)"
