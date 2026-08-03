@@ -137,6 +137,7 @@ const LAYOUT = {
 } as const;
 
 const SHAPE_LABEL_COLOR = '#E3E3E3';
+const DECORATIVE_WORD_COLOR = '#BDBDBD';
 
 const DESKTOP_SHAPE_LABELS = [
   [
@@ -707,8 +708,7 @@ export function DecorativeTextCloud({
           letterSpacing: '0.02em',
           whiteSpace: 'nowrap',
           pointerEvents: 'none',
-          color: '#ffffff',
-          mixBlendMode: 'difference',
+          color: DECORATIVE_WORD_COLOR,
         }}
       >
         {word}
