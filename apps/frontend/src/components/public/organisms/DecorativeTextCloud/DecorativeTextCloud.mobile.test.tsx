@@ -250,7 +250,7 @@ describe('DecorativeTextCloud mobile labels', () => {
 
     const tops = ['轉化', '聽見', '生生'].map((word) => {
       const el = screen.getByText(word);
-      expect(el).toHaveStyle({ color: '#BDBDBD' });
+      expect(el).toHaveStyle({ color: '#A6A6A6' });
       return Number.parseFloat(window.getComputedStyle(el).top);
     });
 

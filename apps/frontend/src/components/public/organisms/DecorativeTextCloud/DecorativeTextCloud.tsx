@@ -137,7 +137,7 @@ const LAYOUT = {
 } as const;
 
 const SHAPE_LABEL_COLOR = '#E3E3E3';
-const DECORATIVE_WORD_COLOR = '#BDBDBD';
+const DECORATIVE_WORD_COLOR = '#A6A6A6';
 
 const DESKTOP_SHAPE_LABELS = [
   [
