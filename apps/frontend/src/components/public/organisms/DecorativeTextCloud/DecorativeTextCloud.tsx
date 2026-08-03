@@ -1352,7 +1352,7 @@ export function DecorativeTextCloud({
             <Box
               component="span"
               sx={{
-                alignSelf: 'flex-start',
+                alignSelf: 'flex-end',
                 fontSize: 15,
                 fontWeight: 400,
                 whiteSpace: 'nowrap',
@@ -1366,6 +1366,7 @@ export function DecorativeTextCloud({
               component="span"
               sx={{
                 alignSelf: 'flex-end',
+                mt: '12px',
                 fontSize: 15,
                 fontWeight: 400,
                 whiteSpace: 'nowrap',

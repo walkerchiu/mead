@@ -39,6 +39,22 @@ function mockTabletViewport() {
   });
 }
 
+function mockDesktopViewport() {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('min-width:1200px'),
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
 describe('DecorativeTextCloud mobile labels', () => {
   afterEach(() => {
     vi.restoreAllMocks();
@@ -294,5 +310,37 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
 
     expect(Math.min(...tops)).toBeGreaterThanOrEqual(48);
+  });
+
+  it('right-aligns the desktop creativity slogan', async () => {
+    mockDesktopViewport();
+
+    render(
+      <DecorativeTextCloud
+        shapeContents={[
+          { words: [], photos: [], label: ['藝術與設計', '菁英海外培訓計畫'] },
+          { words: [], photos: [], label: ['臺灣國際學生', '創意設計大賽'] },
+          {
+            words: [],
+            photos: [],
+            label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+          },
+        ]}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('臺灣的創造力')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('臺灣的創造力')).toHaveStyle({
+      alignSelf: 'flex-end',
+    });
+    expect(screen.getByText('走向世界')).toHaveStyle({
+      alignSelf: 'flex-end',
+      marginTop: '12px',
+    });
   });
 });
