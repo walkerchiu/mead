@@ -2,7 +2,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { PlanTimelineYear } from '@/types/plan';
-import { render, screen } from '@/test/test-utils';
+import { render, screen, waitFor } from '@/test/test-utils';
 
 import { PlanTimeline } from './PlanTimeline';
 
@@ -67,5 +67,48 @@ describe('PlanTimeline', () => {
 
     expect(screen.getByRole('menu')).toBeInTheDocument();
     expect(document.activeElement).toBe(trigger);
+  });
+
+  it('defaults the tooltip to the current month instead of the earliest month-covering event', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date(2026, 7, 5));
+
+    try {
+      render(
+        <PlanTimeline
+          timelines={[
+            {
+              year: 2026,
+              events: [
+                {
+                  id: 'late-july-selection',
+                  kind: 'range',
+                  precision: 'day',
+                  start: { month: 7, day: 27 },
+                  end: { month: 8, day: 2 },
+                  dateLabel: '7/27(一)-8/2(日)',
+                  title: '初選',
+                },
+                {
+                  id: 'august-announcement',
+                  kind: 'point',
+                  precision: 'day',
+                  start: { month: 8, day: 24 },
+                  dateLabel: '8/24(一)',
+                  title: '入圍公告',
+                },
+              ],
+            },
+          ]}
+        />,
+      );
+
+      await waitFor(() =>
+        expect(screen.getByRole('tooltip')).toHaveTextContent('8/24(一)'),
+      );
+      expect(screen.getByRole('tooltip')).toHaveTextContent('入圍公告');
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

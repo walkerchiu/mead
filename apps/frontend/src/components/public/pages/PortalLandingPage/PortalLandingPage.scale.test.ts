@@ -3,14 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { calculatePlanStageScale } from './PortalLandingPage';
 
 describe('calculatePlanStageScale', () => {
-  it('scales the desktop plan stage up while preserving vertical spacing', () => {
+  it('scales the desktop plan stage up on large viewports', () => {
     const scale = calculatePlanStageScale({
-      viewportWidth: 1800,
-      viewportHeight: 1100,
+      viewportWidth: 2048,
+      viewportHeight: 1432,
     });
 
-    expect(scale).toBeGreaterThan(1);
-    expect(561 * scale + (120 + 110) * scale).toBeLessThanOrEqual(1100);
+    expect(scale).toBeCloseTo(1.46, 2);
+    expect(561 * scale + (112 + 82) * scale).toBeLessThanOrEqual(1432);
   });
 
   it('scales the desktop plan stage down for short viewports', () => {
@@ -20,6 +20,6 @@ describe('calculatePlanStageScale', () => {
     });
 
     expect(scale).toBeLessThan(1);
-    expect(561 * scale + (120 + 110) * scale).toBeLessThanOrEqual(620);
+    expect(561 * scale + (112 + 82) * scale).toBeLessThanOrEqual(620);
   });
 });

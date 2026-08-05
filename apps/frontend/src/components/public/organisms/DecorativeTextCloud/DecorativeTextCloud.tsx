@@ -865,9 +865,8 @@ export function DecorativeTextCloud({
           >
             <stop offset="0%" stopColor={portalTokens.color.blobOrangeFrom} />
             <stop offset="44%" stopColor={portalTokens.color.blobOrangeTo} />
-            <stop offset="74%" stopColor={portalTokens.color.blobGrey} />
-            {/* 依 Figma Union radial 終點 #D6D6D6 */}
-            <stop offset="100%" stopColor="#D6D6D6" />
+            <stop offset="76%" stopColor={portalTokens.color.blobPeach} />
+            <stop offset="100%" stopColor={portalTokens.color.blobWarmGrey} />
           </linearGradient>
           {/* goo（metaball）濾鏡：先模糊再以 feColorMatrix 重新銳化 alpha，使三色塊
               重疊處自然相連成連體，消弭鄰塊邊界的明顯摺痕（依業主回饋：中／右色塊

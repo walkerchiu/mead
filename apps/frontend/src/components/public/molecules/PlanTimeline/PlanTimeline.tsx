@@ -47,7 +47,6 @@ const TRACK_PAD = 12;
 /** tooltip 與軌道底的間距、以及軌道下方為 tooltip 預留的高度（px）。 */
 const TIP_GAP = 8;
 const TIP_RESERVE = 54;
-const TIP_PAD = 8;
 
 /** Figma 色票（沿用 node 1:86 Timeline）：月份字、下拉／tooltip 邊框、年度分隔線、
     閒置段（淡灰）、作用段（橘）。 */
@@ -109,6 +108,32 @@ function coversMonth(e: TimelineEvent, month: number): boolean {
   return e.start.month === month;
 }
 
+/** 事件是否精確涵蓋今日；日期級事件以 day 判斷，月份級事件以 month 判斷。 */
+function coversDate(e: TimelineEvent, now: Date): boolean {
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+
+  if (e.precision === 'month') return coversMonth(e, month);
+
+  const today = dayOfYear({ month, day });
+  const start = dayOfYear(e.start);
+  const end = dayOfYear(e.end ?? e.start);
+  return start <= today && today <= end;
+}
+
+/** 預設 tooltip：先選正在進行者，再選當月開始者，最後才退回涵蓋當月者。 */
+function defaultEventId(events: TimelineEvent[], now: Date): string | null {
+  const month = now.getMonth() + 1;
+  const sorted = [...events].sort((a, b) => startPct(a) - startPct(b));
+  const ongoing = sorted.find((e) => coversDate(e, now));
+  if (ongoing) return ongoing.id;
+
+  const startsThisMonth = sorted.find((e) => e.start.month === month);
+  if (startsThisMonth) return startsThisMonth.id;
+
+  return sorted.find((e) => coversMonth(e, month))?.id ?? null;
+}
+
 export interface PlanTimelineProps {
   /** 計畫時程（依年度分組）。未提供或為空時不渲染。 */
   timelines?: PlanTimelineYear[];
@@ -142,11 +167,7 @@ export function PlanTimeline({
   const [yearAnchor, setYearAnchor] = useState<HTMLElement | null>(null);
   // 今日（僅在客戶端取得，避免 SSR／hydration 落差）；用於判斷「當下期程」與當前月份。
   const [now, setNow] = useState<Date | null>(null);
-  // 軌道容器寬與 tooltip 寬（皆取 offsetWidth，為未縮放的本地 px，供夾邊與箭頭對位）。
-  const [dims, setDims] = useState({ container: 0, tip: 0 });
   const yearMenuScrollRef = useRef<{ x: number; y: number } | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const tooltipRef = useRef<HTMLDivElement>(null);
 
   // 掛載後才取今日：伺服器端無日期、客戶端首次渲染亦為 null（與 SSR 一致），之後才補上
   // ——避免直接於 render 取 new Date() 造成 hydration mismatch。
@@ -182,43 +203,20 @@ export function PlanTimeline({
     () => events.filter((e) => e.kind === 'range'),
     [events],
   );
-  const sorted = useMemo(
-    () => [...events].sort((a, b) => startPct(a) - startPct(b)),
-    [events],
-  );
-
   // 當前月份（僅當檢視的年度即今年時才有值）→ 月份軸標示與「當下期程」判斷。
   const curMonth =
     now && current && now.getFullYear() === current.year
       ? now.getMonth() + 1
       : null;
-  // 當下期程：涵蓋今日月份的第一筆事件（依起始排序）；無則不預設顯示。
+  // 當下期程：先挑正在進行者，沒有時挑當月開始者；無則不預設顯示。
   const defaultId = useMemo(() => {
-    if (curMonth == null) return null;
-    return sorted.find((e) => coversMonth(e, curMonth))?.id ?? null;
-  }, [curMonth, sorted]);
+    if (!now || !current || now.getFullYear() !== current.year) return null;
+    return defaultEventId(events, now);
+  }, [current, events, now]);
 
   // 顯示中的事件：使用者選取者優先，否則退回預設「當下期程」。
   const shownId = hoverId ?? defaultId;
   const activeEvent = events.find((e) => e.id === shownId) ?? null;
-
-  // tooltip 內容或容器尺寸變動後量測寬度（offsetWidth 為未縮放本地 px）。
-  useIsoLayoutEffect(() => {
-    const container = trackRef.current?.offsetWidth ?? 0;
-    const tip = tooltipRef.current?.offsetWidth ?? 0;
-    setDims((d) =>
-      d.container === container && d.tip === tip ? d : { container, tip },
-    );
-  }, [shownId, yearIndex, variant, events]);
-  useEffect(() => {
-    const onResize = () =>
-      setDims((d) => ({
-        ...d,
-        container: trackRef.current?.offsetWidth ?? d.container,
-      }));
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
 
   if (years.length === 0 || !current) return null;
 
@@ -249,26 +247,16 @@ export function PlanTimeline({
     onClick: () => setHoverId(id),
   });
 
-  // tooltip 水平定位：事件位於軌道內縮區（左右各 TRACK_PAD），故 mark 中心 =
-  // TRACK_PAD + 比例×內縮區寬；框體夾在容器寬內不出界，箭頭再依 mark 位置相對框中心位移。
-  const innerW = Math.max(0, dims.container - 2 * TRACK_PAD);
-  const markPx = activeEvent ? TRACK_PAD + centerPct(activeEvent) * innerW : 0;
-  const tipHalf = dims.tip / 2;
-  const tipLeft = Math.min(
-    Math.max(markPx, tipHalf + TIP_PAD),
-    Math.max(tipHalf + TIP_PAD, dims.container - tipHalf - TIP_PAD),
-  );
-  const arrowMax = Math.max(0, tipHalf - 8);
-  const arrowDx = Math.max(-arrowMax, Math.min(arrowMax, markPx - tipLeft));
+  // tooltip 與事件 mark 共用同一條內縮軌道的百分比座標，避免縮放卡片內 px 量測失準。
+  const activeCenter = activeEvent ? centerPct(activeEvent) : 0;
 
   const tooltipNode = activeEvent ? (
     <Box
-      ref={tooltipRef}
       role="tooltip"
       sx={{
         position: 'absolute',
         top: `${railHeight + TIP_GAP}px`,
-        left: `${tipLeft}px`,
+        left: `${activeCenter * 100}%`,
         // max-content：避免絕對定位框靠邊時被可用寬壓窄而折行。
         width: 'max-content',
         maxWidth: scroll ? 200 : 260,
@@ -285,7 +273,7 @@ export function PlanTimeline({
         '&::before': {
           content: '""',
           position: 'absolute',
-          left: `calc(50% + ${arrowDx}px)`,
+          left: '50%',
           top: -5,
           transform: 'translateX(-50%) rotate(45deg)',
           width: 8,
@@ -326,7 +314,6 @@ export function PlanTimeline({
   // 月份列 + 軌道 + tooltip：兩種版型共用，僅月份寬度與外層容器不同。
   const monthsAndTrack = (
     <Box
-      ref={trackRef}
       sx={{ position: 'relative', ...(scroll ? { width: MONTH_W * 12 } : {}) }}
     >
       {/* 月份列（當前月份以底色標示）；左右內縮與軌道事件對齊。 */}
@@ -449,7 +436,18 @@ export function PlanTimeline({
           </Box>
         </Box>
 
-        {tooltipNode}
+        <Box
+          sx={{
+            position: 'absolute',
+            left: `${TRACK_PAD}px`,
+            right: `${TRACK_PAD}px`,
+            top: 0,
+            height: railHeight,
+            pointerEvents: 'none',
+          }}
+        >
+          {tooltipNode}
+        </Box>
         {/* 為軌道下方的 tooltip 預留空間，使卡片高度涵蓋之。 */}
         <Box aria-hidden sx={{ height: TIP_RESERVE }} />
       </Box>

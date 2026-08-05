@@ -62,11 +62,11 @@ const DWELL_PX = 100;
  * 上留白須容納卡片上緣溢出的裝飾星形（最高約 112px）；下留白只需容納指示點區，
  * 故較窄 → 同樣視窗高下卡片可放得更大、字級更大。
  */
-const FIT_TOP_BASE = 120;
-const FIT_BOTTOM_BASE = 110;
+const FIT_TOP_BASE = 112;
+const FIT_BOTTOM_BASE = 82;
 /** 自適應縮放下限／上限：下限避免極矮視窗縮到難讀；上限避免大螢幕字體過大。 */
 const MIN_CARD_SCALE = 0.55;
-const MAX_CARD_SCALE = 1.35;
+const MAX_CARD_SCALE = 1.46;
 /** 第二屏桌機舞台設計寬度（px，主卡 537 + gap 29 + 右欄 290）；供寬度上限計算。 */
 const CARD_BASE_W = 856;
 /** 第二屏桌機舞台設計高度（px，與 PlanCarousel desktop stage 一致）。 */
@@ -155,7 +155,7 @@ export function PortalLandingPage({ plans }: PortalLandingPageProps) {
   // 避免圖片在主執行緒初始化卡住入場動畫（壓縮會頓成「跳一段」）。
   // 使用者一開始捲動或入場結束後才掛載。
   const [mountPlans, setMountPlans] = useState(false);
-  // 自適應第二屏：卡片內容高於一屏時的等比縮放倍率（≤1）；量測後設定。
+  // 自適應第二屏：依視窗寬高等比縮放，寬裕桌機可放大、矮螢幕會縮小；量測後設定。
   const [cardScale, setCardScale] = useState(1);
   // 自適應第一屏（hero）：依視窗等比縮放整個 hero 畫布（色塊＋文字一起），比照第二屏
   // 填滿一屏；桌機才縮放，手機維持原生（vertical 佈局自行撐滿寬）。

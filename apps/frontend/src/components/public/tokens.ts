@@ -10,10 +10,12 @@ export const portalTokens = {
     /** 品牌橘 — 強調色（hover 強調 / 時程 highlight / 主標關鍵字 / 指示點） */
     brandOrange: '#E84C1F',
     brandOrangeSoft: '#F4914E',
-    /** hero 文字雲色塊漸層 — 依 Figma 各 frame Union：radial #E3571B → #D6D6D6 */
+    /** hero 文字雲色塊漸層 — 右側維持舊版暖橘粉，避免末段過灰 */
     blobOrangeFrom: '#E3571B',
     blobOrangeTo: '#E3571B',
     blobGrey: '#D6D6D6',
+    blobPeach: '#E7B49C',
+    blobWarmGrey: '#DCDCDC',
     /** 頁面底色 — 依 Figma frame 底 #E3E3E3 */
     pageBg: '#E3E3E3',
     surface: '#FFFFFF',
