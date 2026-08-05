@@ -686,6 +686,7 @@ function DesktopPlanBackPhotos({ plan }: { plan: Plan }) {
       {DESKTOP_BACK_PHOTOS.map((photoLayout, index) => {
         const src = photos[index];
         if (!src) return null;
+        const hazeSrc = src.replace(/\.jpg$/i, '.blur.jpg');
         const clipPath =
           photoLayout.clipId === 'flowerA'
             ? `url(#${flowerAId})`
@@ -704,11 +705,25 @@ function DesktopPlanBackPhotos({ plan }: { plan: Plan }) {
               height: photoLayout.size,
               zIndex: 0,
               pointerEvents: 'auto',
-              '&:has([data-hover-effect="true"]:hover)': {
+              transformOrigin: 'center',
+              willChange: 'transform',
+              '--desktop-back-photo-hover-transform': `translate(${photoLayout.hoverX}px, ${photoLayout.hoverY}px) rotate(${photoLayout.hoverRotate}deg) scale(1.1)`,
+              transition: 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
+              '&:hover': {
                 zIndex: 3,
+                transform: 'var(--desktop-back-photo-hover-transform)',
+                '& [data-testid="desktop-plan-back-photo"]': {
+                  visibility: 'visible',
+                  opacity: Math.min(0.86, photoLayout.opacity + 0.24),
+                  filter: 'saturate(1.08) brightness(1.08)',
+                },
+                '& [data-testid="desktop-plan-back-photo-haze"]': {
+                  opacity: 0,
+                },
               },
               '@media (prefers-reduced-motion: reduce)': {
-                '&:has([data-hover-effect="true"]:hover)': { zIndex: 3 },
+                transition: 'none',
+                '&:hover': { zIndex: 3, transform: 'none' },
               },
             }}
           >
@@ -720,33 +735,49 @@ function DesktopPlanBackPhotos({ plan }: { plan: Plan }) {
               src={src}
               alt=""
               sx={{
+                position: 'absolute',
+                inset: 0,
                 display: 'block',
                 width: '100%',
                 height: '100%',
                 objectFit: 'cover',
                 clipPath,
-                opacity: photoLayout.opacity,
+                visibility: 'hidden',
+                opacity: 0,
                 cursor: 'inherit',
                 filter: 'saturate(0.82) brightness(1.02)',
-                transformOrigin: 'center',
-                willChange: 'transform, opacity, filter',
-                '--desktop-back-photo-hover-transform': `translate(${photoLayout.hoverX}px, ${photoLayout.hoverY}px) rotate(${photoLayout.hoverRotate}deg) scale(1.1)`,
-                transition:
-                  'opacity 0.45s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease',
+                willChange: 'opacity, filter',
+                transition: 'opacity 0.45s ease, filter 0.45s ease',
+                '@media (prefers-reduced-motion: reduce)': {
+                  transition: 'opacity 0.2s ease, filter 0.2s ease',
+                },
+              }}
+            />
+            <Box
+              data-testid="desktop-plan-back-photo-haze"
+              component="img"
+              src={hazeSrc}
+              alt=""
+              loading="eager"
+              fetchPriority="high"
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                display: 'block',
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                clipPath,
+                opacity: 1,
+                cursor: 'inherit',
+                willChange: 'opacity',
+                transition: 'opacity 0.45s ease',
                 animation:
                   'desktopBackPhotoIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) backwards',
                 animationDelay: `${index * 0.08}s`,
-                '&:hover': {
-                  opacity: Math.min(0.86, photoLayout.opacity + 0.24),
-                  filter: 'saturate(1.08) brightness(1.08)',
-                  transform: 'var(--desktop-back-photo-hover-transform)',
-                },
                 '@media (prefers-reduced-motion: reduce)': {
-                  transition: 'opacity 0.2s ease, filter 0.2s ease',
+                  transition: 'none',
                   animation: 'none',
-                  '&:hover': {
-                    transform: 'none',
-                  },
                 },
               }}
             />

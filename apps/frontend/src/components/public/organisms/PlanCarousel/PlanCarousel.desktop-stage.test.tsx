@@ -57,6 +57,9 @@ describe('PlanCarousel desktop stage', () => {
     );
     expect(screen.getAllByTestId('desktop-plan-side')).toHaveLength(2);
     expect(screen.getAllByTestId('desktop-plan-back-photo')).toHaveLength(2);
+    expect(screen.getAllByTestId('desktop-plan-back-photo-haze')).toHaveLength(
+      2,
+    );
   });
 
   it('marks desktop back photos as hoverable motion elements', () => {
@@ -77,9 +80,22 @@ describe('PlanCarousel desktop stage', () => {
     screen.getAllByTestId('desktop-plan-back-photo').forEach((photo) => {
       expect(photo).toHaveAttribute('data-hover-effect', 'true');
       expect(photo).toHaveAttribute('data-hover-trigger', 'self');
+      expect(photo).toHaveStyle({ visibility: 'hidden' });
     });
     screen.getAllByTestId('desktop-plan-back-photo-layer').forEach((layer) => {
       expect(layer).toHaveAttribute('data-hover-layer', 'self');
+      expect(
+        getComputedStyle(layer).getPropertyValue(
+          '--desktop-back-photo-hover-transform',
+        ),
+      ).toContain('scale(1.1)');
+    });
+    screen.getAllByTestId('desktop-plan-back-photo-haze').forEach((photo) => {
+      expect(photo).toHaveAttribute(
+        'src',
+        expect.stringMatching(/\.blur\.jpg$/),
+      );
+      expect(photo).toHaveStyle({ opacity: '1' });
     });
   });
 
