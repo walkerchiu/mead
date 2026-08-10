@@ -71,8 +71,13 @@ const RELEASE_DEG = 330;
 const WORD_STAGGER_S = 0.55;
 /** 舊計畫單字淡出時長（s） */
 const WORD_FADE_OUT_S = 0.5;
+/** 新計畫單字淡入時長（s） */
+const WORD_FADE_IN_S = 0.72;
+/** 切換時降到低透明度後接續換字，避免畫面完全空掉造成閃爍感。 */
+const WORD_SWAP_OPACITY = 0.18;
 /** 過場總長（ms）：錯開跨度 + 單字淡出後，移除淡出層 */
-const WORD_TRANSITION_MS = (WORD_STAGGER_S + WORD_FADE_OUT_S) * 1000 + 50;
+const WORD_TRANSITION_MS =
+  (WORD_STAGGER_S + Math.max(WORD_FADE_OUT_S, WORD_FADE_IN_S)) * 1000 + 50;
 
 /**
  * 圖形半徑 — 依 Figma 1:2 / 23:21 / 31:215 量測：每個 blob 369.44×369.44px、半徑 184.72。
@@ -379,26 +384,15 @@ export function DecorativeTextCloud({
   // hover 某色塊時，該色塊翻出「該色塊計畫」的照片（照片仍隨 hover 顯示）。
   const displayedIndex = hovered ?? defaultIndex;
 
-  // 整片雲的裝飾文字：進場隨機呈現一組；hover 某色塊時切換為「該色塊計畫」的詞，
-  // 離開後回到進場隨機那組。Math.random 僅於掛載後（client）執行，避免 SSR / hydration
-  // 取值不一致；定前先以 defaultIndex 佔位，定後就地更新固定數量的字 span（不重跑入場動畫）。
-  const [randomGroup, setRandomGroup] = useState<number | null>(null);
-  const textIndex = hovered ?? randomGroup ?? defaultIndex;
+  // 整片雲的裝飾文字：hover 某色塊時切換為該色塊計畫的詞；非 hover 時跟隨
+  // 上層目前計畫 defaultIndex，讓自動／捲動切換能完整輪到每一組裝飾文字。
+  const textIndex = hovered ?? defaultIndex;
 
   // 各色塊對應計畫的照片陣列（index 對應色塊 = 計畫）。
   const photosByShape = useMemo(
     () => [0, 1, 2].map((i) => shapeContents[i]?.photos ?? []),
     [shapeContents],
   );
-
-  // 進場隨機挑一組「有詞」的裝飾文字。
-  useEffect(() => {
-    const candidates = [0, 1, 2].filter(
-      (i) => (shapeContents[i]?.words?.length ?? 0) > 0,
-    );
-    if (!candidates.length) return;
-    setRandomGroup(candidates[Math.floor(Math.random() * candidates.length)]);
-  }, [shapeContents]);
 
   // 佈局模式判斷 — SSR 與首次 client render 皆為桌機橫向（h），掛載後再依視窗校正，
   // 避免 hydration 不一致。<834=手機(v)、834–1199=平板(t)、≥1200=桌機(h)。
@@ -612,7 +606,7 @@ export function DecorativeTextCloud({
         animationName: 'portalWordFadeOut',
         animationTimingFunction: 'ease-in-out',
         animationIterationCount: 1,
-        // fillMode both：延遲前維持可見（opacity 1）、結束後停在 opacity 0。
+        // fillMode both：延遲前維持可見（opacity 1）、結束後停在低透明度。
         animationFillMode: 'both',
       };
       animStyle = {
@@ -621,14 +615,13 @@ export function DecorativeTextCloud({
       };
     } else if (phase === 'in') {
       animSx = {
-        animationName: 'portalTwinkle',
+        animationName: 'portalWordFadeIn',
         animationTimingFunction: 'ease-in-out',
-        animationIterationCount: 'infinite',
-        // fillMode backwards：延遲前停在 0%（opacity 0），延遲到才由 0 淡入後續閃爍。
-        animationFillMode: 'backwards',
+        animationIterationCount: 1,
+        animationFillMode: 'both',
       };
       animStyle = {
-        animationDuration: `${dur.toFixed(2)}s`,
+        animationDuration: `${WORD_FADE_IN_S}s`,
         animationDelay: `${stagger.toFixed(2)}s`,
       };
     } else if (vertical) {
@@ -733,10 +726,14 @@ export function DecorativeTextCloud({
           '16%, 62%': { opacity: 1 },
           '86%': { opacity: 0 },
         },
-        // 計畫切換時，舊計畫的字逐一淡出（一次性、停在 opacity 0）。
+        // 計畫切換時，舊句淡到低透明度；新句從同一低透明度淡回來。
         '@keyframes portalWordFadeOut': {
           from: { opacity: 1 },
-          to: { opacity: 0 },
+          to: { opacity: WORD_SWAP_OPACITY },
+        },
+        '@keyframes portalWordFadeIn': {
+          from: { opacity: WORD_SWAP_OPACITY },
+          to: { opacity: 1 },
         },
         // 只在父層提供 base opacity；animation shorthand 留給 span 自己設，
         // 否則此 selector specificity (0,2,0) 會壓過 span sx 的 (0,1,0)，把

@@ -345,30 +345,43 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('softens the non-hover decorative word switch after the random group settles', async () => {
+  it('softens the non-hover decorative word switch when the default plan changes', async () => {
     mockDesktopViewport();
-    vi.spyOn(Math, 'random').mockReturnValue(0.99);
 
-    render(
+    const shapeContents = [
+      {
+        words: [{ zh: '轉化', en: 'transform' }],
+        photos: [],
+        label: ['藝術與設計', '菁英海外培訓計畫'],
+      },
+      {
+        words: [{ zh: '創作', en: 'create' }],
+        photos: [],
+        label: ['臺灣國際學生', '創意設計大賽'],
+      },
+      {
+        words: [{ zh: '競賽', en: 'compete' }],
+        photos: [],
+        label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+      },
+    ];
+
+    const { rerender } = render(
       <DecorativeTextCloud
-        shapeContents={[
-          {
-            words: [{ zh: '轉化', en: 'transform' }],
-            photos: [],
-            label: ['藝術與設計', '菁英海外培訓計畫'],
-          },
-          {
-            words: [{ zh: '創作', en: 'create' }],
-            photos: [],
-            label: ['臺灣國際學生', '創意設計大賽'],
-          },
-          {
-            words: [{ zh: '競賽', en: 'compete' }],
-            photos: [],
-            label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
-          },
-        ]}
+        shapeContents={shapeContents}
         defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('轉化')).toBeInTheDocument();
+    });
+
+    rerender(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={2}
         language="zh"
       />,
     );
@@ -379,8 +392,77 @@ describe('DecorativeTextCloud mobile labels', () => {
 
     expect(screen.getByText('轉化')).toBeInTheDocument();
     expect(screen.getByText('轉化').style.animationDuration).toBe('0.5s');
+    const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
+    expect(injectedCss).not.toContain(
+      'portalWordFadeOut{from{opacity:1}to{opacity:0}}',
+    );
+    expect(injectedCss).toContain(
+      'portalWordFadeOut{from{opacity:1}to{opacity:0.18}}',
+    );
+    expect(injectedCss).toContain(
+      'portalWordFadeIn{from{opacity:0.18}to{opacity:1}}',
+    );
+    expect(screen.getByText('競賽').style.animationDuration).toBe('0.72s');
     expect(screen.getByText('競賽').style.animationDuration).not.toContain(
       ', 2.4s',
     );
+  });
+
+  it('follows every default plan index when no shape is hovered', async () => {
+    mockDesktopViewport();
+
+    const shapeContents = [
+      {
+        words: [{ zh: '第一組文字', en: 'first' }],
+        photos: [],
+        label: ['藝術與設計', '菁英海外培訓計畫'],
+      },
+      {
+        words: [{ zh: '第二組文字', en: 'second' }],
+        photos: [],
+        label: ['臺灣國際學生', '創意設計大賽'],
+      },
+      {
+        words: [{ zh: '第三組文字', en: 'third' }],
+        photos: [],
+        label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+      },
+    ];
+
+    const { rerender } = render(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('第一組文字')).toBeInTheDocument();
+    });
+
+    rerender(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={1}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('第二組文字')).toBeInTheDocument();
+    });
+
+    rerender(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={2}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('第三組文字')).toBeInTheDocument();
+    });
   });
 });
