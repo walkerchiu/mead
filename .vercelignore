@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+storybook-static/
+
+# Cache
+.cache/
+.turbo/
+*.tsbuildinfo
+.eslintcache
+
+# Local environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Agent-local settings
+AGENTS.md
+AGENTS.override.md
+CLAUDE.md
+.claude/
+.codex/
+
+# Local tool state
+.vercel/
+.current-env
+
+# Test and debug artifacts
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
+.playwright-mcp/
+logs/
+*.log
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.cursor/
