@@ -1,0 +1,16 @@
+{
+  "name": "@mead/typescript-config",
+  "version": "0.1.0",
+  "author": {
+    "name": "Walker Chiu",
+    "email": "walker.chiu@icp-si.com"
+  },
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "nestjs.json",
+    "react-library.json"
+  ]
+}

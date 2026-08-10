@@ -1,0 +1,33 @@
+# EC2 部署：前端入口網 only（純展示）+ Caddy（自動 HTTPS）。
+# 映像於本機建好後 docker load 進來（image: mead-frontend），不在 EC2 build。
+#
+# 需要同目錄 .env：SITE_DOMAIN、ACME_EMAIL
+#   docker compose up -d
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp' # HTTP/3
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?請於 .env 設定 SITE_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?請於 .env 設定 ACME_EMAIL}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data # 憑證與 ACME 帳號 — 務必持久保留
+      - caddy-config:/config
+    depends_on:
+      - frontend
+
+  frontend:
+    image: mead-frontend:latest
+    restart: unless-stopped
+    expose:
+      - '3000' # 僅供 Caddy 內網存取
+
+volumes:
+  caddy-data:
+  caddy-config:

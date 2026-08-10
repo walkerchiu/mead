@@ -1,0 +1,720 @@
+{
+  "version": "2026-05-15",
+  "plans": [
+    {
+      "id": "sposad",
+      "slug": "sposad",
+      "folderName": "01_sposad",
+      "logoUrl": "/images/plans/01_sposad/logo/logo.svg",
+      "logoNameplate": {
+        "mark": "/images/plans/01_sposad/logo/mark.png",
+        "nameZh": ["教育部", "藝術與設計菁英", "海外培訓計畫"],
+        "nameEn": "MOE Scholarship Program for Overseas Study in Arts and Design"
+      },
+      "name": {
+        "zh": "教育部 藝術與設計菁英海外培訓計畫",
+        "en": "Scholarship Program for Overseas Study in Arts & Design (SPOSAD)"
+      },
+      "slogan": {
+        "zh": "值得你期待的設計公費留學品牌",
+        "en": null
+      },
+      "intro": "本計畫每年選送優秀學子赴海外頂尖設計校院或知名機構，進行為期一年的進修與實習，並提供全額學費及生活費補助。目前設有「數位動畫組」、「視覺傳達設計組」、「產品設計組」、「建築與景觀設計組」、「時尚設計組」五大培訓領域。透過接軌國際的學術與實務訓練，深化學生的專業能力並拓展國際視野，進而強化國家設計產業核心競爭力，以期打造產業菁英人才的搖籃。",
+      "officialUrl": "https://www.animlab.yuntech.edu.tw/sposad/",
+      "organizers": [
+        "國立雲林科技大學 計畫總辦公室",
+        "國立成功大學 工業設計系",
+        "國立成功大學 建築學系"
+      ],
+      "stats": [
+        {
+          "value": "20+",
+          "unit": "年計畫辦理",
+          "description": "持續推動人才培育"
+        },
+        {
+          "value": "160萬",
+          "unit": "每人補助",
+          "description": "全方位支持海外培訓"
+        },
+        {
+          "value": "445",
+          "unit": "累計出國學子",
+          "description": "將臺灣設計力帶向國際"
+        },
+        {
+          "value": "48",
+          "unit": "累積合作機構",
+          "description": "全球頂尖設計學府或實習機構"
+        },
+        {
+          "value": "13",
+          "unit": "累積合作國家",
+          "description": "建立全球培訓機制"
+        }
+      ],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/banner/banner_01.jpg",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/1i8k_ddwnuVxWbfsImlDTaTtymFif40tm/view?usp=drive_link"
+        }
+      ],
+      "socialLinks": [
+        {
+          "platform": "官網",
+          "url": "https://www.animlab.yuntech.edu.tw/sposad/"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/MOESPOSAD"
+        },
+        {
+          "platform": "Linktree",
+          "url": "https://linktr.ee/moesposad?utm_source=linktree_profile_share&ltsid=a2103359-5714-4598-8ea2-dc084b1984bc"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_04.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_05.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_06.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_07.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/01_sposad/photos/photo_08.jpg",
+          "url": null
+        },
+        {
+          "type": "remote_folder",
+          "src": null,
+          "url": "https://drive.google.com/drive/folders/1yxCF9s8T8raykSR1Xm-_tbQ5-RPHqkfy?usp=drive_link"
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "數位動畫",
+          "en": "Digital Animation"
+        },
+        {
+          "zh": "視覺傳達設計",
+          "en": "Visual Communication Design"
+        },
+        {
+          "zh": "產品設計",
+          "en": "Product Design"
+        },
+        {
+          "zh": "建築與景觀設計",
+          "en": "Architecture and Landscape Design"
+        },
+        {
+          "zh": "時尚設計",
+          "en": "Fashion Design"
+        },
+        {
+          "zh": "美國",
+          "en": "United States"
+        },
+        {
+          "zh": "加拿大",
+          "en": "Canada"
+        },
+        {
+          "zh": "英國",
+          "en": "United Kingdom"
+        },
+        {
+          "zh": "法國",
+          "en": "France"
+        },
+        {
+          "zh": "德國",
+          "en": "Germany"
+        },
+        {
+          "zh": "荷蘭",
+          "en": "Netherlands"
+        },
+        {
+          "zh": "丹麥",
+          "en": "Denmark"
+        },
+        {
+          "zh": "義大利",
+          "en": "Italy"
+        },
+        {
+          "zh": "日本",
+          "en": "Japan"
+        },
+        {
+          "zh": "韓國",
+          "en": "South Korea"
+        },
+        {
+          "zh": "馬來西亞",
+          "en": "Malaysia"
+        },
+        {
+          "zh": "澳洲",
+          "en": "Australia"
+        },
+        {
+          "zh": "紐西蘭",
+          "en": "New Zealand"
+        },
+        {
+          "zh": "藝術與設計人才培育",
+          "en": "Art and Design Talent Development"
+        }
+      ],
+      "timelines": [
+        {
+          "year": 2026,
+          "events": [
+            {
+              "id": "sposad-2026-brief",
+              "kind": "range",
+              "precision": "month",
+              "start": { "month": 3 },
+              "end": { "month": 5 },
+              "dateLabel": "3-5月",
+              "title": "簡章公告及受理報名"
+            },
+            {
+              "id": "sposad-2026-apply-review1",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 6 },
+              "dateLabel": "6月",
+              "title": "報名截止及國內初審"
+            },
+            {
+              "id": "sposad-2026-camp",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 7 },
+              "dateLabel": "7月",
+              "title": "國內研習營"
+            },
+            {
+              "id": "sposad-2026-review2",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 12 },
+              "dateLabel": "12月",
+              "title": "國內複審"
+            }
+          ]
+        },
+        {
+          "year": 2027,
+          "label": "隔年（2027）",
+          "events": [
+            {
+              "id": "sposad-2027-overseas-final",
+              "kind": "range",
+              "precision": "month",
+              "start": { "month": 1 },
+              "end": { "month": 5 },
+              "dateLabel": "1-5月",
+              "title": "海外決選"
+            },
+            {
+              "id": "sposad-2027-depart",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 9 },
+              "dateLabel": "9月",
+              "title": "出發"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tisdc",
+      "slug": "tisdc",
+      "folderName": "02_tisdc",
+      "logoUrl": "/images/plans/02_tisdc/logo/logo.png",
+      "logoNameplate": {
+        "mark": "/images/plans/02_tisdc/logo/mark.png",
+        "nameZh": ["臺灣國際學生", "創意設計大賽"],
+        "nameEn": "Taiwan International Student Design Competition"
+      },
+      "name": {
+        "zh": "臺灣國際學生創意設計大賽",
+        "en": "Taiwan International Student Design Competition (TISDC)"
+      },
+      "slogan": {
+        "zh": "臺灣國際學生創意設計大賽（TISDC）",
+        "en": null
+      },
+      "intro": "教育部主辦之全球性學生設計盛事，現已成為亞太地區最具規模的國際學生競賽平臺。每年廣邀全球超過 60 個國家、上萬件優異作品參賽，類別涵蓋產品設計、視覺設計、數位動畫、建築與景觀設計、時尚設計共五類。透過邀請國際頂尖大師組成專業評審團，提供公正且具高度視野的評選機制。此賽事不僅是國內外學生創意交流的樞紐，更提供豐厚獎金與高度國際曝光，致力於發掘並獎勵全球具備前瞻性的設計新秀。",
+      "officialUrl": "https://www.tisdc.org/",
+      "organizers": [
+        "臺灣國際學生創意設計大賽執行小組",
+        "國立臺灣科技大學建築系"
+      ],
+      "stats": [
+        {
+          "value": "19",
+          "unit": "計畫推動年數",
+          "description": "國際學生創意設計大賽推動年數"
+        },
+        {
+          "value": "135",
+          "unit": "參賽國家數",
+          "description": "歷年曾參加 TISDC 的國家總數"
+        },
+        {
+          "value": "219947",
+          "unit": "全球參賽總件數",
+          "description": "歷年總參賽件數"
+        },
+        {
+          "value": "400萬",
+          "unit": "總獎金",
+          "description": "國際學生創意設計大賽總獎金高達新臺幣 400 萬元"
+        }
+      ],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/banner/banner_01.png",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/11RWuxpmV1EolE2sWSY2kbHkLnV6NQjCV/view?usp=sharing"
+        }
+      ],
+      "socialLinks": [
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/tisdc.tw?igsh=MWpsODBnd3k5MmNvbg%3D%3D&utm_source=qr"
+        },
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/profile.php?id=100009332293905"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/02_tisdc/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/12uNqo-lv_5qGyxZXi_424nhdB09dSiac/view?usp=drive_link"
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/16nDCQcgkP2lKuuKE6ofM2gXvQG_JrVTK/view?usp=drive_link"
+        },
+        {
+          "type": "remote",
+          "src": null,
+          "url": "https://drive.google.com/file/d/1xLflOVMiyakLhHcFxHgI4yr3Zo1c_e7H/view?usp=drive_link"
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "出入",
+          "en": "IN OUT"
+        },
+        {
+          "zh": "復甦",
+          "en": "RESTORE"
+        },
+        {
+          "zh": "根",
+          "en": "FUNDAMENTAL"
+        },
+        {
+          "zh": "之後",
+          "en": "NEXT"
+        },
+        {
+          "zh": "轉化",
+          "en": "TRANSFORM"
+        },
+        {
+          "zh": "聽．見",
+          "en": "SIGHT & SOUNDS"
+        },
+        {
+          "zh": "生生",
+          "en": "CIRCLE OF LIFE"
+        },
+        {
+          "zh": "擁抱",
+          "en": "EMBRACE"
+        },
+        {
+          "zh": null,
+          "en": "OPEN"
+        },
+        {
+          "zh": null,
+          "en": "OPPORTUNITY"
+        },
+        {
+          "zh": null,
+          "en": "BREAKTHROUGH & INNOVATION"
+        },
+        {
+          "zh": null,
+          "en": "EMPATHY"
+        },
+        {
+          "zh": null,
+          "en": "ACTION"
+        },
+        {
+          "zh": null,
+          "en": "REGENERATE"
+        },
+        {
+          "zh": null,
+          "en": "ONE WORLD"
+        },
+        {
+          "zh": "惻隱之心",
+          "en": "COMPASSION"
+        },
+        {
+          "zh": "平等",
+          "en": "EQUALITY"
+        },
+        {
+          "zh": "多樣性",
+          "en": "DIVERSITY"
+        },
+        {
+          "zh": "韌性",
+          "en": "RESILIENCE"
+        }
+      ],
+      "timelines": [
+        {
+          "year": 2026,
+          "events": [
+            {
+              "id": "tisdc-2026-promo",
+              "kind": "range",
+              "precision": "month",
+              "start": { "month": 1 },
+              "end": { "month": 7 },
+              "dateLabel": "1-7月",
+              "title": "宣傳期"
+            },
+            {
+              "id": "tisdc-2026-registration",
+              "kind": "range",
+              "precision": "day",
+              "start": { "month": 4, "day": 27 },
+              "end": { "month": 7, "day": 6 },
+              "dateLabel": "4/27(一)-7/6(一)",
+              "title": "報名期間"
+            },
+            {
+              "id": "tisdc-2026-preliminary",
+              "kind": "range",
+              "precision": "day",
+              "start": { "month": 7, "day": 27 },
+              "end": { "month": 8, "day": 2 },
+              "dateLabel": "7/27(一)-8/2(日)",
+              "title": "初選"
+            },
+            {
+              "id": "tisdc-2026-shortlist",
+              "kind": "point",
+              "precision": "day",
+              "start": { "month": 8, "day": 24 },
+              "dateLabel": "8/24(一)",
+              "title": "入圍名單公告"
+            },
+            {
+              "id": "tisdc-2026-final",
+              "kind": "point",
+              "precision": "day",
+              "start": { "month": 10, "day": 1 },
+              "dateLabel": "10/1(四)",
+              "title": "實體決選"
+            },
+            {
+              "id": "tisdc-2026-winners",
+              "kind": "point",
+              "precision": "day",
+              "start": { "month": 10, "day": 30 },
+              "dateLabel": "10/30(五)",
+              "title": "公告獲獎名單"
+            },
+            {
+              "id": "tisdc-2026-ceremony",
+              "kind": "point",
+              "precision": "day",
+              "start": { "month": 12, "day": 2 },
+              "dateLabel": "12/2(三)",
+              "title": "獲獎學生交流會暨頒獎典禮"
+            },
+            {
+              "id": "tisdc-2026-exhibition",
+              "kind": "range",
+              "precision": "day",
+              "start": { "month": 12, "day": 1 },
+              "end": { "month": 12, "day": 7 },
+              "dateLabel": "12/1(二)-12/7(一)",
+              "title": "得獎作品展"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "idc",
+      "slug": "idc",
+      "folderName": "03_idc",
+      "logoUrl": "/images/plans/03_idc/logo/logo.png",
+      "logoNameplate": {
+        "mark": "/images/plans/03_idc/logo/mark.png",
+        "nameZh": ["教育部", "鼓勵學生參加", "藝術與設計類", "國際競賽計畫"],
+        "nameEn": "International Design Competition"
+      },
+      "name": {
+        "zh": "教育部鼓勵學生參加藝術與設計類國際競賽計畫",
+        "en": null
+      },
+      "slogan": {
+        "zh": "躍上國際舞臺 培育具全球視野的藝術設計人才",
+        "en": null
+      },
+      "intro": "完整的國際競賽獎助體系，鼓勵臺灣學生主動挑戰全球指標性設計獎項。針對如德國 iF、Red Dot、美國 IDEA 等國際重要賽事進行分級，凡獲獎學生即可申請核發的實質獎金。除了經費支持，計畫亦透過作品展覽與成果發表，提升獲獎學生的國際知名度。其核心目標在於減輕學生參賽負擔，並藉由參與世界級競爭，持續強化臺灣設計的國際影響力。",
+      "officialUrl": "https://www.moe-idc.org/",
+      "objective": "為落實我國「大學校院藝術與設計領域人才培育」之目標，加強藝術與設計領域人才培育國際化，提昇國內藝術與設計教育與國際比賽接軌之能力，促使全國大學校院藝術與設計科系學生能踴躍參加國際比賽，藉由參與競賽作品之準備，提升學生藝術與設計創作的水準，並且透過參賽作品之觀摩學習，擴展學生國際視野以提昇專業的人力素質。",
+      "executionItems": [
+        "蒐集國際設計競賽資料與整理國際設計競賽辦法。",
+        "辦理「鼓勵學生參加藝術與設計類國際競賽獎勵要點」之獎勵金審查與頒獎典禮暨成果發表記者會。",
+        "舉辦獲獎學生作品海外成果展覽，促進國際交流。",
+        "舉辦國際設計研討會暨工作坊－「來自亞洲的設計力量」系列活動。",
+        "舉辦設計傳承推廣計畫－「設計深耕X生根設計」系列活動，提供設計知識、分享參加國際競賽經驗談及心得交流。",
+        "編輯出版國際競賽獲獎作品之專輯一冊。",
+        "統整歷屆獲獎人資料與建置獲獎作品資料庫。"
+      ],
+      "executionNote": "本專案計畫由教育部主辦，亞洲大學數位媒體設計學系執行。",
+      "organizers": ["亞洲大學 數位媒體設計學系"],
+      "stats": [
+        {
+          "value": "20+年",
+          "unit": "計畫推動",
+          "description": "持續深耕藝術設計教育"
+        },
+        {
+          "value": "60+所",
+          "unit": "學校參與",
+          "description": "全國大專校院"
+        },
+        {
+          "value": "2K+件",
+          "unit": "國際獲獎作品",
+          "description": "歷年累計"
+        },
+        {
+          "value": "95M+元",
+          "unit": "核發獎勵金",
+          "description": "累計核發金額"
+        }
+      ],
+      "banners": [
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/banner/banner_01.jpg",
+          "url": null
+        }
+      ],
+      "socialLinks": [
+        {
+          "platform": "Facebook",
+          "url": "https://www.facebook.com/idcmoe"
+        },
+        {
+          "platform": "YouTube",
+          "url": "https://www.youtube.com/channel/UCcJn_eRHn2B9a43PkzhJk9w?view_as=subscriber"
+        },
+        {
+          "platform": "Instagram",
+          "url": "https://www.instagram.com/idc.org.tw/?hl=zh-tw"
+        }
+      ],
+      "photos": [
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_01.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_02.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_03.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_04.jpg",
+          "url": null
+        },
+        {
+          "type": "local",
+          "src": "/images/plans/03_idc/photos/photo_05.jpg",
+          "url": null
+        }
+      ],
+      "decorativeText": [
+        {
+          "zh": "臺灣設計X國際發光",
+          "en": "Taiwan Design X International Spotlighting"
+        },
+        {
+          "zh": "設計力量",
+          "en": "Design Power"
+        },
+        {
+          "zh": "設計深耕X生根設計",
+          "en": "Design Plows Deep X Design Takes Root"
+        },
+        {
+          "zh": "國際設計競賽",
+          "en": "International Design Competition"
+        },
+        {
+          "zh": "來自亞洲的設計力量",
+          "en": "The Power of Asian Design"
+        },
+        {
+          "zh": "國際設計研討會",
+          "en": "International Design Seminar"
+        },
+        {
+          "zh": "國際設計工作坊",
+          "en": "International Design Workshop"
+        },
+        {
+          "zh": "國際交流",
+          "en": "International Exchange"
+        },
+        {
+          "zh": "鼓勵學生",
+          "en": "Encouraging Students"
+        },
+        {
+          "zh": "從校園到世界舞臺",
+          "en": "From Campus to the Global Stage"
+        }
+      ],
+      "timelines": [
+        {
+          "year": 2026,
+          "events": [
+            {
+              "id": "idc-2026-campus-tour",
+              "kind": "range",
+              "precision": "month",
+              "start": { "month": 3 },
+              "end": { "month": 5 },
+              "dateLabel": "3-5月",
+              "title": "設計深耕X生根設計 校園講座、校園巡迴展、專題講座"
+            },
+            {
+              "id": "idc-2026-grant-open",
+              "kind": "range",
+              "precision": "month",
+              "start": { "month": 6 },
+              "end": { "month": 7 },
+              "dateLabel": "6-7月",
+              "title": "獎勵金申請開放"
+            },
+            {
+              "id": "idc-2026-asia-power",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 9 },
+              "dateLabel": "9月",
+              "title": "來自亞洲的設計力量 系列活動"
+            },
+            {
+              "id": "idc-2026-grant-list",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 11 },
+              "dateLabel": "11月",
+              "title": "獎勵金核發名單公布"
+            },
+            {
+              "id": "idc-2026-ceremony",
+              "kind": "point",
+              "precision": "month",
+              "start": { "month": 12 },
+              "dateLabel": "12月",
+              "title": "IDC頒獎典禮"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

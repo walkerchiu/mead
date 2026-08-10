@@ -1,0 +1,22 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Shared/Overview" />
+
+# Shared
+
+不專屬於入口網、可跨處重用的基礎元件放這裡。
+
+## 現況
+
+通用 UI 基礎元件（Buttons、Icon 等 Atoms）、錯誤與提示相關共用元件
+（AlertMessage、ErrorDisplay、SnackbarWithProgress）、Design System（Colors、
+Typography）歸在此 scope。
+
+源碼上對應 `components/<atomicLevel>/`（無 scope 子資料夾）。
+
+## 何時放這裡
+
+- 一個元件屬於通用 UI、不綁定入口網內容 → 放 **Shared**
+- 元件只服務公開入口網 → 放 `components/public/<level>/`（Public Scope）
+
+> 不確定歸屬時，預設放 **Shared**。

@@ -1,0 +1,26 @@
+{
+  "name": "@repo/eslint-config",
+  "version": "0.0.0",
+  "author": {
+    "name": "Walker Chiu",
+    "email": "walker.chiu@icp-si.com"
+  },
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./base": "./base.mjs",
+    "./next": "./next.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "9.39.2",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-prettier": "5.5.5",
+    "globals": "16.5.0",
+    "typescript-eslint": "8.59.2"
+  },
+  "peerDependencies": {
+    "eslint": ">=9.0.0",
+    "prettier": ">=3.0.0"
+  }
+}

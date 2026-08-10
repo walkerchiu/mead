@@ -1,0 +1,30 @@
+# 教育部藝術設計三大計畫入口網 — 正式環境反向代理 / 自動 HTTPS
+#
+# 由環境變數注入網域與通知信箱（見 docker-compose.prod.yml）。
+# Caddy 會自動向 Let's Encrypt 申請憑證並在到期前自動續簽（憑證存於 /data）。
+
+{
+	# 憑證到期 / ACME 問題通知信箱
+	email {$ACME_EMAIL}
+
+	# 測試期建議先用 staging，避免觸及 Let's Encrypt 正式環境 rate limit；
+	# 確認整套流程無誤後，註解掉這行即改用正式 CA：
+	# acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# 後端 GraphQL / API（若有部署後端）
+	handle /graphql* {
+		reverse_proxy backend:4000
+	}
+
+	# 其餘流量 → Next.js 入口網
+	handle {
+		reverse_proxy frontend:3000
+	}
+
+	# 隱藏伺服器標頭（HSTS 等安全標頭由 Next.js 回應帶出，Caddy 透傳）
+	header -Server
+}

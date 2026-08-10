@@ -1,0 +1,448 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Best Practices" />
+
+# 元件開發最佳實踐
+
+本指南提供開發 MEAD 元件的最佳實踐與慣例。
+
+---
+
+## 📋 開發流程
+
+### 1. Story-First 開發
+
+**先撰寫 Story，再實作元件**
+
+```tsx
+// ✅ Good practice
+// 1. Define the UI you want in Storybook first
+export const LoginButton: Story = {
+  args: {
+    children: 'Login',
+    variant: 'contained',
+    loading: false,
+  },
+};
+
+// 2. Then implement the component
+export function Button({ children, loading, ...props }) {
+  return <MuiButton {...props}>{loading ? '...' : children}</MuiButton>;
+}
+```
+
+**為什麼？**
+
+- ✅ 即時的視覺回饋
+- ✅ 更容易發現設計問題
+- ✅ 自動產生文件
+- ✅ 更好的協作與溝通
+
+---
+
+## 🎯 元件設計原則
+
+### 1. 保持元件純粹
+
+```tsx
+// ❌ Bad: Data loading inside a presentational component
+function PlanList() {
+  const { plans } = usePlans(); // data loading
+  const router = useNavRouter(); // routing logic
+
+  return <div>...</div>;
+}
+
+// ✅ Good: Component only handles UI, data comes via props
+function PlanList({ plans, onSelect }) {
+  return (
+    <div>
+      {plans.map((plan) => (
+        <PlanCard key={plan.id} plan={plan} onSelect={onSelect} />
+      ))}
+    </div>
+  );
+}
+
+// Load data at the page level
+function PortalLandingPage() {
+  const { plans, loading } = usePlans();
+  if (loading) return <CircularProgress />;
+  return <PlanList plans={plans} onSelect={openPlan} />;
+}
+```
+
+### 2. Props 設計原則
+
+#### 保持簡單
+
+```tsx
+// ❌ Bad: Too many props
+<Button
+  showIcon
+  iconPosition="left"
+  iconSize="small"
+  iconColor="primary"
+/>
+
+// ✅ Good: Use composition
+<Button startIcon={<IconCheck />}>
+  Confirm
+</Button>
+```
+
+#### 使用有意義的命名
+
+```tsx
+// ❌ Bad
+<FormField err={true} txt="Enter content" />
+
+// ✅ Good
+<FormField error="Field is required" helperText="Please enter your email" />
+```
+
+#### 提供預設值
+
+```tsx
+export interface ButtonProps {
+  variant?: 'contained' | 'outlined' | 'text'; // ✅ Explicit types
+  size?: 'small' | 'medium' | 'large';
+  loading?: boolean;
+}
+
+export function Button({
+  variant = 'contained', // ✅ Reasonable defaults
+  size = 'medium',
+  loading = false,
+  ...props
+}) {
+  // ...
+}
+```
+
+### 3. TypeScript 用法
+
+#### 明確的型別定義
+
+```tsx
+// ✅ Good: Explicit types
+export interface PlanCardProps {
+  plan: Plan;
+  active?: boolean;
+  onSelect?: (plan: Plan) => void;
+}
+```
+
+#### 避免使用 any
+
+```tsx
+// ❌ Bad
+function selectPlan(plan: any) {}
+
+// ✅ Good
+function selectPlan(plan: Plan) {}
+```
+
+---
+
+## 📝 Story 撰寫準則
+
+### 1. 為每個狀態建立 Story
+
+```tsx
+// ✅ Complete Stories example
+export const Default: Story = {
+  args: { children: 'Button' },
+};
+
+export const Loading: Story = {
+  args: { children: 'Loading...', loading: true },
+};
+
+export const Disabled: Story = {
+  args: { children: 'Disabled', disabled: true },
+};
+
+export const WithIcon: Story = {
+  args: { children: 'Add', startIcon: <IconAdd /> },
+};
+
+export const Error: Story = {
+  args: { children: 'Error', color: 'error' },
+};
+```
+
+### 2. 提供互動範例
+
+```tsx
+export const Interactive: Story = {
+  render: function InteractiveExample() {
+    const [count, setCount] = useState(0);
+
+    return (
+      <Button onClick={() => setCount(count + 1)}>Click count: {count}</Button>
+    );
+  },
+};
+```
+
+### 3. 加入文件說明
+
+````tsx
+/**
+ * Primary Button
+ *
+ * Used for the most important actions, such as submitting forms, confirming actions, etc.
+ *
+ * @example
+ * ```tsx
+ * <Button variant="contained" color="primary">
+ *   Submit
+ * </Button>
+ * ```
+ */
+export const Primary: Story = {
+  args: {
+    children: 'Primary Button',
+    variant: 'contained',
+  },
+};
+````
+
+---
+
+## 🎨 樣式準則
+
+### 1. 使用 MUI 的 sx prop
+
+```tsx
+// ✅ Good: Use sx
+<Box sx={{
+  p: 2,
+  mb: 3,
+  borderRadius: 1,
+  bgcolor: 'background.paper',
+}}>
+  Content
+</Box>
+
+// ❌ Avoid: inline styles
+<Box style={{
+  padding: '16px',
+  marginBottom: '24px',
+}}>
+  Content
+</Box>
+```
+
+### 2. 響應式設計
+
+```tsx
+<Box
+  sx={{
+    p: { xs: 2, sm: 3, md: 4 }, // Different padding for different breakpoints
+    width: { xs: '100%', sm: '80%', md: '60%' },
+  }}
+>
+  Content
+</Box>
+```
+
+### 3. 使用主題變數
+
+```tsx
+// ✅ Good: Use theme
+<Box sx={{ color: 'primary.main', bgcolor: 'background.paper' }} />
+
+// ❌ Avoid: Hard-coded colors
+<Box sx={{ color: '#1976d2', bgcolor: '#fff' }} />
+```
+
+---
+
+## 🧪 測試準則
+
+### 1. 在 Storybook 中測試
+
+每個元件都應具備：
+
+- ✅ Default story（預設狀態）
+- ✅ Loading story（載入中狀態）
+- ✅ Error story（錯誤狀態）
+- ✅ Interactive story（互動範例）
+
+### 2. 以 args 驅動情境
+
+入口網元件為純展示、props 驅動，直接用 `args` 切換情境即可，不需模擬後端。
+
+```tsx
+export const Loading: Story = {
+  args: { loading: true },
+};
+```
+
+---
+
+## 📦 元件組織
+
+### 1. 檔案結構
+
+```text
+ComponentName/
+├── ComponentName.tsx       # Main component file
+├── ComponentName.stories.tsx  # Stories
+├── ComponentName.test.tsx  # Unit tests (optional)
+└── index.ts                # Exports
+```
+
+### 2. 匯出慣例
+
+```tsx
+// ComponentName/index.ts
+export { ComponentName } from './ComponentName';
+export type { ComponentNameProps } from './ComponentName';
+
+// atoms/index.ts
+export * from './Buttons';
+export * from './Icon';
+```
+
+---
+
+## ⚡ 效能最佳化
+
+### 1. 使用 React.memo
+
+```tsx
+// For pure presentational components
+export const Button = React.memo(function Button({ children, ...props }) {
+  return <MuiButton {...props}>{children}</MuiButton>;
+});
+```
+
+### 2. 避免不必要的重新渲染
+
+```tsx
+// ❌ Bad: Creates new object every time
+<Button onClick={() => handleClick(id)} />;
+
+// ✅ Good: Use useCallback
+const handleClick = useCallback(() => {
+  doSomething(id);
+}, [id]);
+
+<Button onClick={handleClick} />;
+```
+
+---
+
+## 🔍 無障礙設計（a11y）
+
+### 1. 語意化 HTML
+
+```tsx
+// ✅ Good
+<button type="submit">Submit</button>
+
+// ❌ Bad
+<div onClick={handleSubmit}>Submit</div>
+```
+
+### 2. ARIA 標籤
+
+```tsx
+<IconButton aria-label="Close dialog" onClick={onClose}>
+  <CloseIcon />
+</IconButton>
+```
+
+### 3. 鍵盤導覽
+
+確保所有互動元素皆可透過鍵盤操作。
+
+---
+
+## 📚 文件撰寫準則
+
+### 1. JSDoc 註解
+
+````tsx
+/**
+ * Button Component - Atomic Design: Atom
+ *
+ * Wrapper around MUI Button providing unified button styles and behavior.
+ *
+ * @example
+ * ```tsx
+ * <Button variant="contained" loading>
+ *   Loading...
+ * </Button>
+ * ```
+ */
+export function Button({ children, loading, ...props }: ButtonProps) {
+  // ...
+}
+````
+
+### 2. Props 說明
+
+```tsx
+export interface ButtonProps {
+  /**
+   * Button content
+   */
+  children: React.ReactNode;
+
+  /**
+   * Whether to show loading state
+   * @default false
+   */
+  loading?: boolean;
+
+  /**
+   * Button variant
+   * @default 'contained'
+   */
+  variant?: 'contained' | 'outlined' | 'text';
+}
+```
+
+---
+
+## ✅ 檢查清單
+
+開發新元件時，請確保：
+
+- [ ] 遵循 Atomic Design 原則，放置於正確的層級
+- [ ] 元件保持純粹（無副作用）
+- [ ] 提供完整的 TypeScript 型別
+- [ ] 建立多個 Story 以展示不同狀態
+- [ ] 加入 JSDoc 註解
+- [ ] 支援響應式設計
+- [ ] 符合無障礙標準
+- [ ] 使用主題變數（不寫死顏色）
+- [ ] 提供合理的預設值
+- [ ] 在 Storybook 中測試所有狀態
+
+---
+
+## 🎓 學習資源
+
+- [Storybook 最佳實踐](https://storybook.js.org/docs/react/writing-stories/introduction)
+- [React TypeScript 速查表](https://react-typescript-cheatsheet.netlify.app/)
+- [MUI 客製化指南](https://mui.com/material-ui/customization/how-to-customize/)
+- [Atomic Design 方法論](https://bradfrost.com/blog/post/atomic-web-design/)
+
+---
+
+## 💡 提示
+
+**請記住：好的元件應該是**
+
+- 📦 **可重用** - 可在多處使用
+- 🧪 **可測試** - 容易為其撰寫測試
+- 📖 **有文件** - 使用說明清晰
+- 🎨 **一致** - 遵循設計系統
+- ⚡ **高效能** - 效能良好
+
+開始建構你的元件吧！🚀

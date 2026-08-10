@@ -1,0 +1,43 @@
+{
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "learnMore": "Visit website",
+    "externalLinkAriaLabel": "{label} (opens in new tab)"
+  },
+  "portal": {
+    "eyebrow": "MOE Three Major Arts & Design Programs",
+    "heading": "Opening more possibilities for Taiwan's arts and design",
+    "viewingPlan": "Now viewing: {name}",
+    "learnMore": "Learn more",
+    "loading": "Loading program data…",
+    "error": "Failed to load program data. Please try again later.",
+    "retry": "Retry",
+    "footer": {
+      "siteName": "MOE Three Major Arts & Design Programs Portal",
+      "tagline": "The Ministry of Education is dedicated to advancing arts and design education in Taiwan.",
+      "copyright": "Copyright {year} . All Rights Reserved."
+    },
+    "detail": {
+      "back": "Back to home",
+      "intro": "About the program",
+      "objective": "Program objectives",
+      "execution": "Execution items",
+      "stats": "Program impact",
+      "organizers": "Organizers",
+      "timeline": "Timeline",
+      "gallery": "Gallery",
+      "social": "Social",
+      "decorative": "Keywords",
+      "notFound": "Program not found",
+      "loading": "Loading program data…"
+    },
+    "narrative": {
+      "heading": "About the Three Major Arts & Design Programs",
+      "intro": "In 2003 the Executive Yuan announced the “Challenge 2008: National Development Plan” and, in response to the international competition driven by globalization and digitalization, designated the “Cultural and Creative Industries Development Plan” as a priority, tasking the Ministry of Education with leading the related talent-cultivation strategy.",
+      "body1": "After preparing the environment across five teaching resource centers in northern, central, and southern Taiwan, the Ministry of Education launched the “<link>Overseas Training Program for Arts and Design Elites</link>” (SPOSAD) in 2005, establishing an international training mechanism to cultivate designers with a global perspective. It has since grown to span five fields: digital animation, visual communication design, product design, architecture and landscape design, and fashion design.",
+      "body2": "Also launched in 2005, the “<link>Program Encouraging Students to Enter International Arts and Design Competitions</link>” (IDC) selects the world’s benchmark design competitions and sets tiers and incentives, encouraging arts and design students across the nation’s universities to take part in international events and aligning Taiwan’s design education with international practice.",
+      "body3": "First held in 2010, the “<link>Taiwan International Student Design Competition</link>” combines the competitive strengths of the Ministry’s arts and design talent cultivation. By independently hosting an international-class student design competition, Taiwan not only fosters exchange among design students worldwide but also tangibly elevates its international image as a nation that values design and creativity.",
+      "body4": "From making talent seen and creativity seen to, ultimately, making Taiwan seen, these three programs complement one another and form the core foundation of the Ministry of Education’s long-term support for Taiwan’s arts and design students. Over the past two decades they have cultivated countless outstanding talents — many former students now work at renowned companies at home and abroad, run their own ventures, or devote themselves to higher education and flagship competitions. The design capability they nurtured has become a mainstay across Taiwan’s industries and cultural fields. Carrying twenty years of solid achievement, the three programs are also an indispensable force for cultivating top design talent and shaping the global design stage in the years ahead."
+    }
+  }
+}

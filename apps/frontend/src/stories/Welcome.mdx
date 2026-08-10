@@ -1,0 +1,206 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction/Welcome" />
+
+# 歡迎使用 MEAD Storybook
+
+這是 MEAD 公開入口網的 Storybook 元件庫，以 **Atomic Design** 原則為基礎建構。
+
+## 🎯 什麼是 Atomic Design？
+
+Atomic Design 是一套設計系統方法論，將 UI 元件組織為以下層級：
+
+```
+Atoms → Molecules → Organisms → Pages
+```
+
+### 📦 元件層級
+
+#### 1. **Atoms**
+
+最基本、無法再進一步拆解的 UI 元素。
+
+範例：
+
+- `Button` - 按鈕元件
+- `Icon` - 圖示元件
+
+**何時使用**：當你需要最基本的 UI 元素時。
+
+#### 2. **Molecules**
+
+由多個 Atoms 組合而成，具備特定功能。
+
+範例：
+
+- `AlertMessage` - 警示訊息
+- `SnackbarWithProgress` - 帶進度條的提示
+- `PlanTimeline` - 計畫時程
+
+**何時使用**：當你需要組合多個基本元素以達成特定功能時。
+
+#### 3. **Organisms**
+
+由 Molecules 與 Atoms 組合而成的完整功能模組。
+
+範例：
+
+- `PlanCard` - 計畫卡片
+- `PlanCarousel` - 三計畫展開／收合輪播
+- `PortalFooter` - 入口網頁尾
+
+**何時使用**：當你需要完整的功能模組時。
+
+#### 4. **Pages**
+
+完整的頁面呈現。
+
+範例：
+
+- `PortalLandingPage` - 入口網首頁
+- `PlanDetailPage` - 計畫詳細頁
+
+**何時使用**：用於展示完整的使用者流程與互動。
+
+---
+
+## 🚀 快速開始
+
+### 瀏覽元件
+
+側邊欄分為兩個頂層 **scope**，各自擁有專屬的 `Overview` 頁面：
+
+1. **Public Scope** - 公開、免登入的入口網內容元件
+2. **Shared** - 不綁定入口網的通用 UI 基礎元件
+
+Scope 由原始碼資料夾決定：入口網專屬元件位於 `components/public/<level>/`，
+通用的共用元件則直接放在 `components/<level>/` 之下。當不確定元件歸屬時，
+預設放入 **Shared**。
+
+### 測試元件
+
+每個元件都有多個 **Story**（情境展示）：
+
+- **Default** - 預設狀態
+- **Interactive** - 互動範例
+
+### 使用 Controls
+
+點選 **Controls** 分頁即可即時調整元件 props：
+
+- 修改文字內容
+- 切換狀態
+- 調整樣式（variant、color、size）
+
+---
+
+## 🛠️ 開發指南
+
+### Story-First 開發流程
+
+1. **在 Storybook 中開發 UI**
+
+   ```bash
+   pnpm storybook
+   ```
+
+2. **建立元件與 Story**
+
+   ```tsx
+   // Button.tsx
+   export function Button({ children, loading }) {
+     return <MuiButton disabled={loading}>{children}</MuiButton>;
+   }
+
+   // Button.stories.tsx
+   export const Default: Story = {
+     args: { children: 'Click me' },
+   };
+   ```
+
+3. **測試所有狀態**
+   - 在 Storybook 中預覽
+   - 使用 Controls 測試不同的 props
+   - 檢查響應式設計
+
+4. **整合至 Next.js 頁面**
+
+   ```tsx
+   // app/[locale]/page.tsx
+   import { PortalLandingPage } from '@/components/public';
+
+   export default function Home() {
+     return <PortalLandingPage />;
+   }
+   ```
+
+### 命名慣例
+
+- **元件**：PascalCase（例如 `PlanCard`）
+- **檔案**：與元件名稱相同（例如 `PlanCard.tsx`）
+- **Story**：ComponentName.stories.tsx（例如 `PlanCard.stories.tsx`）
+
+### 目錄結構
+
+```text
+src/components/
+├── atoms/
+│   ├── Buttons/
+│   └── index.ts
+├── molecules/
+│   ├── AlertMessage/
+│   └── index.ts
+└── public/
+    ├── atoms/
+    ├── molecules/
+    ├── organisms/
+    └── pages/
+```
+
+---
+
+## 🎨 設計原則
+
+### 1. 單一職責
+
+每個元件只做一件事，並把它做好。
+
+### 2. 組合優於繼承
+
+使用組合而非繼承來建構複雜的元件。
+
+### 3. Props 驅動
+
+元件應為無狀態，透過 props 控制。
+
+### 4. 一致性
+
+在命名、樣式與行為上維持一致性。
+
+---
+
+## 🔧 技術堆疊
+
+- **Storybook** - 元件展示與文件
+- **Next.js 16** - 應用框架
+- **React 19** - UI 函式庫
+- **MUI 7** - Material-UI 元件庫
+- **TypeScript** - 型別安全
+- **next-intl** - 國際化（i18n）
+
+---
+
+## 📖 更多資源
+
+- [Storybook 官方文件](https://storybook.js.org/docs)
+- [Atomic Design 設計原則](https://bradfrost.com/blog/post/atomic-web-design/)
+- [MUI 官方文件](https://mui.com/)
+- [Next.js 官方文件](https://nextjs.org/docs)
+
+---
+
+## 🎉 開始探索
+
+從左側邊欄選擇任一元件即可開始探索！
+
+我們建議從 **Public Scope/Pages/PortalLandingPage** 開始。

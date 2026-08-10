@@ -1,0 +1,20 @@
+# 純前端容器化執行（本地驗證用）。正式部署見 deploy/ec2/（frontend + Caddy 自動 TLS）。
+# 本地開發直接用 `pnpm dev` 即可，不需此 compose。
+name: mead
+
+services:
+  frontend:
+    image: mead-frontend:${IMAGE_TAG:-latest}
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+      args:
+        # NEXT_PUBLIC_* 於 build 時烘進 client bundle；值由環境插值（未設則為空）。
+        NEXT_PUBLIC_APP_VERSION: ${NEXT_PUBLIC_APP_VERSION:-}
+        NEXT_PUBLIC_BUILD_ID: ${NEXT_PUBLIC_BUILD_ID:-}
+        NEXT_PUBLIC_COMMIT_SHA: ${NEXT_PUBLIC_COMMIT_SHA:-}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+    container_name: mead-frontend
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:${FRONTEND_PORT:-3000}:3000'

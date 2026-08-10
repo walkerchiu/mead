@@ -1,0 +1,128 @@
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+:root {
+  /* 自帶字體字族名（對應 layout.tsx 的 @fontsource import）；供下方 font-family
+     與 theme typography 的 var(--font-*) 解析。 */
+  --font-inter: 'Inter';
+  --font-roboto: 'Roboto';
+  --font-noto-sans-tc: 'Noto Sans TC';
+  --font-roboto-mono: 'Roboto Mono';
+}
+
+html,
+body {
+  max-width: 100vw;
+  /* 用 clip 而非 hidden：兩者都能擋掉橫向捲軸，但 overflow-x:hidden 會讓
+     html/body 成為 scroll container，進而破壞後代的 position:sticky（入口網
+     第二屏的 sticky 釘住效果）。overflow-x:clip 不建立 scroll container，
+     可同時擋橫向溢出又不影響 sticky。 */
+  overflow-x: clip;
+}
+
+body {
+  font-family:
+    var(--font-roboto, Roboto), var(--font-noto-sans-tc, 'Noto Sans TC'),
+    sans-serif;
+  /* Light mode default background - 企業識別淺冷白 */
+  background-color: #f5f7fa;
+  color: #001239;
+  /* Smooth transition when theme changes */
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Dark mode styles applied immediately by blocking script */
+html.dark-mode body {
+  background-color: #0d0d0d;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* CSS custom properties for page backgrounds */
+:root {
+  /* Light mode: 品牌深藍漸層 (PANTONE 294C → 648C) */
+  --page-gradient-bg: linear-gradient(135deg, #0c3467 0%, #00194e 100%);
+  --page-solid-bg: #f5f7fa;
+}
+
+html.dark-mode {
+  /* Dark mode: 純深黑漸層 */
+  --page-gradient-bg: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+  --page-solid-bg: #0d0d0d;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family:
+    var(--font-roboto-mono, 'Roboto Mono'), ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* 隱藏 Next.js DevTools 按鈕（開發環境） */
+#__next-build-watcher,
+[data-nextjs-dialog-overlay],
+[data-nextjs-devtools],
+[data-nextjs-devtools-button],
+button[aria-label='Open Next.js Dev Tools'],
+/* Next.js 16 的新 DevTools 結構 - 更精確的選擇器 */
+nextjs-portal,
+nextjs-portal > div {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 確保 notistack 容器固定在視窗下方中央 */
+[class*='notistack-SnackbarContainer'] {
+  position: fixed !important;
+  z-index: 9999 !important;
+  /* 強制設定為下方中央 */
+  top: auto !important;
+  bottom: 24px !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+}
+
+/* ----- 無障礙：跳至主要內容（skip link）----- */
+/* 預設視覺隱藏；獲得鍵盤焦點時顯示於頁面左上方 */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10000;
+  padding: 10px 16px;
+  border-radius: 6px;
+  background: #001239;
+  color: #ffffff;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-150%);
+  transition: transform 0.15s ease;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid #ffcc00;
+  outline-offset: 2px;
+}
+
+/* 視覺隱藏但仍由螢幕報讀器讀出 */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
