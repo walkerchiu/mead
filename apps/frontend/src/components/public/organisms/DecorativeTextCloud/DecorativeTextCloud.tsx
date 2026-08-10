@@ -70,11 +70,11 @@ const RELEASE_DEG = 330;
 /** 一組字依序淡入／淡出的錯開跨度（s） */
 const WORD_STAGGER_S = 0.55;
 /** 舊計畫單字淡出時長（s） */
-const WORD_FADE_OUT_S = 0.5;
+const WORD_FADE_OUT_S = 0.36;
 /** 新計畫單字淡入時長（s） */
 const WORD_FADE_IN_S = 0.72;
 /** 切換時降到低透明度後接續換字，避免畫面完全空掉造成閃爍感。 */
-const WORD_SWAP_OPACITY = 0.18;
+const WORD_SWAP_OPACITY = 0.08;
 /** 過場總長（ms）：錯開跨度 + 單字淡出後，移除淡出層 */
 const WORD_TRANSITION_MS =
   (WORD_STAGGER_S + Math.max(WORD_FADE_OUT_S, WORD_FADE_IN_S)) * 1000 + 50;

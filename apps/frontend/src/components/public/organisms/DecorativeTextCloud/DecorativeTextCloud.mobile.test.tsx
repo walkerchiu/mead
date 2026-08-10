@@ -391,16 +391,16 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
 
     expect(screen.getByText('轉化')).toBeInTheDocument();
-    expect(screen.getByText('轉化').style.animationDuration).toBe('0.5s');
+    expect(screen.getByText('轉化').style.animationDuration).toBe('0.36s');
     const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
     expect(injectedCss).not.toContain(
       'portalWordFadeOut{from{opacity:1}to{opacity:0}}',
     );
     expect(injectedCss).toContain(
-      'portalWordFadeOut{from{opacity:1}to{opacity:0.18}}',
+      'portalWordFadeOut{from{opacity:1}to{opacity:0.08}}',
     );
     expect(injectedCss).toContain(
-      'portalWordFadeIn{from{opacity:0.18}to{opacity:1}}',
+      'portalWordFadeIn{from{opacity:0.08}to{opacity:1}}',
     );
     expect(screen.getByText('競賽').style.animationDuration).toBe('0.72s');
     expect(screen.getByText('競賽').style.animationDuration).not.toContain(
