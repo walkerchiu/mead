@@ -408,6 +408,59 @@ describe('DecorativeTextCloud mobile labels', () => {
     );
   });
 
+  it('staggers decorative word breathing so words do not pulse as one group', async () => {
+    mockDesktopViewport();
+
+    render(
+      <DecorativeTextCloud
+        shapeContents={[
+          {
+            words: [
+              { zh: '轉化', en: 'transform' },
+              { zh: '聽見', en: 'listen' },
+              { zh: '生生', en: 'life' },
+            ],
+            photos: [],
+            label: ['藝術與設計', '菁英海外培訓計畫'],
+          },
+          { words: [], photos: [], label: ['臺灣國際學生', '創意設計大賽'] },
+          {
+            words: [],
+            photos: [],
+            label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+          },
+        ]}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('轉化')).toBeInTheDocument();
+    });
+
+    const words = ['轉化', '聽見', '生生'].map((text) =>
+      screen.getByText(text),
+    );
+    const durations = words.map((word) => word.style.animationDuration);
+    const delays = words.map((word) => word.style.animationDelay);
+    const minOpacities = words.map((word) =>
+      word.style.getPropertyValue('--word-min-opacity'),
+    );
+    const maxOpacities = words.map((word) =>
+      word.style.getPropertyValue('--word-max-opacity'),
+    );
+
+    expect(new Set(durations).size).toBeGreaterThan(1);
+    expect(new Set(delays).size).toBeGreaterThan(1);
+    expect(new Set(minOpacities).size).toBeGreaterThan(1);
+    expect(new Set(maxOpacities).size).toBeGreaterThan(1);
+
+    const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
+    expect(injectedCss).toContain('16%,62%{opacity:var(--word-max-opacity)}');
+    expect(injectedCss).toContain('0%,100%{opacity:var(--word-min-opacity)}');
+  });
+
   it('follows every default plan index when no shape is hovered', async () => {
     mockDesktopViewport();
 

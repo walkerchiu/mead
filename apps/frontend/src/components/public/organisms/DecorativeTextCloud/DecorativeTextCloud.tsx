@@ -587,9 +587,14 @@ export function DecorativeTextCloud({
     keyStr: string,
     visibleCount: number,
   ) => {
-    const dur = 4.6 + ((i * 1.73) % 3.6);
-    // steady：負延遲把 twinkle 相位固定在 opacity=1 區間，第一影格即可見。
-    const steadyDelay = -(0.2 + ((i * 0.151) % 0.4)) * dur;
+    const breathDuration = 5.8 + ((i * 1.37) % 4.2);
+    const breathDelay = -((i * 2.11) % breathDuration);
+    const minOpacity = 0.1 + ((i * 0.07) % 0.18);
+    const maxOpacity = 0.68 + ((i * 0.11) % 0.24);
+    const breathVars = {
+      ['--word-min-opacity' as string]: minOpacity.toFixed(2),
+      ['--word-max-opacity' as string]: maxOpacity.toFixed(2),
+    };
     // in／out：依序錯開（前面的先、後面的後），形成數量漸增／漸減。
     const frac =
       visibleCount > 1 ? Math.min(i, visibleCount - 1) / (visibleCount - 1) : 0;
@@ -612,6 +617,7 @@ export function DecorativeTextCloud({
       animStyle = {
         animationDuration: `${WORD_FADE_OUT_S}s`,
         animationDelay: `${stagger.toFixed(2)}s`,
+        ...breathVars,
       };
     } else if (phase === 'in') {
       animSx = {
@@ -623,6 +629,7 @@ export function DecorativeTextCloud({
       animStyle = {
         animationDuration: `${WORD_FADE_IN_S}s`,
         animationDelay: `${stagger.toFixed(2)}s`,
+        ...breathVars,
       };
     } else if (vertical) {
       animSx = {
@@ -631,8 +638,9 @@ export function DecorativeTextCloud({
         animationIterationCount: 'infinite',
       };
       animStyle = {
-        animationDuration: `${dur.toFixed(2)}s`,
-        animationDelay: `${steadyDelay.toFixed(2)}s`,
+        animationDuration: `${breathDuration.toFixed(2)}s`,
+        animationDelay: `${breathDelay.toFixed(2)}s`,
+        ...breathVars,
       };
     } else {
       animSx = {
@@ -642,10 +650,11 @@ export function DecorativeTextCloud({
         animationFillMode: 'none, both',
       };
       animStyle = {
-        animationDuration: `${dur.toFixed(2)}s, 2.4s`,
-        animationDelay: `${steadyDelay.toFixed(2)}s, 0s`,
+        animationDuration: `${breathDuration.toFixed(2)}s, 2.4s`,
+        animationDelay: `${breathDelay.toFixed(2)}s, 0s`,
         ['--init-left' as string]: `${initLeftPct.toFixed(2)}%`,
         ['--final-left' as string]: `${pos.leftPct.toFixed(2)}%`,
+        ...breathVars,
       } as React.CSSProperties;
     }
 
@@ -722,9 +731,9 @@ export function DecorativeTextCloud({
         [portalTokens.mq.desktopUp]: { height: 620, mt: '84px' },
         // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
         '@keyframes portalTwinkle': {
-          '0%, 100%': { opacity: 0 },
-          '16%, 62%': { opacity: 1 },
-          '86%': { opacity: 0 },
+          '0%, 100%': { opacity: 'var(--word-min-opacity)' },
+          '16%, 62%': { opacity: 'var(--word-max-opacity)' },
+          '86%': { opacity: 'var(--word-min-opacity)' },
         },
         // 計畫切換時，舊句淡到低透明度；新句從同一低透明度淡回來。
         '@keyframes portalWordFadeOut': {

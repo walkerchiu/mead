@@ -26,6 +26,7 @@ storybook-static/
 .vscode/
 .cursor/
 .claude/
+.worktrees/
 .github/
 *.swp
 *.swo
