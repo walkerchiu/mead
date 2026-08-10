@@ -80,32 +80,89 @@ describe('DecorativeTextCloud mobile labels', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('藝術與設計')).toHaveAttribute('x', '150');
+      expect(screen.getByText('藝術與設計')).toHaveAttribute('x', '146');
     });
 
-    const labelPairs = [
+    const figmaMobileLabels = [
+      { text: '藝術與設計', x: '146', y: '140' },
+      { text: '菁英海外培訓計畫', x: '157', y: '164' },
+      { text: '臺灣國際學生', x: '167', y: '430' },
+      { text: '創意設計大賽', x: '186', y: '451' },
+      { text: '鼓勵學生參加', x: '120', y: '690' },
+      { text: '藝術與設計類國際競賽計畫', x: '128', y: '713' },
+    ] as const;
+
+    figmaMobileLabels.forEach(({ text, x, y }) => {
+      const el = screen.getByText(text);
+      expect(el).toHaveAttribute('x', x);
+      expect(el).toHaveAttribute('y', y);
+      expect(el).toHaveAttribute('text-anchor', 'start');
+      expect(el).toHaveAttribute('font-size', '12.58');
+      expect(el).toHaveStyle({ writingMode: 'horizontal-tb' });
+    });
+
+    [
       ['藝術與設計', '菁英海外培訓計畫'],
       ['臺灣國際學生', '創意設計大賽'],
       ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+    ].forEach(([first, second]) => {
+      expect(screen.getByText(first)).not.toHaveAttribute(
+        'y',
+        screen.getByText(second).getAttribute('y'),
+      );
+    });
+  });
+
+  it('uses Figma desktop coordinates for every vertical shape label line', async () => {
+    mockDesktopViewport();
+
+    render(
+      <DecorativeTextCloud
+        shapeContents={[
+          { words: [], photos: [], label: ['藝術與設計', '菁英海外培訓計畫'] },
+          { words: [], photos: [], label: ['臺灣國際學生', '創意設計大賽'] },
+          {
+            words: [],
+            photos: [],
+            label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+          },
+        ]}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('藝術與設計')).toBeInTheDocument();
+    });
+
+    const figmaLabels = [
+      { text: '藝術與設計', x: '492', y: '228' },
+      { text: '菁英海外培訓計畫', x: '460', y: '246' },
+      { text: '臺灣國際學生', x: '764', y: '261' },
+      { text: '創意設計大賽', x: '728.33', y: '248' },
+      { text: '鼓勵學生參加', x: '954', y: '218' },
+      { text: '藝術與設計類國際競賽計畫', x: '926', y: '240' },
     ] as const;
 
-    labelPairs.forEach(([first, second]) => {
-      const firstText = screen.getByText(first);
-      const secondText = screen.getByText(second);
+    figmaLabels.forEach(({ text, x, y }) => {
+      const el = screen.getByText(text);
+      expect(el).toHaveAttribute('x', x);
+      expect(el).toHaveAttribute('y', y);
+      expect(el).toHaveAttribute('text-anchor', 'start');
+      expect(el).toHaveAttribute('dominant-baseline', 'middle');
+      expect(el).toHaveStyle({ writingMode: 'vertical-rl' });
+    });
 
-      expect(Number(firstText.getAttribute('x'))).toBeLessThan(
-        Number(secondText.getAttribute('x')),
+    [
+      ['藝術與設計', '菁英海外培訓計畫'],
+      ['臺灣國際學生', '創意設計大賽'],
+      ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+    ].forEach(([first, second]) => {
+      expect(screen.getByText(first)).not.toHaveAttribute(
+        'y',
+        screen.getByText(second).getAttribute('y'),
       );
-      expect(Number(secondText.getAttribute('x'))).toBeLessThan(
-        Number(firstText.getAttribute('x')) + 38,
-      );
-      expect(firstText).toHaveAttribute('text-anchor', 'start');
-      expect(secondText).toHaveAttribute('text-anchor', 'start');
-      expect(firstText).toHaveAttribute('font-size', '12');
-      expect(secondText).toHaveAttribute('font-size', '12');
-      expect(firstText).not.toHaveAttribute('y', secondText.getAttribute('y'));
-      expect(firstText).toHaveStyle({ writingMode: 'horizontal-tb' });
-      expect(secondText).toHaveStyle({ writingMode: 'horizontal-tb' });
     });
   });
 
@@ -300,9 +357,39 @@ describe('DecorativeTextCloud mobile labels', () => {
     expect(screen.getByText('臺灣的創造力')).toHaveStyle({
       alignSelf: 'flex-end',
     });
-    expect(screen.getByText('藝術與設計')).toHaveAttribute('font-size', '18');
+    expect(screen.getByText('藝術與設計')).toHaveAttribute(
+      'font-size',
+      '12.58',
+    );
     expect(screen.getByText('藝術與設計')).toHaveStyle({
       writingMode: 'vertical-rl',
+    });
+
+    const figmaTabletLabels = [
+      { text: '藝術與設計', x: '453', y: '159' },
+      { text: '菁英海外培訓計畫', x: '422', y: '168' },
+      { text: '臺灣國際學生', x: '410', y: '564' },
+      { text: '創意設計大賽', x: '386', y: '559' },
+      { text: '鼓勵學生參加', x: '440', y: '900' },
+      { text: '藝術與設計類國際競賽計畫', x: '414', y: '918' },
+    ] as const;
+
+    figmaTabletLabels.forEach(({ text, x, y }) => {
+      const el = screen.getByText(text);
+      expect(el).toHaveAttribute('x', x);
+      expect(el).toHaveAttribute('y', y);
+      expect(el).toHaveAttribute('text-anchor', 'start');
+    });
+
+    [
+      ['藝術與設計', '菁英海外培訓計畫'],
+      ['臺灣國際學生', '創意設計大賽'],
+      ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+    ].forEach(([first, second]) => {
+      expect(screen.getByText(first)).not.toHaveAttribute(
+        'y',
+        screen.getByText(second).getAttribute('y'),
+      );
     });
 
     const tops = ['轉化', '聽見', '生生'].map((word) => {
@@ -345,7 +432,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('softens the non-hover decorative word switch when the default plan changes', async () => {
+  it('switches decorative words without stacking old and new layers', async () => {
     mockDesktopViewport();
 
     const shapeContents = [
@@ -360,7 +447,10 @@ describe('DecorativeTextCloud mobile labels', () => {
         label: ['臺灣國際學生', '創意設計大賽'],
       },
       {
-        words: [{ zh: '競賽', en: 'compete' }],
+        words: [
+          { zh: '競賽', en: 'compete' },
+          { zh: '延續', en: 'continue' },
+        ],
         photos: [],
         label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
       },
@@ -390,22 +480,25 @@ describe('DecorativeTextCloud mobile labels', () => {
       expect(screen.getByText('競賽')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('轉化')).toBeInTheDocument();
-    expect(screen.getByText('轉化').style.animationDuration).toBe('0.36s');
+    expect(screen.queryByText('轉化')).not.toBeInTheDocument();
     const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
     expect(injectedCss).not.toContain(
       'portalWordFadeOut{from{opacity:1}to{opacity:0}}',
     );
-    expect(injectedCss).toContain(
+    expect(injectedCss).not.toContain(
       'portalWordFadeOut{from{opacity:1}to{opacity:0.08}}',
     );
-    expect(injectedCss).toContain(
+    expect(injectedCss).not.toContain(
       'portalWordFadeIn{from{opacity:0.08}to{opacity:1}}',
     );
-    expect(screen.getByText('競賽').style.animationDuration).toBe('0.72s');
-    expect(screen.getByText('競賽').style.animationDuration).not.toContain(
-      ', 2.4s',
+    expect(screen.getByText('競賽').style.animationDuration).toMatch(
+      /^\d+(?:\.\d+)?s$/,
     );
+    expect(screen.getByText('延續').style.animationDelay).toMatch(
+      /^-\d+(?:\.\d+)?s$/,
+    );
+    expect(screen.getByText('競賽').style.animationDuration).not.toContain(',');
+    expect(screen.getByText('延續').style.animationDelay).not.toContain(',');
   });
 
   it('staggers decorative word breathing so words do not pulse as one group', async () => {
