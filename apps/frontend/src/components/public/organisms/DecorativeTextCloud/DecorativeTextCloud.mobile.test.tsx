@@ -83,16 +83,16 @@ describe('DecorativeTextCloud mobile labels', () => {
       expect(screen.getByText('藝術與設計')).toHaveAttribute('x', '146');
     });
 
-    const figmaMobileLabels = [
-      { text: '藝術與設計', x: '146', y: '140' },
-      { text: '菁英海外培訓計畫', x: '157', y: '164' },
-      { text: '臺灣國際學生', x: '167', y: '430' },
-      { text: '創意設計大賽', x: '186', y: '451' },
-      { text: '鼓勵學生參加', x: '120', y: '690' },
-      { text: '藝術與設計類國際競賽計畫', x: '128', y: '713' },
+    const mobileLabels = [
+      { text: '藝術與設計', x: '146', y: '173' },
+      { text: '菁英海外培訓計畫', x: '157', y: '197' },
+      { text: '臺灣國際學生', x: '167', y: '444' },
+      { text: '創意設計大賽', x: '186', y: '468' },
+      { text: '鼓勵學生參加', x: '120', y: '732' },
+      { text: '藝術與設計類國際競賽計畫', x: '128', y: '756' },
     ] as const;
 
-    figmaMobileLabels.forEach(({ text, x, y }) => {
+    mobileLabels.forEach(({ text, x, y }) => {
       const el = screen.getByText(text);
       expect(el).toHaveAttribute('x', x);
       expect(el).toHaveAttribute('y', y);
@@ -136,16 +136,16 @@ describe('DecorativeTextCloud mobile labels', () => {
       expect(screen.getByText('藝術與設計')).toBeInTheDocument();
     });
 
-    const figmaLabels = [
-      { text: '藝術與設計', x: '492', y: '228' },
-      { text: '菁英海外培訓計畫', x: '460', y: '246' },
-      { text: '臺灣國際學生', x: '764', y: '261' },
-      { text: '創意設計大賽', x: '728.33', y: '248' },
-      { text: '鼓勵學生參加', x: '954', y: '218' },
-      { text: '藝術與設計類國際競賽計畫', x: '926', y: '240' },
+    const desktopLabels = [
+      { text: '藝術與設計', x: '529', y: '228' },
+      { text: '菁英海外培訓計畫', x: '497', y: '246' },
+      { text: '臺灣國際學生', x: '746.84', y: '261' },
+      { text: '創意設計大賽', x: '711.16', y: '248' },
+      { text: '鼓勵學生參加', x: '961', y: '218' },
+      { text: '藝術與設計類國際競賽計畫', x: '933', y: '240' },
     ] as const;
 
-    figmaLabels.forEach(({ text, x, y }) => {
+    desktopLabels.forEach(({ text, x, y }) => {
       const el = screen.getByText(text);
       expect(el).toHaveAttribute('x', x);
       expect(el).toHaveAttribute('y', y);
@@ -365,16 +365,16 @@ describe('DecorativeTextCloud mobile labels', () => {
       writingMode: 'vertical-rl',
     });
 
-    const figmaTabletLabels = [
-      { text: '藝術與設計', x: '453', y: '159' },
-      { text: '菁英海外培訓計畫', x: '422', y: '168' },
-      { text: '臺灣國際學生', x: '410', y: '564' },
-      { text: '創意設計大賽', x: '386', y: '559' },
-      { text: '鼓勵學生參加', x: '440', y: '900' },
-      { text: '藝術與設計類國際競賽計畫', x: '414', y: '918' },
+    const tabletLabels = [
+      { text: '藝術與設計', x: '429.5', y: '159' },
+      { text: '菁英海外培訓計畫', x: '398.5', y: '168' },
+      { text: '臺灣國際學生', x: '426', y: '564' },
+      { text: '創意設計大賽', x: '402', y: '559' },
+      { text: '鼓勵學生參加', x: '427', y: '900' },
+      { text: '藝術與設計類國際競賽計畫', x: '401', y: '918' },
     ] as const;
 
-    figmaTabletLabels.forEach(({ text, x, y }) => {
+    tabletLabels.forEach(({ text, x, y }) => {
       const el = screen.getByText(text);
       expect(el).toHaveAttribute('x', x);
       expect(el).toHaveAttribute('y', y);
