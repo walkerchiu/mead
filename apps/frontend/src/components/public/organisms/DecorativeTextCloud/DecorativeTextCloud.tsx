@@ -463,19 +463,16 @@ export function DecorativeTextCloud({
   );
 
   // 計畫切換的緩衝過場：transFrom = 正在淡出的（前一個）計畫；transId 每次切換遞增，
-  // 用於 key 讓新計畫的字 span 重新掛載、重跑「逐字淡入」。只在 hover 改變時觸發
-  // （略過進場隨機那組的初次落定 — 那由入場壓縮動畫負責，不走淡入淡出）。
+  // 用於 key 讓新計畫的字 span 重新掛載、重跑「逐字淡入」。初次載入不觸發；
+  // 後續不論 hover、輪播 defaultIndex 或 randomGroup 落定造成 textIndex 改變，都走過場。
   const [transFrom, setTransFrom] = useState<number | null>(null);
   const [transId, setTransId] = useState(0);
-  const prevHoveredRef = useRef(hovered);
   const prevTextRef = useRef(textIndex);
   const transTimerRef = useRef<number | null>(null);
   useIsoLayoutEffect(() => {
     const fromText = prevTextRef.current;
-    const hoveredChanged = prevHoveredRef.current !== hovered;
-    prevHoveredRef.current = hovered;
     prevTextRef.current = textIndex;
-    if (!hoveredChanged || fromText === textIndex || prefersReducedMotion()) {
+    if (fromText === textIndex || prefersReducedMotion()) {
       return;
     }
     setTransFrom(fromText);

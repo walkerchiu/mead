@@ -344,4 +344,43 @@ describe('DecorativeTextCloud mobile labels', () => {
       marginTop: '12px',
     });
   });
+
+  it('softens the non-hover decorative word switch after the random group settles', async () => {
+    mockDesktopViewport();
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    render(
+      <DecorativeTextCloud
+        shapeContents={[
+          {
+            words: [{ zh: '轉化', en: 'transform' }],
+            photos: [],
+            label: ['藝術與設計', '菁英海外培訓計畫'],
+          },
+          {
+            words: [{ zh: '創作', en: 'create' }],
+            photos: [],
+            label: ['臺灣國際學生', '創意設計大賽'],
+          },
+          {
+            words: [{ zh: '競賽', en: 'compete' }],
+            photos: [],
+            label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+          },
+        ]}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('競賽')).toBeInTheDocument();
+    });
+
+    expect(screen.getByText('轉化')).toBeInTheDocument();
+    expect(screen.getByText('轉化').style.animationDuration).toBe('0.5s');
+    expect(screen.getByText('競賽').style.animationDuration).not.toContain(
+      ', 2.4s',
+    );
+  });
 });

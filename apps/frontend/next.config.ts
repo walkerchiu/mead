@@ -52,6 +52,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // 開發時允許以 127.0.0.1 存取 dev server，避免 localhost / 127.0.0.1
+  // origin 不一致造成 dev runtime 或 HMR 連線被擋。
+  allowedDevOrigins: ['127.0.0.1'],
   // 自架部署：產出獨立執行檔（含追蹤過的最小 node_modules），供 Docker 使用
   output: 'standalone',
   // monorepo：standalone 追蹤需以 workspace root 為基準
