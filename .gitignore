@@ -1,0 +1,86 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+next-env.d.ts
+storybook-static/
+
+# Cache
+.cache/
+.turbo/
+*.tsbuildinfo
+.eslintcache
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# IDE / 開發者個人設定
+.idea/
+.vscode/
+.cursor/
+.claude/
+.github/
+*.swp
+*.swo
+*~
+
+# Husky 內部 wrapper（auto-generated；.husky/ 本身要追蹤 hooks）
+.husky/_/
+
+# Playwright 產物
+test-results/
+playwright-report/
+playwright/.cache/
+# Playwright MCP 除錯產物（console log / page 快照）
+.playwright-mcp/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test coverage
+coverage/
+
+# Environment state
+.current-env
+.vercel/
+
+# Temporary
+tmp/
+temp/
+
+# AWS bootstrap 一次性產物
+*-policy.json
+/trust-policy.json
+
+# SSH 私鑰 / 憑證（絕不入庫）
+*.pem
+*.key
+
+# Local screenshot / debug artifacts at repo root
+/chin_*.jpeg
+/live_*.jpeg
+/match_*.jpeg
+/mine_*.jpeg
+/second_screen_*.jpeg
+/spec_*.jpeg
+/svg_*.jpeg
+/verify_*.jpeg
+/figma_*.jpeg
+/final_*.jpeg
+/carousel_*.jpeg
+/peek_*.jpeg
+/note
