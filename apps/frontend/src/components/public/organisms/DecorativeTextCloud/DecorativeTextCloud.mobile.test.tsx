@@ -114,7 +114,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('uses Figma desktop coordinates for every vertical shape label line', async () => {
+  it('uses consistent desktop y coordinates for every vertical shape label line', async () => {
     mockDesktopViewport();
 
     render(
@@ -140,10 +140,10 @@ describe('DecorativeTextCloud mobile labels', () => {
     const desktopLabels = [
       { text: '藝術與設計', x: '529', y: '228' },
       { text: '菁英海外培訓計畫', x: '497', y: '246' },
-      { text: '臺灣國際學生', x: '746.84', y: '261' },
-      { text: '創意設計大賽', x: '711.16', y: '248' },
-      { text: '鼓勵學生參加', x: '961', y: '218' },
-      { text: '藝術與設計類國際競賽計畫', x: '933', y: '240' },
+      { text: '臺灣國際學生', x: '746.84', y: '228' },
+      { text: '創意設計大賽', x: '711.16', y: '246' },
+      { text: '鼓勵學生參加', x: '961', y: '228' },
+      { text: '藝術與設計類國際競賽計畫', x: '933', y: '246' },
     ] as const;
 
     desktopLabels.forEach(({ text, x, y }) => {
