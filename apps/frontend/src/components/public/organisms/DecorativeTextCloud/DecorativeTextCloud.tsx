@@ -127,6 +127,15 @@ const LAYOUT = {
 
 const SHAPE_LABEL_COLOR = '#E3E3E3';
 const DECORATIVE_WORD_COLOR = '#A6A6A6';
+const DECORATIVE_WORD_MIN_CYCLE_S = 18;
+const DECORATIVE_WORD_CYCLE_SPREAD_S = 12;
+const DECORATIVE_WORD_TWINKLE_NAMES = [
+  'portalTwinkleLongA',
+  'portalTwinkleLongB',
+  'portalTwinkleLongC',
+] as const;
+const DECORATIVE_WORD_INITIAL_PHASES = [0.34, 0.42, 0.3] as const;
+const DECORATIVE_WORD_VISIBLE_PHASES = [0.28, 0.44, 0.58, 0.36, 0.52] as const;
 
 const DESKTOP_SHAPE_LABELS = [
   [
@@ -541,10 +550,34 @@ export function DecorativeTextCloud({
     keyStr: string,
   ) => {
     const breathSeed = i + transId * 3 + textIndex * 5;
-    const breathDuration = 5.8 + ((breathSeed * 1.37) % 4.2);
-    const breathDelay = -((breathSeed * 2.11) % breathDuration);
-    const minOpacity = 0.1 + ((breathSeed * 0.07) % 0.18);
-    const maxOpacity = 0.68 + ((breathSeed * 0.11) % 0.24);
+    const durationRand = ((breathSeed * 37 + 17) % 100) / 100;
+    const breathDuration =
+      DECORATIVE_WORD_MIN_CYCLE_S +
+      durationRand * DECORATIVE_WORD_CYCLE_SPREAD_S;
+    const twinkleVariant =
+      (breathSeed * 7 + i) % DECORATIVE_WORD_TWINKLE_NAMES.length;
+    const twinkleName =
+      DECORATIVE_WORD_TWINKLE_NAMES[twinkleVariant] ??
+      DECORATIVE_WORD_TWINKLE_NAMES[0];
+    const initialPhase =
+      DECORATIVE_WORD_INITIAL_PHASES[twinkleVariant] ??
+      DECORATIVE_WORD_INITIAL_PHASES[0];
+    const visiblePhaseBase =
+      DECORATIVE_WORD_VISIBLE_PHASES[
+        (breathSeed * 5 + i * 3) % DECORATIVE_WORD_VISIBLE_PHASES.length
+      ] ?? DECORATIVE_WORD_VISIBLE_PHASES[0];
+    const visiblePhaseJitter =
+      (((breathSeed * 19 + 11) % 100) / 100 - 0.5) * 0.06;
+    const visiblePhase = Math.min(
+      0.66,
+      Math.max(0.18, visiblePhaseBase + visiblePhaseJitter),
+    );
+    const breathDelay =
+      phase === 'steady'
+        ? -(breathDuration * initialPhase)
+        : -(visiblePhase * breathDuration);
+    const minOpacity = 0;
+    const maxOpacity = 0.42 + ((breathSeed * 0.07) % 0.18);
     const breathVars = {
       ['--word-min-opacity' as string]: minOpacity.toFixed(2),
       ['--word-max-opacity' as string]: maxOpacity.toFixed(2),
@@ -558,7 +591,7 @@ export function DecorativeTextCloud({
     let animStyle: React.CSSProperties;
     if (phase === 'in') {
       animSx = {
-        animationName: 'portalTwinkle',
+        animationName: twinkleName,
         animationTimingFunction: 'ease-in-out',
         animationIterationCount: 'infinite',
       };
@@ -569,7 +602,7 @@ export function DecorativeTextCloud({
       };
     } else if (vertical) {
       animSx = {
-        animationName: 'portalTwinkle',
+        animationName: twinkleName,
         animationTimingFunction: 'ease-in-out',
         animationIterationCount: 'infinite',
       };
@@ -580,7 +613,7 @@ export function DecorativeTextCloud({
       };
     } else {
       animSx = {
-        animationName: 'portalTwinkle, portalLabelEntrance',
+        animationName: `${twinkleName}, portalLabelEntrance`,
         animationTimingFunction: 'ease-in-out, cubic-bezier(0.22, 1, 0.36, 1)',
         animationIterationCount: 'infinite, 1',
         animationFillMode: 'none, both',
@@ -665,11 +698,21 @@ export function DecorativeTextCloud({
         // 桌機橫向 620（對齊 Figma hero 區段 y=130~750 約 620 高）。
         height: mode === 'v' ? LAYOUT.v.viewH : mode === 't' ? 1278 : 440,
         [portalTokens.mq.desktopUp]: { height: 620, mt: '84px' },
-        // 裝飾文字閃爍動畫 — 淡入、停留、淡出後變換詞彙
-        '@keyframes portalTwinkle': {
-          '0%, 100%': { opacity: 'var(--word-min-opacity)' },
-          '16%, 62%': { opacity: 'var(--word-max-opacity)' },
-          '86%': { opacity: 'var(--word-min-opacity)' },
+        // 裝飾文字閃爍動畫 — 三組不同節奏讓詞彙此起彼落；淡出後維持全透明長休息。
+        '@keyframes portalTwinkleLongA': {
+          '0%, 10%, 100%': { opacity: 'var(--word-min-opacity)' },
+          '18%, 66%': { opacity: 'var(--word-max-opacity)' },
+          '74%': { opacity: 'var(--word-min-opacity)' },
+        },
+        '@keyframes portalTwinkleLongB': {
+          '0%, 14%, 100%': { opacity: 'var(--word-min-opacity)' },
+          '24%, 70%': { opacity: 'var(--word-max-opacity)' },
+          '78%': { opacity: 'var(--word-min-opacity)' },
+        },
+        '@keyframes portalTwinkleLongC': {
+          '0%, 6%, 100%': { opacity: 'var(--word-min-opacity)' },
+          '14%, 62%': { opacity: 'var(--word-max-opacity)' },
+          '70%': { opacity: 'var(--word-min-opacity)' },
         },
         // 只在父層提供 base opacity；animation shorthand 留給 span 自己設，
         // 否則此 selector specificity (0,2,0) 會壓過 span sx 的 (0,1,0)，把

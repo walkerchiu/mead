@@ -501,7 +501,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     expect(screen.getByText('延續').style.animationDelay).not.toContain(',');
   });
 
-  it('staggers decorative word breathing so words do not pulse as one group', async () => {
+  it('shows every first-plan decorative word at initial load', async () => {
     mockDesktopViewport();
 
     render(
@@ -535,23 +535,135 @@ describe('DecorativeTextCloud mobile labels', () => {
     const words = ['轉化', '聽見', '生生'].map((text) =>
       screen.getByText(text),
     );
-    const durations = words.map((word) => word.style.animationDuration);
-    const delays = words.map((word) => word.style.animationDelay);
+    const durations = words.map(
+      (word) => word.style.animationDuration.split(',')[0]?.trim() ?? '',
+    );
+    const delays = words.map(
+      (word) => word.style.animationDelay.split(',')[0]?.trim() ?? '',
+    );
+    const animationNames = words.map((word) =>
+      window.getComputedStyle(word).animationName.split(',')[0]?.trim(),
+    );
+
+    durations.forEach((duration, index) => {
+      const durationSeconds = Number.parseFloat(duration);
+      const delaySeconds = Math.abs(Number.parseFloat(delays[index]));
+      expect(delaySeconds / durationSeconds).toBeGreaterThanOrEqual(0.29);
+      expect(delaySeconds / durationSeconds).toBeLessThanOrEqual(0.43);
+    });
+    expect(new Set(animationNames).size).toBeGreaterThan(1);
+  });
+
+  it('randomizes decorative word breathing while keeping enough words visible after plan changes', async () => {
+    mockDesktopViewport();
+
+    const shapeContents = [
+      {
+        words: [{ zh: '起點', en: 'start' }],
+        photos: [],
+        label: ['藝術與設計', '菁英海外培訓計畫'],
+      },
+      {
+        words: [
+          { zh: '轉化', en: 'transform' },
+          { zh: '聽見', en: 'listen' },
+          { zh: '生生', en: 'life' },
+        ],
+        photos: [],
+        label: ['臺灣國際學生', '創意設計大賽'],
+      },
+      {
+        words: [],
+        photos: [],
+        label: ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
+      },
+    ];
+
+    const { rerender } = render(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('起點')).toBeInTheDocument();
+    });
+
+    rerender(
+      <DecorativeTextCloud
+        shapeContents={shapeContents}
+        defaultIndex={1}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('轉化')).toBeInTheDocument();
+    });
+
+    const words = ['轉化', '聽見', '生生'].map((text) =>
+      screen.getByText(text),
+    );
+    const durations = words.map(
+      (word) => word.style.animationDuration.split(',')[0]?.trim() ?? '',
+    );
+    const delays = words.map(
+      (word) => word.style.animationDelay.split(',')[0]?.trim() ?? '',
+    );
     const minOpacities = words.map((word) =>
       word.style.getPropertyValue('--word-min-opacity'),
     );
     const maxOpacities = words.map((word) =>
       word.style.getPropertyValue('--word-max-opacity'),
     );
+    const animationNames = words.map((word) =>
+      window.getComputedStyle(word).animationName.split(',')[0]?.trim(),
+    );
 
     expect(new Set(durations).size).toBeGreaterThan(1);
     expect(new Set(delays).size).toBeGreaterThan(1);
-    expect(new Set(minOpacities).size).toBeGreaterThan(1);
+    expect(new Set(animationNames).size).toBeGreaterThan(1);
+    expect(durations).not.toEqual(['10.80s', '10.80s', '10.80s']);
+    expect(delays).not.toEqual(['0.00s', '-3.60s', '-7.20s']);
+    durations.forEach((duration) => {
+      expect(Number.parseFloat(duration)).toBeGreaterThanOrEqual(18);
+      expect(Number.parseFloat(duration)).toBeLessThanOrEqual(30);
+    });
+    delays.forEach((delay, index) => {
+      const delaySeconds = Number.parseFloat(delay);
+      const durationSeconds = Number.parseFloat(durations[index]);
+      const phaseRatio = Math.abs(delaySeconds) / durationSeconds;
+      expect(delaySeconds).toBeLessThanOrEqual(0);
+      expect(Math.abs(delaySeconds)).toBeLessThan(durationSeconds);
+      expect(phaseRatio).toBeGreaterThanOrEqual(0.14);
+      expect(phaseRatio).toBeLessThanOrEqual(0.7);
+    });
     expect(new Set(maxOpacities).size).toBeGreaterThan(1);
+    minOpacities.forEach((opacity) => {
+      expect(Number(opacity)).toBe(0);
+    });
+    maxOpacities.forEach((opacity) => {
+      expect(Number(opacity)).toBeLessThanOrEqual(0.6);
+    });
 
     const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
-    expect(injectedCss).toContain('16%,62%{opacity:var(--word-max-opacity)}');
-    expect(injectedCss).toContain('0%,100%{opacity:var(--word-min-opacity)}');
+    expect(injectedCss).toContain(
+      '0%,10%,100%{opacity:var(--word-min-opacity)}',
+    );
+    expect(injectedCss).toContain('18%,66%{opacity:var(--word-max-opacity)}');
+    expect(injectedCss).toContain('74%{opacity:var(--word-min-opacity)}');
+    expect(injectedCss).toContain(
+      '0%,14%,100%{opacity:var(--word-min-opacity)}',
+    );
+    expect(injectedCss).toContain('24%,70%{opacity:var(--word-max-opacity)}');
+    expect(injectedCss).toContain('78%{opacity:var(--word-min-opacity)}');
+    expect(injectedCss).toContain(
+      '0%,6%,100%{opacity:var(--word-min-opacity)}',
+    );
+    expect(injectedCss).toContain('14%,62%{opacity:var(--word-max-opacity)}');
+    expect(injectedCss).toContain('70%{opacity:var(--word-min-opacity)}');
   });
 
   it('follows every default plan index when no shape is hovered', async () => {
