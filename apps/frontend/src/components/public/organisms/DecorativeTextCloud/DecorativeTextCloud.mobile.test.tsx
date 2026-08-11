@@ -433,7 +433,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('waits after fading out old plan words before fading in the new layer', async () => {
+  it('crossfades old and new plan words at the same time', async () => {
     mockDesktopViewport();
 
     const shapeContents = [
@@ -498,7 +498,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
     expect(screen.getByText('競賽').parentElement).toHaveStyle({
       animationName: 'portalPlanWordsFadeIn',
-      animationDelay: '680ms',
+      animationDelay: '0ms',
     });
 
     act(() => {
@@ -513,6 +513,83 @@ describe('DecorativeTextCloud mobile labels', () => {
 
     expect(screen.queryByText('轉化')).not.toBeInTheDocument();
     expect(screen.getByText('競賽')).toBeInTheDocument();
+  });
+
+  it('does not duplicate shared decorative words while crossfading plans', async () => {
+    mockDesktopViewport();
+
+    const { rerender } = render(
+      <DecorativeTextCloud
+        shapeContents={[
+          {
+            words: [
+              { zh: '共用詞', en: 'shared' },
+              { zh: '舊詞', en: 'old' },
+            ],
+            photos: [],
+            label: ['藝術與設計', '菁英海外培訓計畫'],
+          },
+          {
+            words: [
+              { zh: '共用詞', en: 'shared' },
+              { zh: '新詞', en: 'new' },
+            ],
+            photos: [],
+            label: ['臺灣國際學生', '創意設計大賽'],
+          },
+        ]}
+        defaultIndex={0}
+        language="zh"
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('共用詞')).toBeInTheDocument();
+    });
+
+    vi.useFakeTimers();
+
+    rerender(
+      <DecorativeTextCloud
+        shapeContents={[
+          {
+            words: [
+              { zh: '共用詞', en: 'shared' },
+              { zh: '舊詞', en: 'old' },
+            ],
+            photos: [],
+            label: ['藝術與設計', '菁英海外培訓計畫'],
+          },
+          {
+            words: [
+              { zh: '共用詞', en: 'shared' },
+              { zh: '新詞', en: 'new' },
+            ],
+            photos: [],
+            label: ['臺灣國際學生', '創意設計大賽'],
+          },
+        ]}
+        defaultIndex={1}
+        language="zh"
+      />,
+    );
+
+    expect(screen.getAllByText('共用詞')).toHaveLength(1);
+    expect(screen.getByText('共用詞').parentElement).toHaveStyle({
+      animationName: 'portalPlanWordsFadeOut',
+    });
+    expect(screen.getByText('新詞').parentElement).toHaveStyle({
+      animationName: 'portalPlanWordsFadeIn',
+      animationDelay: '0ms',
+    });
+    expect(screen.queryByText('舊詞')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(680);
+    });
+
+    expect(screen.queryByText('舊詞')).not.toBeInTheDocument();
+    expect(screen.getByText('共用詞')).toBeInTheDocument();
   });
 
   it('shows every first-plan decorative word at initial load', async () => {

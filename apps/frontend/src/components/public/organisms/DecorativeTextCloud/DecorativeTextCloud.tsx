@@ -139,7 +139,7 @@ const DECORATIVE_WORD_VISIBLE_PHASES = [0.28, 0.44, 0.58, 0.36, 0.52] as const;
 const PLAN_WORDS_FADE_OUT_MS = 680;
 const PLAN_WORDS_GAP_MS = 0;
 const PLAN_WORDS_FADE_IN_MS = 520;
-const PLAN_WORDS_FADE_IN_DELAY_MS = PLAN_WORDS_FADE_OUT_MS + PLAN_WORDS_GAP_MS;
+const PLAN_WORDS_FADE_IN_DELAY_MS = PLAN_WORDS_GAP_MS;
 
 const DESKTOP_SHAPE_LABELS = [
   [
@@ -434,13 +434,16 @@ export function DecorativeTextCloud({
   );
 
   // 某計畫的裝飾文字散布位置。每個字只出現一組、不重複；詞數少於 maxWords 時以隱藏
-  // 佔位補齊到固定長度（沿用最後一個位置、visibility 控制顯隱）。供「進場層」與
-  // 「淡出層」共用（各帶不同的計畫 index）。
+  // 佔位補齊到固定長度（沿用最後一個位置、visibility 控制顯隱）。切換進場時可排除
+  // 舊層正在淡出的同詞，避免同一個詞在新舊 layer 同時重疊。
   const buildPositions = useCallback(
-    (idx: number): PlacedWord[] => {
+    (idx: number, excludeTexts?: ReadonlySet<string>): PlacedWord[] => {
       const texts = (shapeContents[idx]?.words ?? [])
         .map((w) => (language === 'en' ? (w.en ?? w.zh) : (w.zh ?? w.en)))
-        .filter((t): t is string => Boolean(t));
+        .filter(
+          (t): t is string =>
+            typeof t === 'string' && t.length > 0 && !excludeTexts?.has(t),
+        );
       const placed = placeWords(texts, mode);
       if (placed.length >= maxWords) return placed;
       const anchor = placed[placed.length - 1] ?? {
@@ -460,7 +463,7 @@ export function DecorativeTextCloud({
     [shapeContents, language, mode, maxWords],
   );
 
-  // 計畫切換時短暫保留舊文字層淡出，再讓新文字層淡入，避免跨計畫直接替換造成閃跳。
+  // 計畫切換時短暫保留舊文字層淡出，並讓新文字層同步淡入，避免跨計畫直接替換造成閃跳。
   // transId 也參與呼吸相位計算，讓每次切換後的可見／隱沒節奏都重新錯開。
   const [transId, setTransId] = useState(0);
   const transIdRef = useRef(0);
@@ -492,11 +495,13 @@ export function DecorativeTextCloud({
     return () => window.clearTimeout(id);
   }, [buildPositions, hovered, textIndex]);
 
-  // 目前計畫的裝飾文字位置。切換計畫時不疊舊層，避免新舊文字重疊。
-  const positions = useMemo(
-    () => buildPositions(textIndex),
-    [buildPositions, textIndex],
-  );
+  // 目前計畫的裝飾文字位置。切換期間排除舊層同詞，避免新舊相同文字疊在一起。
+  const positions = useMemo(() => {
+    const exitingTexts = exitingLayer
+      ? new Set(exitingLayer.positions.map((pos) => pos.text).filter(Boolean))
+      : undefined;
+    return buildPositions(textIndex, exitingTexts);
+  }, [buildPositions, exitingLayer, textIndex]);
   // hover 期間，照片依序輪換（取 hover 色塊對應計畫 displayedIndex 的照片）。
   // 進入 hover 時從第一張起、之後每隔 PHOTO_INTERVAL 循序播下一張、循環回第一張。
   const currentPhotoCount = photosByShape[displayedIndex]?.length ?? 0;
@@ -1101,7 +1106,7 @@ export function DecorativeTextCloud({
         })}
       </Box>
 
-      {/* 色塊周圍的裝飾文字 — 切換計畫時先讓舊層淡出，再讓新層淡入，避免直接替換閃跳。
+      {/* 色塊周圍的裝飾文字 — 切換計畫時舊層淡出、新層同步淡入，避免直接替換閃跳。
           橫向：散布於色塊上、下、左右周圍（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
           首載（transId 0）走 steady：一開始即全部可見（twinkle 負延遲鎖在 opacity=1 相位）、
           入場 left 從外側收回；後續切換直接進入各句自己的 twinkle 相位。 */}
