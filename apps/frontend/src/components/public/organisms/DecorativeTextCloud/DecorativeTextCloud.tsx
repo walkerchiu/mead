@@ -136,6 +136,9 @@ const DECORATIVE_WORD_TWINKLE_NAMES = [
 ] as const;
 const DECORATIVE_WORD_INITIAL_PHASES = [0.34, 0.42, 0.3] as const;
 const DECORATIVE_WORD_VISIBLE_PHASES = [0.28, 0.44, 0.58, 0.36, 0.52] as const;
+const PLAN_WORDS_FADE_OUT_MS = 520;
+const PLAN_WORDS_FADE_IN_MS = 520;
+const PLAN_WORDS_FADE_IN_DELAY_MS = 120;
 
 const DESKTOP_SHAPE_LABELS = [
   [
@@ -229,6 +232,13 @@ interface PlacedWord {
   side: 'left' | 'right';
   /** 補齊用的隱藏佔位（詞數少於最大值時常駐但不顯示） */
   hidden?: boolean;
+}
+
+interface ExitingWordLayer {
+  key: string;
+  textIndex: number;
+  transId: number;
+  positions: PlacedWord[];
 }
 
 /**
@@ -449,18 +459,37 @@ export function DecorativeTextCloud({
     [shapeContents, language, mode, maxWords],
   );
 
-  // 計畫切換時只重掛目前文字層，不保留舊文字層，避免新舊計畫詞彙在同一位置疊字。
+  // 計畫切換時短暫保留舊文字層淡出，再讓新文字層淡入，避免跨計畫直接替換造成閃跳。
   // transId 也參與呼吸相位計算，讓每次切換後的可見／隱沒節奏都重新錯開。
   const [transId, setTransId] = useState(0);
+  const transIdRef = useRef(0);
   const prevTextRef = useRef(textIndex);
+  const [exitingLayer, setExitingLayer] = useState<ExitingWordLayer | null>(
+    null,
+  );
   useIsoLayoutEffect(() => {
     const fromText = prevTextRef.current;
     prevTextRef.current = textIndex;
     if (fromText === textIndex || prefersReducedMotion()) {
       return;
     }
-    setTransId((n) => n + 1);
-  }, [hovered, textIndex]);
+    const exitingTransId = transIdRef.current;
+    const nextTransId = exitingTransId + 1;
+    transIdRef.current = nextTransId;
+    setExitingLayer({
+      key: `out-${nextTransId}-${fromText}`,
+      textIndex: fromText,
+      transId: exitingTransId,
+      positions: buildPositions(fromText),
+    });
+    setTransId(nextTransId);
+    const id = window.setTimeout(() => {
+      setExitingLayer((layer) =>
+        layer?.key === `out-${nextTransId}-${fromText}` ? null : layer,
+      );
+    }, PLAN_WORDS_FADE_OUT_MS);
+    return () => window.clearTimeout(id);
+  }, [buildPositions, hovered, textIndex]);
 
   // 目前計畫的裝飾文字位置。切換計畫時不疊舊層，避免新舊文字重疊。
   const positions = useMemo(
@@ -548,8 +577,10 @@ export function DecorativeTextCloud({
     i: number,
     phase: 'steady' | 'in',
     keyStr: string,
+    layerTextIndex = textIndex,
+    layerTransId = transId,
   ) => {
-    const breathSeed = i + transId * 3 + textIndex * 5;
+    const breathSeed = i + layerTransId * 3 + layerTextIndex * 5;
     const durationRand = ((breathSeed * 37 + 17) % 100) / 100;
     const breathDuration =
       DECORATIVE_WORD_MIN_CYCLE_S +
@@ -684,6 +715,58 @@ export function DecorativeTextCloud({
     );
   };
 
+  const renderWordLayer = (
+    layerPositions: PlacedWord[],
+    phase: 'steady' | 'in',
+    keyPrefix: string,
+    layerTextIndex: number,
+    layerTransId: number,
+    fade: 'steady' | 'in' | 'out',
+  ) => (
+    <Box
+      key={keyPrefix}
+      aria-hidden
+      sx={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        ...(fade === 'in'
+          ? {
+              opacity: 0,
+              animationName: 'portalPlanWordsFadeIn',
+              animationDuration: `${PLAN_WORDS_FADE_IN_MS}ms`,
+              animationDelay: `${PLAN_WORDS_FADE_IN_DELAY_MS}ms`,
+              animationTimingFunction: 'ease-out',
+              animationFillMode: 'both',
+            }
+          : fade === 'out'
+            ? {
+                opacity: 1,
+                animationName: 'portalPlanWordsFadeOut',
+                animationDuration: `${PLAN_WORDS_FADE_OUT_MS}ms`,
+                animationTimingFunction: 'ease-in',
+                animationFillMode: 'both',
+              }
+            : {}),
+        '@media (prefers-reduced-motion: reduce)': {
+          animationName: 'none',
+          opacity: 1,
+        },
+      }}
+    >
+      {layerPositions.map((pos, i) =>
+        renderWord(
+          pos,
+          i,
+          phase,
+          `${keyPrefix}-${i}`,
+          layerTextIndex,
+          layerTransId,
+        ),
+      )}
+    </Box>
+  );
+
   return (
     <Box
       sx={{
@@ -713,6 +796,14 @@ export function DecorativeTextCloud({
           '0%, 6%, 100%': { opacity: 'var(--word-min-opacity)' },
           '14%, 62%': { opacity: 'var(--word-max-opacity)' },
           '70%': { opacity: 'var(--word-min-opacity)' },
+        },
+        '@keyframes portalPlanWordsFadeOut': {
+          from: { opacity: 1 },
+          to: { opacity: 0 },
+        },
+        '@keyframes portalPlanWordsFadeIn': {
+          from: { opacity: 0 },
+          to: { opacity: 1 },
         },
         // 只在父層提供 base opacity；animation shorthand 留給 span 自己設，
         // 否則此 selector specificity (0,2,0) 會壓過 span sx 的 (0,1,0)，把
@@ -1000,17 +1091,27 @@ export function DecorativeTextCloud({
         })}
       </Box>
 
-      {/* 色塊周圍的裝飾文字 — 切換計畫時維持單一文字層，避免新舊文字疊在同一位置。
+      {/* 色塊周圍的裝飾文字 — 切換計畫時先讓舊層淡出，再讓新層淡入，避免直接替換閃跳。
           橫向：散布於色塊上、下、左右周圍（中文直書、英文 −90°）；直向：左右兩欄、正立橫書。
           首載（transId 0）走 steady：一開始即全部可見（twinkle 負延遲鎖在 opacity=1 相位）、
           入場 left 從外側收回；後續切換直接進入各句自己的 twinkle 相位。 */}
-      {positions.map((pos, i) =>
-        renderWord(
-          pos,
-          i,
-          transId === 0 ? 'steady' : 'in',
-          `in-${transId}-${i}`,
-        ),
+      {exitingLayer
+        ? renderWordLayer(
+            exitingLayer.positions,
+            'in',
+            exitingLayer.key,
+            exitingLayer.textIndex,
+            exitingLayer.transId,
+            'out',
+          )
+        : null}
+      {renderWordLayer(
+        positions,
+        transId === 0 ? 'steady' : 'in',
+        `in-${transId}-${textIndex}`,
+        textIndex,
+        transId,
+        transId === 0 ? 'steady' : 'in',
       )}
 
       {/* 底部固定標語 — 對齊 Figma 1:38 / 1:39 / 1:40：

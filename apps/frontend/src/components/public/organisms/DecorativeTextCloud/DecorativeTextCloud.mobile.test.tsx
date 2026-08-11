@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { waitFor } from '@testing-library/react';
+import { act, waitFor } from '@testing-library/react';
 
 import { render, screen } from '@/test/test-utils';
 
@@ -57,6 +57,7 @@ function mockDesktopViewport() {
 
 describe('DecorativeTextCloud mobile labels', () => {
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -432,7 +433,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('switches decorative words without stacking old and new layers', async () => {
+  it('crossfades decorative words between plans before removing the old layer', async () => {
     mockDesktopViewport();
 
     const shapeContents = [
@@ -468,6 +469,8 @@ describe('DecorativeTextCloud mobile labels', () => {
       expect(screen.getByText('轉化')).toBeInTheDocument();
     });
 
+    vi.useFakeTimers();
+
     rerender(
       <DecorativeTextCloud
         shapeContents={shapeContents}
@@ -476,29 +479,31 @@ describe('DecorativeTextCloud mobile labels', () => {
       />,
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('競賽')).toBeInTheDocument();
+    expect(screen.getByText('競賽')).toBeInTheDocument();
+
+    expect(screen.getByText('轉化')).toBeInTheDocument();
+    const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
+    expect(injectedCss).toContain(
+      'portalPlanWordsFadeOut{from{opacity:1}to{opacity:0}}',
+    );
+    expect(injectedCss).toContain(
+      'portalPlanWordsFadeIn{from{opacity:0}to{opacity:1}}',
+    );
+    expect(screen.getByText('轉化').parentElement).toHaveStyle({
+      animationName: 'portalPlanWordsFadeOut',
+      pointerEvents: 'none',
+    });
+    expect(screen.getByText('競賽').parentElement).toHaveStyle({
+      animationName: 'portalPlanWordsFadeIn',
+      animationDelay: '120ms',
+    });
+
+    act(() => {
+      vi.advanceTimersByTime(520);
     });
 
     expect(screen.queryByText('轉化')).not.toBeInTheDocument();
-    const injectedCss = (document.head.textContent ?? '').replace(/\s|;/g, '');
-    expect(injectedCss).not.toContain(
-      'portalWordFadeOut{from{opacity:1}to{opacity:0}}',
-    );
-    expect(injectedCss).not.toContain(
-      'portalWordFadeOut{from{opacity:1}to{opacity:0.08}}',
-    );
-    expect(injectedCss).not.toContain(
-      'portalWordFadeIn{from{opacity:0.08}to{opacity:1}}',
-    );
-    expect(screen.getByText('競賽').style.animationDuration).toMatch(
-      /^\d+(?:\.\d+)?s$/,
-    );
-    expect(screen.getByText('延續').style.animationDelay).toMatch(
-      /^-\d+(?:\.\d+)?s$/,
-    );
-    expect(screen.getByText('競賽').style.animationDuration).not.toContain(',');
-    expect(screen.getByText('延續').style.animationDelay).not.toContain(',');
+    expect(screen.getByText('競賽')).toBeInTheDocument();
   });
 
   it('shows every first-plan decorative word at initial load', async () => {
