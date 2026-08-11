@@ -433,7 +433,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('crossfades decorative words between plans before removing the old layer', async () => {
+  it('waits after fading out old plan words before fading in the new layer', async () => {
     mockDesktopViewport();
 
     const shapeContents = [
@@ -493,13 +493,22 @@ describe('DecorativeTextCloud mobile labels', () => {
       animationName: 'portalPlanWordsFadeOut',
       pointerEvents: 'none',
     });
+    expect(screen.getByText('轉化')).toHaveStyle({
+      animationName: 'none',
+    });
     expect(screen.getByText('競賽').parentElement).toHaveStyle({
       animationName: 'portalPlanWordsFadeIn',
-      animationDelay: '120ms',
+      animationDelay: '520ms',
     });
 
     act(() => {
-      vi.advanceTimersByTime(520);
+      vi.advanceTimersByTime(519);
+    });
+
+    expect(screen.getByText('轉化')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
     });
 
     expect(screen.queryByText('轉化')).not.toBeInTheDocument();

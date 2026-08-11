@@ -137,8 +137,9 @@ const DECORATIVE_WORD_TWINKLE_NAMES = [
 const DECORATIVE_WORD_INITIAL_PHASES = [0.34, 0.42, 0.3] as const;
 const DECORATIVE_WORD_VISIBLE_PHASES = [0.28, 0.44, 0.58, 0.36, 0.52] as const;
 const PLAN_WORDS_FADE_OUT_MS = 520;
+const PLAN_WORDS_GAP_MS = 0;
 const PLAN_WORDS_FADE_IN_MS = 520;
-const PLAN_WORDS_FADE_IN_DELAY_MS = 120;
+const PLAN_WORDS_FADE_IN_DELAY_MS = PLAN_WORDS_FADE_OUT_MS + PLAN_WORDS_GAP_MS;
 
 const DESKTOP_SHAPE_LABELS = [
   [
@@ -569,13 +570,14 @@ export function DecorativeTextCloud({
    * 渲染單一裝飾字。phase：
    *  - 'steady'：首載狀態 — twinkle 閃爍（一開始即可見）+ 橫向的入場 left 壓縮。
    *  - 'in'    ：切換後新計畫的字 — 直接進入各自錯開的 twinkle 相位。
+   *  - 'out'   ：切換時舊計畫的字 — 停止 twinkle，只交給整層 fade out。
    * 動畫名／節奏放在 sx（讓 prefers-reduced-motion 能覆寫 animationName:none），
    * duration／delay／CSS 變數放 inline style。
    */
   const renderWord = (
     pos: PlacedWord,
     i: number,
-    phase: 'steady' | 'in',
+    phase: 'steady' | 'in' | 'out',
     keyStr: string,
     layerTextIndex = textIndex,
     layerTransId = transId,
@@ -620,7 +622,15 @@ export function DecorativeTextCloud({
 
     let animSx: Record<string, string | number>;
     let animStyle: React.CSSProperties;
-    if (phase === 'in') {
+    if (phase === 'out') {
+      animSx = {
+        animationName: 'none',
+        opacity: maxOpacity,
+      };
+      animStyle = {
+        ...breathVars,
+      };
+    } else if (phase === 'in') {
       animSx = {
         animationName: twinkleName,
         animationTimingFunction: 'ease-in-out',
@@ -717,7 +727,7 @@ export function DecorativeTextCloud({
 
   const renderWordLayer = (
     layerPositions: PlacedWord[],
-    phase: 'steady' | 'in',
+    phase: 'steady' | 'in' | 'out',
     keyPrefix: string,
     layerTextIndex: number,
     layerTransId: number,
@@ -1098,7 +1108,7 @@ export function DecorativeTextCloud({
       {exitingLayer
         ? renderWordLayer(
             exitingLayer.positions,
-            'in',
+            'out',
             exitingLayer.key,
             exitingLayer.textIndex,
             exitingLayer.transId,
