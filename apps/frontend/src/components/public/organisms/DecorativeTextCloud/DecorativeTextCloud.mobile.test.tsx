@@ -114,7 +114,7 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
   });
 
-  it('uses consistent desktop y coordinates for every vertical shape label line', async () => {
+  it('vertically centers desktop shape labels while keeping the left line lower', async () => {
     mockDesktopViewport();
 
     render(
@@ -138,12 +138,12 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
 
     const desktopLabels = [
-      { text: '藝術與設計', x: '529', y: '228' },
-      { text: '菁英海外培訓計畫', x: '497', y: '246' },
-      { text: '臺灣國際學生', x: '746.84', y: '228' },
-      { text: '創意設計大賽', x: '711.16', y: '246' },
-      { text: '鼓勵學生參加', x: '961', y: '228' },
-      { text: '藝術與設計類國際競賽計畫', x: '933', y: '246' },
+      { text: '藝術與設計', x: '529', y: '215.68' },
+      { text: '菁英海外培訓計畫', x: '497', y: '233.68' },
+      { text: '臺灣國際學生', x: '746.84', y: '228.26' },
+      { text: '創意設計大賽', x: '711.16', y: '246.26' },
+      { text: '鼓勵學生參加', x: '961', y: '190.52' },
+      { text: '藝術與設計類國際競賽計畫', x: '933', y: '208.52' },
     ] as const;
 
     desktopLabels.forEach(({ text, x, y }) => {
@@ -160,10 +160,9 @@ describe('DecorativeTextCloud mobile labels', () => {
       ['臺灣國際學生', '創意設計大賽'],
       ['鼓勵學生參加', '藝術與設計類國際競賽計畫'],
     ].forEach(([first, second]) => {
-      expect(screen.getByText(first)).not.toHaveAttribute(
-        'y',
-        screen.getByText(second).getAttribute('y'),
-      );
+      expect(
+        Number(screen.getByText(second).getAttribute('y')),
+      ).toBeGreaterThan(Number(screen.getByText(first).getAttribute('y')));
     });
   });
 

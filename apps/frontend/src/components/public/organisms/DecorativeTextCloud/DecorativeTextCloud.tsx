@@ -126,6 +126,9 @@ const LAYOUT = {
 } as const;
 
 const SHAPE_LABEL_COLOR = '#E3E3E3';
+const SHAPE_LABEL_FONT_SIZE = 12.58;
+const DESKTOP_SHAPE_LABEL_CENTER_Y = 275;
+const DESKTOP_SHAPE_LABEL_STAGGER_Y = 18;
 const DECORATIVE_WORD_COLOR = '#A6A6A6';
 const DECORATIVE_WORD_MIN_CYCLE_S = 18;
 const DECORATIVE_WORD_CYCLE_SPREAD_S = 12;
@@ -155,6 +158,33 @@ const DESKTOP_SHAPE_LABELS = [
     { x: 933, y: 246 },
   ],
 ] as const;
+
+function estimateVerticalShapeLabelHeight(text: string) {
+  return Array.from(text).length * SHAPE_LABEL_FONT_SIZE;
+}
+
+function roundSvgCoordinate(value: number) {
+  return Number(value.toFixed(2));
+}
+
+function desktopShapeLabelPoints(shapeIndex: number, label: readonly string[]) {
+  const xPoints = DESKTOP_SHAPE_LABELS[shapeIndex] ?? DESKTOP_SHAPE_LABELS[0];
+  const rightHeight = estimateVerticalShapeLabelHeight(label[0] ?? '');
+  const leftHeight = estimateVerticalShapeLabelHeight(label[1] ?? '');
+  const visualHeight = Math.max(
+    rightHeight,
+    DESKTOP_SHAPE_LABEL_STAGGER_Y + leftHeight,
+  );
+  const rightY = roundSvgCoordinate(
+    DESKTOP_SHAPE_LABEL_CENTER_Y - visualHeight / 2,
+  );
+  const leftY = roundSvgCoordinate(rightY + DESKTOP_SHAPE_LABEL_STAGGER_Y);
+
+  return [
+    { x: xPoints[0].x, y: rightY },
+    { x: xPoints[1].x, y: leftY },
+  ] as const;
+}
 
 const STACKED_SHAPE_LABELS = {
   t: [
@@ -1017,8 +1047,7 @@ export function DecorativeTextCloud({
             : undefined;
           const isHovered = hovered === i;
           const label = shapeContents[i]?.label?.slice(0, 2) ?? [];
-          const desktopLabelPoints =
-            DESKTOP_SHAPE_LABELS[i] ?? DESKTOP_SHAPE_LABELS[0];
+          const desktopLabelPoints = desktopShapeLabelPoints(i, label);
           const stackedLabelPoints =
             mode === 'h'
               ? null
@@ -1073,7 +1102,7 @@ export function DecorativeTextCloud({
                           y={point.y}
                           fill={SHAPE_LABEL_COLOR}
                           fontFamily='Inter, var(--font-noto-sans-tc, "Noto Sans TC"), sans-serif'
-                          fontSize={12.58}
+                          fontSize={SHAPE_LABEL_FONT_SIZE}
                           fontWeight={400}
                           letterSpacing="0"
                           textAnchor="start"
