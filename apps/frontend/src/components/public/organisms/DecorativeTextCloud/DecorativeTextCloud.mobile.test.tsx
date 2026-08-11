@@ -498,11 +498,11 @@ describe('DecorativeTextCloud mobile labels', () => {
     });
     expect(screen.getByText('競賽').parentElement).toHaveStyle({
       animationName: 'portalPlanWordsFadeIn',
-      animationDelay: '520ms',
+      animationDelay: '680ms',
     });
 
     act(() => {
-      vi.advanceTimersByTime(519);
+      vi.advanceTimersByTime(679);
     });
 
     expect(screen.getByText('轉化')).toBeInTheDocument();
